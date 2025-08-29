@@ -1,0 +1,6 @@
+2025-07-14 14:55:08 [[31MERROR[39M]: uncaughtException: Cannot read properties of null (reading 'id')
+TypeError: Cannot read properties of null (reading 'id')
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp2/backend/erp4.0/dist/modules/services/logistics/controllers/ShippingOrders.controller.js:1032:36
+    at Array.map (<anonymous>)
+    at updateComplete (file:///C:/Users/Dioba/Desktop/webshauProjects/erp2/backend/erp4.0/dist/modules/services/logistics/controllers/ShippingOrders.controller.js:1030:63)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)

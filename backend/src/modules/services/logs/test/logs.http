@@ -1,0 +1,44 @@
+### Obtener todos los logs
+GET http://localhost:3003/logs/logs HTTP/1.0
+Accept: application/json
+
+### Obtener un log por ID
+GET http://localhost:3003/logs/logs/id/1 HTTP/1.0
+Accept: application/json
+
+### Obtener un log por nombre de operación
+GET http://localhost:3003/logs/logs/operation-name/operacionEjemplo HTTP/1.0
+Accept: application/json
+
+### Obtener un log por nombre de usuario
+GET http://localhost:3003/logs/logs/user-name/jane_wayne@hotmail.com HTTP/1.0
+Accept: application/json
+
+### Obtener un log por nombre de tabla
+GET http://localhost:3003/logs/logs/table-name/tablaEjemplo HTTP/1.0
+Accept: application/json
+
+### Crear un nuevo log
+POST http://localhost:3003/logs/logs HTTP/1.0
+Content-Type: application/json
+
+{
+    "operation_id": 1,
+    "table_id": 2,
+    "user_id": 3,
+    "old_data": {},
+    "new_data": {},
+    "message": "Se creó una nueva entrada en la tabla"
+}
+
+### Actualizar un log
+PATCH http://localhost:3003/logs/logs/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "message": "Se actualizó la entrada en la tabla"
+}
+
+### Eliminar un log
+DELETE http://localhost:3003/logs/logs/1 HTTP/1.0
+Accept: application/json

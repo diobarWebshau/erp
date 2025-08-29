@@ -1,0 +1,194 @@
+.container {
+
+    /* distribucion flex*/
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    font-family: inherit;
+    font-size: inherit;
+    
+    /* distribucion box*/
+    padding: 1rem;
+    
+    /* estilos */
+    user-select: none;
+}
+
+.label {
+    /* distribucion box */
+    margin-bottom: 2rem;
+    
+    /* distribucion */
+    display: block;
+    
+    /* estilos */
+    color: var(--color-theme-primary);
+    text-align: center;
+}
+
+.track {
+    /* position */
+    position: relative;
+
+    /* dimension */
+    height: 5px;
+    width: 100%;
+    
+    /* distribucion flex */
+    display: flex;
+    
+    /* distribucion box */
+    border-radius: 6px;
+}
+
+.marksContainer {
+    /* position */
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    /* dimension */
+    height: 10px;
+    width: 100%;
+    
+    /* distribucion flex */
+    display: flex;
+    justify-content: space-between;
+
+    /* estilos */
+    pointer-events: none;
+    user-select: none;
+}
+
+.mark {
+    /* dimension */
+    width: 2px;
+    height: 10px;
+    
+    /* estilos */
+    background-color: var(--color-theme-neutral-primary);
+    opacity: 0.5;
+}
+
+.thumb {
+
+    /* position */
+    position: relative;
+    
+    /* dimension */
+    height: 12px;
+    width: 12px;
+
+    /* distribucion box */
+    border-radius: 50%;
+    
+    /* distribucion flex */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* estilos */
+    background-color: var(--color-theme-neutral-primary);
+    cursor: pointer;
+}
+
+.thumbLabel {
+    /* position */
+    position: absolute;
+    top: -30px;
+
+    /* distribucion box */
+    padding-left: 6px;
+    padding-right: 6px;
+    border-radius: 10px;
+
+    /* estilos */
+    color: var(--color-theme-font-white);
+    background-color: var(--color-theme-neutral-primary);
+    white-space: nowrap;
+    user-select: none;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+
+}
+
+.thumbInnerDot {
+    /* dimension */
+    height: 8px;
+    width: 8px;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    border-radius: 50%;
+}
+
+/*  Section inputs */
+
+.sectionInputContainer {
+
+    /* distribucion flex*/
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    /* estilos */
+}
+
+.inputContainer {
+    /* dimension */
+    width: 40%;
+
+    /* distribucion flex*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.input {
+    /* dimension */
+    width: 100%;
+    height: 30px;
+    min-width: 0%;
+    max-width: 100%;
+
+    /* distribuccion box */
+    border-radius: 10px;
+    padding-left: 0.5rem;
+    border: 1px solid var(--color-theme-background);
+    
+    /* estilos */
+    font-size: 14px;
+    background-color: var(--color-theme-border-table);
+    color: var(--color-theme-font-black);
+    outline: none;
+}
+
+.labelMin,
+.labelMax {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion */
+    display: block;
+    text-align: center;
+    
+    /* distribucion box */
+    margin-bottom: 1rem;
+    
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+.symbolRange {
+    /* dimension */
+    width: 20px;
+
+    /* distribucion box*/
+    margin-top: 2rem;
+    border: 2px solid var(--color-theme-font-black);
+
+}

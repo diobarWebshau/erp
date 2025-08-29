@@ -1,0 +1,45 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\.73602891792727e6f5e6f7edc51d6955cd7e27f0-audit.json",
+    "files": [
+        {
+            "date": 1750872915152,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-06-25.log",
+            "hash": "e60e7aea75536db694d83e946c8559f581114d2f9bbf0290386e7da86e2ac6a2"
+        },
+        {
+            "date": 1750951360222,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-06-26.log",
+            "hash": "822b0a55576263b210710fa1b73c381383dd4351a42698f31ec0b42e8eb1839a"
+        },
+        {
+            "date": 1751383185537,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-01.log",
+            "hash": "1ec2e6b3d18faf46f230c8df3187d169a4973d14925e1df253427239baa09e97"
+        },
+        {
+            "date": 1751469396907,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-02.log",
+            "hash": "4406b6cda9ca618a806ea1dd6b7c00e4f7fb9150dffc422c4ca56b251c7ecee7"
+        },
+        {
+            "date": 1751557290873,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-03.log",
+            "hash": "7870522ca0a83f9719d25106f5675f38d9180501f3b76241c8b872978e1dd922"
+        },
+        {
+            "date": 1751642234796,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-04.log",
+            "hash": "384629ac539805f75024cfe008c243c1c84655966441fde4e85dad32f8bcac3e"
+        },
+        {
+            "date": 1751904910876,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-07.log",
+            "hash": "2c629f465b86d175f2176a7cf34d2599a31027a96ecffe04d9f5932e79fad279"
+        }
+    ],
+    "hashType": "sha256"
+}

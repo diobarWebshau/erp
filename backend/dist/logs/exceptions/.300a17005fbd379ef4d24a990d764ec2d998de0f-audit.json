@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\dfsdferp2\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\.300a17005fbd379ef4d24a990d764ec2d998de0f-audit.json",
+    "files": [
+        {
+            "date": 1751944497228,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\dfsdferp2\\erp\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-07.log",
+            "hash": "42ca183b368856c8dbf80c18d37438fd7b4aecd612aa6aaf23aad5a0e9da0088"
+        }
+    ],
+    "hashType": "sha256"
+}

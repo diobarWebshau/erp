@@ -1,0 +1,32 @@
+### get
+GET http://localhost:3003/inventories/inventories HTTP/1.0
+
+### getbyid
+GET http://localhost:3003/inventories/inventories/id/2 HTTP/1.0
+
+### POST
+POST http://localhost:3003/inventories/inventories/ HTTP/1.0
+Content-Type: application/json
+
+{
+    "stock": 80.5000,
+    "minimum_stock": 30.0000,
+    "maximum_stock": 200.0000,
+    "lead_time": 3
+}
+
+### PATCH
+PATCH http://localhost:3003/inventories/inventories/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "minimum_stock": 0.0000,
+    "maximum_stock": 200.0000
+}
+
+### delete
+DELETE http://localhost:3003/inventories/inventories/1 HTTP/1.0
+
+
+### GETDETAILS
+GET http://localhost:3003/inventories/inventories/details HTTP/1.0

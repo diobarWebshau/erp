@@ -1,0 +1,503 @@
+2025-08-11 08:27:50 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 09:25:28 [[31MERROR[39M]: uncaughtException: Transaction cannot be rolled back because it has been finished with state: commit
+Error: Transaction cannot be rolled back because it has been finished with state: commit
+    at Transaction.rollback (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\sequelize\lib\transaction.js:59:13)
+    at createComplete (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/modules/features/productions/controllers/PurchasedOrderVProduction.controller.js:616:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-08-11 09:29:50 [[31MERROR[39M]: uncaughtException: Transaction cannot be rolled back because it has been finished with state: commit
+Error: Transaction cannot be rolled back because it has been finished with state: commit
+    at Transaction.rollback (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\sequelize\lib\transaction.js:59:13)
+    at createComplete (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/modules/features/productions/controllers/PurchasedOrderVProduction.controller.js:616:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-08-11 09:30:01 [[31MERROR[39M]: uncaughtException: Transaction cannot be rolled back because it has been finished with state: commit
+Error: Transaction cannot be rolled back because it has been finished with state: commit
+    at Transaction.rollback (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\sequelize\lib\transaction.js:59:13)
+    at createComplete (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/modules/features/productions/controllers/PurchasedOrderVProduction.controller.js:616:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-08-11 09:42:58 [[31MERROR[39M]: uncaughtException: Transaction cannot be rolled back because it has been finished with state: commit
+Error: Transaction cannot be rolled back because it has been finished with state: commit
+    at Transaction.rollback (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\sequelize\lib\transaction.js:59:13)
+    at createComplete (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/modules/features/productions/controllers/PurchasedOrderVProduction.controller.js:617:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-08-11 09:43:57 [[31MERROR[39M]: uncaughtException: Transaction cannot be rolled back because it has been finished with state: commit
+Error: Transaction cannot be rolled back because it has been finished with state: commit
+    at Transaction.rollback (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\sequelize\lib\transaction.js:59:13)
+    at createComplete (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/modules/features/productions/controllers/PurchasedOrderVProduction.controller.js:617:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-08-11 09:45:40 [[31MERROR[39M]: uncaughtException: Transaction cannot be rolled back because it has been finished with state: commit
+Error: Transaction cannot be rolled back because it has been finished with state: commit
+    at Transaction.rollback (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\sequelize\lib\transaction.js:59:13)
+    at createComplete (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/modules/features/productions/controllers/PurchasedOrderVProduction.controller.js:617:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-08-11 10:57:50 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 11:02:51 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 11:06:01 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 11:11:48 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 11:36:47 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 12:38:00 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 12:38:02 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 13:38:18 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 13:38:20 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 14:38:30 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 14:38:32 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 14:43:01 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 14:47:16 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 15:08:58 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 15:59:55 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 15:59:56 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 16:07:52 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 16:09:10 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 16:10:01 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 16:10:56 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 16:13:08 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 16:14:56 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 17:27:48 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 17:27:50 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 18:23:56 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 18:26:11 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 18:27:08 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 18:28:59 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 18:30:34 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:29:39 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:29:41 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:31:18 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:31:35 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:52:17 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:52:47 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:53:57 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 19:59:20 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 22:36:21 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 22:36:23 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 22:37:32 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 23:37:33 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-08-11 23:37:35 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp_webshau\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp_webshau/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)

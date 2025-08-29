@@ -1,0 +1,874 @@
+.container {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "headerSection" auto
+        "formSection" 1fr
+        / 100% 100%;
+    gap: 1rem;
+
+    /* distribuccion box */
+    padding: 2rem;
+
+    /* estilos */
+    background-color: var(--color-theme-background);
+    border-radius: 15px;
+
+}
+
+/* *************** Header *************** */
+
+.headerSection {
+    grid-area: headerSection;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    gap: 0.5rem;
+}
+
+.headerSection>*:not(:last-child) {
+    /* distribucion padre*/
+    flex-grow: 1;
+    flex-basis: auto;
+    flex-shrink: 1;
+}
+
+.headerSection>*:last-child {
+    /* distribucion padre*/
+    flex-grow: 0;
+    flex-basis: auto;
+    flex-shrink: 1;
+}
+
+.clientSection {
+    display: flex;
+    justify-content: start;
+
+}
+
+/* *************** Header *************** */
+
+.headerSection {
+    grid-area: headerSection;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    gap: 0.5rem;
+}
+
+.headerSection>*:not(:last-child) {
+    /* distribucion padre*/
+    flex-grow: 1;
+    flex-basis: auto;
+    flex-shrink: 1;
+}
+
+.headerSection>*:last-child {
+    /* distribucion padre*/
+    flex-grow: 0;
+    flex-basis: auto;
+    flex-shrink: 1;
+}
+
+.clientSection {
+    display: flex;
+    justify-content: start;
+
+}
+
+
+/* ? *************** FirstBlock *************** */
+
+.firstBlock {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+
+}
+
+.firstBlock h2 {
+    /* estilos */
+    font-family: inherit;
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+
+.clientOrderSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+
+.clientOrderSection p {
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.AddressOrderSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+
+
+}
+
+.AddressOrderSection p {
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.buttonPencil {
+    height: 100%;
+    cursor: pointer;
+}
+
+.iconPencil {
+    height: 100%;
+}
+
+
+
+/* ? *************** SecondBlock *************** */
+
+.secondBlock {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+
+}
+
+.containerDescriptionDate {
+    /* dimension */
+    width: 60%;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    gap: 0.1rem;
+
+}
+
+.containerDate p {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+
+
+/* ? *************** ThirdBlock *************** */
+
+.thirdBlock {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    gap: 0.5rem;
+}
+
+.thirdBlock dt {
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-theme-primary);
+}
+
+.thirdBlock dd {
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-theme-font-black);
+}
+
+
+/* Contenedor de fechas */
+
+.containerMainDayPickerFieldDeliver,
+.containerMainDayPickerFieldCreation {
+    /* dimension */
+    width: 100%;
+}
+
+.containerFieldDayPickerFieldDeliver,
+.containerFieldDayPickerFieldCreation {
+    /* dimension */
+    height: 30px;
+    width: 62%;
+}
+
+.inputDayPickerFieldCreation,
+.inputDayPickerFieldDeliver {
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 15px;
+    color: var(--color-theme-font-black);
+    font-size: 14px;
+}
+
+.inputDayPickerFieldCreation:focus,
+.inputDayPickerFieldDeliver:focus {
+    outline: none;
+}
+
+.labelDayPickerFieldDeliverValidate,
+.labelDayPickerFieldCreationValidate,
+.labelDayPickerFieldDeliver,
+.labelDayPickerFieldCreation {
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    flex-basis: 38%;
+    color: var(--color-theme-primary);
+}
+
+.inputDayPickerFieldCreationValidate::placeholder,
+.inputDayPickerFieldDeliverVidate::placeholder {
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-alert);
+}
+
+.inputDayPickerFieldCreationValidate,
+.inputDayPickerFieldDeliverVidate {
+    /* estilos */
+    font-size: 14px;
+    border: 1px solid var(--color-alert);
+    border-radius: 15px;
+    background-color: var(--color-theme-font-white);
+}
+
+.iconDayPickerField {
+    /* dimension */
+    width: 20px;
+    height: 20px;
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+.dayPicker {
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.containerPopoverDayPickerField {
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-border-table);
+}
+
+/* ? nameClientContainer */
+
+.subTitleContainer {
+    /* dimension */
+    width: fit-content;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+
+}
+
+.subTitleContainer p {
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.buttonPencil {
+    height: 100%;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    padding: 0.25rem;
+}
+
+
+.iconPencil {
+    width: 16px;
+    height: 16px;
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+
+/* *************** Form *************** */
+
+.formSection {
+    grid-area: formSection;
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: grid;
+    grid-template:
+        "bodySection" 1fr
+        "footerSection" auto
+        / 100%;
+    gap: 1rem;
+}
+
+
+.validation {
+    /* dimension */
+    width: 100%;
+    height: 20px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+
+    /* estilos */
+    color: var(--color-alert);
+}
+
+
+/* ? bodySection */
+
+.bodySection {
+    grid-area: bodySection;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ? ExtraComponents */
+
+.containerExtraComponents {
+    position: static;
+    /* o relative si es necesario */
+    z-index: auto;
+    /* sin stacking context innecesario */
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+}
+
+.extraComponentsFadeButton {
+    /* dimension */
+    width: 200px;
+    height: 45px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    z-index: 5000;
+
+    /* distribuccion box */
+    border-radius: 15px;
+    cursor: pointer;
+
+    background: linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
+}
+
+.extraComponentsFadeButton:hover {
+    background: var(--color-theme-primary-light);
+}
+
+.extraComponentsFadeButtonSpan {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.extraComponentsFadeButtonLabel {
+    color: var(--color-theme-font-white);
+}
+
+.extraComponentsFadeButtonIcon {
+    color: var(--color-theme-font-white);
+    width: 15px;
+    height: 15px;
+}
+
+.addProductModal {
+    /* dimension */
+    width: 40%;
+    height: 70%;
+}
+
+.addProductModalCustomContainer {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+
+    /* distribuccion box */
+    padding: 1rem;
+}
+
+/* ? footerSection */
+
+.footerSection {
+    grid-area: footerSection;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+}
+
+.cancelEditButtonSpan,
+.saveEditButtonSpan {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.saveEditButton,
+.cancelEditButton {
+    width: 200px;
+    height: 45px;
+    border-radius: 15px;
+}
+
+
+/* ? icon date field */
+
+.iconConditional {
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+.iconDefault {
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+.cancelEditButtonIcon,
+.saveEditButtonIcon {
+    width: 16px;
+    height: 16px;
+}
+
+/* ? */
+
+.cancelEditButton {
+    background-color: var(--color-theme-font-white);
+}
+
+.cancelEditButtonLabel {
+    color: var(--color-theme-neutral-primary);
+}
+
+.cancelEditButtonIcon {
+    color: var(--color-theme-neutral-primary);
+}
+
+.cancelEditButton:hover {
+    /* estilos */
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.cancelEditButton:hover .cancelEditButtonLabel,
+.cancelEditButton:hover .cancelEditButtonIcon {
+    /* estilos */
+    color: var(--color-alert);
+}
+
+/* ? */
+
+.saveEditButton {
+    background: linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
+}
+
+.saveEditButtonLabel {
+    color: var(--color-theme-font-white);
+}
+
+.saveEditButtonIcon {
+    color: var(--color-theme-font-white);
+}
+
+.saveEditButton:hover {
+    /* estilos */
+    background: var(--color-theme-primary-light);
+}
+
+.saveEditButton:hover .saveEditButtonLabel,
+.saveEditButton:hover .saveEditButtonIcon {
+    /* estilos */
+    color: var(--color-theme-font-white);
+}
+
+/* *************** Disponibilidad *************** */
+
+.baseAvailable {
+    /* dimension */
+    height: 30px;
+    width: 100px;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+
+    border-radius: 15px;
+
+}
+
+.highStock {
+    /* estilos */
+    background: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}
+
+.lowStock {
+    /* estilos */
+    background: var(--color-warning-light);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+}
+
+.unavailable {
+    /* estilos */
+    background: var(--color-alert-light);
+    color: var(--color-alert);
+    border: 1px solid var(--color-alert);
+}
+
+
+/* *************** Precio *************** */
+
+.containerPrice {
+    /* dimension */
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* *************** Footer de la tabla *************** */
+
+.footerComponentsContainer {
+    /* dimension */
+    width: 100%;
+    height: 50px;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+.containerFooterComponents {
+    /* dimension */
+    width: 100%;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: start;
+    gap: 0.5rem;
+
+    font-size: 14px;
+}
+
+
+
+.containerFooterComponentsSymbologySection {
+    /* dimension */
+    width: 50%;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 1rem;
+
+}
+
+.containerFooterComponentsSymbologySection dl {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+}
+
+.containerFooterComponentsTotalSection {
+    /* dimension */
+    width: 50%;
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    flex-direction: row;
+
+    padding-right: 10rem;
+    gap: 1rem;
+}
+
+
+.cargos {
+    display: flex;
+    flex-direction: column;
+    text-align: flex-end;
+    align-items: end;
+}
+
+.cargos dt {
+    text-align: end;
+}
+
+.total {
+    color: var(--color-theme-primary);
+}
+
+.trash2IconShippingOrderModel {
+    width: 16px;
+    height: 16px;
+    color: var(--color-alert);
+    cursor: pointer;
+}
+
+
+/* *************** Confirm Modal Add *************** */
+
+.containerConfirmModalAdd {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.containerConfirmModalAddButtons {
+    /* dimension */
+    width: 100%;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.containerConfirmModalAddButtonBackSales {
+    /* dimension */
+    width: 100%;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconCloseConfirmModalAdd {
+    width: 40px;
+    height: 40px;
+    color: var(--color-theme-primary);
+}
+
+/* ? botones principales */
+
+.sendByEmailButtonConfirmModalAdd,
+.seeSaleButtonConfirmModalAdd {
+    /* dimension */
+    width: 200px;
+    height: 45px;
+
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.sendByEmailButtonConfirmModalAddSpan,
+.seeSaleButtonConfirmModalAddSpan {
+    justify-content: center;
+    align-items: center;
+}
+
+.sendByEmailButtonConfirmModalAddIcon,
+.seeSaleButtonConfirmModalAddIcon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-theme-primary);
+}
+
+.sendByEmailButtonConfirmModalAdd:hover .sendByEmailButtonConfirmModalAddLabel {
+    color: var(--color-theme-font-white);
+}
+
+.sendByEmailButtonConfirmModalAdd:hover .sendByEmailButtonConfirmModalAddIcon {
+    color: var(--color-theme-font-white);
+}
+
+/* ? boton de enviar por correo */
+
+.sendByEmailButtonConfirmModalAdd {
+    background-color: var(--color-theme-neutral-background);
+}
+
+.sendByEmailButtonConfirmModalAddLabel {
+    color: var(--color-theme-primary);
+}
+
+.sendByEmailButtonConfirmModalAdd:hover {
+    background: var(--color-theme-primary-light);
+    color: var(--color-theme-font-white);
+}
+
+
+/* ? boton de ver venta */
+
+.seeSaleButtonConfirmModalAdd {
+    background: linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
+    color: var(--color-theme-font-white);
+}
+
+.seeSaleButtonConfirmModalAddIcon {
+    color: var(--color-theme-font-white);
+}
+
+.seeSaleButtonConfirmModalAdd:hover {
+    background: var(--color-theme-primary-light);
+}
+
+/* ? boton de regresar a ventas */
+
+
+.backToSalesButtonConfirmModalAddLabel {
+    color: var(--color-theme-primary-light);
+    cursor: pointer;
+}
+
+.backToSalesButtonConfirmModalAdd:hover .backToSalesButtonConfirmModalAddLabel {
+    color: var(--color-theme-primary);
+}
+
+
+.completedProgressTag {
+    /* dimension */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+
+    /* dimension */
+    width: 120px;
+    height: 30px;
+
+    border-radius: 10px;
+    border: 1px solid var(--color-success);
+}
+
+
+
+/* *************** Progreso *************** */
+
+.containerProgressQtyProduction {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerProgressIsNotCompleted {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    gap: 0.2rem;
+}
+
+.containerProgress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 66.66%;
+}
+
+.progressBar {
+    width: 100%;
+    height: 40%;
+    background-color: var(--color-theme-neutral-background);
+}
+
+.labelProgressBar {
+    color: var(--color-theme-primary);
+}
+
+.sectionProgressBar {
+    background-color: var(--color-theme-primary);
+}
+
+.containerProgressText {
+    width: 33.33%;
+}
+
+.completedProgressTag {
+    /* dimension */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+
+    /* dimension */
+    width: 120px;
+    height: 30px;
+
+    border-radius: 10px;
+    border: 1px solid var(--color-success);
+}

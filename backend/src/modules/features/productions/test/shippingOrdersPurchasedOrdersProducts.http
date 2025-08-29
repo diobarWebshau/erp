@@ -1,0 +1,29 @@
+### get
+GET http://localhost:3003/production/shipping-orders-purchased-orders-products HTTP/1.0
+
+### get
+GET http://localhost:3003/production/shipping-orders-purchased-orders-products/prueba/1 HTTP/1.0
+
+### getbyid
+GET http://localhost:3003/production/shipping-orders-purchased-orders-products/id/1 HTTP/1.0
+
+### post
+POST http://localhost:3003/production/shipping-orders-purchased-orders-products HTTP/1.0
+Content-Type: application/json
+
+{
+    "shipping_order_id": 1,
+    "purchase_order_product_id":1,
+    "qty": 100
+}
+
+### PATCH
+PATCH http://localhost:3003/production/shipping-orders-purchased-orders-products/7 HTTP/1.0
+Content-Type: application/json
+
+{
+    "purchase_order_product_id": 2
+}
+
+### delete
+delete http://localhost:3003/production/shipping-orders-purchased-orders-products/1 HTTP/1.0

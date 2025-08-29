@@ -1,0 +1,266 @@
+.container {
+    /* posicionamiento */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    z-index: 1000;
+
+    /* distribucion flex */
+    display: grid;
+    grid-template: 
+     "header" 80px
+     "body" 1fr /
+     100%;
+    /* estilos */
+    background-color: white;
+}
+
+
+
+/* *************** Header *************** */
+
+.headerSection {
+    grid-area: header;
+    /* dimension */
+    width: 100%;
+    max-height: 100px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+
+    /* estilos */
+}
+
+.headerSectionControl {
+    /* dimension */
+    width: 100%;
+    height: 30px;
+
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+
+    /* estilos */
+    font-size: 16px;
+}
+
+.headerSectionTitle {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+
+
+    /* estilos */
+}
+
+.headerSectionTitle h1 {
+    /* distribucion box */
+    margin-left: 0.6rem;
+    font-family: inherit;
+    font-size: 36px;
+    color: var(--color-theme-primary);
+}
+
+.backButton {
+    /* dimension */
+    width: 90px;
+    height: 100%;
+
+    /* distribucion box */
+    margin-left: 0.2rem;
+
+    /* estilos */
+    background: transparent;
+
+}
+
+.backButton:hover .backButtonIcon,
+.backButton:hover .backButtonSpan {
+    color: var(--color-theme-primary-light);
+}
+
+.backButtonIcon {
+    /* dimension */
+    width: 20px;
+    height: 20px;
+
+    /* estilos */
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+.backButtonSpan {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    /* estilos */
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+
+/* *************** Body *************** */
+
+.bodySection {
+    grid-area: body;
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.2rem;
+    padding-left: 0.6rem;
+    padding-right: 0.8rem;
+    padding-bottom: 2rem;
+
+
+    overflow: auto;
+    /* distribucion box */
+    border-radius: 20px;
+}
+
+
+/* *************** Footer *************** */
+
+
+
+/* *************** Animaciones *************** */
+
+
+/* Posición inicial: fuera del viewport a la derecha */
+.slideInRightEnter {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+/* Posición final: dentro del viewport */
+.slideInRightEnterActive {
+    transform: translateX(0%);
+    opacity: 1;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+/* (Opcional) salida hacia la derecha */
+.slideOutRightExit {
+    transform: translateX(0%);
+    opacity: 1;
+}
+
+.slideOutRightExitActive {
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 0.4s ease-in, opacity 0.4s ease-in;
+}
+
+
+/* *************** Modal Cancel Process *************** */
+
+.containerChildrenCancelProcess{
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.iconCancelProcess{
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+.exitProcessButton, .cancelProcessButton {
+    width: 200px;
+    height: 45px;
+
+    /* distribucion box */
+    border-radius: 20px;
+    
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+}
+
+.cancelProcessButtonSpan, 
+.exitProcessButtonSpan {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cancelProcessButtonIcon, 
+.exitProcessButtonIcon {
+    width: 15px;
+    height: 15px;
+}
+
+/* ? cancelProcessButton */
+
+.cancelProcessButton:hover .cancelProcessButtonLabel,
+.cancelProcessButton:hover .cancelProcessButtonIcon {
+    color: var(--color-alert);
+}
+
+.cancelProcessButton:hover{
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.cancelProcessButtonLabel{
+    color: var(--color-theme-neutral-primary);
+}
+
+.cancelProcessButtonIcon{
+    color: var(--color-theme-neutral-primary);
+}
+
+/* ? exitProcessButton */
+
+.exitProcessButton{
+    background: linear-gradient( var(--color-theme-gradient-start), var(--color-theme-gradient-end));
+}
+
+.exitProcessButton:hover{
+    background: var(--color-theme-primary-light);
+}
+
+.exitProcessButtonLabel{
+    color: var(--color-theme-font-white);
+}
+
+.exitProcessButtonIcon{
+    color: var(--color-theme-font-white);
+}
+
+
+
+
+
+

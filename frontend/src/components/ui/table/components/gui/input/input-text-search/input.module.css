@@ -1,0 +1,38 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 0.2rem;
+
+    position: relative;
+}
+
+.container input {
+    border: none;
+    width: 100%;
+    height: 100%;
+    padding-left: 1rem;
+    padding-right: 2.8rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    /* border-radius: 10px; */
+    /* background-color: #F3F4FA; */
+}
+
+.container input:focus{
+    outline: none;
+}
+
+.container button {
+    position: absolute;
+    right: 15px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+/* input::placeholder {
+    color: #423DD9;
+    font-size: 0.9rem;
+} */

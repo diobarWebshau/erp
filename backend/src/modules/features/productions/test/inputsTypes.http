@@ -1,0 +1,32 @@
+### Obtener todos los input-types
+GET http://localhost:3003/production/input-types/
+
+### Obtener un input por ID
+GET http://localhost:3003/production/input-types/id/1
+
+### Obtener un input por nombre
+GET http://localhost:3003/production/input-types/name/Nuevo Input
+
+### Crear un nuevo input
+POST http://localhost:3003/production/input-types/
+Content-Type: application/json
+
+{
+    "name": "Type4"
+}
+
+### Actualizar un input por ID
+PATCH http://localhost:3003/production/input-types/3
+Content-Type: application/json
+
+{
+    "name": "Nombre Actualizado"
+}
+
+### Eliminar un input por ID
+DELETE http://localhost:3003/production/input-types/3
+Content-Type: application/json
+
+
+### get inputs
+GET http://localhost:3003/production/input-types/1/inputs HTTP/1.0

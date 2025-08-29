@@ -1,0 +1,286 @@
+.loginContainer {
+
+    height: 75%;
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 0% 100%,
+            rgba(80, 75, 246, 0) 0%,
+            rgba(80, 75, 246, 1) 100%),
+        linear-gradient(to bottom right,
+            rgba(255, 255, 255, 0.541) 0%,
+            rgba(255, 255, 255, 0) 100%);
+    border-radius: 20px;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.presentationContainer {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.logoImage {
+    width: 150px;
+    height: 260px;
+    color: var(--color-theme-primary);
+}
+
+.presentationContainer h1,
+h2 {
+    color: var(--color-theme-font-white);
+}
+
+.presentationContainer h1 {
+    font-size: 36px;
+}
+
+.presentationContainer h2 {
+    font-size: 24px;
+}
+
+
+/* * Form */
+
+.loginForm {
+    height: 100%;
+    width: 40%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* ? Form Container */
+
+.loginFormContainer {
+
+    width: 60%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+
+}
+
+
+/* ? container buttons */
+
+.containerButtons {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.fadeButtonGoogle,
+.fadeButtonMicrosoft {
+    height: 52px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.fadeButtonSignIn {
+    height: 45px;
+    width: 100%;
+    border-radius: 10px;
+    background-color: var(--color-theme-neutral-background);
+}
+
+
+.fadeButtonGoogle,
+.fadeButtonMicrosoft {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid var(--color-theme-font-white);
+    border-radius: 10px;
+}
+
+.fadeButtonLabelGoogle,
+.fadeButtonLabelMicrosoft {
+    color: var(--color-theme-font-white);
+    font-size: 16px;
+}
+
+
+.fadeButtonSpanGoogle,
+.fadeButtonSpanMicrosoft,
+.fadeButtonSpanSignIn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.fadeButtonGoogle:hover,
+.fadeButtonMicrosoft:hover {
+    background-color: var(--color-theme-secondary-light);
+}
+
+
+.fadeButtonGoogle:hover .fadeButtonLabelGoogle,
+.fadeButtonMicrosoft:hover .fadeButtonLabelMicrosoft {
+    color: var(--color-theme-font-black);
+}
+
+.fadeButtonSignIn:hover {
+    background-color: var(--color-theme-secondary-light);
+}
+
+.fadeButtonSignIn:hover .fadeButtonLabelSignIn {
+    color: var(--color-theme-font-black);
+}
+
+
+
+/* ? Input */
+
+.textFieldContainerEmail,
+.textFieldContainerPassword {
+    width: 100%;
+    height: 73px;
+    gap: 0.2rem;
+}
+
+.textFieldInputEmail,
+.textFieldInputPassword {
+    width: 100%;
+    height: 44px;
+    font-size: 14px;
+}
+
+.textFieldLabelEmail,
+.textFieldLabelPassword {
+    font-size: 14px;
+    color: var(--color-theme-font-white);
+}
+
+
+.textFieldIconEmail,
+.textFieldIconEye {
+    width: 20px;
+    color: var(--color-theme-primary);
+}
+
+
+
+
+/* ? Container options password */
+
+.containerOptionsPassword {
+    width: 100%;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+}
+
+
+.containerRememberCheckbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.spanRememberMe,
+.spanForgotPassword {
+    color: var(--color-theme-font-white);
+    font-size: 14px;
+}
+
+.spanForgotPassword {
+    text-decoration: underline;
+}
+
+.spanForgotPassword:hover {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--color-theme-secondary-light);
+}
+
+.spanRememberMe:hover {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--color-theme-secondary-light);
+}
+
+
+.rememberCheckbox {
+
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    
+    /* posicionamiento */
+    position: relative;
+
+    /* distribucion */
+
+    display: inline-block;
+    
+    /* distribucion box */
+    border: 2px solid var(--color-theme-font-white);
+    border-radius: 4px;
+
+    /* estilos */
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-color: transparent;
+    cursor: pointer;
+    appearance: none;
+    
+    /* animaciones */
+    transition: all 0.2s ease;
+}
+
+.rememberCheckbox:checked {
+    /* distribucion box */
+    border-color: var(--color-theme-font-white);
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+}
+
+.rememberCheckbox:checked::after {
+    /* dimension */
+    width: 4px;
+    height: 8px;
+
+    /* posicionamiento */
+    position: absolute;
+    top: 0.5px;
+    left: 3.8px;
+    transform: rotate(45deg);
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-primary);
+    border-width: 0 2.5px 2.5px 0;
+
+    /* estilos */
+    content: "";
+}

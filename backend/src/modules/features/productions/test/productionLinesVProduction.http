@@ -1,0 +1,49 @@
+### GET
+GET http://localhost:3003/production/production-lines HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/production-lines/details/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/production-lines/id/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/production-lines/name/Location1 HTTP/1.0
+
+
+### POST
+POST http://localhost:3003/production/production-lines HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Location3",
+    "type": "Almecen",
+    "description": "Mi primer location",
+    "active": 1
+}
+
+### PATCH
+PATCH http://localhost:3003/production/production-lines/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Location30000"
+}
+
+###     DELETE
+DELETE http://localhost:3003/production/production-lines/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/production-lines/2/products/ HTTP/1.0
+
+### add product
+POST http://localhost:3003/production/production-lines/2/products HTTP/1.0
+Content-Type: application/json
+
+{
+    "product_id": 3
+}
+
+### delete product
+DELETE http://localhost:3003/production/production-lines/2/products/2 HTTP/1.0
+Content-Type: application/json

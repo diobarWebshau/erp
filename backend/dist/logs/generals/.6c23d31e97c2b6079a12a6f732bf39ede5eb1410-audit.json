@@ -1,0 +1,45 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\.6c23d31e97c2b6079a12a6f732bf39ede5eb1410-audit.json",
+    "files": [
+        {
+            "date": 1750872915145,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\app-2025-06-25.log",
+            "hash": "da058c08fd768a47dcef8e2717825f71d3c6b2fcb7d4217052d5247958e2fc60"
+        },
+        {
+            "date": 1750951360214,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\app-2025-06-26.log",
+            "hash": "aeaef6d90dd5edf901763393c6154cbf39d12bda65bb34fea59d7c85e88d659b"
+        },
+        {
+            "date": 1751383185531,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\app-2025-07-01.log",
+            "hash": "21f5fab0c45eb762a66888ea1ea9ddfef689e55c4cde167bbd619d94ffe594da"
+        },
+        {
+            "date": 1751469396899,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\app-2025-07-02.log",
+            "hash": "d08a4a425ae89099c788b7466d0ecb92116cff4b0dbfbddfc8823c840dcc0e17"
+        },
+        {
+            "date": 1751557290867,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\app-2025-07-03.log",
+            "hash": "202810bbb074926c63e63dbaf8109e2a45a9f75c939182119984619f9ec07ad6"
+        },
+        {
+            "date": 1751642234788,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\app-2025-07-04.log",
+            "hash": "18ef408accc229199dc058075108912ca396b653fbd6ccc2b5b72df284091973"
+        },
+        {
+            "date": 1751904910869,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\erp4.0\\dist\\logs\\generals\\app-2025-07-07.log",
+            "hash": "54cd5b833b1e8e6d54a36f2d75e8c152fc31ceb2ed3f56fe3c9461647d9fd582"
+        }
+    ],
+    "hashType": "sha256"
+}

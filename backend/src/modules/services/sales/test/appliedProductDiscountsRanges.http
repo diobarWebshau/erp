@@ -1,0 +1,24 @@
+### GET
+GET http://localhost:3003/sales/applied-product-discounts-ranges HTTP/1.0
+### GET
+GET http://localhost:3003/sales/applied-product-discounts-ranges/id/2 HTTP/1.0
+
+### POST
+POST http://localhost:3003/sales/applied-product-discounts-ranges HTTP/1.0
+Content-Type: application/json
+
+{
+    "purchase_order_product_id": 1,
+    "product_discount_range_id": 1
+}
+
+### PATCH
+PATCH http://localhost:3003/sales/applied-product-discounts-ranges/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "purchase_order_product_id": 2
+}
+
+### DELETE
+DELETE http://localhost:3003/sales/applied-product-discounts-ranges/2 HTTP/1.0

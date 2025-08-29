@@ -1,0 +1,45 @@
+
+### Obtener todos los productos de órdenes de compra
+GET http://localhost:3003/sales/purchased-orders-products/ HTTP/1.1
+Accept: application/json
+
+### Obtener un producto de orden de compra por ID
+GET http://localhost:3003/sales/purchased-orders-products/id/1 HTTP/1.1
+Accept: application/json
+
+### Crear un producto de orden de compra
+POST http://localhost:3003/sales/purchased-orders-products/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "purchase_order_id": 1,
+  "product_id": 2,
+  "qty": 1200, 
+  "status": "proccess"
+}
+
+### Crear un producto de orden de compra
+POST http://localhost:3003/sales/purchased-orders-products/batch/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "products": [
+    { 
+      "product_id": 5,
+      "qty": 10,
+      "status": "released"
+    }
+  ]
+}
+
+### Actualizar un producto de orden de compra por ID
+PATCH http://localhost:3003/sales/purchased-orders-products/3 HTTP/1.1
+Content-Type: application/json
+
+{
+  "product_id": 3
+}
+
+### Eliminar un producto de orden de compra por ID
+DELETE http://localhost:3003/sales/purchased-orders-products/1 HTTP/1.1
+Accept: application/json

@@ -1,0 +1,38 @@
+
+### GET
+GET http://localhost:3003/logistics/carriers HTTP/1.0
+### GET
+GET http://localhost:3003/logistics/carriers/id/1 HTTP/1.0
+### GET
+GET http://localhost:3003/logistics/carriers/name/Logistica Express HTTP/1.0
+### GET
+GET http://localhost:3003/logistics/carriers/rfc/LE1234567890 HTTP/1.0
+
+### POST 
+POST http://localhost:3003/logistics/carriers HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Diobar",
+    "company_name": "Elecktra",
+    "rfc": "ABC123456XYZ",
+    "type": "Carga pesada",
+    "phone": "555-1234",
+    "vehicle": "Camión",
+    "plates": "XYZ-987",
+    "license_number": "LIC-123456",
+    "active": 1
+}
+
+### PATCH 
+PATCH http://localhost:3003/logistics/carriers/5 HTTP/1.1
+Content-Type: application/json
+
+{
+    "phone": "555-5678",
+    "vehicle": "Camión actualizado",
+    "active": 0
+}
+
+### DELETE
+DELETE http://localhost:3003/logistics/carriers/4 HTTP/1.0

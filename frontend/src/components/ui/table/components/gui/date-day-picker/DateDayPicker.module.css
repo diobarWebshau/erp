@@ -1,0 +1,30 @@
+.wrapper {
+    display: flex;
+    height: 280px;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 8px;
+    background-color: #fefefe;
+}
+
+.calendar {
+    /* Puedes personalizar más: */
+}
+
+.footer {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+/* En el contenedor padre
+
+    .padre {
+        transform: scale(0.75);
+        padding-left: 4rem;
+        transform-origin: top left;
+        width: calc(100% * (1 / 0.75));
+        height: calc(100% * (1 / 0.75));
+    }
+
+*/

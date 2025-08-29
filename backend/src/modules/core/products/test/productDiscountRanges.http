@@ -1,0 +1,32 @@
+### Get all product discounts
+GET http://localhost:3003/products/product-discounts-ranges/
+
+### Get product discount by ID
+GET http://localhost:3003/products/product-discounts-ranges/id/2
+
+### Create a new product discount
+POST http://localhost:3003/products/product-discounts-ranges/
+Content-Type: application/json
+
+{
+  "name": "Descuento 30% Product1",
+  "product_id": 1,
+  "unit_price": 30,
+  "min_qty": 2000,
+  "max_qty": 10000
+}
+
+### Update an existing product discount
+PATCH http://localhost:3003/products/product-discounts-ranges/20
+Content-Type: application/json
+
+{
+  "name": "Descuento 30% Product1",
+  "product_id": 1,
+  "unit_price": 40,
+  "min_qty": 2000,
+  "max_qty": 10000
+}
+
+### Delete a product discount
+DELETE http://localhost:3003/products/product-discounts-ranges/20

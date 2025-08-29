@@ -1,0 +1,36 @@
+/* input-text.module.css */
+
+.input_text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: sans-serif;
+  }
+  
+  .input_text label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .input_text input {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .input_text input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+  }
+  
+  .input_text input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    color: #999;
+    border-color: #ddd;
+  }
+  

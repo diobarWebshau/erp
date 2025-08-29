@@ -1,0 +1,53 @@
+### GET
+GET http://localhost:3003/locations/locations HTTP/1.0
+
+### GET
+GET http://localhost:3003/locations/locations/with-types HTTP/1.0
+
+### GET
+GET http://localhost:3003/locations/locations/id/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/locations/locations/types/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/locations/locations/name/Location Z HTTP/1.0
+
+
+### POST
+POST http://localhost:3003/locations/locations HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Location Z",
+    "description": "Mi primer location",
+    "active": 1
+}
+
+### PATCH
+PATCH http://localhost:3003/locations/locations/4 HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Location30000"
+}
+
+### DELETE
+DELETE http://localhost:3003/locations/locations/4 HTTP/1.0
+
+
+### DELETE
+POST http://localhost:3003/locations/locations/create-complete HTTP/1.0
+Content-Type: application/json
+
+{
+  "name": "Central Warehouse",
+  "description": "Main location for all incoming inventory",
+  "types": [
+    { "id": 1, "name": "Store" },
+    { "id": 2, "name": "Production" }
+  ],
+  "is_active": true
+}
+
+

@@ -1,0 +1,27 @@
+### GET
+GET http://localhost:3003/production/productions HTTP/1.0
+
+### get by id
+GET http://localhost:3003/production/productions/id/1 HTTP/1.0
+
+### post 
+POST http://localhost:3003/production/productions/ HTTP/1.0
+Content-Type:  application/json
+
+{
+  "production_order_id": 1,
+  "product_id": 1,
+  "qty": 100,
+  
+}
+
+### patch
+PATCH http://localhost:3003/production/productions/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "qty": 20
+}
+
+### delete
+DELETE http://localhost:3003/production/productions/1 HTTP/1.0

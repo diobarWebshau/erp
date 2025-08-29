@@ -1,0 +1,33 @@
+### Obtener todas las tablas
+GET http://localhost:3003/logs/tables HTTP/1.0
+Accept: application/json
+
+### Obtener una tabla por ID
+GET http://localhost:3003/logs/tables/id/1 HTTP/1.0
+Accept: application/json
+
+### Obtener una tabla por nombre
+GET http://localhost:3003/logs/tables/name/users HTTP/1.0
+Accept: application/json
+
+### Crear una nueva tabla
+POST http://localhost:3003/logs/tables HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Nueva Tabla",
+    "table_name": "TablaEjemplo"
+}
+
+### Actualizar una tabla
+PATCH http://localhost:3003/logs/tables/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Tabla Actualizada",
+    "table_name": "TablaEjemploActualizada"
+}
+
+### Eliminar una tabla
+DELETE http://localhost:3003/logs/tables/1 HTTP/1.0
+Accept: application/json

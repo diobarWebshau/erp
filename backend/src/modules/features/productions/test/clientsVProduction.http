@@ -1,0 +1,49 @@
+### GET
+GET http://localhost:3003/production/clients HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/clients/id/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/clients/company_name/Company1 HTTP/1.0
+
+### POST
+POST http://localhost:3003/production/clients HTTP/1.0
+Content-Type: application/json
+
+{
+    "company_name": "Innova Corp.",
+    "tax_id": "DEF789101",
+    "email": "ventas@innovacorp.com",
+    "phone": "+52 987 654 3210",
+    "city": "Monterrey",
+    "state": "Nuevo León",
+    "country": "México",
+    "address": "Calle Innovación 456, Parque Industrial",
+    "payment_terms": "Net 60",
+    "credit_limit": 100000.0000,
+    "zip_code": "64000",
+    "tax_regimen": "Régimen Simplificado de Confianza",
+    "cfdi": "G01 - Adquisición de mercancías",
+    "payment_method": "PPD"
+}
+
+### PATCH
+PATCH http://localhost:3003/production/clients/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "company_name":"Empresa Actualizada",
+    "email":"nuevo-correo@ejemplo.com",
+    "phone":"555-5678"
+}
+
+### DELETE
+DELETE http://localhost:3003/production/clients/1 HTTP/1.0
+
+### GET ADDRESSES
+GET http://localhost:3003/production/clients/addresses/2 HTTP/1.0
+
+
+### GET DISCOUNTS OF CLIENT 
+GET http://localhost:3003/production/clients/discounts/1 HTTP/1.0

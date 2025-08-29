@@ -1,0 +1,26 @@
+### GET
+GET http://localhost:3003/production/products-inputs
+
+### GET
+GET http://localhost:3003/production/products-inputs/id/1
+
+### POST
+POST http://localhost:3003/production/products-inputs/
+Content-Type: application/json
+
+{
+    "input_id": 2,
+    "product_id": 2,
+    "equivalence": 5.5
+}
+
+### PATCH
+PATCH http://localhost:3003/production/products-inputs/1
+Content-Type: application/json
+
+{
+    "equivalence": 10.2
+}
+
+### DELETE
+DELETE http://localhost:3003/production/products-inputs/1

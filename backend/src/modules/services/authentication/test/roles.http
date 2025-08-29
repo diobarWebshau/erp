@@ -1,0 +1,29 @@
+### getAll
+GET http://localhost:3003/authentication/roles HTTP/1.0
+
+### getById
+GET http://localhost:3003/authentication/roles/id/1 HTTP/1.0
+
+### getByName
+GET http://localhost:3003/authentication/roles/name/Manager HTTP/1.0
+
+### create
+POST http://localhost:3003/authentication/roles/ HTTP/1.0
+Content-Type: application/json
+
+{
+}
+
+### update
+PATCH http://localhost:3003/authentication/roles/4 HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Diobar22"
+}
+
+### delete
+DELETE http://localhost:3003/authentication/roles/3 HTTP/1.0
+
+### get
+GET http://localhost:3003/authentication/roles/users/3 HTTP/1.0

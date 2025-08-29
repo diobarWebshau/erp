@@ -1,0 +1,33 @@
+### get
+GET http://localhost:3003/authentication/permissions HTTP/1.0 
+
+### getById
+GET http://localhost:3003/authentication/permissions/id/3 HTTP/1.0
+Content-Type: application/json
+
+### getByName
+GET http://localhost:3003/authentication/permissions/name/Admin HTTP/1.0
+Content-Type: application/json
+
+### post
+POST http://localhost:3003/authentication/permissions/ HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Read&Write"
+}
+
+### patch
+PATCH http://localhost:3003/authentication/permissions/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "dasdsdads"
+}
+
+### delete
+DELETE http://localhost:3003/authentication/permissions/2 HTTP/1.0
+Content-Type: application/json
+
+### get
+GET http://localhost:3003/authentication/permissions/roles/3 HTTP/1.0

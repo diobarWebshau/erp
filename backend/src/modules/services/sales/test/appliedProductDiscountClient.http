@@ -1,0 +1,26 @@
+### Obtener todos los Applied Product Discounts Clients
+GET http://localhost:3003/sales/applied-product-discounts-clients/ HTTP/1.1
+
+### Obtener Applied Product Discount Client por ID
+GET http://localhost:3003/sales/applied-product-discounts-clients/id/1 HTTP/1.1
+
+### Crear un nuevo Applied Product Discount Client
+POST http://localhost:3003/sales/applied-product-discounts-clients/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "purchase_order_product_id": 1,
+  "product_discount_client_id": 1
+}
+
+### Actualizar un Applied Product Discount Client por ID
+PATCH http://localhost:3003/sales/applied-product-discounts-clients/1 HTTP/1.1
+Content-Type: application/json
+
+{
+  "purchase_order_product_id": 1,
+  "product_discount_client_id": 1
+}
+
+### Eliminar un Applied Product Discount Client por ID
+DELETE http://localhost:3003/sales/applied-product-discounts-clients/7 HTTP/1.1

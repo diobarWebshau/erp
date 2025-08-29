@@ -1,0 +1,29 @@
+### get
+GET http://localhost:3003/inventories/inventories-locations-items HTTP/1.0
+
+
+### getbyid
+GET http://localhost:3003/inventories/inventories-locations-items/id/1 HTTP/1.0
+
+
+### POST
+POST http://localhost:3003/inventories/inventories-locations-items/ HTTP/1.0
+Content-Type: application/json
+
+{
+    "inventory_id": 1,
+    "location_id": 3,
+    "item_type": "product",
+    "item_id": 2
+}
+
+### PATCH
+PATCH http://localhost:3003/inventories/inventories-locations-items/2 HTTP/1.0
+Content-Type: application/json
+
+{
+    "item_id": 2
+}
+
+### delete
+DELETE http://localhost:3003/inventories/inventories-locations-items/1 HTTP/1.0

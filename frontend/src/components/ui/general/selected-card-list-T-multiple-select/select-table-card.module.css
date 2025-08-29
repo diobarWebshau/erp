@@ -1,0 +1,118 @@
+.wrapper {
+  width: 100%;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid white; /* gray-300 */
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 250px;
+  background-color: black;
+  color: white
+}
+
+.card:hover {
+  border-color: #60a5fa; /* blue-400 */
+}
+
+.cardSelected {
+  border-color: #3b82f6; /* blue-500 */
+  background-color: white; /* blue-50 */
+  color: black;
+}
+
+.checkboxVisible {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+  margin-top: 0.25rem;
+  cursor: pointer;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.textRow {
+  font-size: 0.875rem;
+}
+
+.key {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.value {
+  color: #374151; /* gray-700 */
+}
+
+.selectedPreview {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #ecfdf5; /* green-50 */
+  border: 1px solid #86efac; /* green-300 */
+  border-radius: 0.5rem;
+}
+
+.previewTitle {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.previewJson {
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.cardImage {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.cardWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.emptyMessage {
+  color: #9ca3af; /* gray-400 */
+  font-size: 0.875rem;
+  padding: 0.5rem;
+}

@@ -1,0 +1,72 @@
+.cardWrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  margin: 0.5rem;
+  border: 1px solid red;
+  width: 80%;
+}
+
+.card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+  background-color: white;
+}
+
+.card:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.cardSelected {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px #007bff66;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cardImage {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+/* Contenedor para los botones */
+.actionButtons {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  gap: 0.3rem;
+}
+
+/* Botón eliminar */
+.deleteButton {
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Botón editar */
+.editButton {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.emptyMessage {
+  padding: 1rem;
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}

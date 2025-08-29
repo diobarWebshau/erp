@@ -1,0 +1,37 @@
+.checkboxContainer {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.groupOptions {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.option {
+    /* distribucion box */
+    padding: 6px 10px;
+    
+    /* distribucion flex */
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    
+    /* transiciones */
+    transition: background-color 0.2s ease;
+}
+
+/* .option:hover {
+    background-color: #f0f0ff;
+} */
+
+/* .selected {
+    background-color: #716CE3;
+    color: #fff;
+    font-weight: 600;
+} */

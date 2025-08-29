@@ -1,0 +1,307 @@
+.container {
+    /* dimension */
+    width: 100%;
+    min-height: 0;
+
+    /* distribucion  grif */
+    display: grid;
+    grid-template:
+        "header" auto
+        "main" 1fr
+        / auto;
+    gap: 0.5rem;
+}
+
+.FeaturesContainer {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion  grid*/
+    grid-area: header;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    gap: 0.5rem;
+}
+
+
+/*************
+*   table    *
+**************/
+
+.table {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion box */
+    border-collapse: separate;
+    border-spacing: 0.2px;
+}
+
+.table td {
+    /* distribucion box */    
+    border: 1px solid var(--color-theme-border-table);
+    padding: 5px;
+}
+
+.table th {
+    /* distribucion box */
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.containerTableMain {
+    grid-area: main;
+
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "main2" 1fr
+        "option" auto
+        / auto;
+}
+
+
+.containerTable {
+    /* dimension */
+    grid-area: main2;
+    width: 100%;
+    /* dimension */
+    min-height: 0;
+    /* distribucion grid */
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-neutral-background);
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+
+    /* estilos */
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.containerOption {
+    
+    grid-area: option;
+    
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+}
+
+
+/*
+Selecciona el scrollbar en sí (el carril que aparece al hacer overflow). 
+width: define el grosor del scrollbar vertical. 
+height: define el grosor del scrollbar horizontal.
+*/
+.containerTable::-webkit-scrollbar {
+    width: 8px;
+    /* para scroll vertical */
+    height: 8px;
+    /* para scroll horizontal */
+}
+
+/* 
+Define el fondo o carril del scrollbar. background: transparent lo hace invisible,
+para que solo el pulgar (thumb) sea visible.
+ */
+.containerTable::-webkit-scrollbar-track {
+    /* estilos */
+    background: transparent;
+}
+
+/* es el "pulgar" del scrollbar — la parte que arrastras. */
+.containerTable::-webkit-scrollbar-thumb {
+    /* distribucion box */
+    border-radius: 15px;
+    /* estilos */
+    background-color: var(--color-theme-primary);
+}
+
+/*
+Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) son para Chrome, Safari, Edge.
+    scrollbar-width: thin:
+        Controla el grosor del scrollbar.
+        Opciones: auto (normal), thin (más delgado), none (oculto).
+    scrollbar-color: <thumb> <track>:
+        #423DD9: color del pulgar (thumb).
+        transparent: fondo del carril (track).
+*/
+.containerTable {
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: var(--color-theme-primary) transparent;
+    /* Firefox */
+}
+
+.tableHeader {
+    /* dimension */
+    width: 100%;
+}
+
+.extraComponentsContainer {
+    /* dimension */
+    width: 100%;
+}
+
+.containerPagination {
+    /* distribucion grid */
+    grid-area: option;
+    /* dimension */
+    /* distribucion box */
+    border: 1px solid var(--color-theme-neutral-background);
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+
+
+/******************************************
+*    Componentes auxiliares de la tabla  *
+******************************************/
+
+/* checkboxes de las rows  y de la seleccion de todas las rows */
+.checkbox {
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    
+    /* posicionamiento */
+    position: relative;
+
+    /* distribucion */
+
+    display: inline-block;
+    
+    /* distribucion box */
+    border: 2px solid var(--color-theme-primary-light);
+    border-radius: 15px;
+
+    /* estilos */
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-theme-font-white);
+    cursor: pointer;
+    appearance: none;
+    
+    /* animaciones */
+    transition: all 0.2s ease;
+}
+
+.checkbox:checked {
+    /* distribucion box */
+    border-color: var(--color-theme-primary-light);
+    /* estilos */
+    background-color: var(--color-theme-primary-light);
+}
+
+.checkbox:checked::after {
+    /* dimension */
+    width: 4px;
+    height: 8px;
+
+    /* posicionamiento */
+    position: absolute;
+    top: 0.5px;
+    left: 3.8px;
+    transform: rotate(45deg);
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-font-white);
+    border-width: 0 2.5px 2.5px 0;
+
+    /* estilos */
+    content: "";
+}
+
+
+.checkboxHeader {
+
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    
+    /* posicionamiento */
+    position: relative;
+
+    /* distribucion */
+
+    display: inline-block;
+    
+    /* distribucion box */
+    border: 2px solid var(--color-theme-font-white);
+    border-radius: 15px;
+
+    /* estilos */
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-theme-font-white);
+    cursor: pointer;
+    appearance: none;
+    
+    /* animaciones */
+    transition: all 0.2s ease;
+}
+
+.checkboxHeader:checked {
+    /* distribucion box */
+    border-color: var(--color-theme-font-white);
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+}
+
+.checkboxHeader:checked::after {
+    /* dimension */
+    width: 4px;
+    height: 8px;
+
+    /* posicionamiento */
+    position: absolute;
+    top: 0.5px;
+    left: 3.8px;
+    transform: rotate(45deg);
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-primary);
+    border-width: 0 2.5px 2.5px 0;
+
+    /* estilos */
+    content: "";
+}
+
+
+/* options column */
+.optionsColumnContainer {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.optionsColumn {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+}
+
+.optionsColumnButton {
+    /* distribucion box */
+    border: none;
+    /* estilos */
+    background: transparent;
+    cursor: pointer;
+}

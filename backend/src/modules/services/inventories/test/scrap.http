@@ -1,0 +1,3 @@
+###
+GET http://localhost:3003/inventories/scrap HTTP/1.1
+Accept: application/json

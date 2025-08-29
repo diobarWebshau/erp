@@ -1,0 +1,31 @@
+### get
+GET http://localhost:3003/inventory-transfers HTTP/1.0
+
+### getbyid
+GET http://localhost:3003/inventory-transfers/id/1 HTTP/1.0
+
+### post
+POST http://localhost:3003/inventory-transfers HTTP/1.0
+Content-Type: application/json
+
+{
+    "item_type": "product",
+    "item_id": 1,
+    "qty": 52,
+    "reason": "Reposición por baja de stock",
+    "status": "completed",
+    "source_location_id": 3,
+    "destination_location_id": 2
+}
+
+### patch
+PATCH http://localhost:3003/inventory-transfers/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "status": "completed"
+}
+
+
+### delete
+delete http://localhost:3003/inventory-transfers/2 HTTP/1.0

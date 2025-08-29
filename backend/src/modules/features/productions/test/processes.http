@@ -1,0 +1,28 @@
+### Obtener todos los processes
+GET http://localhost:3003/production/processes/
+
+### Obtener un input por ID
+GET http://localhost:3003/production/processes/id/2
+
+### Obtener un input por nombre
+GET http://localhost:3003/production/processes/name/Nuevo Input
+
+### Crear un nuevo input
+POST http://localhost:3003/production/processes/
+Content-Type: application/json
+
+{
+    "name": "Process4"
+}
+
+### Actualizar un input por ID
+PATCH http://localhost:3003/production/processes/2
+Content-Type: application/json
+
+{
+    "name": "Nombre Actualizado"
+}
+
+### Eliminar un input por ID
+DELETE http://localhost:3003/production/processes/1
+Content-Type: application/json

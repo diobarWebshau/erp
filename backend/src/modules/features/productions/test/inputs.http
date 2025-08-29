@@ -1,0 +1,36 @@
+### Obtener todos los inputs
+GET http://localhost:3003/production/inputs
+
+### Obtener todos los inputs
+GET http://localhost:3003/production/inputs/types/1
+
+### Obtener un input por ID
+GET http://localhost:3003/production/inputs/id/1
+
+### Obtener un input por nombre
+GET http://localhost:3003/production/inputs/name/nombreEjemplo
+
+### Crear un nuevo input
+POST http://localhost:3003/production/inputs
+Content-Type: application/json
+
+{
+    "name": "Input4",
+    "input_types_id": "1",
+    "unit_cost": "10.5",
+    "supplier": "Proveedor X",
+    "status": "1",
+    "photo": "foto.jpg"
+}
+
+### Actualizar un input por ID
+PATCH http://localhost:3003/production/inputs/1
+Content-Type: application/json
+
+{
+    "name": "Nombre Actualizado"
+}
+
+### Eliminar un input por ID
+DELETE http://localhost:3003/production/inputs/1
+Content-Type: application/json

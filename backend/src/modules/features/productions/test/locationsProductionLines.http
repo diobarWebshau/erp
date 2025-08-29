@@ -1,0 +1,27 @@
+### Obtener todas las ubicaciones de líneas de producción
+GET http://localhost:3003/production/locations-production-lines
+
+### Obtener una ubicación de línea de producción por ID
+GET http://localhost:3003/production/locations-production-lines/id/1
+
+### Crear una nueva ubicación de línea de producción
+POST http://localhost:3003/production/locations-production-lines
+Content-Type: application/json
+
+{
+    "production_line_id": 2,
+    "location_id": 2
+}
+
+### Actualizar una ubicación de línea de producción
+PATCH http://localhost:3003/production/locations-production-lines/1
+Content-Type: application/json
+
+{
+    "production_line_id": 1,
+    "location_id": 2
+}
+
+### Eliminar una ubicación de línea de producción
+DELETE http://localhost:3003/production/locations-production-lines/2
+

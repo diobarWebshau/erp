@@ -1,0 +1,32 @@
+
+### Obtener todas las operaciones
+GET http://localhost:3003/logs/operations HTTP/1.0
+Accept: application/json
+
+### Obtener una operación por ID
+GET http://localhost:3003/logs/operations/id/1 HTTP/1.0
+Accept: application/json
+
+### Obtener una operación por ID
+GET http://localhost:3003/logs/operations/name/create HTTP/1.0
+Accept: application/json
+
+### Crear una nueva operación
+POST http://localhost:3003/logs/operations HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Nueva Operación"
+}
+
+### Actualizar una operación
+PATCH http://localhost:3003/logs/operations/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Operación Actualizada"
+}
+
+### Eliminar una operación
+DELETE http://localhost:3003/logs/operations/1 HTTP/1.0
+Accept: application/json

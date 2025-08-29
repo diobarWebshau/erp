@@ -1,0 +1,36 @@
+### ✅ GET all inventory movements
+GET http://localhost:3003/production/inventory-movements
+Accept: application/json
+
+###
+
+### ✅ GET inventory movement by ID
+GET http://localhost:3003/production/inventory-movements/1
+Accept: application/json
+
+###
+
+### ✅ POST create new inventory movement
+POST http://localhost:3003/production/inventory-movements
+Content-Type: application/json
+
+{
+  "location_id": 7,
+  "item_id": 1,
+  "item_type": "input",
+  "qty": 500,
+  "movement_type": "in",
+  "description": "Ingreso por producción",
+  "production_id": 3,
+  "is_locked": 0
+}
+
+###
+
+### ✅ PATCH update inventory movement (description, is_locked)
+PATCH http://localhost:3003/production/inventory-movements/13
+Content-Type: application/json
+
+{
+  "is_locked": 0
+}

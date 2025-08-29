@@ -1,0 +1,43 @@
+### get
+GET http://localhost:3003/products/products HTTP/1.0
+
+### get
+GET http://localhost:3003/products/products/id/2 HTTP/1.0
+
+### get
+GET http://localhost:3003/products/products/filter/P HTTP/1.0
+
+### get
+GET http://localhost:3003/products/products/name/Producto E HTTP/1.0
+
+### get
+POST http://localhost:3003/products/products/filter-exclude/P HTTP/1.0
+
+### POST
+POST http://localhost:3003/products/products
+Content-Type: application/json
+
+{
+  "name": "Producto Y",
+  "type": "Electrónico",
+  "description": "Descripción del producto A",
+  "sku": "SKU12345",
+  "active": 1,
+  "sale_price": 25.16
+}
+
+### PATCH
+PATCH http://localhost:3003/products/products/1
+Content-Type: application/json
+
+{
+  "name": "Producto B Actualizado",
+  "description": "Descripción actualizada del producto A",
+  "active": "1"
+}
+
+### DELETE
+DELETE http://localhost:3003/products/products/1 HTTP/1.0
+
+### get discounts
+GET http://localhost:3003/products/products/product-discounts-ranges/2 HTTP/1.0

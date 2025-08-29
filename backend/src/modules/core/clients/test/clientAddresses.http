@@ -1,0 +1,32 @@
+### GET
+GET http://localhost:3003/clients/client-addresses HTTP/1.0
+
+### GET
+GET http://localhost:3003/clients/client-addresses/id/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/clients/client-addresses/filter/06/1 HTTP/1.0
+
+### POST
+POST http://localhost:3003/clients/client-addresses HTTP/1.0
+Content-Type: application/json
+
+{
+    "client_id": 2, 
+    "address": "Esfalerita 1860 Pedregal Turquesa",
+    "city": "Mexicali",
+    "state": "Baja California",
+    "country": "Mexico",
+    "zip_code": "21395"
+}
+
+### PATCH
+PATCH http://localhost:3003/clients/client-addresses/1 HTTP/1.0
+Content-Type: application/json
+
+{
+    "client_id": 1
+}
+
+### DELETE
+DELETE http://localhost:3003/clients/client-addresses/1 HTTP/1.0

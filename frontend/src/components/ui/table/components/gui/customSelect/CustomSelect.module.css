@@ -1,0 +1,39 @@
+.customSelect {
+    position: relative;
+    width: 100%;
+}
+
+.toggle {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion box */
+    padding: 0.7rem;
+    border: 1px solid var(--color-theme-border-table);
+    background: white;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.options {
+    /* posicionamiento */
+    position: absolute;
+    top: 115%;
+    left: 0;
+    width: 100%;
+
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 10px;
+    background: white;
+    z-index: 10;
+}
+
+.option {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.option:hover {
+    background: var(--color-theme-background);
+}

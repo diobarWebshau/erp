@@ -1,0 +1,27 @@
+.overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.container {
+    background-color: var(--color-text);
+    color: var(--color-bg);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 300px;
+}
+
+.button {
+    padding: 10px 20px;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-top: 20px;
+}

@@ -1,0 +1,72 @@
+.container {
+    /* dimension */
+    height: 100%;
+    
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.selectRowPerPage {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+.pageInfo {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pageInfo label {
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+.select {
+    /* dimension */
+    width: 70px;
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+.paginationButtonSection {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.arrowLeftButton,
+.arrowRightButton {
+    /* distribucion box */
+    border: none;
+    /* estilos */
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.arrowRight,
+.arrowLeft {
+    /* estilos */
+    color: var(--color-theme-primary);
+    stroke: var(--color-theme-primary);
+}

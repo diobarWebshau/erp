@@ -1,0 +1,48 @@
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 400px;
+}
+
+.item {
+    cursor: default;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    background-color: black;
+    border: 1px solid #e2e8f0;
+    color: white;
+    transition: box-shadow 0.2s ease;
+}
+
+.controls {
+    display: flex;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+.deleteBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #e53e3e;
+}
+
+.dragHandle {
+    background: transparent;
+    border: none;
+    cursor: grab;
+    color: #4a5568;
+}
+
+.emptyMessage {
+    padding: 1rem;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}

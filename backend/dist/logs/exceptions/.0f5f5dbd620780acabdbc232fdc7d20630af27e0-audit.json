@@ -1,0 +1,25 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp2\\backend\\erp4.0\\dist\\logs\\exceptions\\.0f5f5dbd620780acabdbc232fdc7d20630af27e0-audit.json",
+    "files": [
+        {
+            "date": 1751990122877,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp2\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-08.log",
+            "hash": "b95ae650302c1214b2be3f5ab014cb841bde3cf7590e5d2130b5a1701a1838bd"
+        },
+        {
+            "date": 1752078482816,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp2\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-09.log",
+            "hash": "56a608cbf8ad1372f997647c1637cca026e6839b8bd76faadbdf90ae64c94322"
+        },
+        {
+            "date": 1752160253068,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp2\\backend\\erp4.0\\dist\\logs\\exceptions\\exceptions-2025-07-10.log",
+            "hash": "7393108cafd16d7f70d7f59fd777cafce2fbcdafd86c742f384cea9c5327b7a4"
+        }
+    ],
+    "hashType": "sha256"
+}

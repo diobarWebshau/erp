@@ -1,0 +1,14 @@
+###
+GET http://localhost:3003/production/products/details/1 HTTP/1.1
+Content-Type: application/json
+
+
+### GET ALL
+GET http://localhost:3003/production/products/ HTTP/1.1
+Content-Type: application/json
+
+### GET BEST LOCATION
+GET http://localhost:3003/production/products/best-location/200 HTTP/1.1
+Content-Type: application/json
+
+

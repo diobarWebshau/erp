@@ -1,0 +1,33 @@
+.container {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+
+    /* border: 1px solid black */
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.option:hover {
+    background: var(--color-theme-background);
+}
+
+.selected {
+    background-color: var(--color-theme-background);
+}
+
+.checkbox {
+    cursor: pointer;
+    accent-color: var(--color-theme-primary);
+}

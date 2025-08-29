@@ -1,0 +1,27 @@
+### Obtener todos los descuentos de productos para clientes
+GET http://localhost:3003/sales/product-discounts-clients/
+
+### Obtener un descuento de producto por ID
+GET http://localhost:3003/sales/product-discounts-clients/id/1
+
+### Crear un nuevo descuento de producto para cliente
+POST http://localhost:3003/sales/product-discounts-clients/
+Content-Type: application/json
+
+{
+  "client_id": 2,
+  "product_id": 2,
+  "discount_percentage": 25
+}
+
+### Actualizar un descuento de producto para cliente
+PATCH http://localhost:3003/sales/product-discounts-clients/3
+Content-Type: application/json
+
+{
+
+  "discount_percentage": 50
+}
+
+### Eliminar un descuento de producto para cliente
+DELETE http://localhost:3003/sales/product-discounts-clients/3

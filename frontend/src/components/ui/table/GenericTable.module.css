@@ -1,0 +1,134 @@
+.container {
+    width: 100%;
+    display: grid;
+    grid-template:
+        "header" 120px
+        "main" 1fr
+        "pagination" 100px
+        / auto;
+    min-height: 0;
+}
+
+.FeaturesContainer {
+    grid-area: header;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+
+/*************
+*   table    *
+**************/
+
+.table {
+    width: 100%;
+    height: 100%;
+    border-collapse: separate;
+    border-spacing: 0.2px;
+}
+
+.table th,
+.table td {
+    border: 1px solid #E1E2FB;
+    padding: 5px;
+}
+
+.containerTable {
+    grid-area: main;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #E1E2FB;
+    min-height: 0;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+
+/*
+Selecciona el scrollbar en sí (el carril que aparece al hacer overflow). 
+width: define el grosor del scrollbar vertical. 
+height: define el grosor del scrollbar horizontal.
+*/
+.containerTable::-webkit-scrollbar {
+    width: 8px;
+    /* para scroll vertical */
+    height: 8px;
+    /* para scroll horizontal */
+}
+
+/* 
+Define el fondo o carril del scrollbar. background: transparent lo hace invisible,
+para que solo el pulgar (thumb) sea visible.
+ */
+.containerTable::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* es el "pulgar" del scrollbar — la parte que arrastras. */
+.containerTable::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #423DD9;
+}
+
+/*
+Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) son para Chrome, Safari, Edge.
+    scrollbar-width: thin:
+        Controla el grosor del scrollbar.
+        Opciones: auto (normal), thin (más delgado), none (oculto).
+    scrollbar-color: <thumb> <track>:
+        #423DD9: color del pulgar (thumb).
+        transparent: fondo del carril (track).
+*/
+.containerTable {
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: #423DD9 transparent;
+    /* Firefox */
+}
+
+.tableHeader {
+    width: 100%;
+}
+
+.extraComponentsContainer {
+    width: 100%;
+}
+
+.containerPagination {
+    grid-area: pagination;
+    height: 50px;
+    border: 1px solid #E1E2FB;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+
+
+/******************************************
+*    Componentes auxiliares de la tabla  *
+******************************************/
+
+/* checkboxes de las rows  y de la seleccion de todas las rows */
+.checkbox[type="checkbox"] {
+    accent-color: #423DD9;
+}
+
+/* options column */
+.optionsColumn {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.optionsColumn button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}

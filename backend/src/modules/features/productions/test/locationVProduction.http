@@ -1,0 +1,43 @@
+### GET
+GET http://localhost:3003/production/locations HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/locations/id/1 HTTP/1.0
+
+### GET
+GET http://localhost:3003/production/locations/name/Location Z HTTP/1.0
+
+
+### POST
+POST http://localhost:3003/production/locations HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Location Z",
+    "description": "Mi primer location",
+    "active": 1
+}
+
+### PATCH
+PATCH http://localhost:3003/production/location/4 HTTP/1.0
+Content-Type: application/json
+
+{
+    "name": "Location30000"
+}
+
+### DELETE
+DELETE http://localhost:3003/production/location/4 HTTP/1.0
+
+### getTypes
+GET http://localhost:3003/production/locations/1/location-types HTTP/1.0
+
+### getProductionLines
+GET http://localhost:3003/production/locations/2/production-lines HTTP/1.0
+
+
+### addProductionLine
+POST http://localhost:3003/production/locations/3/production-lines/1 HTTP/1.0
+
+### DELETE productionline
+DELETE http://localhost:3003/production/locations/2/production-lines/1 HTTP/1.0
