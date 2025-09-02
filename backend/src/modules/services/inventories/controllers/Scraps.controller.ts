@@ -3,9 +3,9 @@ import {
     Request, Response
 } from "express";
 import ScrapModel
-    from "../models/references/scrap.model.js";
+    from "../models/references/Scrap.model.js";
 import collectorUpdateFields
-    from "src/scripts/collectorUpdateField.js";
+    from "../../../../scripts/collectorUpdateField.js";
 
 class ScrapController {
     static getAll = async (

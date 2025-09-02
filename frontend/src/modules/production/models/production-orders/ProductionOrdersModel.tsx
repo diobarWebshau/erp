@@ -6,7 +6,6 @@ import type {
     IProductionOrder
 } from "../../../../interfaces/productionOrder";
 import {
-    defaultValuePartialProductionOrder,
     defaultValueProductionOrder
 } from "../../../../interfaces/productionOrder";
 
@@ -24,27 +23,17 @@ import {
 } from "react-redux";
 import {
     columnsProductionOrders
-} from "./structure/columns"
+} from "./structure/Columns"
 import {
-    AddModal
-} from "./modals";
-import {
-    Edit, Trash2, CheckCheck,
-    Download,
-    Search,
-    Plus,
-    Eraser,
-    DollarSign,
-    Boxes,
-    TrendingDown,
-    TrendingUp
+    Trash2, Download, Search,
+    Plus, Eraser, Boxes,
+    TrendingDown, TrendingUp
 } from "lucide-react";
 import type {
     RowAction
 } from "../../../../components/ui/table/types";
 import DeleteModal
     from "./modals/delete/DeleteModal";
-import CheckModal from "./modals/check/CheckModal";
 import type {
     IPartialProduction
 } from "../.././../../interfaces/production";
@@ -54,19 +43,32 @@ import {
 import type {
     AppDispatchRedux
 } from "../../../../store/store";
-import EditModal from "./modals/edit/EditModal";
 import {
     diffObjects
 } from "../../../../utils/validation-on-update/validationOnUpdate";
-import GenericTable from "../../../../components/ui/table/tableContext/GenericTable";
-import type { Table } from "@tanstack/react-table";
-import InvertOnHoverButton from "../../../../components/ui/table/components/gui/button/Invert-on-hover-button/InvertOnHoverButton";
+import GenericTable
+    from "../../../../components/ui/table/tableContext/GenericTable";
+import type {
+    Table
+} from "@tanstack/react-table";
+import InvertOnHoverButton
+    from "../../../../components/ui/table/components/gui/button/Invert-on-hover-button/InvertOnHoverButton";
 import StyleModule from "./ProductionOrdersModel.module.css";
-import { useTableDispatch, useTableState } from "../../../../components/ui/table/tableContext/tableHooks";
-import { reset_column_filters } from "../../../../components/ui/table/tableContext/tableActions";
-import FadeButton from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
-import InputSearch from "../../../../components/ui/table/components/gui/input/input-text-search/input";
-import KPICard from "../../../../components/ui/table/components/gui/kpi-card/KPICard";
+import {
+    useTableDispatch, useTableState
+} from "../../../../components/ui/table/tableContext/tableHooks";
+import {
+    reset_column_filters
+} from "../../../../components/ui/table/tableContext/tableActions";
+import FadeButton
+    from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
+import InputSearch
+    from "../../../../components/ui/table/components/gui/input/input-text-search/input";
+import KPICard
+    from "../../../../components/ui/table/components/gui/kpi-card/KPICard";
+import AddModalProductionOrderGeneric
+    from "././context/AddModalProductionOrderGeneric";
+import AddModal from "./wizard/add/AddModal";
 
 const ProductionOrderModel = () => {
 
@@ -88,16 +90,6 @@ const ProductionOrderModel = () => {
     const [
         productionOrderRecord,
         setproductionOrderRecord
-    ] = useState<IPartialProductionOrder>(
-        defaultValuePartialProductionOrder);
-    const [
-        originalproductionOrderRecord,
-        setOriginalproductionOrderRecord
-    ] = useState<IProductionOrder>(
-        defaultValueProductionOrder);
-    const [
-        productionOrderRecordDelete,
-        setproductionOrderRecordDelete
     ] = useState<IProductionOrder>(
         defaultValueProductionOrder);
 
@@ -158,12 +150,12 @@ const ProductionOrderModel = () => {
         try {
             const update_values_po =
                 await diffObjects(
-                    originalproductionOrderRecord,
+                    productionOrderRecord,
                     productionOrder
                 );
             if (Object.keys(update_values_po).length > 0) {
                 const response = await updateProductionOrderInDB(
-                    originalproductionOrderRecord.id,
+                    productionOrderRecord.id,
                     update_values_po,
                     dispatch
                 );
@@ -187,7 +179,7 @@ const ProductionOrderModel = () => {
         try {
             const response =
                 await deleteProductionOrderInDB(
-                    productionOrderRecordDelete.id,
+                    productionOrderRecord.id,
                     dispatch
                 );
             if (!response) {
@@ -238,19 +230,18 @@ const ProductionOrderModel = () => {
         dispatch(clearAllErrors());
         setServerError(null);
         setproductionOrderRecord({ ...record, qty: Number(record.qty) });
-        setOriginalproductionOrderRecord({ ...record, qty: Number(record.qty) });
         setIsActiveEditModal(!isActiveEditModal);
     }
     const toggleActiveDeleteModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        setproductionOrderRecordDelete(record);
+        setproductionOrderRecord(record);
         setIsActiveDeleteModal(!isActiveDeleteModal);
     }
     const toggleActiveCheckPointModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        setOriginalproductionOrderRecord(record);
+        setproductionOrderRecord(record);
         setIsActiveCheckPointModal(!isActiveCheckPointModal);
     }
 
@@ -308,7 +299,7 @@ const ProductionOrderModel = () => {
                         }
                         childrenIcon={
                             <div className={StyleModule.containerIconKPI}>
-                                <Boxes className={StyleModule.IconKPIFirst}/>
+                                <Boxes className={StyleModule.IconKPIFirst} />
                             </div>
                         }
                         classNameContainer={StyleModule.containerKPIFirst}
@@ -332,7 +323,7 @@ const ProductionOrderModel = () => {
                         }
                         childrenIcon={
                             <div className={StyleModule.containerIconKPI}>
-                                <TrendingUp className={StyleModule.IconKPISecond}/>
+                                <TrendingUp className={StyleModule.IconKPISecond} />
                             </div>
                         }
                         classNameContainer={StyleModule.containerKPISecond}
@@ -356,7 +347,7 @@ const ProductionOrderModel = () => {
                         }
                         childrenIcon={
                             <div className={StyleModule.containerIconKPI}>
-                                <TrendingDown className={StyleModule.IconKPIThird}/>
+                                <TrendingDown className={StyleModule.IconKPIThird} />
                             </div>
                         }
                         classNameContainer={StyleModule.containerKPIThird}
@@ -456,6 +447,16 @@ const ProductionOrderModel = () => {
                         onClose={setIsActiveDeleteModal}
                         onDelete={handleDelete}
                     />
+                }
+                {
+                    isActiveAddModal && (
+                        <AddModalProductionOrderGeneric>
+                            <AddModal
+                                onClose={() => setIsActiveAddModal(false)}
+                                onCreate={handleCreate}
+                            />
+                        </AddModalProductionOrderGeneric>
+                    )
                 }
             </div>
         </>

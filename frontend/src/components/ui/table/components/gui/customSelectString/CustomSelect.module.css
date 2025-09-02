@@ -1,0 +1,87 @@
+.customSelect {
+    width: 100%;
+    position: relative;
+
+    border-radius: 15px;
+}
+
+.fieldSelect {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    height: 44px;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: start;
+
+    padding-left: 0.5rem;
+
+    /* distribucion box */
+    border-radius: 15px;
+    background: white;
+    cursor: pointer;
+}
+
+.iconButton {
+    position: absolute;
+    right: 1%;
+    top: 25%;
+
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.toggle {
+    /* dimension */
+    width: 100%;
+
+    /* posicionamiento */
+    position: absolute;
+    z-index: 10;
+
+    background: var(--color-theme-font-white);
+    border-radius: 15px;
+}
+
+.toggle > *:first-child {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.toggle > *:last-child {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.option {
+    cursor: pointer;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: start;
+
+    border: 1px solid var(--color-theme-border-table);
+    background: transparent;
+    padding-left: 0.5rem;
+
+}
+
+
+.option:hover:not(.optionSelected) {
+    background: var(--color-theme-background);
+}
+
+.optionSelected {
+    background: var(--color-theme-primary-light);
+    color: var(--color-theme-font-white);
+}
+
+.optionSelected:hover {
+    background: var(--color-theme-secondary-light);
+}
+

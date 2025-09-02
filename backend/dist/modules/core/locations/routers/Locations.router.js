@@ -6,6 +6,7 @@ const createLocationsRouter = () => {
     locationRouter.get("/", LocationController.getAll);
     locationRouter.get("/with-types", LocationController.getAllWithTypes);
     locationRouter.get("/id/:id", LocationController.getById);
+    locationRouter.get("/produced/:product_id", LocationController.getLocationsProducedOneProduct);
     locationRouter.get("/types/:id", LocationController.getTypesOfLocation);
     locationRouter.get("/name/:name", LocationController.getByName);
     locationRouter.post("/", validateLocationsMiddleware, LocationController.create);

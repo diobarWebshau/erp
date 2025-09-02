@@ -24,6 +24,5 @@ Content-Type: application/json
     "qty": 100
 }
 
-
 ### delete
 DELETE http://localhost:3003/production/production-orders/1 HTTP/1.0

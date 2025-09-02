@@ -6,10 +6,12 @@ const validatePurchasedOrdersMiddleware = async (req, res, next) => {
         let result;
         console.log(body);
         if (method === "POST") {
-            result = await validateSafeParseAsync(body);
+            result =
+                await validateSafeParseAsync(body);
         }
         else {
-            result = await validatePartialSafeParseAsync(body);
+            result =
+                await validatePartialSafeParseAsync(body);
         }
         if (!result.success) {
             console.log(result.error.errors);

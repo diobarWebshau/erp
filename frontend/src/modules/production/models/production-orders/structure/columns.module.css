@@ -13,7 +13,6 @@
     text-transform: capitalize;
 }
 
-
 .released {
     background-color:var(--color-success-light);
     color:  var(--color-success);
@@ -42,4 +41,85 @@
     background-color: var(--color-partial-liht);
     color: var(--color-partial);
     border: 1px solid var(--color-partial);
+}
+
+
+/* *************** Linea de produccion *************** */
+
+.containerProductionLine{
+    color: var(--color-success);
+}
+
+
+.containerProductionLineInactive{
+    color: var(--color-alert);
+}
+
+
+/* *************** Progreso *************** */
+
+.containerProgressQtyProduction {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerProgressIsNotCompleted {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 0.2rem;
+}
+
+.containerProgress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 66.66%;
+}
+
+.progressBar {
+    width: 100%;
+    height: 40%;
+    background-color: var(--color-theme-neutral-background);
+}
+
+.labelProgressBar {
+    color: var(--color-theme-primary);
+}
+
+.sectionProgressBar {
+    background-color: var(--color-theme-primary);
+}
+
+.containerProgressText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 33.33%;
+}
+
+.completedProgressTag {
+    /* dimension */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+
+    /* dimension */
+    width: 120px;
+    height: 30px;
+
+    border-radius: 10px;
+    border: 1px solid var(--color-success);
 }

@@ -1,9 +1,9 @@
 import createInventoriesRouter from "./routers/Inventories.router.js";
 import createInventoriesLocationsItemsRouter from "./routers/InventoriesLocationsItems.router.js";
-import createScrapRouter from "./routers/scrap.router.js";
+import createScrapRouter from "./routers/Scrap.router.js";
 const Inventories = {
     createInventoriesRouter,
     createInventoriesLocationsItemsRouter,
-    createScrapRouter
+    createScrapRouter,
 };
 export default Inventories;

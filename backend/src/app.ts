@@ -92,6 +92,9 @@ const createApp = (): Express => {
     app.use("/inventories/inventories-locations-items",
         Services.Inventories
             .createInventoriesLocationsItemsRouter());
+    app.use("/inventories/scrap",
+        Services.Inventories
+            .createScrapRouter());
 
 
 
@@ -144,6 +147,8 @@ const createApp = (): Express => {
     app.use("/sales/applied-product-discounts-clients",
         Services.Sales
             .createAppliedProductDiscountsClientRouter());
+
+    
 
 
     app.use("/production/products",

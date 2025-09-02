@@ -5,6 +5,7 @@ const createPurchasedOrderRouter = () => {
     const purchasedOrderRouter = Router();
     purchasedOrderRouter.get("/", PurchasedOrderController.getAll);
     purchasedOrderRouter.get("/id/:id", PurchasedOrderController.getById);
+    purchasedOrderRouter.get("/like/:filter", PurchasedOrderController.getByLike);
     purchasedOrderRouter.get("/client/:client_id", PurchasedOrderController.getByClientId);
     purchasedOrderRouter.post("/", validatepurchasedOrdersMiddleware, PurchasedOrderController.create);
     purchasedOrderRouter.patch("/:id", validatepurchasedOrdersMiddleware, PurchasedOrderController.update);

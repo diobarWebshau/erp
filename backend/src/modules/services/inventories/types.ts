@@ -8,7 +8,7 @@ import {
 import {
     ScrapAttributes,
     ScrapCreateAttributes   
-} from "./models/references/scrap.model.js";
+} from "./models/references/Scrap.model.js";
 
 export type {
     InventoryAttributes,

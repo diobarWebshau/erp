@@ -38,6 +38,6 @@ const Production = {
     createPurchaseOrdersProductsRouter,
     createProductVProductionController,
     createInventoryMovementsRouter,
-    createProductionOrderRouter
+    createProductionOrderRouter,
 };
 export default Production;

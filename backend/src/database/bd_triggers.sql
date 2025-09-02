@@ -94,11 +94,15 @@ DELIMITER ;
 * Eliminar los movimientos de inventario a produccion si lo requiere
 * Actualizacion de precio de la purchased_order
 */
+DROP TRIGGER IF EXISTS trigger_delete_purchased_orders_products;
 DELIMITER //
 CREATE TRIGGER trigger_delete_purchased_orders_products
-AFTER DELETE ON purchased_orders_products
+BEFORE DELETE ON purchased_orders_products
 FOR EACH ROW
 BEGIN
+	CALL sp_revert_movement_inventory_pop(
+		OLD.id, OLD.product_id, OLD.product_name
+    );
 	-- CALL delete_pending_production_order_by_reference(OLD.id, 'client');
     -- CALL revert_asign_purchased_order_product_after_update(OLD.id);
 	-- CALL update_purchased_order_total_price(OLD.purchase_order_id);
@@ -201,17 +205,23 @@ END //
 DELIMITER ;
 */
 
+DROP TRIGGER IF EXISTS trigger_delete_internal_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_delete_internal_production_order
-AFTER DELETE ON internal_product_production_orders
+BEFORE DELETE ON internal_product_production_orders
 FOR EACH ROW
 BEGIN
-	INSERT INTO debug_log(message) values(OLD.id);
+	CALL sp_revert_movement_inventory_pop(
+		OLD.id, OLD.product_id, OLD.product_name
+    );
+	-- INSERT INTO debug_log(message) values(OLD.id);
 	-- CALL revert_asign_internal_after_update(OLD.id);
 	-- CALL delete_pending_production_order_by_reference(OLD.id, 'internal');
 END//
 DELIMITER ;
 
+
+DROP TRIGGER IF EXISTS trigger_update_internal_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_update_internal_production_order
 AFTER UPDATE ON internal_product_production_orders
@@ -243,6 +253,14 @@ BEGIN
 		END IF;
 	END IF;
 */
+	IF NEW.qty <> OLD.qty THEN
+		CALL sp_update_inventory_movements_ippo(
+			NEW.id,
+			NEW.qty,
+			NEW.product_id,
+			NEW.product_name
+		);
+	END IF;
 END //
 DELIMITER ;
 	
@@ -349,6 +367,7 @@ DELIMITER ;
 *		TABLE productions_orders		*
 ****************************************/
 
+/*
 DELIMITER //
 CREATE TRIGGER trigger_after_update_production_order
 AFTER UPDATE ON production_orders
@@ -397,7 +416,7 @@ BEGIN
 			AND po.order_type = 'client';
 
 			-- REALIZAMOS EL MOVIMIENTO DE INVENTARIO
-			/*
+            -- 	! ESTE MOVIMIENTO NO DEBE ESTAR, YA QUE YA SE DENTRO DE UN TRIGGER
 			CALL movements_inputs_production(
 				NEW.order_id,
 				NEW.product_id,
@@ -407,7 +426,6 @@ BEGIN
 				NEW.id,
 				'Production order'
 			);
-			*/
 		END IF;
 	ELSE
 		IF  NEW.qty <> OLD.qty THEN
@@ -449,8 +467,8 @@ BEGIN
 			AND po.order_type = 'internal';
 
 			-- EFECTUAR MOVIMIENTOS DE INSUMOS PARA ORDEN DE PRODUCCION
-			/*
-			CALL movements_inputs_production(
+			-- 	! ESTE MOVIMIENTO NO DEBE ESTAR, YA QUE YA SE DENTRO DE UN TRIGGER
+            CALL movements_inputs_production(
 				NEW.order_id,
 				NEW.product_id,
 				v_location_id,
@@ -459,14 +477,14 @@ BEGIN
 				NEW.id,
 				'Internal production'
 			);
-			*/
 		END IF;
 	END IF;
     
 END //
 DELIMITER ;
+*/
 
-
+/*
 DELIMITER //
 CREATE TRIGGER trigger_after_delete_production_orders
 BEFORE DELETE ON production_orders
@@ -475,6 +493,7 @@ BEGIN
 	-- CALL revert_movements_production_order_after_delete(OLD.id);
 END //
 DELIMITER ;
+*/
 
 
 -- DELIMITER //
@@ -745,35 +764,6 @@ DELIMITER ;
 /****************************************
 *		TABLE productions orders		*
 ****************************************/
-
-
--- DELIMITER //
--- CREATE TRIGGER trigger_create_update_status_order_type
--- AFTER INSERT ON production_orders
--- FOR EACH ROW
--- BEGIN
---   CALL validate_order_completed(NEW.order_id, NEW.order_type);
--- END//
--- DELIMITER ; 
-
--- DELIMITER //
--- CREATE TRIGGER trigger_delete_update_status_order_type
--- AFTER DELETE ON production_orders
--- FOR EACH ROW
--- BEGIN
---     CALL validate_order_completed(OLD.order_id, OLD.order_type);
--- END//
--- DELIMITER ; 
-
-
--- DELIMITER //
--- CREATE TRIGGER trigger_update_update_status_order_type
--- AFTER UPDATE ON production_orders
--- FOR EACH ROW
--- BEGIN
---   CALL validate_order_completed(NEW.order_id, NEW.order_type);
--- END//
--- DELIMITER ; 
 
 /************************************************************
 *		TABLE shipping_orders_purchased_order_products		*

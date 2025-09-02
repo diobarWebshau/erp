@@ -7,7 +7,7 @@ import {
 import {
     inventarySchema,
     locationInventoryItemSchema,
-    scrapSchema
+    ScrapSchema
 } from "./inventories/schemas.js"
 
 import {
@@ -48,7 +48,7 @@ export {
     inventoryTransferSchema,
     inventarySchema,
     locationInventoryItemSchema,
-    scrapSchema,
+    ScrapSchema,
     permissionSchema,
     roleSchema,
     rolePermissionSchema,

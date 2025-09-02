@@ -69,47 +69,26 @@ class ProductionOrdersController {
                 const response:
                     ProductionOrderModel[] =
                     await ProductionOrderModel.findAll({
-                        attributes:
-                            ProductionOrderModel.getAllFields(),
+                        attributes: [
+                            ...ProductionOrderModel.getAllFields(),
+                            [
+                                sequelize.literal(
+                                    "func_get_extra_data_production_order(`ProductionOrderModel`.`id`, `ProductionOrderModel`.`order_type`)"
+                                ),
+                                "extra_data"
+                            ]
+                        ],
                         include: [
                             {
                                 model: ProductionModel,
                                 as: "productions",
                                 attributes:
                                     ProductionModel.getAllFields()
-                            },
-                            {
-                                model: InternalProductProductionOrderModel,
-                                as: "internal_order",
-                                attributes:
-                                    InternalProductProductionOrderModel.getAllFields()
-                            },
-                            {
-                                model: PurchaseOrderProductModel,
-                                as: "purchase_order_product",
-                                attributes:
-                                    PurchaseOrderProductModel.getAllFields(),
-                                include: [
-                                    {
-                                        model: ProductModel,
-                                        as: "product",
-                                        attributes:
-                                            ProductModel.getAllFields()
-                                    }, {
-                                        model: PurchasedOrderModel,
-                                        as: "purchase_order",
-                                        attributes:
-                                            PurchasedOrderModel.getAllFields()
-                                    }
-                                ]
-                            },
+                            }
                         ]
                     });
                 if (response.length < 1) {
-                    res.status(404).json({
-                        validation:
-                            "Production orders no found"
-                    });
+                    res.status(200).json([]);
                     return;
                 }
                 const productionOrders: ProductionOrderAttributes[] =

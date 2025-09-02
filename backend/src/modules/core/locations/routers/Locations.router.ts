@@ -13,6 +13,8 @@ const createLocationsRouter = (): Router => {
         LocationController.getAllWithTypes);
     locationRouter.get("/id/:id",
         LocationController.getById);
+    locationRouter.get("/produced/:product_id",
+        LocationController.getLocationsProducedOneProduct);
     locationRouter.get("/types/:id",
         LocationController.getTypesOfLocation);
     locationRouter.get("/name/:name",

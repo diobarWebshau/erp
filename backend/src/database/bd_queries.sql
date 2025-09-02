@@ -1788,3 +1788,141 @@ CALL test(
     1,
     'Producto A'
 );
+
+
+
+
+SELECT 'product' AS entity,
+       p.id        AS product_id,
+       p.name      AS product_name,
+       NULL        AS input_id,
+       NULL        AS input_name
+FROM products p
+WHERE p.id = 1
+UNION ALL
+SELECT 'product_input' AS entity,
+       pi.product_id   AS product_id,
+       NULL            AS product_name,
+       pi.input_id     AS input_id,
+       NULL            AS input_name
+FROM products_inputs pi
+WHERE pi.product_id = 1
+UNION ALL
+SELECT 'input'  AS entity,
+       p.id     AS product_id,
+       NULL     AS product_name,
+       i.id     AS input_id,
+       i.name   AS input_name
+FROM inputs i
+JOIN products_inputs pi ON pi.input_id = i.id
+JOIN products p ON p.id = pi.product_id
+WHERE p.id = 1;
+
+
+
+
+
+SELECT 'product' AS entity,
+       p.id      AS product_id,
+       p.name    AS product_name,
+       NULL      AS input_id,
+       NULL      AS input_name
+FROM products p
+WHERE p.id = 1
+
+UNION ALL
+
+SELECT 'input'  AS entity,
+       p.id      AS product_id,
+       p.name    AS product_name,
+       i.id      AS input_id,
+       i.name    AS input_name
+FROM products p
+JOIN products_inputs pi ON pi.product_id = p.id
+JOIN inputs i ON i.id = pi.input_id
+WHERE p.id = 1;
+
+
+
+
+
+
+
+
+WITH products_inputs_temp AS (
+  SELECT
+    inp.id   AS input_id,
+    inp.name AS input_name
+  FROM products p
+  JOIN products_inputs pi   
+	ON pi.product_id = p.id
+  JOIN inputs inp           
+	ON inp.id = pi.input_id
+  WHERE p.id = 1
+),
+selected_location AS (
+  SELECT l.id AS location_id
+  FROM locations AS l
+  JOIN locations_location_types AS llt 
+	ON llt.location_id = l.id
+  JOIN location_types AS lt          
+	ON lt.id = llt.location_type_id
+  WHERE lt.name = 'Store'
+    AND l.id   = 1
+),
+loc_product_stock AS (
+  SELECT
+    ili.item_id,
+    ili.location_id,
+    inv.stock,
+    (
+      SELECT COALESCE(SUM(im.qty), 0)
+      FROM inventory_movements AS im
+      WHERE im.item_type = 'input'
+        AND im.movement_type = 'allocate'
+        AND im.reference_type NOT IN ('Transfer', 'Scrap')
+        AND im.is_locked = 1
+        AND im.location_id = ili.location_id
+        AND im.item_id = ili.item_id
+    ) AS commited
+  FROM inventories_locations_items AS ili
+  JOIN inventories AS inv 
+	ON inv.id = ili.inventory_id
+  JOIN selected_location AS 
+	sl ON sl.location_id = ili.location_id
+  WHERE ili.item_type = 'input'
+)
+SELECT
+  pit.input_id,
+  pit.input_name,
+  IFNULL(lps.stock, 0) AS stock,
+  IFNULL(lps.stock, 0) - IFNULL(lps.commited, 0) AS available
+FROM products_inputs_temp AS pit
+LEFT JOIN loc_product_stock AS lps
+       ON lps.item_id = pit.input_id
+ORDER BY available DESC;
+
+
+SELECT * FROM locations_production_lines;
+SELECT * FROM production_lines_products;
+
+
+
+
+	SELECT
+		l.*
+	FROM locations AS l
+	JOIN locations_location_types AS llt 
+		ON llt.location_id = l.id
+	JOIN location_types AS lt 
+		ON lt.id = llt.location_type_id
+	JOIN inventories_locations_items AS ili 
+		ON ili.location_id = l.id
+	JOIN inventories AS inv 
+		ON inv.id = ili.inventory_id
+	WHERE lt.name = 'Store'
+	AND ili.item_type = 'product'
+	AND ili.item_id = 1;
+    
+    
+    

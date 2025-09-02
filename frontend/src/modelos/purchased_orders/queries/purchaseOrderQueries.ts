@@ -80,6 +80,30 @@ const getPurchasedOrderByIdInDB = async (
     }
 }
 
+const fetchPurchasedOrdersLike = async (
+    query: string
+): Promise<IPurchasedOrder[]> => {
+    if (!query || query.trim().length === 0) return [];
+
+    const encodedQuery = encodeURIComponent(query);
+
+    try {
+        const response = await fetch(`http://localhost:3003/production/purchased-orders/like/${encodedQuery}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const products: IPurchasedOrder[] = await response.json();
+        console.log(products);
+        return products;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return [];
+    }
+};
+
 const getAllDetailsPurchasedOrderByIdInDB = async (
     dispatch: AppDispatchRedux,
     id: number
@@ -264,5 +288,6 @@ export {
     createBatchPurchasedOrderInDB,
     updatePurchasedOrderInDB,
     deletePurchasedOrderInDB,
-    getAllDetailsPurchasedOrderByIdInDB
+    getAllDetailsPurchasedOrderByIdInDB,
+    fetchPurchasedOrdersLike
 };

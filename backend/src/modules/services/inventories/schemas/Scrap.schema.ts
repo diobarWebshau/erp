@@ -1,6 +1,6 @@
 import zod from "zod";
 
-const scrapSchema = zod.object({
+const ScrapSchema = zod.object({
     reference_type: zod.enum([
         "Production",
         "Inventory",
@@ -23,20 +23,20 @@ const scrapSchema = zod.object({
 
 const validateSafeParse = (input: object) => {
     const result =
-        scrapSchema.safeParse(input);
+        ScrapSchema.safeParse(input);
     return result;
 }
 
 const validateSafeParseAsync =
     async (input: object) => {
         const result =
-            await scrapSchema
+            await ScrapSchema
                 .safeParseAsync(input);
         return result;
     }
 
 const validatePartialSafeParse = (input: object) => {
-    const result = scrapSchema
+    const result = ScrapSchema
         .partial().safeParse(input);
     return result;
 }
@@ -44,13 +44,13 @@ const validatePartialSafeParse = (input: object) => {
 const validatePartialSafeParseAsync =
     async (input: object) => {
         const result =
-            await scrapSchema
+            await ScrapSchema
                 .partial().safeParseAsync(input);
         return result;
     }
 
 export {
-    scrapSchema,
+    ScrapSchema,
     validateSafeParse,
     validateSafeParseAsync,
     validatePartialSafeParse,

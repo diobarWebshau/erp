@@ -43,7 +43,8 @@ import {
     permissionSchema,
     roleSchema,
     rolePermissionSchema,
-    userSchema
+    userSchema,
+    ScrapSchema
 } from "./services/schemas.js";
 
 
@@ -87,4 +88,5 @@ export {
     roleSchema,
     rolePermissionSchema,
     userSchema,
+    ScrapSchema
 }

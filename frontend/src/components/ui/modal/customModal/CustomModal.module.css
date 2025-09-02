@@ -18,6 +18,8 @@
 
     /* opcional: fondo semitransparente para oscurecer */
     background-color: var(--color-overlay);
+
+    border: 1px solid black;
 }
 
 .container {

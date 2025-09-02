@@ -1,3 +1,14 @@
+import type { ILocation } from "./locations";
+import type { IProduction } from "./production";
+import type { IProductionLine } from "./productionLines";
+
+interface ExtraData {
+    scrap_qty: number;
+    location: ILocation;
+    production_qty: number;
+    production_line: IProductionLine;
+}
+
 interface IProductionOrder {
     id: number;
     order_type: 'internal' | 'client';
@@ -8,6 +19,8 @@ interface IProductionOrder {
     status: string;
     created_at: string;
     updated_at: string;
+    extra_data?: ExtraData;
+    productions?: IProduction[];
 }
 
 type IPartialProductionOrder = Partial<IProductionOrder>;

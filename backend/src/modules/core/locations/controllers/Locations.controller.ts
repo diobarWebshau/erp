@@ -190,6 +190,35 @@ class LocationController {
         }
     }
 
+
+    static getLocationsProducedOneProduct = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        const { product_id } = req.params;
+        try {
+
+            type ProductionLocation = { production_locations: LocationAttributes[] };
+
+            const response: ProductionLocation[] = await sequelize.query(
+                "SELECT func_get_product_production_locations(:product_id) AS production_locations",
+                {
+                    replacements: { product_id: product_id },
+                    type: QueryTypes.SELECT,
+                }
+            );
+            const locations: LocationAttributes[] = response[0].production_locations;
+            res.status(200).json(locations);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error ocurred ${error}`);
+            }
+        }
+    }
+
     static create = async (req: Request, res: Response, next: NextFunction) => {
         const { name, description } = req.body;
         try {

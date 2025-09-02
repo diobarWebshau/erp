@@ -1,28 +1,41 @@
 import zod from "zod";
-const scrapSchema = zod.object({
-    reference_type: zod.enum(["production"]),
-    reference_id: zod.number().int().min(1),
-    location_id: zod.number().int().min(1),
-    location_name: zod.string(),
-    item_id: zod.number().int().min(1),
-    item_type: zod.enum(["product", "input"]),
+const ScrapSchema = zod.object({
+    reference_type: zod.enum([
+        "Production",
+        "Inventory",
+        "Shipping"
+    ]),
+    reference_id: zod.number(),
+    location_id: zod.number().optional(),
+    location_name: zod.string().optional(),
+    item_id: zod.number(),
+    item_type: zod.enum([
+        "input",
+        "product"
+    ]),
     item_name: zod.string(),
-    qty: zod.number().int().min(1),
+    qty: zod.number(),
+    reason: zod.string(),
+    user_id: zod.number().optional(),
+    user_name: zod.string().optional()
 });
 const validateSafeParse = (input) => {
-    const result = scrapSchema.safeParse(input);
+    const result = ScrapSchema.safeParse(input);
     return result;
 };
 const validateSafeParseAsync = async (input) => {
-    const result = await scrapSchema.safeParseAsync(input);
+    const result = await ScrapSchema
+        .safeParseAsync(input);
     return result;
 };
 const validatePartialSafeParse = (input) => {
-    const result = scrapSchema.partial().safeParse(input);
+    const result = ScrapSchema
+        .partial().safeParse(input);
     return result;
 };
 const validatePartialSafeParseAsync = async (input) => {
-    const result = await scrapSchema.partial().safeParseAsync(input);
+    const result = await ScrapSchema
+        .partial().safeParseAsync(input);
     return result;
 };
-export { validateSafeParse, validateSafeParseAsync, validatePartialSafeParse, validatePartialSafeParseAsync, scrapSchema };
+export { ScrapSchema, validateSafeParse, validateSafeParseAsync, validatePartialSafeParse, validatePartialSafeParseAsync };

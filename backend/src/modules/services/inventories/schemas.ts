@@ -5,11 +5,11 @@ import {
     locationInventoryItemSchema
 } from "./schemas/locationsInventoriesItems.schema.js";
 import {
-    scrapSchema
-} from "./schemas/scrap.schema.js";
+    ScrapSchema
+} from "./schemas/Scrap.schema.js";
 
 export {
     inventarySchema,
     locationInventoryItemSchema,
-    scrapSchema
+    ScrapSchema
 }

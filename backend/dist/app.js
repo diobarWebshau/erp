@@ -47,6 +47,8 @@ const createApp = () => {
         .createInventoriesRouter());
     app.use("/inventories/inventories-locations-items", Services.Inventories
         .createInventoriesLocationsItemsRouter());
+    app.use("/inventories/scrap", Services.Inventories
+        .createScrapRouter());
     app.use("/inventory-transfers", Services.InventoryTransfers
         .createInventoryTransfersRouter());
     app.use("/logistics/carriers", Services.Logistic

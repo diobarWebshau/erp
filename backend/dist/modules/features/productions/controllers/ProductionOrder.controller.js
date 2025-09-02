@@ -6,12 +6,23 @@ class ProductionOrdersController {
     static getAll = async (req, res, next) => {
         try {
             const response = await ProductionOrderModel.findAll({
-                attributes: ProductionOrderModel.getAllFields(),
+                attributes: [
+                    ...ProductionOrderModel.getAllFields(),
+                    [
+                        sequelize.literal("func_get_extra_data_production_order(`ProductionOrderModel`.`id`, `ProductionOrderModel`.`order_type`)"),
+                        "extra_data"
+                    ]
+                ],
+                include: [
+                    {
+                        model: ProductionModel,
+                        as: "productions",
+                        attributes: ProductionModel.getAllFields()
+                    }
+                ]
             });
             if (response.length < 1) {
-                res.status(404).json({
-                    validation: "Production orders no found"
-                });
+                res.status(200).json([]);
                 return;
             }
             const productionOrders = response.map(u => u.toJSON());

@@ -149,6 +149,54 @@ class PurchasedOrderController {
             }
         }
     }
+
+    static getByLike = async (req: Request, res: Response, next: NextFunction) => {
+        const { filter } = req.params;
+        try {
+            const response = await PurchasedOrderModel.findAll({
+                where: {
+                    [Op.or]: [
+                        { order_code: { [Op.like]: `${filter}%` } },
+                        { company_name: { [Op.like]: `${filter}%` } },
+                        { email: { [Op.like]: `${filter}%` } },
+                        { phone: { [Op.like]: `${filter}%` } },
+                    ],
+                },
+                attributes: PurchasedOrderModel.getAllFields(),
+                include: [
+                    {
+                        model: PurchaseOrderProductModel,
+                        as: "purchase_order_products",
+                        attributes: [
+                            ...PurchaseOrderProductModel.getAllFields(),
+                        ],
+                        include: [
+                            {
+                                model: ProductModel,
+                                as: "product",
+                                attributes: [
+                                    ...ProductModel.getAllFields(),
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            });
+            if (!(response.length > 0)) {
+                res.status(200).json([]);
+                return;
+            }
+            const purchasedOrders = response.map(c => c.toJSON());
+            res.status(200).json(purchasedOrders);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error ocurred ${error}`);
+            }
+        }
+    }
+
     static getByClientId = async (req: Request, res: Response, next: NextFunction) => {
         const { client_id } = req.params;
         try {

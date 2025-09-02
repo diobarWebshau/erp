@@ -58,11 +58,7 @@ const GeneratorBodyTable = <T,>({
     };
 
     return (
-        <tbody className={`nunito-semibold ${className} ${stylesModules.tableBody}`}
-            style={{
-
-            }}
-        >
+        <tbody className={`nunito-semibold ${className} ${stylesModules.tableBody}`}>
             {
                 table?.getRowModel().rows.length > 0 ? (
                     table?.getRowModel().rows.map((row) => (

@@ -5,7 +5,7 @@ import {
 import {
     validatePartialSafeParseAsync,
     validateSafeParseAsync
-} from "../../schemas/scrap.schema.js";
+} from "../../schemas/Scrap.schema.js";
 
 const validateScrapMiddleware = async (
     req: Request,

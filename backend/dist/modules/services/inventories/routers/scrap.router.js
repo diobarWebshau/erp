@@ -1,6 +1,6 @@
 import { Router } from "express";
-import ScrapController from "../controllers/scrap.controller.js";
-import validateScrapMiddleware from "../middleware/scraps/validationMiddleware.js";
+import ScrapController from "../controllers/Scraps.controller.js";
+import validateScrapMiddleware from "../../../services/inventories/middleware/scrap/validationMiddleware.js";
 const createScrapRouter = () => {
     const ScrapRouter = Router();
     ScrapRouter.get("/", ScrapController.getAll);

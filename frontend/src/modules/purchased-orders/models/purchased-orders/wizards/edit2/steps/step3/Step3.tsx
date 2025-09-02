@@ -538,6 +538,8 @@ const Step3 = ({
                 console.log("valor que se actualiza")
                 console.log(update);
                 onEdit(update);
+                console.log("validationRedux")
+                console.log(validationRedux);
                 if (Object.keys(validationRedux).length === 0) {
                     toggleConfirmModal();
                 }

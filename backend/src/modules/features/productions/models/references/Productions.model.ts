@@ -6,7 +6,7 @@ import {
 import sequelize from
     "../../../../../mysql/configSequelize.js";
 import {
-    ScrapCreationAttributes
+    ScrapCreateAttributes
 } from "../../../../types.js";
 
 interface ProductionAttributes {
@@ -17,7 +17,7 @@ interface ProductionAttributes {
     qty: number,
     created_at: Date,
     updated_at: Date,
-    scraps?: ScrapCreationAttributes[]
+    scraps?: ScrapCreateAttributes[]
 }
 
 interface ProductionCreationAttributes

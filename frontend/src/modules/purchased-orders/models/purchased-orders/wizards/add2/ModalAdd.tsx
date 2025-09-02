@@ -152,9 +152,6 @@ const ModalAdd = ({
                     state.current_step === 2 &&
                     <Step2
                         onClose={toggleCancelProcessModal}
-                        addresses={addresses}
-                        loadingAddresses={loadingAddresses}
-                        refetchAddresses={refetchAddresses}
                     />
                 }
                 {

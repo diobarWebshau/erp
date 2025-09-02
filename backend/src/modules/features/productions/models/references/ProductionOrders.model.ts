@@ -2,6 +2,15 @@ import { DataTypes, Model, Optional }
     from "sequelize";
 import sequelize
     from "../../../../../mysql/configSequelize.js";
+import { ProductionAttributes } from "./Productions.model.js";
+import { LocationAttributes, ProductionLineAttributes } from "src/modules/types.js";
+
+interface ExtraData {
+    scrap_qty: number;
+    location: LocationAttributes;
+    production_qty: number;
+    production_line: ProductionLineAttributes;
+}
 
 interface ProductionOrderAttributes {
     id: number,
@@ -12,7 +21,9 @@ interface ProductionOrderAttributes {
     qty: number,
     status: string,
     created_at: Date,
-    updated_at: Date
+    updated_at: Date,
+    productions?: ProductionAttributes[],
+    extra_data?: ExtraData
 }
 
 interface ProductionOrderCreationAttributes
@@ -25,7 +36,7 @@ class ProductionOrderModel
         ProductionOrderCreationAttributes> {
     static getEditableFields(): string[] {
         return [
-            "qty", "status", 
+            "qty", "status",
         ];
     }
     static getAllFields(): string[] {
