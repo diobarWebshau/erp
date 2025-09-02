@@ -1,17 +1,18 @@
+import type { IInventoryInput } from "../../../interfaces/inventoryInputs";
 import type {
     IPartialLocation,
     ILocation
-} from "../interfaces/locations";
+} from "../../../interfaces/locations";
 import type {
     ILocationType
-} from "../interfaces/locationTypes";
+} from "../../../interfaces/locationTypes";
 import {
     setError,
     clearError,
-} from "../store/slicer/errorSlicer";
+} from "../../../store/slicer/errorSlicer";
 import type {
     AppDispatchRedux
-} from "../store/store";
+} from "../../../store/store";
 
 const API_URL =
     "http://localhost:3003/locations/locations";
@@ -149,6 +150,42 @@ const getLocationsProducedOneProduct = async (
         throw error;
     }
 };
+
+
+const getInventoryInputsOfProductInOneLocation = async (
+    product_id: number | undefined | null,
+    location_id: number | undefined | null,
+    dispatch: AppDispatchRedux
+): Promise<IInventoryInput[]> => {
+    try {
+        const response = await fetch(`${API_URL}/inventory-inputs/${product_id}/${location_id}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(
+                    `${errorText}`
+                );
+            }
+            dispatch(
+                setError({
+                    key: "inventoryInputsProduct",
+                    message: errorText
+                })
+            );
+            return [];
+        }
+        dispatch(
+            clearError("inventoryInputsProduct")
+        );
+        const data: IInventoryInput[] = await response.json();
+        return data;
+    } catch (error: unknown) {
+        throw error;
+    }
+}
 
 const createLocationInDB = async (
     data: IPartialLocation,
@@ -351,5 +388,6 @@ export {
     getTypesOfLocationFromDB,
     updateCompleteLocationInDB,
     fetchLocationsWithTypesFromDB,
-    getLocationsProducedOneProduct
+    getLocationsProducedOneProduct,
+    getInventoryInputsOfProductInOneLocation
 };

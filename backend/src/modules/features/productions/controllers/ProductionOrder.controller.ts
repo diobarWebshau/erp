@@ -84,7 +84,13 @@ class ProductionOrdersController {
                                 as: "productions",
                                 attributes:
                                     ProductionModel.getAllFields()
-                            }
+                            },
+                            {
+                                model: ProductModel,
+                                as: "product",
+                                attributes:
+                                    ProductModel.getAllFields()
+                            },
                         ]
                     });
                 if (response.length < 1) {

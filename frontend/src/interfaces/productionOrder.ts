@@ -1,6 +1,8 @@
 import type { ILocation } from "./locations";
+import type { IProduct } from "./product";
 import type { IProduction } from "./production";
 import type { IProductionLine } from "./productionLines";
+import type { IPurchasedOrder } from "./purchasedOrder";
 
 interface ExtraData {
     scrap_qty: number;
@@ -21,6 +23,9 @@ interface IProductionOrder {
     updated_at: string;
     extra_data?: ExtraData;
     productions?: IProduction[];
+    location?: ILocation;
+    product?: IProduct;
+    purchase_order?: IPurchasedOrder;
 }
 
 type IPartialProductionOrder = Partial<IProductionOrder>;

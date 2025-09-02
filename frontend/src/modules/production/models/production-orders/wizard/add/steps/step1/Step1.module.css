@@ -10,6 +10,8 @@
         "body" 1fr
         "footer" max-content 
         / 100%;
+    padding-inline: 2rem;
+    padding-top: 1rem;
 }
 
 /* *************** Footer *************** */
@@ -324,4 +326,28 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
     width: 20px;
     height: 20px;
     color: var(--color-theme-primary-light);
+}
+
+
+.bodySection{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.containerSelect h2{
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+
+.containerSelect{
+    display: flex;
+    flex-direction: column;
+}
+
+.iconButton{
+    width: 15px;
+    height: 15px;
+    color: var(--color-theme-primary);
 }

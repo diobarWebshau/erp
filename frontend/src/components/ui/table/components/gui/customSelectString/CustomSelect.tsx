@@ -65,7 +65,7 @@ const CustomSelect = <T extends string>({
     return (
         <div className={`${styles.customSelect} ${classNameContainer}`} ref={selectRef}>
             <div
-                className={`${styles.fieldSelect} ${classNameToggle}`}
+                className={`nunito-semibold ${styles.fieldSelect} ${classNameToggle}`}
                 onClick={() => setIsOpen((prev) => !prev)}
             >
                 {selectedLabel}
@@ -84,7 +84,7 @@ const CustomSelect = <T extends string>({
                             <div
                                 key={opt.toString()}
                                 className={
-                                    `${styles.option} ${classNameOption} ` +
+                                    `nunito-semibold ${styles.option} ${classNameOption} ` +
                                     `${isSelected && styles.optionSelected}`}
                                 onClick={() => handlerOnChange(opt)}
                             >

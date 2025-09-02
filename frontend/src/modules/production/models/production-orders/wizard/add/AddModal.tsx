@@ -27,6 +27,7 @@ import type {
 import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";
+import { back_step } from "../../context/AddModalProductionOrderActions";
 
 
 interface IAddModalProps {
@@ -53,11 +54,11 @@ const AddModal = ({
 
     // ? ************ Efectos ************/
 
-    useEffect(() => {
-        // Dispara la animación de entrada
-        const timeout = setTimeout(() => setIsVisible(true), 10);
-        return () => clearTimeout(timeout);
-    }, []);
+    // useEffect(() => {
+    //     // Dispara la animación de entrada
+    //     const timeout = setTimeout(() => setIsVisible(true), 10);
+    //     return () => clearTimeout(timeout);
+    // }, []);
 
     // ? ************ Funciones ************/
 
@@ -65,15 +66,16 @@ const AddModal = ({
         e: MouseEvent<HTMLButtonElement>
     ) => {
         e.preventDefault();
-        if (state.current_step < 2) {
+        if (state.current_step >= 2) {
             // Dispara animación de salida
-            setIsClosing(true);
-            setIsVisible(false);
-            setTimeout(() => {
-                onClose(); // desmonta después de la animación
-            }, 400); // coincide con duración del CSS
+            // setIsClosing(true);
+            // setIsVisible(false);
+            // setTimeout(() => {
+            //     onClose(); // desmonta después de la animación
+            // }, 400); // coincide con duración del CSS
+            dispatch(back_step());
         } else {
-            
+            onClose();
         }
     };
 
@@ -83,14 +85,13 @@ const AddModal = ({
 
     // ? ************ Manejo de animaciones con clases CSS ************/
 
-    const modalClass =
-        `${StyleModule.container} ` +
-        `${isClosing
-            ? `${StyleModule.slideOutRightExitActive}`
-            : `${StyleModule.slideInRightEnter} ${isVisible
-                ? StyleModule.slideInRightEnterActive : ""}`
-        }`;
-
+    // const modalClass =
+    //     `${StyleModule.container} ` +
+    //     `${isClosing
+    //         ? `${StyleModule.slideOutRightExitActive}`
+    //         : `${StyleModule.slideInRightEnter} ${isVisible
+    //             ? StyleModule.slideInRightEnterActive : ""}`
+    //     }`;
 
     // ? ************ Hooks para el manejo de datos ************/
 

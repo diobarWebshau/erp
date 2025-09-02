@@ -219,6 +219,42 @@ class LocationController {
         }
     }
 
+    static getInventoryInputsOfProductInOneLocation = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        const { product_id, location_id } = req.params;
+
+        interface InventoryInput {
+            input_id: number;
+            input_name: string;
+            stock: number;
+            available: number;
+            equivalence: number;
+            minimum_stock: number;
+            maximum_stock: number;
+        }
+
+        try {
+            const response: { inventory_inputs: InventoryInput[] }[] = await sequelize.query(
+                "SELECT func_get_inventory_locations_for_Inputs_of_product(:product_id, :location_id) AS inventory_inputs",
+                {
+                    replacements: { product_id: product_id, location_id: location_id },
+                    type: QueryTypes.SELECT,
+                }
+            );
+            const inventory_inputs: InventoryInput[] = response[0].inventory_inputs;
+            res.status(200).json(inventory_inputs);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error ocurred ${error}`);
+            }
+        }
+    }
+
     static create = async (req: Request, res: Response, next: NextFunction) => {
         const { name, description } = req.body;
         try {

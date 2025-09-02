@@ -936,16 +936,12 @@ READS SQL DATA
 BEGIN
 
 	DECLARE json_agg JSON DEFAULT JSON_ARRAY();
-
-	DECLARE v_available DECIMAL(14,4) DEFAULT 0.00;
-	DECLARE v_input_id INT DEFAULT 0;
-	DECLARE v_input_name VARCHAR(100) DEFAULT '';
-	DECLARE v_stock DECIMAL(14,4) DEFAULT 0.00;
 	
 	WITH products_inputs_temp AS (
-		SELECT	
+		SELECT
 			inp.id   AS input_id,
-			inp.name AS input_name
+			inp.name AS input_name,
+			pi.equivalence AS equivalence
 		FROM products p
 		JOIN products_inputs pi   
 			ON pi.product_id = p.id
@@ -968,6 +964,8 @@ BEGIN
 			ili.item_id,
 			ili.location_id,
 			inv.stock,
+			inv.minimum_stock,
+			inv.maximum_stock,
 			(
 			SELECT COALESCE(SUM(im.qty), 0)
 			FROM inventory_movements AS im
@@ -991,8 +989,11 @@ BEGIN
 				JSON_OBJECT(
 						'input_id', pit.input_id,
 						'input_name', pit.input_name,
+						'equivalence', pit.equivalence,
 						'stock', IFNULL(lps.stock, 0),
-						'available', IFNULL(lps.stock, 0) - IFNULL(lps.commited, 0) 
+						'available', IFNULL(lps.stock, 0) - IFNULL(lps.commited, 0),
+						'minimum_stock', lps.minimum_stock,
+						'maximum_stock', lps.maximum_stock
 					)
 			), 
 			JSON_ARRAY()
@@ -1052,4 +1053,130 @@ END //
 DELIMITER ;
 
 
+USE u482698715_shau_erp;
+
+DROP FUNCTION IF EXISTS func_get_extra_data_production_order;
+DELIMITER //
+CREATE FUNCTION func_get_extra_data_production_order(
+    in_order_id INT,
+    in_order_type VARCHAR(100)
+)
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+
+    DECLARE extra_data JSON;
+    DECLARE v_location JSON DEFAULT NULL;
+    DECLARE v_production_line JSON DEFAULT NULL;
+    DECLARE v_production_qty DECIMAL(14, 4) DEFAULT 0;
+    DECLARE v_scrap_qty DECIMAL(14, 4) DEFAULT 0;
+
+    -- Obtener la cantidad de producida y desecho de la orden de produccion
+    SELECT 
+        IFNULL(SUM(p.qty), 0),
+        IFNULL(SUM(s.qty), 0)
+    INTO 
+        v_production_qty,
+        v_scrap_qty
+    FROM production_orders AS po
+    LEFT JOIN productions AS p
+        ON p.id = po.order_id
+    LEFT JOIN scrap AS s
+        ON s.reference_id = po.id
+        AND s.reference_type = 'Production'
+    WHERE po.id = in_order_id
+        AND po.order_type = in_order_type;
+
+    IF in_order_type = 'client' THEN
+
+        -- Obtener datos extra de la orden de produccion
+        SELECT 
+            JSON_OBJECT(
+                'id', l.id,
+                'name', l.name,
+                'description', l.description,
+                'is_active', l.is_active,
+                'created_at', l.created_at,
+                'updated_at', l.updated_at
+            ),
+            JSON_OBJECT(
+                'id', pl.id,
+                'name', pl.name,
+                'is_active', pl.is_active,
+                'created_at', pl.created_at,
+                'updated_at', pl.updated_at
+            )
+        INTO 
+            v_location,
+            v_production_line
+        FROM production_orders AS po
+        LEFT JOIN purchased_orders_products AS pop
+            ON pop.id = po.order_id
+        LEFT JOIN purchased_orders_products_locations_production_lines AS poplpl
+            ON poplpl.purchase_order_product_id = pop.id
+        LEFT JOIN production_lines AS pl
+            ON pl.id = poplpl.production_line_id
+        LEFT JOIN locations_production_lines AS lpl
+            ON lpl.production_line_id = pl.id
+        LEFT JOIN locations AS l
+            ON l.id = lpl.location_id
+        WHERE 
+            po.id = in_order_id
+            AND po.order_type = in_order_type;
+
+    ELSE
+
+        -- Obtener datos extra de la orden de produccion
+        SELECT 
+            JSON_OBJECT(
+                'id', l.id,
+                'name', l.name,
+                'description', l.description,
+                'is_active', l.is_active,
+                'created_at', l.created_at,
+                'updated_at', l.updated_at
+            ),
+            JSON_OBJECT(
+                'id', pl.id,
+                'name', pl.name,
+                'is_active', pl.is_active,
+                'created_at', pl.created_at,
+                'updated_at', pl.updated_at
+            )
+        INTO 
+            v_location,
+            v_production_line
+        FROM production_orders AS po
+        LEFT JOIN internal_product_production_orders AS ippo
+            ON ippo.id = po.order_id
+        LEFT JOIN internal_product_production_orders_locations_production_lines AS ippolpl
+            ON ippolpl.internal_product_production_order_id = ippo.id
+        LEFT JOIN production_lines AS pl
+            ON pl.id = ippolpl.production_line_id
+        LEFT JOIN locations_production_lines AS lpl
+            ON lpl.production_line_id = pl.id
+        LEFT JOIN locations AS l
+            ON l.id = lpl.location_id
+        WHERE 
+            po.id = in_order_id
+            AND po.order_type = in_order_type;
+
+    END IF;
+
+    -- Crear el JSON con los datos extra
+    SET extra_data = JSON_OBJECT(
+        'location', v_location,
+        'production_line', v_production_line,
+        'production_qty', v_production_qty,
+        'scrap_qty', v_scrap_qty
+    );
+
+    RETURN extra_data;
+
+END //
+DELIMITER ;
+
+
 select func_get_product_production_locations(1);
+select func_get_extra_data_production_order(1, 'client');

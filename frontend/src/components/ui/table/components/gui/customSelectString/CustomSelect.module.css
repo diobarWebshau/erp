@@ -17,12 +17,14 @@
     align-items: center;
     justify-content: start;
 
-    padding-left: 0.5rem;
+    padding-left: 1rem;
 
     /* distribucion box */
     border-radius: 15px;
     background: white;
     cursor: pointer;
+    font-size: 14px;
+
 }
 
 .iconButton {
@@ -67,7 +69,9 @@
 
     border: 1px solid var(--color-theme-border-table);
     background: transparent;
-    padding-left: 0.5rem;
+    padding-left: 1rem;
+
+    font-size: 14px;
 
 }
 
@@ -77,11 +81,6 @@
 }
 
 .optionSelected {
-    background: var(--color-theme-primary-light);
-    color: var(--color-theme-font-white);
+    background: var(--color-theme-neutral-background);
+    color: var(--color-theme-font-black);
 }
-
-.optionSelected:hover {
-    background: var(--color-theme-secondary-light);
-}
-

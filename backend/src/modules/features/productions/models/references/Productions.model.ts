@@ -6,7 +6,7 @@ import {
 import sequelize from
     "../../../../../mysql/configSequelize.js";
 import {
-    ScrapCreateAttributes
+    ScrapCreateAttributes,
 } from "../../../../types.js";
 
 interface ProductionAttributes {

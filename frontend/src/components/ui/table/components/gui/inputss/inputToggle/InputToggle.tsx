@@ -5,9 +5,11 @@ interface InputToggleProps {
     value: number | undefined;
     onChange: (value: number) => void;
     min?: number;
+    className?: string;
+    classNameInput?: string;
 }
 
-const InputToggle = ({ value, onChange, min = 1 }: InputToggleProps) => {
+const InputToggle = ({ value, onChange, min = 1, className, classNameInput }: InputToggleProps) => {
     const [inputValue, setInputValue] = useState(value?.toString() ?? "");
 
     // Sync externo
@@ -32,7 +34,6 @@ const InputToggle = ({ value, onChange, min = 1 }: InputToggleProps) => {
     };
 
     const handleBlur = () => {
-        
         const num = Number(inputValue);
 
         // Si el valor es inválido, lo forzamos al mínimo
@@ -48,9 +49,9 @@ const InputToggle = ({ value, onChange, min = 1 }: InputToggleProps) => {
     };
 
     return (
-        <div className={styleModule.container}>
+        <div className={`${styleModule.container} ${className}`}>
             <input
-                className={`${styleModule.input} ${!isValid() && styleModule.inputValidation}`}
+                className={`${styleModule.input} ${!isValid() && styleModule.inputValidation} ${classNameInput}`}
                 type="number"
                 value={inputValue}
                 onChange={handleChange}

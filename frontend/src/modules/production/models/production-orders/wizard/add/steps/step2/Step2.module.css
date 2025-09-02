@@ -8,14 +8,41 @@
     grid-template:
         "header" max-content
         "body" 1fr
-        "footer" max-content 
-        / 100%;
+        "footer" max-content / 100%;
+    padding-inline: 2rem;
+    padding-top: 1rem;
+    gap: 1rem;
 }
 
-.container > * {
-    border: 1px solid black;
+
+.headerSection {
+    grid-area: header;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
 }
 
+.headerSection h2 {
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+
+.bodySection {
+    grid-area: body;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.iconButton {
+    width: 15px;
+    height: 15px;
+    color: var(--color-theme-primary);
+}
 
 /* *************** Footer *************** */
 
@@ -34,18 +61,20 @@
 /* ? Botones */
 
 .cancelButton,
-.nextButton {
+.nextButton,
+.backButton {
     /* dimension */
     width: 200px;
     height: 45px;
-    
+
     /* distribucion box */
     border-radius: 15px;
     cursor: pointer;
 }
 
 .cancelButtonSpan,
-.nextButtonSpan {
+.nextButtonSpan,
+.backButtonSpan {
     /* dimension */
     width: 100%;
     height: 100%;
@@ -75,8 +104,11 @@
 }
 
 .cancelButton:hover .cancelButtonLabel,
-.cancelButton:hover .cancelButtonIcon{
+.cancelButton:hover .cancelButtonIcon {
     color: var(--color-alert);
+}
+
+.cancelButton:hover {
     border: 1px solid var(--color-theme-border-table);
 }
 
@@ -102,4 +134,275 @@
 }
 
 
+/* ? Back Button */
 
+.backButton {
+    background-color: var(--color-theme-font-white);
+}
+
+.backButtonLabel {
+    color: var(--color-theme-primary-light);
+}
+
+.backButtonIcon {
+    color: var(--color-theme-primary-light);
+    width: 15px;
+    height: 15px;
+}
+
+.backButton:hover .backButtonLabel,
+.backButton:hover .backButtonIcon {
+    color: var(--color-theme-primary);
+}
+
+.backButton:hover {
+    border: 1px solid var(--color-theme-border-table);
+}
+
+
+
+
+/* ? selectSearchMultiCheck */
+
+.selectSearchMultiCheckContainer {
+    gap: 5rem;
+}
+
+.selectSearchMultiCheckInput {
+    /* dimension */
+    height: 45px;
+
+    /* distribuccion box */
+    border-radius: 10px;
+    padding-left: 1rem;
+    padding-right: 3%;
+    border: 1px solid var(--color-theme-border-table);
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+
+    font-size: 14px;
+}
+
+.selectSearchMultiCheckDropDownSelectItemInput {
+    /* dimension */
+    width: 16px;
+    height: 16px;
+
+    /* posicionamiento */
+    position: relative;
+
+    /* distribucion */
+
+    display: inline-block;
+
+    /* distribucion box */
+    border: 2px solid var(--color-theme-primary-light);
+    border-radius: 4px;
+
+    /* estilos */
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-theme-font-white);
+    cursor: pointer;
+    appearance: none;
+
+    /* animaciones */
+    transition: all 0.2s ease;
+}
+
+.selectSearchMultiCheckDropDownHeader {
+    /* dimension */
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-theme-primary);
+}
+
+.selectSearchMultiCheckDropDownSelectItemInput:checked {
+    /* distribucion box */
+    border-color: var(--color-theme-primary-light);
+    /* estilos */
+    background-color: var(--color-theme-primary-light);
+}
+
+.selectSearchMultiCheckDropDownSelectItemInput:checked::after {
+    /* dimension */
+    width: 4px;
+    height: 8px;
+
+    /* posicionamiento */
+    position: absolute;
+    top: 0.5px;
+    left: 3.8px;
+    transform: rotate(45deg);
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-font-white);
+    border-width: 0 2.5px 2.5px 0;
+
+    /* estilos */
+    content: "";
+}
+
+.selectSearchMultiCheckInput:focus {
+    /* estilos */
+    outline: none;
+}
+
+.selectSearchMultiCheckDropDown {
+    /* dimension */
+    width: 100%;
+    max-height: 450px;
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-border-table);
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    overflow-y: auto;
+}
+
+.selectSearchMultiCheckDropDownSelectItemSelected,
+.selectSearchMultiCheckDropDownSearchItem {
+    /* dimension */
+    width: 100%;
+    height: 45px;
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-border-table);
+    padding-left: 1rem;
+
+    /* distribucion flex */
+    font-family: inherit;
+    font-size: 14px;
+    gap: 0.5rem;
+}
+
+.selectSearchMultiCheckDropDownSearchItem:hover,
+.selectSearchMultiCheckDropDownSelectItemSelected:hover {
+    /* estilos */
+    background-color: var(--color-theme-background);
+}
+
+.selectSearchMultiCheckDropDownSelectItemSelected {
+    /* estilos */
+    background-color: var(--color-theme-neutral-background);
+}
+
+.selectSearchMultiCheckEmptyMessage {
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* estilos */
+    font-size: 14px;
+}
+
+
+/*
+Selecciona el scrollbar en sí (el carril que aparece al hacer overflow). 
+width: define el grosor del scrollbar vertical. 
+height: define el grosor del scrollbar horizontal.
+*/
+.selectSearchMultiCheckDropDown::-webkit-scrollbar {
+    width: 8px;
+    /* para scroll vertical */
+    height: 8px;
+    /* para scroll horizontal */
+}
+
+/* 
+Define el fondo o carril del scrollbar. background: transparent lo hace invisible,
+para que solo el pulgar (thumb) sea visible.
+ */
+.selectSearchMultiCheckDropDown::-webkit-scrollbar-track {
+    /* estilos */
+    background: transparent;
+}
+
+/* es el "pulgar" del scrollbar — la parte que arrastras. */
+.selectSearchMultiCheckDropDown::-webkit-scrollbar-thumb {
+    /* distribucion box */
+    border-radius: 4px;
+    /* estilos */
+    background-color: var(--color-theme-primary-light);
+}
+
+/*
+Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) son para Chrome, Safari, Edge.
+    scrollbar-width: thin:
+        Controla el grosor del scrollbar.
+        Opciones: auto (normal), thin (más delgado), none (oculto).
+    scrollbar-color: <thumb> <track>:
+        #423DD9: color del pulgar (thumb).
+        transparent: fondo del carril (track).
+*/
+.selectSearchMultiCheckDropDown {
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: var(--color-theme-primary-light) transparent;
+    /* Firefox */
+}
+
+
+.selectSearchMultiCheckButtonInputIcon {
+    /* dimension */
+    width: 20px;
+    height: 20px;
+    color: var(--color-theme-primary-light);
+}
+
+
+
+
+/* *************** Disponibilidad *************** */
+
+.baseAvailable {
+    /* dimension */
+    height: 30px;
+    width: 100px;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+
+    border-radius: 15px;
+}
+
+.highStock {
+    /* estilos */
+    background: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}
+
+.lowStock {
+    /* estilos */
+    background: var(--color-warning-light);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+}
+
+.unavailable {
+    /* estilos */
+    background: var(--color-alert-light);
+    color: var(--color-alert);
+    border: 1px solid var(--color-alert);
+}
+
+
+/* * Input Memoizado del qty */
+
+.InputMemorizadoContainer {
+    height: 44px;
+}
+
+.InputMemorizado {
+    height: 44px;
+    padding: 1rem;
+    color: var(--color-theme-font-black);
+}
