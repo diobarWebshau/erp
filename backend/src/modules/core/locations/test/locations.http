@@ -11,6 +11,9 @@ GET http://localhost:3003/locations/locations/id/1 HTTP/1.0
 GET http://localhost:3003/locations/locations/produced/1 HTTP/1.0
 
 ### GET
+GET http://localhost:3003/locations/locations/production-lines/1/1 HTTP/1.0
+
+### GET
 GET http://localhost:3003/locations/locations/types/1 HTTP/1.0
 
 ### GET

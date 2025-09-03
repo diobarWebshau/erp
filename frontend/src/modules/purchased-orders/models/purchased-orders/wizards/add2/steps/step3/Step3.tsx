@@ -671,7 +671,7 @@ const Step3 = ({
                                 + `${state.data.shipping_country}.`
                             }
                         </p>
-                        <p>{state.data.shipping_address}</p>
+                        <p className="nunito-semibold">{state.data.shipping_address}</p>
                     </section>
                 </section>
                 <section className={`nunito-bold ${styleModule.thirdBlock}`}>

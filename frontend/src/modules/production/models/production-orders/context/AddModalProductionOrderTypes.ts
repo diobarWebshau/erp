@@ -13,6 +13,7 @@ type AddModalProductionOrderState = {
 const AddModalProductionOrderActionsTypes = {
     SET_PRODUCTION_ORDER: "SET_PRODUCTION_ORDER",
     UPDATE_PRODUCTION_ORDER: "UPDATE_PRODUCTION_ORDER",
+    REMOVE_ATTRIBUTES: "REMOVE_ATTRIBUTES",
     SET_STEP: "SET_STEP",
     BACK_STEP: "BACK_STEP",
     NEXT_STEP: "NEXT_STEP",
@@ -27,6 +28,7 @@ type AddModalProductionOrderActionType =
 type AddModalProductionOrderAction =
     | { type: typeof AddModalProductionOrderActionsTypes.SET_PRODUCTION_ORDER, payload: IPartialProductionOrder }
     | { type: typeof AddModalProductionOrderActionsTypes.UPDATE_PRODUCTION_ORDER, payload: IPartialProductionOrder }
+    | { type: typeof AddModalProductionOrderActionsTypes.REMOVE_ATTRIBUTES, payload: string[]}
     | { type: typeof AddModalProductionOrderActionsTypes.SET_STEP, payload: number }
     | { type: typeof AddModalProductionOrderActionsTypes.BACK_STEP }
     | { type: typeof AddModalProductionOrderActionsTypes.NEXT_STEP }

@@ -3,7 +3,10 @@ import { DataTypes, Model, Optional }
 import sequelize
     from "../../../../../mysql/configSequelize.js";
 import { ProductionAttributes } from "./Productions.model.js";
-import { LocationAttributes, ProductAttributes, ProductionLineAttributes, PurchasedOrderAttributes } from "src/modules/types.js";
+import {
+    LocationAttributes, ProductAttributes,
+    ProductionLineAttributes, PurchasedOrderAttributes
+} from "src/modules/types.js";
 
 interface ExtraData {
     scrap_qty: number;
@@ -27,6 +30,7 @@ interface ProductionOrderAttributes {
     location?: LocationAttributes
     product?: ProductAttributes
     purchase_order?: PurchasedOrderAttributes
+    production_line?: ProductionLineAttributes
 }
 
 interface ProductionOrderCreationAttributes

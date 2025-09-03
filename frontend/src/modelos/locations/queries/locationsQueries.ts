@@ -6,6 +6,7 @@ import type {
 import type {
     ILocationType
 } from "../../../interfaces/locationTypes";
+import type { IProductionLine } from "../../../interfaces/productionLines";
 import {
     setError,
     clearError,
@@ -150,6 +151,41 @@ const getLocationsProducedOneProduct = async (
         throw error;
     }
 };
+
+const getProductionLinesForProductAtLocation = async (
+    product_id: number | undefined | null,
+    location_id: number | undefined | null,
+    dispatch: AppDispatchRedux
+): Promise<IProductionLine[]> => {
+    try {
+        const response = await fetch(`${API_URL}/production-lines/${location_id}/${product_id}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(
+                    `${errorText}`
+                );
+            }
+            dispatch(
+                setError({
+                    key: "getProductionLinesForProductAtLocation",
+                    message: errorText
+                })
+            );
+            return [];
+        }
+        dispatch(
+            clearError("getProductionLinesForProductAtLocation")
+        );
+        const data: IProductionLine[] = await response.json();
+        return data;
+    } catch (error: unknown) {
+        throw error;
+    }
+}
 
 
 const getInventoryInputsOfProductInOneLocation = async (
@@ -389,5 +425,6 @@ export {
     updateCompleteLocationInDB,
     fetchLocationsWithTypesFromDB,
     getLocationsProducedOneProduct,
-    getInventoryInputsOfProductInOneLocation
+    getInventoryInputsOfProductInOneLocation,
+    getProductionLinesForProductAtLocation
 };

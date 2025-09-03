@@ -1,0 +1,91 @@
+.container {
+    /* posicionamiento */
+    position: relative;
+
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+}
+
+.inputContainer {
+    /* posicionamiento */
+    position: relative;
+
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    align-items: center;
+}
+
+.input {
+    /* dimension */
+    width: 100%;
+}
+
+
+.dropDown {
+
+    /* posicionamiento */
+    position: absolute;
+
+    /* dimension */
+    top: 100%;
+    left: 0;
+    right: 0;
+
+    /* distribucion box */
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.dropDownSelect,
+.dropDownSearch {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.dropDownhHeader {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.buttonIconInput {
+    /* posicionamiento */
+    position: absolute;
+
+    /* dimension */
+    right: 1%;
+    height: 90%;
+
+    /* estilos */
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.dropDownSelectItemSelected,
+.dropDownSearchItem {
+    /* distribucion flex */
+    display: flex;
+    align-items: center;
+    /* distribucion box */
+}
+
+.loading {
+    /* distribucion box */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+}

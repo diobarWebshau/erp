@@ -443,6 +443,14 @@ ProductionModel.belongsTo(ProductionOrderModel, {
     onDelete: "CASCADE",
     as: "production_order"
 });
+ProductionOrderModel.belongsTo(ProductModel, {
+    foreignKey: "product_id",
+    as: "product"
+});
+ProductModel.hasMany(ProductionOrderModel, {
+    foreignKey: "product_id",
+    as: "production_orders"
+});
 /* Scrap-Location
 * Un Scrap puede tener una Location, pero una Location puede tener muchos Scraps
 */

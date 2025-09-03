@@ -160,9 +160,23 @@
 }
 
 
+/* *************** Select Custom *************** */
+
+.customSelectFieldContainer{
+    height: 44px;
+    background-color: var(--color-theme-font-white);
+}
+
+.customSelectToggleContainer{
+    background-color: var(--color-theme-font-white);
+}
+
+.customSelectOption{
+    height: 44px;
+}
 
 
-/* ? selectSearchMultiCheck */
+/* *  selectSearchMultiCheck */
 
 .selectSearchMultiCheckContainer {
     gap: 5rem;

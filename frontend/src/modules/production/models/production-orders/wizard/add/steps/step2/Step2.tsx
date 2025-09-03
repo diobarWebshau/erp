@@ -259,20 +259,12 @@ const Step2 = () => {
                             onChange={setSelectedLocation}
                             value={selectedLocation}
                             icon={<ChevronDown className={StyleModule.iconButton} />}
+                            classNameFieldContainer={StyleModule.customSelectFieldContainer}
+                            classNameToggleContainer={StyleModule.customSelectToggleContainer}
+                            classNameOption={StyleModule.customSelectOption}
 
                         />
                     )}
-                    {/* <StandarNumericField
-                        value={quantity || ''}
-                        onChange={hadnleOnChangeQuantity}
-                        required
-                        type="number"
-                        placeholder="Ingrese la cantidad"
-                        autoFocus
-                        id="quantity"
-                        name="quantity"
-
-                    /> */}
                     <InputToggleMemorizado
                         value={state.data.qty}
                         onChange={hadnleOnChangeQuantity}
@@ -297,6 +289,7 @@ const Step2 = () => {
                         enableViews={false}
                         enableRowEditClick={false}
                         typeRowActions="icon"
+                        noResultsMessage="El producto no requiere de insumos"
                         classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
                     />
                 </div>

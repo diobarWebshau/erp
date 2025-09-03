@@ -211,7 +211,7 @@ const Step1 = () => {
                     qty: quantity,
                 }));
                 dispatch(next_step());
-                
+
             } else {
                 if (!selectedProduct) {
                     setValidationForm((prev) => ({
@@ -265,10 +265,10 @@ const Step1 = () => {
             }));
         } else {
             purchaseOrder === null &&
-            setValidationForm((prev) => ({
-                ...prev,
-                purchase_order: "Por favor, selecciona una orden de compra",
-            }));
+                setValidationForm((prev) => ({
+                    ...prev,
+                    purchase_order: "Por favor, selecciona una orden de compra",
+                }));
         }
     };
 
@@ -333,6 +333,9 @@ const Step1 = () => {
                         value={orderType ?? "Seleccione una opcion"}
                         onChange={setOrderType}
                         icon={<ChevronDown className={StyleModule.iconButton} />}
+                        classNameFieldContainer={StyleModule.customSelectFieldContainer}
+                        classNameToggleContainer={StyleModule.customSelectToggleContainer}
+                        classNameOption={StyleModule.customSelectOption}
                     />
                     {
                         validationForm.order_type && (
@@ -368,7 +371,6 @@ const Step1 = () => {
                                 loadOptions={fetchPurchaseOrderLike}
                                 selected={selectedPurchaseOrder}
                                 setSelected={hadnleOnChangePurchaseOrder}
-                                
                             />
                             {
                                 validationForm.purchase_order && (
@@ -433,7 +435,9 @@ const Step1 = () => {
                                 onChange={setSelectedLocation}
                                 value={selectedLocation}
                                 icon={<ChevronDown className={StyleModule.iconButton} />}
-
+                                classNameFieldContainer={StyleModule.customSelectFieldContainer}
+                                classNameToggleContainer={StyleModule.customSelectToggleContainer}
+                                classNameOption={StyleModule.customSelectOption}
                             />
                             {
                                 validationForm.location && (
@@ -455,7 +459,7 @@ const Step1 = () => {
                                 autoFocus
                                 id="quantity"
                                 name="quantity"
-                                
+
                             />
                             {
                                 validationForm.quantity && (

@@ -1,0 +1,13 @@
+.textarea {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion box */
+    border-radius: 15px;
+    padding-inline: 1rem;
+
+    /* estilos */
+    border: 1px solid var(--color-theme-border-table);
+    resize: none;
+    field-sizing: content;
+}

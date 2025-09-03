@@ -66,6 +66,20 @@ class ProductionOrdersController {
             }
         }
     };
+    static getNextOrderCode = async (req, res, next) => {
+        try {
+            const response = await sequelize.query('');
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            }
+            else {
+                console.error(`
+                    An unexpected error ocurred ${error}`);
+            }
+        }
+    };
     static getDetailsById = async (req, res, next) => {
         const { id } = req.params;
         try {

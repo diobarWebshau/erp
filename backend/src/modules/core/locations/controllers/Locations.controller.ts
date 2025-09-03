@@ -5,7 +5,11 @@ import sequelize
 import {
     LocationModel,
     LocationTypeModel,
-    LocationLocationTypeModel
+    LocationLocationTypeModel,
+    ProductionLineModel,
+    LocationsProductionLinesModel,
+    ProductionLineProductModel,
+    ProductModel
 } from "../../../associations.js";
 import {
     LocationAttributes,
@@ -210,6 +214,45 @@ class LocationController {
             );
             const locations: LocationAttributes[] = response[0].production_locations;
             res.status(200).json(locations);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error ocurred ${error}`);
+            }
+        }
+    }
+
+    static getProductionLinesForProductAtLocation = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        const { location_id, product_id } = req.params;
+        try {
+            const response = await ProductionLineModel.findAll({
+                attributes: ProductionLineModel.getAllFields(),
+                include: [
+                    {
+                        model: LocationsProductionLinesModel,
+                        as: "location_production_line",
+                        attributes: [],
+                        where: {
+                            location_id: location_id
+                        }
+                    },
+                    {
+                        model: ProductionLineProductModel,
+                        as: "production_lines_products",
+                        attributes: [],
+                        where: {
+                            product_id: product_id
+                        }
+                    }
+                ]
+            });
+            const production_lines = response.map((pl) => pl.toJSON());
+            res.status(200).json(production_lines);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 next(error);

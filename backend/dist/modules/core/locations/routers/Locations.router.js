@@ -8,6 +8,7 @@ const createLocationsRouter = () => {
     locationRouter.get("/id/:id", LocationController.getById);
     locationRouter.get("/inventory-inputs/:product_id/:location_id", LocationController.getInventoryInputsOfProductInOneLocation);
     locationRouter.get("/produced/:product_id", LocationController.getLocationsProducedOneProduct);
+    locationRouter.get("/production-lines/:location_id/:product_id", LocationController.getProductionLinesForProductAtLocation);
     locationRouter.get("/types/:id", LocationController.getTypesOfLocation);
     locationRouter.get("/name/:name", LocationController.getByName);
     locationRouter.post("/", validateLocationsMiddleware, LocationController.create);

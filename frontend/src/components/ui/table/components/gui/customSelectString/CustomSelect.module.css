@@ -1,86 +1,99 @@
 .customSelect {
     width: 100%;
-    position: relative;
 
-    border-radius: 15px;
+    position: relative;
+    display: flex;
 }
 
-.fieldSelect {
-    /* dimension */
-    width: 100%;
-    height: 100%;
-    height: 44px;
+.fieldSelectContainer {
 
+    /* posicionamiento */
     position: relative;
 
+    /* distribucion dentro del padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 100%;
+
+    /* distribucion flex */
     display: flex;
     align-items: center;
     justify-content: start;
 
-    padding-left: 1rem;
-
     /* distribucion box */
+    padding-left: 1rem;
+    padding-right: 1%;
     border-radius: 15px;
-    background: white;
+    border: 1px solid var(--color-theme-border-table);
+
+    /* estilos */
     cursor: pointer;
     font-size: 14px;
-
 }
 
 .iconButton {
+    /* posicionamiento */
     position: absolute;
     right: 1%;
     top: 25%;
 
-    background-color: transparent;
+    /* dimension */
     border: none;
+
+    /* estilos */
     cursor: pointer;
+    background: transparent;
+
 }
 
+
 .toggle {
+    /* posicionamiento */
+    position: absolute;
+    top: 105%;
+
     /* dimension */
     width: 100%;
 
-    /* posicionamiento */
-    position: absolute;
+    /* distribucion box */
+    border-radius: 15px;
     z-index: 10;
 
-    background: var(--color-theme-font-white);
-    border-radius: 15px;
+    /* estilos */
+    font-size: 14px;
 }
 
-.toggle > *:first-child {
+.toggle>*:first-child {
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
 }
 
-.toggle > *:last-child {
+.toggle>*:last-child {
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
 }
 
 .option {
-    cursor: pointer;
-    height: 44px;
 
+    /* distribucion flex */
     display: flex;
     align-items: center;
     justify-content: start;
-
-    border: 1px solid var(--color-theme-border-table);
-    background: transparent;
     padding-left: 1rem;
 
-    font-size: 14px;
+    /* estilos */
+    cursor: pointer;
+    background: transparent;
 
+    border-bottom: 1px solid var(--color-theme-border-table);
 }
 
-
-.option:hover:not(.optionSelected) {
+.option:hover {
+    /* estilos */
     background: var(--color-theme-background);
 }
 
-.optionSelected {
+.selected {
+    /* estilos */
     background: var(--color-theme-neutral-background);
-    color: var(--color-theme-font-black);
 }

@@ -26,6 +26,7 @@ interface IProductionOrder {
     location?: ILocation;
     product?: IProduct;
     purchase_order?: IPurchasedOrder;
+    production_line?: IProductionLine;
 }
 
 type IPartialProductionOrder = Partial<IProductionOrder>;

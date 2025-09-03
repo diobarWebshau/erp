@@ -15,6 +15,7 @@ import {
     AddModalProductionOrderActionsTypes,
     total_steps
 } from "./AddModalProductionOrderTypes";
+import type { IPartialProductionOrder } from "../../../../../interfaces/productionOrder";
 
 // * ****************** Initial State  ******************/
 
@@ -35,6 +36,11 @@ const AddModalProductionOrderReducer = produce(
         switch (action.type) {
             case AddModalProductionOrderActionsTypes.SET_PRODUCTION_ORDER:
                 Object.assign(draft.data, action.payload);
+                break;
+            case AddModalProductionOrderActionsTypes.REMOVE_ATTRIBUTES:
+                action.payload.forEach((attribute) => {
+                    delete draft.data[attribute as keyof IPartialProductionOrder];
+                });
                 break;
             case AddModalProductionOrderActionsTypes.UPDATE_PRODUCTION_ORDER:
                 if (action.payload.order_type === "internal") {

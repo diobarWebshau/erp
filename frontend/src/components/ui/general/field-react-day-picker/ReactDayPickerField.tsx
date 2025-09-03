@@ -23,7 +23,7 @@ import {
 } from "@floating-ui/react-dom";
 
 interface ReactDayPickerFieldProps {
-    label: string;
+    label?: string;
     icon?: ReactNode;
     value?: Date;
     classNameLabel?: string;
@@ -146,12 +146,15 @@ const ReactDayPickerField = ({
 
     return (
         <div className={`${stylesModules.container} ${classNameContainer ?? ""}`}>
-            <label
-                htmlFor="date-input"
-                className={`${stylesModules.dateLabel} ${classNameLabel ?? ""}`}
-            >
-                {label}
-            </label>
+            {
+                label &&
+                <label
+                    htmlFor="date-input"
+                    className={`${stylesModules.dateLabel} ${classNameLabel ?? ""}`}
+                >
+                    {label}
+                </label>
+            }
             <div className={`${stylesModules.dateField} ${classNameField ?? ""}`}>
                 <input
                     className={`${stylesModules.dateInput} ${classNameInput ?? ""}`}

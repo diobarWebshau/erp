@@ -22,6 +22,13 @@ const update_production_order = (
     payload
 });
 
+const remove_attributes = (
+    payload: string[]
+): AddModalProductionOrderAction => ({
+    type: AddModalProductionOrderActionsTypes.REMOVE_ATTRIBUTES,
+    payload
+});
+
 const set_step = (
     payload: number
 ): AddModalProductionOrderAction => ({
@@ -44,6 +51,7 @@ const clear = (): AddModalProductionOrderAction => ({
 export {
     set_production_order,
     update_production_order,
+    remove_attributes,
     set_step,
     back_step,
     next_step,

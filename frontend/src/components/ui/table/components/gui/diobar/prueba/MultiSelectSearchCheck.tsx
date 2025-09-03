@@ -1,11 +1,11 @@
 import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useDebounce, type StringKeys } from "./types";
+import { useDebounce, type StrictStringKeys } from "./types";
 import style from "./MultiSelectSearchCheck.module.css";
 import { useClickOutside } from "../../../../customHooks/useClickOutside";
 
 interface MultiProps<T> {
-    rowId: StringKeys<T>;
+    rowId: StrictStringKeys<T>;
     search: string;
     setSearch: (search: string) => void;
     open: boolean;

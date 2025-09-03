@@ -17,6 +17,8 @@ const createLocationsRouter = (): Router => {
         LocationController.getInventoryInputsOfProductInOneLocation);
     locationRouter.get("/produced/:product_id",
         LocationController.getLocationsProducedOneProduct);
+    locationRouter.get("/production-lines/:location_id/:product_id",
+        LocationController.getProductionLinesForProductAtLocation);
     locationRouter.get("/types/:id",
         LocationController.getTypesOfLocation);
     locationRouter.get("/name/:name",
