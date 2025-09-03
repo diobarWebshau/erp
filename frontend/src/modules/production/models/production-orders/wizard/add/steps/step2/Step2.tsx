@@ -3,7 +3,10 @@ import {
     ChevronDown,
     ChevronLeft,
     ChevronRight,
+    CircleCheck,
     CircleX,
+    FileCheck,
+    FileCheck2,
     Search
 } from "lucide-react";
 import FadeButton
@@ -11,7 +14,8 @@ import FadeButton
 import StyleModule
     from "./Step2.module.css";
 import {
-    back_step
+    back_step,
+    next_step
 } from "../../../../context/AddModalProductionOrderActions";
 import {
     useAddModalProductionOrderDispatch,
@@ -32,6 +36,8 @@ import InputToggle from "../../../../../../../../components/ui/table/components/
 import {
     update_production_order,
 } from "../../../../context/AddModalProductionOrderActions";
+import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
+import WarningIcon from "../../../../../../../../components/icons/WarningIcon";
 const InputToggleMemorizado = memo(
     ({
         value,
@@ -46,7 +52,7 @@ const InputToggleMemorizado = memo(
                 onChange={onChange}
                 min={1}
                 className={StyleModule.ContainerInputMemorizado}
-                classNameInput={StyleModule.InputMemorizado}
+                classNameInput={`nunito-semibold ${StyleModule.InputMemorizado}`}
             />
         );
     }
@@ -65,14 +71,12 @@ const Step2 = () => {
         useState(false);
     const [searchDropDownSelectProduct, setSearchDropDownSelectProduct] =
         useState(state.data.product?.name ?? "");
-
-
     const [selectedLocation, setSelectedLocation] =
         useState<ILocation | null | undefined>(state.data.location ?? null);
-
-
     const [quantity, setQuantity] =
         useState<number | undefined>(state.data.qty ?? undefined);
+    const [isActiveModalConfirmation, setIsActiveModalConfirmation] =
+        useState<boolean>(false);
 
     const columnsInventoryInputs: ColumnDef<IInventoryInput>[] = useMemo(
         () => [
@@ -153,6 +157,24 @@ const Step2 = () => {
             }))
             console.log(value);
         }
+    };
+
+    const handlerOnClickButtonNext = () => {
+        // dispatch(next_step());
+        const isFulfillable = inventoryInputsProduct.every(input => input.available >= ((state.data.qty ?? 0) * input.equivalence));
+        if (isFulfillable) {
+            dispatch(next_step());
+        } else {
+            setIsActiveModalConfirmation(true);
+        }
+    };
+
+    const handlerOnClickButtonContinue = () => {
+        dispatch(next_step());
+    };
+
+    const handlerOnClickButtonBackModal = () => {
+        setIsActiveModalConfirmation(false);
     };
 
     const fetchProductsLike = async (query: string): Promise<IProduct[]> => {
@@ -256,20 +278,28 @@ const Step2 = () => {
                         onChange={hadnleOnChangeQuantity}
                     />
                 </div>
-
-                <GenericTable
-                    modelName="InventoryInputs"
-                    columns={columnsInventoryInputs}
-                    data={inventoryInputsProduct}
-                    onDeleteSelected={() => console.log("Delete selected")}
-                    getRowId={i => i.input_id.toString()}
-                    enableFilters={false}
-                    enablePagination={false}
-                    enableRowSelection={false}
-                    enableOptionsColumn={false}
-                    typeRowActions="icon"
-                    classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
-                />
+                <div
+                style={{
+                backgroundColor: "#fff"    
+                }}
+                >
+                    <GenericTable
+                        modelName="InventoryInputs"
+                        columns={columnsInventoryInputs}
+                        data={inventoryInputsProduct}
+                        onDeleteSelected={() => console.log("Delete selected")}
+                        getRowId={i => i.input_id.toString()}
+                        enableFilters={false}
+                        enablePagination={false}
+                        enableRowSelection={false}
+                        enableOptionsColumn={false}
+                        enableSorting={false}
+                        enableViews={false}
+                        enableRowEditClick={false}
+                        typeRowActions="icon"
+                        classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
+                    />
+                </div>
             </section>
             <section className={StyleModule.footerSection}>
                 <FadeButton
@@ -294,7 +324,7 @@ const Step2 = () => {
                 />
                 <FadeButton
                     label="Siguiente"
-                    onClick={() => { }}
+                    onClick={handlerOnClickButtonNext}
                     type="button"
                     typeOrderIcon="first"
                     classNameButton={StyleModule.nextButton}
@@ -303,6 +333,41 @@ const Step2 = () => {
                     icon={<ChevronRight className={StyleModule.nextButtonIcon} />}
                 />
             </section>
+            {
+                isActiveModalConfirmation && (
+                    <CustomModal
+                        onClose={() => setIsActiveModalConfirmation(false)}
+                        title="Esta planta no cuenta con los insumos suficientes para la orden de producción. ¿Seguro que desea continuar?"
+                        icon={<WarningIcon className={StyleModule.iconButtonModal} />}
+                        message="Esta acción puede ocasionar conflictos"
+
+                        children={() => (
+                            <div className={StyleModule.containerModalButtons}>
+                                <FadeButton
+                                    label="Regresar"
+                                    onClick={handlerOnClickButtonBackModal}
+                                    type="button"
+                                    typeOrderIcon="first"
+                                    classNameButton={StyleModule.cancelButton}
+                                    classNameLabel={StyleModule.cancelButtonLabel}
+                                    classNameSpan={StyleModule.cancelButtonSpan}
+                                    icon={<ChevronLeft className={StyleModule.cancelButtonIcon} />}
+                                />
+                                <FadeButton
+                                    label="Continuar"
+                                    onClick={handlerOnClickButtonContinue}
+                                    type="button"
+                                    typeOrderIcon="first"
+                                    classNameButton={StyleModule.nextButton}
+                                    classNameLabel={StyleModule.nextButtonLabel}
+                                    classNameSpan={StyleModule.nextButtonSpan}
+                                    icon={<FileCheck2 className={StyleModule.nextButtonIcon} />}
+                                />
+                            </div>
+                        )}
+                    />
+                )
+            }
         </div>
     );
 };

@@ -8,14 +8,10 @@
     grid-template:
         "header" max-content
         "body" 1fr
-        "footer" max-content 
-        / 100%;
+        "footer" max-content / 100%;
+    padding-top: 1rem;
+    padding-inline: 3rem;
 }
-
-.container > * {
-    border: 1px solid black;
-}
-
 
 /* *************** Footer *************** */
 
@@ -34,18 +30,20 @@
 /* ? Botones */
 
 .cancelButton,
-.nextButton {
+.nextButton,
+.backButton {
     /* dimension */
     width: 200px;
     height: 45px;
-    
+
     /* distribucion box */
     border-radius: 15px;
     cursor: pointer;
 }
 
 .cancelButtonSpan,
-.nextButtonSpan {
+.nextButtonSpan,
+.backButtonSpan {
     /* dimension */
     width: 100%;
     height: 100%;
@@ -75,7 +73,7 @@
 }
 
 .cancelButton:hover .cancelButtonLabel,
-.cancelButton:hover .cancelButtonIcon{
+.cancelButton:hover .cancelButtonIcon {
     color: var(--color-alert);
     border: 1px solid var(--color-theme-border-table);
 }
@@ -101,5 +99,70 @@
     background-color: var(--color-theme-primary-light);
 }
 
+/* ? Back Button */
+
+.backButton {
+    background-color: var(--color-theme-font-white);
+}
+
+.backButtonLabel {
+    color: var(--color-theme-primary-light);
+}
+
+.backButtonIcon {
+    color: var(--color-theme-primary-light);
+    width: 15px;
+    height: 15px;
+}
+
+.backButton:hover .backButtonLabel,
+.backButton:hover .backButtonIcon {
+    color: var(--color-theme-primary);
+}
+
+.backButton:hover {
+    border: 1px solid var(--color-theme-border-table);
+}
 
 
+
+
+.headerSection {
+    grid-area: header;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.headerSection h1 {
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+.containerDate {
+    /* dimension */
+    width: max-content;
+    height: max-content;
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+
+    border: 1px solid red;
+}
+
+.containerDate > *:first-child {
+    color: var(--color-theme-primary);
+}
+
+.containerDate > *:last-child {
+    color: var(--color-theme-font-black);
+}

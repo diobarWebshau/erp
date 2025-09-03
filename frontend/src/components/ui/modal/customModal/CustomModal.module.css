@@ -19,7 +19,6 @@
     /* opcional: fondo semitransparente para oscurecer */
     background-color: var(--color-overlay);
 
-    border: 1px solid black;
 }
 
 .container {
@@ -84,6 +83,10 @@
     /* estilos */
     font-size: 24px;
     color: var(--color-theme-font-black);
+}
+
+.containerTitle > p {
+    font-size: 14px;
 }
 
 /*?  Container icon */

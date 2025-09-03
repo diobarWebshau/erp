@@ -864,29 +864,31 @@ const TableBase = <T,>({
                         </table>
                     )}
                 </section>
-                <section className={`${stylesModules.containerOption}`}
-                >
-                    {
-                        footerComponents && (
-                            <section
-                                className={`${stylesModules.footerComponentsContainer} ${classNameFooter}`}
-                            >
-                                {footerComponents(table)}
-                            </section>
-                        )
-                    }
-                    {
-                        table?.getRowModel()?.rows?.length >= 0 &&
-                        enablePagination && (
-                            <TableFooterControls<T>
-                                deleteRowsSelected={deleteRowsSelected}
-                                table={table}
-                                className={`${stylesModules.containerPagination} ${classNamePagination}`}
-                                enableRowSelection={enableRowSelection}
-                            />
-                        )
-                    }
-                </section>
+                {(enablePagination || footerComponents) &&
+                    <section className={`${stylesModules.containerOption}`}
+                    >
+                        {
+                            footerComponents && (
+                                <section
+                                    className={`${stylesModules.footerComponentsContainer} ${classNameFooter}`}
+                                >
+                                    {footerComponents(table)}
+                                </section>
+                            )
+                        }
+                        {
+                            table?.getRowModel()?.rows?.length >= 0 &&
+                            enablePagination && (
+                                <TableFooterControls<T>
+                                    deleteRowsSelected={deleteRowsSelected}
+                                    table={table}
+                                    className={`${stylesModules.containerPagination} ${classNamePagination}`}
+                                    enableRowSelection={enableRowSelection}
+                                />
+                            )
+                        }
+                    </section>
+                }
             </section>
         </div >
     )

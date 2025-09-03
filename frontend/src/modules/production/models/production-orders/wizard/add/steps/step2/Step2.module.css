@@ -397,12 +397,28 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
 
 /* * Input Memoizado del qty */
 
-.InputMemorizadoContainer {
+.ContainerInputMemorizado {
     height: 44px;
 }
 
 .InputMemorizado {
     height: 44px;
-    padding: 1rem;
+    font-size: 14px;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-theme-border-table);
     color: var(--color-theme-font-black);
+}
+
+/* * MOdal de confirmacion */
+.containerModalButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconButtonModal{
+    color: var(--color-theme-primary);
+    width: 30px;
+    height: 30px;
 }
