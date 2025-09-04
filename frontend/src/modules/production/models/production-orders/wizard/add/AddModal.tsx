@@ -1,22 +1,14 @@
-import type {
-    MouseEvent,
-} from "react";
 import {
-    useEffect,
     useState
 } from "react";
 import {
     ChevronLeft,
-    CircleX, X
 } from "lucide-react";
 import {
-    useAddModalProductionOrderDispatch,
     useAddModalProductionOrderState
 } from "./../../context/AddModalProductionOrderHooks";
 import FadeButton
     from "../../../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
-import CustomModal
-    from "../../../../../../components/ui/modal/customModal/CustomModal";
 import WarningIcon
     from "../../../../../../components/icons/WarningIcon";
 import StyleModule
@@ -27,7 +19,7 @@ import type {
 import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";
-import { back_step } from "../../context/AddModalProductionOrderActions";
+import CancelModalCustom from "../../../../../../components/ui/modal/custom-modal/cancel/CancelModalCustom";
 
 
 interface IAddModalProps {
@@ -43,12 +35,11 @@ const AddModal = ({
     // ? ************ Hooks de contexto ************/
 
     const state = useAddModalProductionOrderState();
-    const dispatch = useAddModalProductionOrderDispatch();
 
     // ? ************ Estados ************/
 
-    const [isVisible, setIsVisible] = useState(false);      // Para entrada
-    const [isClosing, setIsClosing] = useState(false);      // Para salida
+    // const [isVisible, setIsVisible] = useState(false);      // Para entrada
+    // const [isClosing, setIsClosing] = useState(false);      // Para salida
     const [isActiveCancelProcessModal, setIsActiveCancelProcessModal] =
         useState<boolean>(false);
 
@@ -62,25 +53,29 @@ const AddModal = ({
 
     // ? ************ Funciones ************/
 
-    const handleOnClickBack = (
-        e: MouseEvent<HTMLButtonElement>
-    ) => {
-        e.preventDefault();
-        if (state.current_step >= 2) {
-            // Dispara animación de salida
-            // setIsClosing(true);
-            // setIsVisible(false);
-            // setTimeout(() => {
-            //     onClose(); // desmonta después de la animación
-            // }, 400); // coincide con duración del CSS
-            dispatch(back_step());
-        } else {
-            onClose();
-        }
-    };
+    // const handleOnClickBack = (
+    //     e: MouseEvent<HTMLButtonElement>
+    // ) => {
+    //     e.preventDefault();
+    //     if (state.current_step >= 2) {
+    //         // Dispara animación de salida
+    //         // setIsClosing(true);
+    //         // setIsVisible(false);
+    //         // setTimeout(() => {
+    //         //     onClose(); // desmonta después de la animación
+    //         // }, 400); // coincide con duración del CSS
+    //         dispatch(back_step());
+    //     } else {
+    //         onClose();
+    //     }
+    // };
 
     const toggleCancelProcessModal = () => {
         setIsActiveCancelProcessModal(!isActiveCancelProcessModal);
+    }
+
+    const handleOnClickCloseAddModal = () => {
+        onClose();
     }
 
     // ? ************ Manejo de animaciones con clases CSS ************/
@@ -111,7 +106,7 @@ const AddModal = ({
                 >
                     <FadeButton
                         label="Regresar"
-                        onClick={handleOnClickBack}
+                        onClick={toggleCancelProcessModal}
                         icon={<ChevronLeft className={StyleModule.backButtonIcon} />}
                         typeOrderIcon="first"
                         classNameButton={StyleModule.backButton}
@@ -132,56 +127,35 @@ const AddModal = ({
             <main className={StyleModule.bodySection}>
                 {
                     state.current_step === 1 && (
-                        <Step1 />
+                        <Step1
+                            onCancel={toggleCancelProcessModal}
+                        />
                     )
                 }
                 {
                     state.current_step === 2 && (
-                        <Step2 />
+                        <Step2 
+                            onCancel={toggleCancelProcessModal}
+                        />
                     )
                 }
                 {
                     state.current_step === 3 && (
-                        <Step3 />
+                        <Step3 
+                            onCancel={toggleCancelProcessModal}
+                            onBack={handleOnClickCloseAddModal}
+                            onCreate={onCreate}
+                        />
                     )
                 }
             </main>
             <footer className={StyleModule.footerSection}></footer>
             {
                 isActiveCancelProcessModal && (
-                    <CustomModal
+                    <CancelModalCustom
                         onClose={toggleCancelProcessModal}
-                        title="¿Seguro que deseas salir?"
-                        message="El avance de este proceso no se guardara."
                         icon={<WarningIcon className={StyleModule.iconCancelProcess} />}
-                        children={
-                            () => {
-                                return (
-                                    <div className={StyleModule.containerChildrenCancelProcess}>
-                                        <FadeButton
-                                            label="Cancelar"
-                                            type="button"
-                                            typeOrderIcon="first"
-                                            classNameButton={StyleModule.cancelProcessButton}
-                                            classNameLabel={StyleModule.cancelProcessButtonLabel}
-                                            classNameSpan={StyleModule.cancelProcessButtonSpan}
-                                            icon={<CircleX className={StyleModule.cancelProcessButtonIcon} />}
-                                            onClick={toggleCancelProcessModal}
-                                        />
-                                        <FadeButton
-                                            label="Salir"
-                                            type="button"
-                                            typeOrderIcon="first"
-                                            classNameButton={StyleModule.exitProcessButton}
-                                            classNameLabel={StyleModule.exitProcessButtonLabel}
-                                            classNameSpan={StyleModule.exitProcessButtonSpan}
-                                            icon={<X className={StyleModule.exitProcessButtonIcon} />}
-                                            onClick={onClose}
-                                        />
-                                    </div>
-                                );
-                            }
-                        }
+                        onClickCancel={handleOnClickCloseAddModal}
                     />
                 )
             }

@@ -13,17 +13,8 @@ import type {
 } from "./AddModalProductionOrderTypes";
 import {
     AddModalProductionOrderActionsTypes,
-    total_steps
 } from "./AddModalProductionOrderTypes";
 import type { IPartialProductionOrder } from "../../../../../interfaces/productionOrder";
-
-// * ****************** Initial State  ******************/
-
-const initialState: AddModalProductionOrderState = {
-    total_steps: total_steps,
-    current_step: 1,
-    data: {}
-}
 
 // * ****************** Reducer  ******************/ 
 
@@ -59,13 +50,10 @@ const AddModalProductionOrderReducer = produce(
             case AddModalProductionOrderActionsTypes.NEXT_STEP:
                 draft.current_step += 1;
                 break;
-            case AddModalProductionOrderActionsTypes.CLEAR:
-                return initialState;
         }
     }
 )
 
 export {
     AddModalProductionOrderReducer,
-    initialState
 }

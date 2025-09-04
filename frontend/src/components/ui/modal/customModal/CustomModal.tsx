@@ -1,8 +1,7 @@
 import type {
-    SetStateAction,
-    Dispatch,
     ReactNode,
     MouseEvent,
+    JSX,
 } from "react";
 import {
     X
@@ -13,9 +12,9 @@ import { createPortal } from "react-dom";
 
 interface ICustomModalProps<T> {
     onClose: (e: MouseEvent<HTMLButtonElement>) => void;
-    title?: string | null,
-    message?: string | null,
-    icon?: ReactNode | null,
+    title?: string,
+    message?: string,
+    icon?: JSX.Element,
     children?: (args?: T) => ReactNode | ReactNode
     childrenProps?: T
 }
@@ -23,9 +22,9 @@ interface ICustomModalProps<T> {
 const CustomModal = <T,>(
     {
         onClose,
-        title = null,
-        message = null,
-        icon = null,
+        title = "",
+        message = "",
+        icon,
         children = () => null,
         childrenProps
     }: ICustomModalProps<T>
@@ -37,6 +36,7 @@ const CustomModal = <T,>(
                 <button
                     className={stylesModules.closeButton}
                     onClick={onClose}
+                    type="button"
                 >
                     <X className={stylesModules.icon} />
                 </button>

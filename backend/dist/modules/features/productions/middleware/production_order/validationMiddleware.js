@@ -4,6 +4,7 @@ const validateProductionOrderMiddleware = async (req, res, next) => {
     const method = req.method;
     try {
         let result;
+        console.log(body);
         if (method === "POST") {
             result =
                 await validateSafeParseAsync(body);
@@ -13,14 +14,16 @@ const validateProductionOrderMiddleware = async (req, res, next) => {
                 await validatePartialSafeParseAsync(body);
         }
         if (!result.success) {
-            const zod_errors = result.error.errors;
+            console.log(result.error.errors);
+            const formattedErrors = result.error.errors.map(err => ({
+                message: err.message
+            }));
             res.status(400).json({
-                zod_validation: zod_errors
+                validation: formattedErrors.map(e => e.message)
             });
+            return;
         }
-        else {
-            next();
-        }
+        next();
     }
     catch (error) {
         next(error);

@@ -1150,10 +1150,10 @@ BEGIN
         FROM production_orders AS po
         LEFT JOIN internal_product_production_orders AS ippo
             ON ippo.id = po.order_id
-        LEFT JOIN internal_product_production_orders_locations_production_lines AS ippolpl
-            ON ippolpl.internal_product_production_order_id = ippo.id
+        LEFT JOIN internal_production_orders_lines_products AS ipolp
+            ON ipolp.internal_product_production_order_id = ippo.id
         LEFT JOIN production_lines AS pl
-            ON pl.id = ippolpl.production_line_id
+            ON pl.id = ipolp.production_line_id
         LEFT JOIN locations_production_lines AS lpl
             ON lpl.production_line_id = pl.id
         LEFT JOIN locations AS l

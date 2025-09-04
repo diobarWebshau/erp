@@ -31,6 +31,41 @@
     font-size: 14px;
 }
 
+.fieldSelectContainer {
+
+    /* posicionamiento */
+    position: relative;
+
+    /* distribucion dentro del padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    align-items: center;
+    justify-content: start;
+
+    /* distribucion box */
+    padding-left: 1rem;
+    padding-right: 1%;
+    border-radius: 15px;
+
+    /* estilos */
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.fieldSelectContainerValidate {
+    /* estilos */
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.fieldSelectContainerInvalid {
+    /* estilos */
+    border: 1px solid var(--color-alert);
+}
+
 .iconButton {
     /* posicionamiento */
     position: absolute;

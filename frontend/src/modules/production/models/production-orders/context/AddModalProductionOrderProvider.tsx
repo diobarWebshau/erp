@@ -8,7 +8,6 @@ import {
 } from "./AddModalProductionOrderContext";
 import {
     AddModalProductionOrderReducer,
-    initialState
 } from "./AddModalProductionOrderReducer";
 import {
     useReducer,
@@ -16,10 +15,27 @@ import {
     type ReactNode
 } from "react";
 
+interface IProviderAddModalProductionOrder {
+    mode: "create" | "update";
+    currentStep: number;
+    totalSteps: number;
+    children: ReactNode;
+}
+
 
 const ProviderAddModalProductionOrder = ({
-    children
-}: { children: ReactNode }) => {
+    mode,
+    currentStep,
+    totalSteps,
+    children,
+}: IProviderAddModalProductionOrder) => {
+
+    const initialState: AddModalProductionOrderState = {
+        mode: mode,
+        current_step: currentStep,
+        total_steps: totalSteps,
+        data: {},
+    }
 
     const [state, dispatch]: [AddModalProductionOrderState, Dispatch<AddModalProductionOrderAction>] =
         useReducer(AddModalProductionOrderReducer, initialState);

@@ -27,7 +27,7 @@ const StandardTextArea = ({
     ...props
 }: StandardTextAreaProps) => {
     return (
-        <div className={classNameContainer}>
+        <div className={`${StyleModule.container} ${classNameContainer}`}>
             {
                 ComponentLabel ? (
                     ComponentLabel({ id: props.id ?? "" })

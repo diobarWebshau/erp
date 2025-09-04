@@ -1,7 +1,7 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import sequelize from "../../../../mysql/configSequelize.js";
-import { QueryTypes } from "sequelize";
-import { InternalProductProductionOrderModel, ProductionOrderModel, ProductModel, PurchaseOrderProductModel, ProductionModel, } from "../../../associations.js";
+import { QueryTypes, Transaction } from "sequelize";
+import { InternalProductProductionOrderModel, ProductionOrderModel, ProductModel, PurchaseOrderProductModel, ProductionModel, InternalProductionOrderLineProductModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, } from "../../../associations.js";
 class ProductionOrdersController {
     static getAll = async (req, res, next) => {
         try {
@@ -127,7 +127,13 @@ class ProductionOrdersController {
         }
     };
     static create = async (req, res, next) => {
-        const { order_type, order_id, product_id, qty, status } = req.body;
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
+        });
+        let isSucessfull = false;
+        let po_id = null;
+        const { order_type, order_id, product_name, product_id, qty, status, production_line, location, product, purchase_order } = req.body;
+        let orderId = order_id;
         try {
             // usamos el tipo base de cualquier modelo Sequelize
             let orderModel;
@@ -147,122 +153,191 @@ class ProductionOrdersController {
                     return;
             }
             // Aqui no afecta el tipado porque no se acceden a las propiedades
-            const validateOrder = await orderModel.findByPk(order_id);
-            if (!validateOrder) {
-                res.status(404).json({
-                    validation: "Order product not found"
-                });
-                return;
-            }
-            // Aqui si afecta el tipado porque se acceden a las propiedades
-            const order = validateOrder.toJSON();
-            const order_product_id = order.product_id;
-            if (order_product_id !== product_id) {
-                res.status(400).json({
-                    validation: "The product id does not match with the order"
-                });
-                return;
-            }
-            const validateProduct = await ProductModel.findByPk(order_product_id);
-            if (!validateProduct) {
-                res.status(404).json({
-                    validation: "Product does not exist"
-                });
-                return;
-            }
-            const product = validateProduct.toJSON();
-            if (qty <= 0) {
-                res.status(400).json({
-                    validation: "The production order quantity must be greater than 0"
-                });
-                return;
-            }
-            const validateQtyProduction = await sequelize.query("CALL get_order_summary_by_pop(:order_id, :order_type);", {
-                replacements: {
-                    order_id: order_id,
-                    order_type: order_type
-                },
-                type: QueryTypes.SELECT,
-                /*
-                    Para SELECT -->  [{},{}]
-                    Para INSERT -->
-                    [
-                         result: id | undefinded | [] ,
-                         metadata: {affectedRows: 1, insertId: 1, ...}
-                    ]
-                    Para UPDATE --> [affectedCount]
-                    Para DELETE --> [affectedCount]
-                    Para RAW --> [
-                        result :id | undefinded | [] , metadata
-                    ]
-                */
-                /*
-                     RAW
-                     Para obtener el resultado sin procesar, exactamente
-                     como lo devuelve el driver de la base de datos.
-                */
-            });
-            const result = validateQtyProduction.shift();
-            const resultArray = Object.values(result).map((entry) => entry.result);
-            const summary = resultArray[0];
-            if (summary.qty === 0) {
-                res.status(400).json({
-                    validation: `It is not possible to create a new production order. `
-                        + `All units for this product order have already been assigned.`
-                });
-                return;
-            }
-            else if (qty > summary.qty) {
-                if (summary.qty > 0) {
-                    res.status(400).json({
-                        validation: `Cannot create the new production order with the entered quantity (${qty}). `
-                            + `Only ${summary.qty} units are still available for this product order.`
+            if (order_type === "internal" && location && product) {
+                const responseCreateInternalOrder = await InternalProductProductionOrderModel.create({
+                    product_name: product_name,
+                    location_id: location.id,
+                    location_name: location.name,
+                    product_id: product.id,
+                    qty: qty,
+                    status: status,
+                }, { transaction });
+                if (!responseCreateInternalOrder) {
+                    await transaction.rollback();
+                    res.status(500).json({
+                        validation: "The internal order could not be created"
                     });
                     return;
                 }
-                else {
-                    res.status(400).json({
-                        validation: `Cannot create the production order. This `
-                            + `productionproduct order has already been completed.`
+                const internalOrder = responseCreateInternalOrder.toJSON();
+                orderId = internalOrder.id;
+            }
+            if (order_type === "client" && orderId) {
+                const responsePurchaseOrder = await PurchaseOrderProductModel.findByPk(orderId);
+                if (!responsePurchaseOrder) {
+                    await transaction.rollback();
+                    res.status(404).json({
+                        validation: "Purchase order no existe"
                     });
+                    return;
+                }
+                const validateOrder = await orderModel.findByPk(orderId);
+                if (!validateOrder) {
+                    await transaction.rollback();
+                    res.status(404).json({
+                        validation: "Order product not found"
+                    });
+                    return;
+                }
+                // Aqui si afecta el tipado porque se acceden a las propiedades
+                const order = validateOrder.toJSON();
+                const order_product_id = order.product_id;
+                if (order_product_id !== product_id) {
+                    await transaction.rollback();
+                    res.status(400).json({
+                        validation: "The product id does not match with the order"
+                    });
+                    return;
+                }
+                const validateProduct = await ProductModel.findByPk(order_product_id);
+                if (!validateProduct) {
+                    await transaction.rollback();
+                    res.status(404).json({
+                        validation: "Product does not exist"
+                    });
+                    return;
+                }
+                if (qty <= 0) {
+                    await transaction.rollback();
+                    res.status(400).json({
+                        validation: "The production order quantity must be greater than 0"
+                    });
+                    return;
+                }
+                const validateQtyProduction = await sequelize.query("CALL get_order_summary_by_pop(:order_id, :order_type);", {
+                    replacements: {
+                        order_id: orderId,
+                        order_type: order_type
+                    },
+                    type: QueryTypes.SELECT,
+                    transaction: transaction
+                });
+                const result = validateQtyProduction.shift();
+                const resultArray = Object.values(result).map((entry) => entry.result);
+                const summary = resultArray[0];
+                if (summary.qty === 0) {
+                    await transaction.rollback();
+                    res.status(400).json({
+                        validation: `It is not possible to create a new production order. `
+                            + `All units for this product order have already been assigned.`
+                    });
+                    return;
+                }
+                else if (qty > summary.qty) {
+                    if (summary.qty > 0) {
+                        await transaction.rollback();
+                        res.status(400).json({
+                            validation: `Cannot create the new production order with the entered quantity (${qty}). `
+                                + `Only ${summary.qty} units are still available for this product order.`
+                        });
+                        return;
+                    }
+                    else {
+                        await transaction.rollback();
+                        res.status(400).json({
+                            validation: `Cannot create the production order. This `
+                                + `productionproduct order has already been completed.`
+                        });
+                    }
                 }
             }
             const response = await ProductionOrderModel.create({
-                order_id: order.id,
+                order_id: orderId,
                 order_type: order_type,
                 product_id: product_id,
-                product_name: product.name,
+                product_name: product_name,
                 qty,
                 status: "pending"
-            });
+            }, { transaction });
             if (!response) {
+                await transaction.rollback();
                 res.status(400).json({
                     validation: "The production order could not be created"
                 });
                 return;
             }
             const po = response.toJSON();
-            await sequelize.query(`CALL handle_production_order_after_insert(:id, :order_id, :order_type, :product_id, :product_name, :qty)`, {
-                replacements: {
-                    id: po.id,
-                    order_id: order.id,
-                    order_type: order_type,
-                    product_id: product_id,
-                    product_name: product.name,
-                    qty: qty
+            if (production_line) {
+                const responseProductionLine = await ProductionLineModel.findByPk(production_line.id);
+                if (!responseProductionLine) {
+                    await transaction.rollback();
+                    res.status(404).json({
+                        validation: "Production line no existe"
+                    });
+                    return;
                 }
-            });
-            res.status(201).json({
-                message: "Production order created succefally"
-            });
+                if (order_type === "internal") {
+                    const responseInternalProductionOrderLineProduct = await InternalProductionOrderLineProductModel.create({
+                        internal_product_production_order_id: orderId,
+                        production_line_id: production_line.id
+                    }, { transaction });
+                    if (!responseInternalProductionOrderLineProduct) {
+                        await transaction.rollback();
+                        res.status(500).json({
+                            validation: `No se pudo asignar la orden de produccion` +
+                                ` interna a la linea de produccion`
+                        });
+                        return;
+                    }
+                }
+                else {
+                    const responsePurchasedOrdersProductsLocationsProductionLines = await PurchasedOrdersProductsLocationsProductionLinesModel.create({
+                        purchase_order_product_id: po.id,
+                        production_line_id: production_line.id
+                    }, { transaction });
+                    if (!responsePurchasedOrdersProductsLocationsProductionLines) {
+                        await transaction.rollback();
+                        res.status(500).json({
+                            validation: `No se pudo asignar la orden de produccion` +
+                                ` asociado a una orden de compra a la linea `
+                                + `de produccion`
+                        });
+                        return;
+                    }
+                }
+            }
+            console.log("POOOOOOOOOOOOOOOOO");
+            console.log(po);
+            isSucessfull = true;
+            po_id = po.id;
+            console.log("EXITOSOOOOOOOOOOOOOOOO");
+            transaction.commit();
+            res.status(201).json(po);
         }
         catch (error) {
+            await transaction.rollback();
             if (error instanceof Error) {
+                console.error(`
+                        An unexpected error ocurred ${error}`);
                 next(error);
             }
             else {
                 console.error(`
                         An unexpected error ocurred ${error}`);
+            }
+        }
+        finally {
+            if (po_id && product && isSucessfull) {
+                await sequelize.query(`CALL handle_production_order_after_insert(:id, :order_id, :order_type, :product_id, :product_name, :qty)`, {
+                    replacements: {
+                        id: po_id,
+                        order_id: orderId,
+                        order_type: order_type,
+                        product_id: product_id,
+                        product_name: product.name,
+                        qty: qty
+                    },
+                });
             }
         }
     };

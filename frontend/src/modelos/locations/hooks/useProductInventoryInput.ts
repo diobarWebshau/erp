@@ -24,51 +24,58 @@ const useProductInventoryInput = (
     location_id: number | undefined | null
 ) => {
     const dispatch = useDispatch<AppDispatchRedux>();
-    const [inventoryInputsProduct, setInventoryInputsProduct] =
-        useState<IInventoryInput[]>([]);
-    const [loadingInventoryInputsProduct, setLoadingInventoryInputsProduct] =
-        useState<boolean>(true);
+    const [inventoryInputsProduct, setInventoryInputsProduct] = useState<IInventoryInput[]>([]);
+    const [loadingInventoryInputsProduct, setLoadingInventoryInputsProduct] = useState<boolean>(false);
 
-
-    const fetchInventoryInputsProductFunction = async () => {
+    // Nueva: Limpia insumos en cuanto uno sea null
+    useEffect(() => {
+        if (!product_id || !location_id) {
+            setInventoryInputsProduct([]);
+            setLoadingInventoryInputsProduct(false); // Asegura no loading
+            return;
+        }
         setLoadingInventoryInputsProduct(true);
-        dispatch(
-            clearError("inventoryInputsProductHook")
-        );
+        dispatch(clearError("inventoryInputsProductHook"));
+        getInventoryInputsOfProductInOneLocation(product_id, location_id, dispatch)
+            .then(data => setInventoryInputsProduct(data))
+            .catch(err => {
+                const msg = err instanceof Error
+                    ? { validation: err.message }
+                    : { validation: "Unknown error" };
+                dispatch(setError({ key: "inventoryInputsProductHook", message: msg }));
+                setInventoryInputsProduct([]);
+            })
+            .finally(() => setLoadingInventoryInputsProduct(false));
+    }, [product_id, location_id, dispatch]);
+
+    const refetchInventoryInputsProduct = async () => {
+        if (!product_id || !location_id) {
+            setInventoryInputsProduct([]);
+            setLoadingInventoryInputsProduct(false);
+            return;
+        }
+        setLoadingInventoryInputsProduct(true);
+        dispatch(clearError("inventoryInputsProductHook"));
         try {
-            const data =
-                await getInventoryInputsOfProductInOneLocation(
-                    product_id,
-                    location_id,
-                    dispatch
-                );
+            const data = await getInventoryInputsOfProductInOneLocation(product_id, location_id, dispatch);
             setInventoryInputsProduct(data);
         } catch (err: unknown) {
             const msg = err instanceof Error
                 ? { validation: err.message }
                 : { validation: "Unknown error" };
-            dispatch(
-                setError({
-                    key: "inventoryInputsProductHook",
-                    message: msg
-                })
-            );
-            return [];
+            dispatch(setError({ key: "inventoryInputsProductHook", message: msg }));
+            setInventoryInputsProduct([]);
         } finally {
             setLoadingInventoryInputsProduct(false);
         }
     };
 
-    useEffect(() => {
-        fetchInventoryInputsProductFunction();
-    }, [product_id, location_id]);
-
     return {
         inventoryInputsProduct,
         loadingInventoryInputsProduct,
-        refetchInventoryInputsProduct:
-            fetchInventoryInputsProductFunction,
+        refetchInventoryInputsProduct,
     };
 };
+
 
 export default useProductInventoryInput;

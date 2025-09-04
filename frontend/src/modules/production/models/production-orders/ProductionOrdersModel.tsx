@@ -16,9 +16,6 @@ import {
     updateProductionOrderInDB
 } from "../../../../queries/productionOrdersQueries";
 import {
-    createProductionInDB
-} from "../../../../queries/productionQueries"
-import {
     useDispatch
 } from "react-redux";
 import {
@@ -69,6 +66,7 @@ import KPICard
 import AddModalProductionOrderGeneric
     from "././context/AddModalProductionOrderGeneric";
 import AddModal from "./wizard/add/AddModal";
+import EditModal from "./wizard/edit/EditModal";
 
 const ProductionOrderModel = () => {
 
@@ -124,7 +122,9 @@ const ProductionOrderModel = () => {
         }
     };
 
-    const handleCreate = async (productionOrder: IPartialProductionOrder) => {
+    const handleCreate = async (
+        productionOrder: IPartialProductionOrder
+    ) => {
         try {
             const result =
                 await createProductionOrderInDB(
@@ -188,29 +188,6 @@ const ProductionOrderModel = () => {
             setServerError(null);
             fetchs();
             setIsActiveDeleteModal(false);
-        } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const handleCreateCheckPoint = async (production: IPartialProduction) => {
-        setLoading(true);
-        try {
-            const response =
-                await createProductionInDB(
-                    production,
-                    dispatch
-                );
-            console.log(response);
-            if (!response) {
-                return;
-            }
-            setServerError(null);
-            fetchs();
-            setIsActiveCheckPointModal(false);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -429,6 +406,8 @@ const ProductionOrderModel = () => {
                     enablePagination={true}
                     enableRowSelection={false}
                     enableOptionsColumn={true}
+                    enableRowEditClick={true}
+                    enableRowEditClickHandler={toggleActiveEditModal}
 
                     // acciones de la tabla
                     onDeleteSelected={() => console.log("Delete selected")}
@@ -450,10 +429,28 @@ const ProductionOrderModel = () => {
                 }
                 {
                     isActiveAddModal && (
-                        <AddModalProductionOrderGeneric>
+                        <AddModalProductionOrderGeneric
+                            mode="create"
+                            currentStep={1}
+                            totalSteps={3}
+                        >
                             <AddModal
                                 onClose={() => setIsActiveAddModal(false)}
                                 onCreate={handleCreate}
+                            />
+                        </AddModalProductionOrderGeneric>
+                    )
+                }
+                {
+                    isActiveEditModal && (
+                        <AddModalProductionOrderGeneric
+                            mode="update"
+                            currentStep={3}
+                            totalSteps={4}
+                        >
+                            <EditModal
+                                onClose={() => setIsActiveEditModal(false)}
+                                onCreate={handleUpdate}
                             />
                         </AddModalProductionOrderGeneric>
                     )

@@ -193,7 +193,7 @@ const CustomSelect = <T extends string>({
     return (
         <div className={`${styles.customSelect} ${classNameContainer ?? ""}`}>
             <div
-                className={`nunito-semibold ${styles.fieldSelectContainer} ${classNameFieldContainer ?? ""}`}
+                className={`nunito-semibold ${styles.fieldSelectContainer} ${value ? styles.fieldSelectContainerValidate : styles.fieldSelectContainerInvalid} ${classNameFieldContainer}`}
                 ref={refs.setReference}
                 {...getReferenceProps()}
                 tabIndex={0}

@@ -1,0 +1,30 @@
+2025-09-04 15:04:24 [[31MERROR[39M]: uncaughtException: commit has been called on this transaction(b51380a7-c15a-4414-937d-c61f68c1f61e), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+Error: commit has been called on this transaction(b51380a7-c15a-4414-937d-c61f68c1f61e), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+    at checkTransaction (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:294:23)
+    at C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:304:7
+    at C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\retry-as-promised\dist\index.js:65:25
+    at new Promise (<anonymous>)
+    at retryAsPromised (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\retry-as-promised\dist\index.js:54:12)
+    at Sequelize.query (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:300:12)
+    at create (file:///C:/Users/DiobarBaez/Documents/shauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:331:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-04 15:09:22 [[31MERROR[39M]: uncaughtException: commit has been called on this transaction(dc33e870-3d43-4b49-a57d-0886631b955f), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+Error: commit has been called on this transaction(dc33e870-3d43-4b49-a57d-0886631b955f), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+    at checkTransaction (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:294:23)
+    at C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:304:7
+    at C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\retry-as-promised\dist\index.js:65:25
+    at new Promise (<anonymous>)
+    at retryAsPromised (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\retry-as-promised\dist\index.js:54:12)
+    at Sequelize.query (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:300:12)
+    at create (file:///C:/Users/DiobarBaez/Documents/shauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:331:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-09-04 15:13:29 [[31MERROR[39M]: uncaughtException: commit has been called on this transaction(5522d3e0-0e3a-43a3-a67b-6fd9cf2c3762), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+Error: commit has been called on this transaction(5522d3e0-0e3a-43a3-a67b-6fd9cf2c3762), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+    at checkTransaction (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:294:23)
+    at C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:304:7
+    at C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\retry-as-promised\dist\index.js:65:25
+    at new Promise (<anonymous>)
+    at retryAsPromised (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\retry-as-promised\dist\index.js:54:12)
+    at Sequelize.query (C:\Users\DiobarBaez\Documents\shauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:300:12)
+    at create (file:///C:/Users/DiobarBaez/Documents/shauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:331:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)

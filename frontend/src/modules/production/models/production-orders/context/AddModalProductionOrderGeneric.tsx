@@ -6,13 +6,23 @@ import type {
 
 interface IModalProductionOrderGeneric {
     children: ReactNode;
+    mode: "create" | "update";
+    currentStep: number;
+    totalSteps: number;
 }
 
 const ModalProductionOrderGeneric = ({
-    children
+    children,
+    mode,
+    currentStep,
+    totalSteps
 }: IModalProductionOrderGeneric) => {
     return (
-        <ProviderAddModalProductionOrder>
+        <ProviderAddModalProductionOrder
+            mode={mode}
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+        >
             {children}
         </ProviderAddModalProductionOrder>
     );

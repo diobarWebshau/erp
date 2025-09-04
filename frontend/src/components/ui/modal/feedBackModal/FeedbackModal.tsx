@@ -1,7 +1,8 @@
-import type {
-    SetStateAction,
-    Dispatch,
-    ReactNode,
+import {
+    type SetStateAction,
+    type Dispatch,
+    type JSX,
+    cloneElement,
 } from "react";
 import {
     X
@@ -11,19 +12,25 @@ import stylesModules
 
 interface IFeedbackModalProps {
     onClose: Dispatch<SetStateAction<boolean>>
-    title?: string | null,
-    message?: string | null,
-    icon?: ReactNode | null
+    title?: string
+    message?: string
+    icon?: JSX.Element
 }
 
 const FeedbackModal = (
     {
         onClose,
-        title = null,
-        message = null,
-        icon = null
+        title,
+        message,
+        icon
     }: IFeedbackModalProps
 ) => {
+
+    // Clonamos el icono y le agregamos la clase deseada
+    const iconWithClass = icon && cloneElement(icon, {
+        className: [stylesModules.icon, icon.props.className].filter(Boolean).join(" ")
+    });
+
 
     return (
         <div className={stylesModules.overlay}>
@@ -36,7 +43,7 @@ const FeedbackModal = (
                 </button>
                 <div className={stylesModules.containerCheckIcon} >
                     {
-                        icon && icon
+                        icon && iconWithClass
                     }
                 </div>
                 <div className={stylesModules.content}>

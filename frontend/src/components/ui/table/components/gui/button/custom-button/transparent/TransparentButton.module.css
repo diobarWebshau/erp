@@ -1,0 +1,36 @@
+.transparentButton {
+    /* dimension */
+    width: 200px;
+    height: 45px;
+
+    /* distribucion box */
+    background-color: transparent;
+    border: none;
+}
+
+.transparentButtonSpan {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.transparentButtonLabel {
+    color: var(--color-theme-primary-light);
+}
+
+.transparentButtonIcon {
+    color: var(--color-theme-primary-light);
+    width: 15px;
+    height: 15px;
+}
+
+.transparentButton:hover .transparentButtonLabel,
+.transparentButton:hover .transparentButtonIcon {
+    color: var(--color-theme-primary);
+}

@@ -2,9 +2,9 @@ import type {
     IPartialProductionOrder
 } from "../../../../../interfaces/productionOrder";
 
-const total_steps = 3;
 
 type AddModalProductionOrderState = {
+    mode: "create" | "update",
     total_steps: number,
     current_step: number,
     data: IPartialProductionOrder,
@@ -43,5 +43,4 @@ export type {
 
 export {
     AddModalProductionOrderActionsTypes,
-    total_steps
 };

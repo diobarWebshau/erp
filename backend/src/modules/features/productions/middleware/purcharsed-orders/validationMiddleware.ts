@@ -25,7 +25,6 @@ const validatePurchasedOrdersMiddleware = async (
                 await validatePartialSafeParseAsync(body);
         }
         if (!result.success) {
-            console.log(result.error.errors);
             const formattedErrors = result.error.errors.map(err => ({
                 message: err.message
             }));

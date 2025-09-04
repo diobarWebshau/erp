@@ -749,6 +749,7 @@ BEGIN
         in_qty, 'pending'
     );
     
+    /*
 
     SET v_production_order_id = LAST_INSERT_ID();
     
@@ -774,6 +775,8 @@ BEGIN
         v_production_order_id,
         'Internal Production Order'
     );
+
+    */
 
 END //
 DELIMITER ;
@@ -1690,6 +1693,8 @@ SELECT * FROM inventory_movements;
 SELECT * FROM product_discounts_clients;
 SELECT * FROM inventories;
 SELECT * FROM purchased_orders_products_locations_production_lines;
+SELECT * FROM internal_production_orders_lines_products;
+SELECT * FROM internal_product_production_orders;
 SELECT * FROM production_orders;
 SELECT * FROM purchased_orders;
 SELECT * FROM productions;

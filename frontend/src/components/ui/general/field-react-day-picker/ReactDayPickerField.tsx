@@ -144,6 +144,12 @@ const ReactDayPickerField = ({
         }
     };
 
+    function isValidDate(dateString: string) {
+        const date = new Date(dateString);
+        // Valida que sea un date válido y no un "Invalid Date"
+        return !isNaN(date.getTime());
+    }
+
     return (
         <div className={`${stylesModules.container} ${classNameContainer ?? ""}`}>
             {
@@ -155,9 +161,9 @@ const ReactDayPickerField = ({
                     {label}
                 </label>
             }
-            <div className={`${stylesModules.dateField} ${classNameField ?? ""}`}>
+            <div className={`${stylesModules.dateField} ${isValidDate(inputValue) ? stylesModules.dateFieldValid : stylesModules.dateFieldInvalid} ${classNameField ?? ""}`}>
                 <input
-                    className={`${stylesModules.dateInput} ${classNameInput ?? ""}`}
+                    className={`${ stylesModules.dateInput} ${classNameInput ?? ""}`}
                     id="date-input"
                     type="text"
                     value={inputValue}

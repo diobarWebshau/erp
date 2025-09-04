@@ -60,6 +60,7 @@ const createProductionOrderInDB = async (
 
         if (!response.ok) {
             const errorText = await response.json();
+            console.log(errorText);
             if (response.status > 500) {
                 throw new Error(JSON.stringify(errorText));
             }

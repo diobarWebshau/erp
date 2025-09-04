@@ -96,3 +96,9 @@
 .warningIcon {
     color: var(--color-theme-primary);
 }
+
+.icon {
+    color: var(--color-theme-primary);
+    width: 30px;
+    height: 30px;
+}

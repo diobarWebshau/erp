@@ -1,0 +1,42 @@
+.secundaryButton {
+    /* dimension */
+    width: 200px;
+    height: 45px;
+
+    /* distribucion box */
+    border-radius: 15px;
+    cursor: pointer;
+    background-color: var(--color-theme-neutral-background);
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.secundaryButtonSpan {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.secundaryButtonLabel {
+    color: var(--color-theme-primary);
+}
+
+.secundaryButtonIcon {
+    color: var(--color-theme-primary);
+    width: 15px;
+    height: 15px;
+}
+
+.secundaryButton:hover {
+    background-color: var(--color-theme-primary-light);
+}
+
+.secundaryButton:hover .secundaryButtonLabel,
+.secundaryButton:hover .secundaryButtonIcon {
+    color: var(--color-theme-font-white);
+}

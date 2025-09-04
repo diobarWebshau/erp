@@ -122,6 +122,7 @@ interface CustomSelectProps<T extends BaseRow> {
     classNameToggleContainer?: string;
     classNameOption?: string;
     classNameOptionSelected?: string;
+    classNameOptionValidate?: string;
 }
 
 const CustomSelectObject = <T extends BaseRow>({
@@ -183,7 +184,7 @@ const CustomSelectObject = <T extends BaseRow>({
     return (
         <div className={`${styles.customSelect} ${classNameContainer}`}>
             <div
-                className={`nunito-semibold ${styles.fieldSelectContainer} ${classNameFieldContainer}`}
+                className={`nunito-semibold ${styles.fieldSelectContainer} ${value ? styles.fieldSelectContainerValidate : styles.fieldSelectContainerInvalid} ${classNameFieldContainer}`}
                 ref={refs.setReference}
                 {...getReferenceProps()}
                 tabIndex={0}
