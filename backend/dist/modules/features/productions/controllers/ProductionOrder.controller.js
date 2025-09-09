@@ -641,13 +641,24 @@ class ProductionOrdersController {
                 }
             }
             if (location) {
-                await InternalProductProductionOrderModel.update({
+                console.log("******************************************************************************");
+                console.log(location);
+                console.log("******************************************************************************");
+                console.log(location.id, relationship.order_id, location.name);
+                console.log(relationship);
+                const responsedasdasd = await InternalProductProductionOrderModel.findByPk(relationship.order_id, { transaction });
+                console.log("Registro encontrado ******************************************************************************");
+                console.log(responsedasdasd?.toJSON());
+                console.log("******************************************************************************");
+                const responseUpdateInternalProductProductionOrder = await InternalProductProductionOrderModel.update({
                     location_id: location.id,
                     location_name: location.name,
                 }, {
                     where: { id: relationship.order_id },
                     transaction
                 });
+                console.log(`actualizo registro de internal_product_production_order`);
+                console.log(responseUpdateInternalProductProductionOrder[0]);
             }
             if (production_line) {
                 if (relationship.order_type === 'client') {

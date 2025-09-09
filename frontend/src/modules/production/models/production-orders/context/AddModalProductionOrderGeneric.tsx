@@ -22,9 +22,6 @@ const ModalProductionOrderGeneric = ({
     data,
     updated
 }: IModalProductionOrderGeneric) => {
-
-
-
     
     return (
         <ProviderAddModalProductionOrder

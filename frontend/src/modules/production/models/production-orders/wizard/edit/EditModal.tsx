@@ -26,22 +26,17 @@ interface IEditModalProps {
     onClose: () => void;
     onUpdate: (data: IPartialProductionOrder) => void
     onDelete: (data: IPartialProductionOrder) => void
-    onRefetch: () => void
 }
 
 const EditModal = ({    
     onClose,
     onUpdate,
     onDelete,
-    onRefetch,
 }: IEditModalProps) => {
 
     // ? ************ Hooks de contexto ************/
 
     const state = useAddModalProductionOrderState();
-
-    console.log('Diobar ALERT');
-    console.log(state.data);
 
     // ? ************ Estados ************/
 
@@ -141,7 +136,6 @@ const EditModal = ({
                     state.current_step === 2 && (
                         <Step2
                             onUpdate={onUpdate}
-                            onRefetch={onRefetch}
                         />
                     )
                 }

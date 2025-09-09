@@ -68,6 +68,7 @@ import AddModalProductionOrderGeneric
 import AddModal from "./wizard/add/AddModal";
 import EditModal from "./wizard/edit/EditModal";
 import useProductionOrderById from "../../../../modelos/production_orders/hooks/useProductionOrderById";
+import ProductionPanel from "./panel/ProductionPanel";
 
 const ProductionOrderModel = () => {
 
@@ -100,6 +101,8 @@ const ProductionOrderModel = () => {
     const [isActiveEditModal, setIsActiveEditModal] =
         useState<boolean>(false);
     const [isActiveCheckPointModal, setIsActiveCheckPointModal] =
+        useState<boolean>(false);
+    const [isActiveProductionPanel, setIsActiveProductionPanel] =
         useState<boolean>(false);
 
     // * ******************** Funciones de operaciones CRUD ******************** */
@@ -136,7 +139,7 @@ const ProductionOrderModel = () => {
                 return;
             }
             setServerError(null);
-            fetchs();
+            await fetchs();
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -163,7 +166,8 @@ const ProductionOrderModel = () => {
                 return;
             }
             setServerError(null);
-            fetchs();
+            await refetchProductionOrderById();
+            await fetchs();
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -187,7 +191,7 @@ const ProductionOrderModel = () => {
                 return;
             }
             setServerError(null);
-            fetchs();
+            await fetchs();
             setIsActiveDeleteModal(false);
         } catch (error) {
             if (error instanceof Error)
@@ -207,7 +211,6 @@ const ProductionOrderModel = () => {
     const toggleActiveEditModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        console.log(`record`, record);
         setproductionOrderRecord({ ...record, qty: Number(record.qty) });
         setIsActiveEditModal(!isActiveEditModal);
     }
@@ -393,12 +396,12 @@ const ProductionOrderModel = () => {
 
 
     const getColumns = () => {
-        return columnsProductionOrders({ onClickEdit });
+        return columnsProductionOrders({ onClickContent });
     }
 
-    const onClickEdit = (e: React.MouseEvent) => {
+    const onClickContent = (e: React.MouseEvent) => {
         e.stopPropagation();
-        console.log("Diobar guapo");
+        setIsActiveProductionPanel(true);
     }
 
     return (
@@ -468,16 +471,20 @@ const ProductionOrderModel = () => {
                             mode="update"
                             currentStep={3}
                             totalSteps={3}
-                            data={productionOrderById ?? undefined}
+                            data={{...productionOrderById}}
                         >
                             <EditModal
                                 onClose={() => setIsActiveEditModal(false)}
                                 onUpdate={handleUpdate}
                                 onDelete={handleDelete}
-                                onRefetch={refetchProductionOrderById}
                             />
                         </AddModalProductionOrderGeneric>
                     )
+                }
+                {
+                    isActiveProductionPanel && <ProductionPanel
+                        onClose={() => setIsActiveProductionPanel(false)}
+                    />
                 }
             </div>
         </>

@@ -54,10 +54,11 @@ const ProviderAddModalProductionOrder = ({
     const [state, dispatch]: [AddModalProductionOrderState, Dispatch<AddModalProductionOrderAction>] =
         useReducer(AddModalProductionOrderReducer, initialState);
 
+
     useEffect(() => {
         if (data) {
-            console.log('se actualizo data porque cambio ')
-            console.log(`data`, data);
+            // console.log('se actualizo data porque cambio ')
+            // console.log(`data`, data);
             dispatch(
                 set_production_order(
                     {
@@ -72,6 +73,7 @@ const ProviderAddModalProductionOrder = ({
         }
     }, [data, dispatch]);
 
+    // console.log('Provider se renderiza', data);
     return (
         <AddModalProductionOrderStateContext.Provider value={state}>
             <AddModalProductionOrderDispatchContext.Provider value={dispatch}>

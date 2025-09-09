@@ -67,8 +67,6 @@ const RenderHeaderRow = <T,>({
 
     const rowCount = table?.getRowModel()?.rows?.length ?? 0;
 
-    console.log(rowCount);
-
     return (
         <tr
             className={`nunito-bold ${stylesModules.rowTableHeader}`}

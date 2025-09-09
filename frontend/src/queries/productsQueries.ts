@@ -167,7 +167,6 @@ const createCompleteProductInDB = async (
         formData.append("sale_price", String(product.sale_price ?? ""));
         formData.append("active", Number(product.active).toString());
         formData.append("product_processes", JSON.stringify(processes ?? []));
-        console.log(inputs);
         formData.append("products_inputs", JSON.stringify(inputs ?? []));
         formData.append("product_discount_ranges", JSON.stringify(discounts ?? []));
 

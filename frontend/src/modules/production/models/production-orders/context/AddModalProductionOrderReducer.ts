@@ -25,7 +25,8 @@ const AddModalProductionOrderReducer = produce(
     ) => {
         switch (action.type) {
             case AddModalProductionOrderActionsTypes.SET_PRODUCTION_ORDER:
-                Object.assign(draft.data, action.payload);
+                // ? Para remplazar todo el data con el actualizado
+                draft.data = action.payload;
                 break;
             case AddModalProductionOrderActionsTypes.REMOVE_ATTRIBUTES:
                 action.payload.forEach((attribute) => {

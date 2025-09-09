@@ -24,12 +24,10 @@ import TertiaryActionButtonCustom from "../../../../../../../../components/ui/ta
 
 interface IStep2Props {
     onUpdate: (data: IPartialProductionOrder) => void;
-    onRefetch: () => void;
 }
 
 const Step2 = ({
     onUpdate,
-    onRefetch,
 }: IStep2Props) => {
 
     const validationError =
@@ -377,7 +375,6 @@ const Step2 = ({
             onUpdate(state.draft);
             if (!(Object.keys(validationError).length > 0)) {
                 // setShowModalConfirm(!showModalConfirm);
-                onRefetch();
                 dispatch(next_step());
             }
         }

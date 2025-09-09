@@ -8,12 +8,12 @@ import stylesModules from "./columns.module.css";
 import { Progress } from "@mantine/core";
 
 interface IColumnsProductionOrdersProps {
-    onClickEdit: (e: React.MouseEvent) => void;
+    onClickContent  : (e: React.MouseEvent) => void;
 }
 
 
 const columnsProductionOrders = ({
-    onClickEdit,
+    onClickContent,
 }: IColumnsProductionOrdersProps): ColumnDef<IProductionOrder>[] => [
         {
             accessorKey: "id",
@@ -43,10 +43,10 @@ const columnsProductionOrders = ({
                 const locationName = row.original.extra_data?.location.name;
                 return <div
                     className={stylesModules.containerTextDecoration}
-                    onClick={(e) => onClickEdit(e)}
+                    onClick={(e) => onClickContent(e)}
                 >
                     {locationName}
-                </div>;
+                </div>; 
             },
             meta: {
                 hidden: false,
@@ -70,7 +70,7 @@ const columnsProductionOrders = ({
                                 : stylesModules.containerProductionLineInactive}
                             `
                         }
-                        onClick={(e) => onClickEdit(e)}
+                        onClick={(e) => onClickContent(e)}
                     >
                         {productionLineName}
                     </div>
