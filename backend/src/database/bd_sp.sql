@@ -1453,7 +1453,7 @@ BEGIN
             in_qty, 'allocate', in_id, 'Internal Production Order',
             'Production Allocation', 1
         );
-
+  
         -- LLAMAR A PROCEDIMIENTO DE INSUMOS
         CALL movements_inputs_production(
             in_order_id,

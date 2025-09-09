@@ -1,7 +1,7 @@
 
 import {
     ChevronDown,
-    ChevronRight, 
+    ChevronRight,
     Search
 } from "lucide-react";
 import StyleModule
@@ -28,8 +28,8 @@ import {
 } from "../../../../context/AddModalProductionOrderActions";
 import StandarNumericField
     from "../../../../../../../../components/ui/table/components/gui/text-field/standar-numeric-field/StandarNumericField";
-import CancelButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/cancel/CancelButtonCustom";
-import ActionMainButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/action-main/ActionMainButtonCustom";
+import CriticalActionButton from "../../../../../../../../components/ui/table/components/gui/button/custom-button/critical-action/CriticalActionButton";
+import MainActionButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/main-action/MainActionButtonCustom";
 
 type OrderType =
     "Si, ligar a una orden de venta" |
@@ -155,9 +155,14 @@ const Step1 = ({
     } = useLocationsProducedOneProduct(selectedProduct?.id ?? null);
 
 
+
+
     const handleOnClickButtonNext = () => {
         if (orderType === "Si, ligar a una orden de venta") {
             if (selectedPurchaseOrder && selectedProduct && selectedLocation && quantity) {
+                if (!validateQtyProductsOfPurchaseOrder(selectedProduct, quantity)) {
+                    return;
+                }
                 dispatch(update_production_order({
                     order_type: "client",
                     order_id:
@@ -279,6 +284,24 @@ const Step1 = ({
         const quantitys = e.target.value;
         if (quantitys && Number(quantitys) > 0) {
             setQuantity(Number(quantitys));
+            if (
+                orderType === "Si, ligar a una orden de venta"
+            ) {
+                const quantityPurchaseOrder =
+                    selectedPurchaseOrder?.purchase_order_products?.find(
+                        product =>
+                            product?.product?.id === selectedProduct?.id
+                    )?.qty;
+                if (Number(quantitys) > (quantityPurchaseOrder ?? 0)) {
+                    setValidationForm((prev) => ({
+                        ...prev,
+                        quantity:
+                            `La cantidad no puede ser mayor a la de la orden` +
+                            ` de compra (${Number(Number(quantityPurchaseOrder).toFixed(0))})`,
+                    }));
+                    return;
+                }
+            }
             setValidationForm((prev) => ({
                 ...prev,
                 quantity: null,
@@ -288,13 +311,10 @@ const Step1 = ({
         }
     };
 
-
     useEffect(() => {
         if (orderType === "Si, ligar a una orden de venta") {
             setProductsOfPurchaseOrder(
-                (selectedPurchaseOrder?.purchase_order_products
-                    ?.map(product => product?.product)
-                    ?? []) as IProduct[]
+                returnValidProductsOfPurchaseOrder()
             );
         }
     }, [selectedPurchaseOrder]);
@@ -320,6 +340,42 @@ const Step1 = ({
         }));
         setQuantity(undefined);
     }, [orderType]);
+
+    const returnValidProductsOfPurchaseOrder = () => {
+        return selectedPurchaseOrder?.purchase_order_products?.filter(
+            (product) => {
+                const originalQty = product.production_summary?.purchased_order_product_qty ?? 0;
+                const productionOrderQty = product.production_summary?.production_order_qty ?? 0;
+                const productionQty = product.production_summary?.production_qty ?? 0;
+                if (productionQty + productionOrderQty < originalQty) {
+                    return product.product;
+                }
+            }
+        ) as IProduct[] ?? [];
+    };
+
+    const validateQtyProductsOfPurchaseOrder = (
+        product: IProduct,
+        quantity: number
+    ) => {
+        const productoInPurchasedOrder =
+            selectedPurchaseOrder?.purchase_order_products?.find(p => p?.product?.id === product.id);
+
+        const productionOrderQty = productoInPurchasedOrder?.production_summary?.production_order_qty ?? 0;
+        const productionQty = productoInPurchasedOrder?.production_summary?.production_qty ?? 0;
+
+        const availableQty = productionOrderQty - productionQty;
+
+        if (quantity > availableQty) {
+            setValidationForm((prev) => ({
+                ...prev,
+                quantity:
+                    `La cantidad no puede exceder la cantidad disponible para producir (${availableQty})`,
+            }));
+            return false;
+        }
+        return true;
+    }
 
     return (
         <div className={StyleModule.container}>
@@ -473,8 +529,11 @@ const Step1 = ({
                 }
             </section>
             <section className={StyleModule.footerSection}>
-                <CancelButtonCustom onClick={onCancel} />
-                <ActionMainButtonCustom
+                <CriticalActionButton
+                    onClick={onCancel}
+                    label="Cancelar"
+                />
+                <MainActionButtonCustom
                     onClick={handleOnClickButtonNext}
                     label="Siguiente"
                     icon={<ChevronRight />}

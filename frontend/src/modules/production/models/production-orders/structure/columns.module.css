@@ -19,6 +19,14 @@
     border: 1px solid var(--color-success); 
 }
 
+.containerTextDecoration{
+    cursor: pointer;
+}
+
+.containerTextDecoration:hover{
+    text-decoration: underline;
+}
+
 .pending {
     background-color: var(--color-warning-light);
     color: var(--color-warning);

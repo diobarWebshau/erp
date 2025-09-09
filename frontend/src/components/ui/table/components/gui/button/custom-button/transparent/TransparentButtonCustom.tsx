@@ -1,23 +1,23 @@
 import { cloneElement, type JSX } from "react";
 import FadeButton from "../../fade-button/FadeButton";
-import StyleModule from "./TransparentButton.module.css";
+import StyleModule from "./TransparentButtonCustom.module.css";
 
 
-interface ITransparentButton {
+interface ITransparentButtonCustomProps {
     onClick: () => void;
     label: string;
     icon: JSX.Element;
 }
 
-const TransparentButton = ({
+const TransparentButtonCustom = ({
     onClick,
     label,
     icon
-}: ITransparentButton) => {
+}: ITransparentButtonCustomProps) => {
 
     // Clonamos el icono y le agregamos la clase deseada
     const iconWithClass = icon ? cloneElement(icon, {
-        className: [StyleModule.transparentButtonIcon, icon.props.className].filter(Boolean).join(" ")
+        className: [StyleModule.transparentButtonCustomIcon, icon.props.className].filter(Boolean).join(" ")
     }) : null;
 
     return (
@@ -26,13 +26,13 @@ const TransparentButton = ({
             onClick={onClick}
             type="button"
             typeOrderIcon="first"
-            classNameButton={StyleModule.transparentButton}
-            classNameLabel={StyleModule.transparentButtonLabel}
-            classNameSpan={StyleModule.transparentButtonSpan}
+            classNameButton={StyleModule.transparentButtonCustom}
+            classNameLabel={StyleModule.transparentButtonCustomLabel}
+            classNameSpan={StyleModule.transparentButtonCustomSpan}
             {...(icon && { icon: iconWithClass })}
             
         />
     )
 }
 
-export default TransparentButton
+export default TransparentButtonCustom  

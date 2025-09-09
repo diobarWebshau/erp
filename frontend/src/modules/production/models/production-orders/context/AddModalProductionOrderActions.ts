@@ -48,6 +48,27 @@ const clear = (): AddModalProductionOrderAction => ({
     type: AddModalProductionOrderActionsTypes.CLEAR,
 });
 
+const set_draft_production_order = (
+    payload: IPartialProductionOrder
+): AddModalProductionOrderAction => ({
+    type: AddModalProductionOrderActionsTypes.SET_DRAFT_PRODUCTION_ORDER,
+    payload
+});
+
+const update_draft_production_order = (
+    payload: IPartialProductionOrder
+): AddModalProductionOrderAction => ({
+    type: AddModalProductionOrderActionsTypes.UPDATE_DRAFT_PRODUCTION_ORDER,
+    payload
+});
+
+const remove_draft_attributes = (
+    payload: string[]
+): AddModalProductionOrderAction => ({
+    type: AddModalProductionOrderActionsTypes.REMOVE_DRAFT_ATTRIBUTES,
+    payload
+}); 
+
 export {
     set_production_order,
     update_production_order,
@@ -55,5 +76,8 @@ export {
     set_step,
     back_step,
     next_step,
-    clear
+    clear,
+    set_draft_production_order,
+    update_draft_production_order,
+    remove_draft_attributes
 }

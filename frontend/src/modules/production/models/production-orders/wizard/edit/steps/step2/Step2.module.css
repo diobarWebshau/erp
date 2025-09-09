@@ -9,47 +9,8 @@
         "header" max-content
         "body" 1fr
         "footer" max-content / 100%;
-    padding-inline: 2rem;
     padding-top: 1rem;
-    gap: 1rem;
-}
-
-
-.headerSection {
-    grid-area: header;
-    /* distribucion flex */
-    display: flex;
-    flex-direction: row;
-    justify-content: start;
-    align-items: center;
-}
-
-.headerSection h2 {
-    font-size: 24px;
-    color: var(--color-theme-primary);
-}
-
-
-.bodySection {
-    grid-area: body;
-    /* distribucion flex */
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.iconButton {
-    width: 15px;
-    height: 15px;
-    color: var(--color-theme-primary);
-}
-
-/* *************** body section *************** */
-
-.externalContainerGenericTable {
-    width: 100%;
-    width: auto;
-    background-color: var(--color-theme-font-white);
+    padding-inline: 3rem;
 }
 
 /* *************** Footer *************** */
@@ -66,23 +27,99 @@
     gap: 1rem;
 }
 
-/* *************** Select Custom *************** */
+/* *************** Header *************** */
 
-.customSelectFieldContainer{
-    height: 44px;
+.headerSection {
+    grid-area: header;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.headerSection h1 {
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+.containerDate {
+    /* dimension */
+    width: max-content;
+    height: max-content;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+
+}
+
+.containerDate>*:first-child {
+    color: var(--color-theme-primary);
+}
+
+.containerDate>*:last-child {
+    color: var(--color-theme-font-black);
+}
+
+
+/* *************** Body *************** */
+
+.bodySection {
+    grid-area: body;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.externalContainerGenericTable{
+    /* dimension */
+    width: 100%;
     background-color: var(--color-theme-font-white);
 }
 
-.customSelectToggleContainer{
-    background-color: var(--color-theme-font-white);
+
+/* *************** TextArea *************** */
+
+.containerTextArea{
+    /* dimension */
+    gap: 0.5rem;
+    height: auto;
 }
 
-.customSelectOption{
-    height: 44px;
+.textArea{
+    font-size: 14px;
+}
+
+.labelTextArea {
+    /* dimension */
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    gap: 0.2rem;
+}
+
+.labelTextArea p {
+    font-size: 14px;
+}
+
+.labelTextArea p:first-child {
+    color: var(--color-theme-primary);
+}
+
+.labelTextArea p:last-child {
+    color: var(--color-theme-font-black);
 }
 
 
-/* *  selectSearchMultiCheck */
+/* *************** selectSearchMultiCheck *************** */
 
 .selectSearchMultiCheckContainer {
     gap: 5rem;
@@ -90,7 +127,7 @@
 
 .selectSearchMultiCheckInput {
     /* dimension */
-    height: 45px;
+    height: 30px;
 
     /* distribuccion box */
     border-radius: 10px;
@@ -99,7 +136,7 @@
     border: 1px solid var(--color-theme-border-table);
 
     /* estilos */
-    background-color: var(--color-theme-font-white);
+    background-color: var(--color-theme-background);
 
     font-size: 14px;
 }
@@ -186,7 +223,7 @@
 .selectSearchMultiCheckDropDownSearchItem {
     /* dimension */
     width: 100%;
-    height: 45px;
+    height: 30px;
 
     /* distribucion box */
     border: 1px solid var(--color-theme-border-table);
@@ -275,72 +312,146 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
 }
 
 
+/* *************** DateDayPicker *************** */
 
 
-/* *************** Disponibilidad *************** */
+/* Contenedor de fechas */
 
-.baseAvailable {
+.containerMainDayPickerFieldDeliver {
+    /* dimension */
+    width: 100%;
+    border-radius: 15px;
+}
+
+.containerFieldDayPickerFieldDeliver {
     /* dimension */
     height: 30px;
-    width: 100px;
-    /* distribucion flex */
+    width: 100%;
+    border-radius: 15px;
+    /* width: 62%; */
+}
+
+.inputDayPickerFieldDeliver {
+    /* estilos */
+    background-color: var(--color-theme-background);
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 15px;
+    color: var(--color-theme-font-black);
+    font-size: 14px;
+}
+
+.inputDayPickerFieldDeliver:focus {
+    outline: none;
+}
+
+.labelDayPickerFieldDeliverValidate,
+.labelDayPickerFieldDeliver {
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-theme-primary);
+}
+
+.inputDayPickerFieldDeliverVidate::placeholder {
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-alert);
+}
+
+.inputDayPickerFieldDeliverVidate {
+    /* estilos */
+    font-size: 14px;
+    border: 1px solid var(--color-alert);
+    border-radius: 15px;
+    background-color: var(--color-theme-font-white);
+}
+
+.iconDayPickerField {
+    /* dimension */
+    width: 20px;
+    height: 20px;
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+.dayPicker {
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.containerPopoverDayPickerField {
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-border-table);
+}
+
+
+/* *************** Select Custom *************** */
+
+.customSelectFieldContainer{
+    width: 100%;
+    height: 30px;
+    background-color: var(--color-theme-background);
+}
+
+.customSelectToggleContainer{
+    background-color: var(--color-theme-font-white);
+}
+
+.externalContainerCustomSelectObject {
+    /* dimension */
+    width: 100%;
+    display: flex;
+}
+
+.customSelectOption{
+    /* dimension */
+    height: 30px;   
+}
+
+/* *************** Otros *************** */
+
+.iconButton {
+    width: 15px;
+    height: 15px;
+    color: var(--color-theme-primary);
+}
+
+
+/* *************** Input Toggle *************** */
+
+.ContainerInputMemorizado {
+    /* dimension */
+    width: 100%;
+
+    
+    display: flex;
+}
+
+.InputMemorizado {
+    height: 30px;
+    font-size: 14px;
+    padding-inline: 1rem;
+    background-color: var(--color-theme-background);
+    border: 1px solid var(--color-theme-border-table);
+}
+
+
+/* *************** Modal Confirm *************** */
+
+.containerInternalModalConfirm {
+    /* dimension */
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 0.2rem;
-
-    border-radius: 15px;
-}
-
-.highStock {
-    /* estilos */
-    background: var(--color-success-light);
-    color: var(--color-success);
-    border: 1px solid var(--color-success);
-}
-
-.lowStock {
-    /* estilos */
-    background: var(--color-warning-light);
-    color: var(--color-warning);
-    border: 1px solid var(--color-warning);
-}
-
-.unavailable {
-    /* estilos */
-    background: var(--color-alert-light);
-    color: var(--color-alert);
-    border: 1px solid var(--color-alert);
-}
-
-
-/* * Input Memoizado del qty */
-
-.ContainerInputMemorizado {
-    height: 44px;
-}
-
-.InputMemorizado {
-    height: 44px;
-    font-size: 14px;
-    padding-inline: 1rem;
-    border: 1px solid var(--color-theme-border-table);
-    color: var(--color-theme-font-black);
-}
-
-/* * MOdal de confirmacion */
-
-
-.containerModalButtons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-wrap: wrap;
     gap: 1rem;
 }
 
-.iconButtonModal{
-    color: var(--color-theme-primary);
+.customModalConfirmIcon{
     width: 30px;
     height: 30px;
+    color: var(--color-theme-primary);
 }

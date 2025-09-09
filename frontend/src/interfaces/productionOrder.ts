@@ -1,3 +1,4 @@
+import type { IInternalProductProductionOrder } from "./internalOrder";
 import type { ILocation } from "./locations";
 import type { IProduct } from "./product";
 import type { IProduction } from "./production";
@@ -11,6 +12,13 @@ interface ExtraData {
     production_line: IProductionLine;
 }
 
+interface ExtraData2 {
+    location: ILocation;
+    production_line: IProductionLine;
+    purchase_order?: IPurchasedOrder;
+    internal_order?: IInternalProductProductionOrder;
+}
+
 interface IProductionOrder {
     id: number;
     order_type: 'internal' | 'client';
@@ -22,11 +30,13 @@ interface IProductionOrder {
     created_at: string;
     updated_at: string;
     extra_data?: ExtraData;
+    extra_data2?: ExtraData2;
     productions?: IProduction[];
     location?: ILocation;
     product?: IProduct;
     purchase_order?: IPurchasedOrder;
     production_line?: IProductionLine;
+    internal_order?: IInternalProductProductionOrder;
 }
 
 type IPartialProductionOrder = Partial<IProductionOrder>;

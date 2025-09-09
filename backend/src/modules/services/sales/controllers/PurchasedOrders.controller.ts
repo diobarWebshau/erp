@@ -169,6 +169,10 @@ class PurchasedOrderController {
                         as: "purchase_order_products",
                         attributes: [
                             ...PurchaseOrderProductModel.getAllFields(),
+                            [
+                                sequelize.literal("func_get_production_summary_of_pop(`purchase_order_products`.id)"),
+                                "production_summary"
+                            ],
                         ],
                         include: [
                             {

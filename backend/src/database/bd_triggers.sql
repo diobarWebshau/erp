@@ -4,6 +4,7 @@ USE u482698715_shau_erp;
 *		TABLE inventory_movements		*
 ****************************************/
 
+DROP TRIGGER IF EXISTS trigger_created_inventory_movements;
 DELIMITER //
 CREATE TRIGGER trigger_created_inventory_movements
 AFTER INSERT ON inventory_movements
@@ -21,6 +22,7 @@ END //
 DELIMITER ;
 
 /***/
+DROP TRIGGER IF EXISTS trigger_update_inventory_movements;
 DELIMITER //
 CREATE TRIGGER trigger_update_inventory_movements
 AFTER UPDATE ON inventory_movements
@@ -66,34 +68,25 @@ BEGIN
 END //
 DELIMITER ;
 
+/****************************************
+*	     TABLE purchased_orders		    *
+****************************************/
+
+DROP TRIGGER IF EXISTS trigger_delete_purchased_orders;
+DELIMITER //
+CREATE TRIGGER trigger_delete_purchased_orders
+BEFORE DELETE ON purchased_orders
+FOR EACH ROW
+BEGIN
+	DELETE FROM purchased_orders_products
+	WHERE purchase_order_id = OLD.id;
+END//
+DELIMITER ;
 
 /****************************************
 *	TABLE purchased_orders_products		*
 ****************************************/
 
-/* Trigger en create
-* Asignacion de location, linea automatica
-* Crear orden de produccion si lo requiere
-* Realizar movimientos de inventario a produccion si lo requiere
-* Actualizar precio de la purchased_order
-*/
-DELIMITER //
-CREATE TRIGGER trigger_insert_purchased_orders_products
-AFTER INSERT ON purchased_orders_products
-FOR EACH ROW
-BEGIN
-	-- CALL process_purchased_order_product_single(NEW.id);
-	-- CALL update_purchased_order_total_price(NEW.purchase_order_id);
-END//
-DELIMITER ;
-
-/* Trigger en delete
-* (REQUISITO) NO TENER PRODUCCION EMPEZADA
-* Eliminacion de la relacion con location, linea
-* Eliminar ordenes de produccion de la purchased_order
-* Eliminar los movimientos de inventario a produccion si lo requiere
-* Actualizacion de precio de la purchased_order
-*/
 DROP TRIGGER IF EXISTS trigger_delete_purchased_orders_products;
 DELIMITER //
 CREATE TRIGGER trigger_delete_purchased_orders_products
@@ -101,24 +94,14 @@ BEFORE DELETE ON purchased_orders_products
 FOR EACH ROW
 BEGIN
 	CALL sp_revert_movement_inventory_pop(
-		OLD.id, OLD.product_id, OLD.product_name
-    );
-	-- CALL delete_pending_production_order_by_reference(OLD.id, 'client');
-    -- CALL revert_asign_purchased_order_product_after_update(OLD.id);
-	-- CALL update_purchased_order_total_price(OLD.purchase_order_id);
+		OLD.id,
+		OLD.product_id,
+		OLD.product_name
+	);
 END//
 DELIMITER ;
 
-/* Trigger para update
-* (REQUISITO) NO TENER PRODUCCION EMPEZADA
-* Eliminacion de la relacion con location, linea
-* Eliminar ordenes de produccion de la purchased_order
-* Eliminar los movimientos de inventario a produccion si lo requiere
-* Asignacion de location, linea automatica
-* Crear orden de produccion si lo requiere
-* Realizar movimientos de inventario a produccion si lo requiere
-* Actualizacion de precio de la purchased_order
-*/
+DROP TRIGGER IF EXISTS trigger_update_purchased_orders_products; 
 DELIMITER //
 CREATE TRIGGER trigger_update_purchased_orders_products
 AFTER UPDATE ON purchased_orders_products
@@ -189,85 +172,74 @@ DELIMITER ;
 *	 TABLE internal_product_production_order  *
 ***********************************************/
 
-/* Trigger para eliminar orden interna
-* (REQUISITO) NO TENER PRODUCCION EMPEZADA
-* Para eliminar una orden interna no tiene que tener produccion empezada
-*/
-
-/*
-DELIMITER //
-CREATE TRIGGER trigger_create_internal_production_order
-AFTER CREATE ON internal_product_production_orders
-FOR EACH ROW
-BEGIN
-
-END //
-DELIMITER ;
-*/
-
-DROP TRIGGER IF EXISTS trigger_delete_internal_production_order;
-DELIMITER //
-CREATE TRIGGER trigger_delete_internal_production_order
-BEFORE DELETE ON internal_product_production_orders
-FOR EACH ROW
-BEGIN
-	CALL sp_revert_movement_inventory_pop(
-		OLD.id, OLD.product_id, OLD.product_name
-    );
-	-- INSERT INTO debug_log(message) values(OLD.id);
-	-- CALL revert_asign_internal_after_update(OLD.id);
-	-- CALL delete_pending_production_order_by_reference(OLD.id, 'internal');
-END//
-DELIMITER ;
-
-
 DROP TRIGGER IF EXISTS trigger_update_internal_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_update_internal_production_order
 AFTER UPDATE ON internal_product_production_orders
 FOR EACH ROW
 BEGIN
-/*
-	IF NEW.status <> OLD.status THEN
-		IF NEW.status = 'completed' AND OLD.status = 'pending' THEN
-			UPDATE inventory_movements
-			SET is_locked = 0 
-			WHERE reference_type = 'production'
-			AND reference_id IN (
-				SELECT id FROM production_orders
-				WHERE order_type = 'internal' 
-                AND order_id = NEW.id
-                AND description = 'Internal production'
-			);
-		END IF;
-		IF NEW.status = 'pending' AND OLD.status = 'completed' THEN
-			UPDATE inventory_movements
-			SET is_locked = 1 
-			WHERE reference_type = 'production'
-			AND reference_id IN (
-				SELECT id FROM production_orders
-				WHERE order_type = 'internal' 
-                AND order_id = NEW.id
-                AND description = 'Internal production'
-			);
-		END IF;
-	END IF;
-*/
+
 	IF NEW.qty <> OLD.qty THEN
 		CALL sp_update_inventory_movements_ippo(
 			NEW.id,
-			NEW.qty,
 			NEW.product_id,
-			NEW.product_name
+			NEW.product_name,
+			NEW.qty
 		);
 	END IF;
+
+	IF NEW.location_id <> OLD.location_id THEN
+		UPDATE inventory_movements AS im
+		SET 
+			location_id = NEW.location_id,
+			location_name = NEW.location_name
+		WHERE im.reference_type IN (
+				'Internal Production Order'
+			)
+			AND (
+				im.reference_id = NEW.id OR 
+				im.reference_id IN (
+					SELECT id
+					FROM production_orders AS po
+					WHERE po.order_type = 'internal'
+					AND po.order_id = NEW.id
+				)
+			)
+			AND im.item_type IN (
+				'product', 
+				'input'
+			)
+			AND im.movement_type = 'allocate';
+	END IF;
+	
 END //
 DELIMITER ;
-	
+
 /****************************************
-*		TABLE productions		*
+*		TABLE productions_orders		*
 ****************************************/
 
+DROP TRIGGER IF EXISTS trigger_after_delete_production_orders;
+DELIMITER //
+CREATE TRIGGER trigger_after_delete_production_orders
+BEFORE DELETE ON production_orders
+FOR EACH ROW
+BEGIN
+	CALL sp_delete_production_order(
+		OLD.id,
+		OLD.order_id,
+		OLD.order_type,
+		OLD.product_id,
+		OLD.product_name
+	);
+END //
+DELIMITER ;
+
+/****************************************
+*		   TABLE productions			*
+****************************************/
+
+DROP TRIGGER IF EXISTS trigger_create_update_status_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_create_update_status_production_order
 AFTER INSERT ON productions
@@ -343,305 +315,13 @@ BEGIN
         'product', v_product_name, v_qty, 'in',
         NEW.production_order_id, v_reference_type, v_description, NEW.id
     );
-	/*
-    IF v_order_type = 'client' THEN
-		INSERT INTO inventory_movements(
-			location_id, location_name, item_id, 
-			item_type, item_name, qty, movement_type, 
-			reference_id, reference_type, description,
-            production_id, is_locked
-        ) VALUES (
-			v_location_id, v_location_name, v_product_id, 
-			'product', v_product_name, v_qty, 'out',
-			NEW.production_order_id, v_reference_type, 
-            v_description, NEW.id, 1
-        );
-    END IF;
-	*/
+
     CALL validate_production_order_completed(NEW.production_order_id);
 	CALL validate_order_completed(v_order_id, v_order_type);
 END//
 DELIMITER ; 
 
-/****************************************
-*		TABLE productions_orders		*
-****************************************/
-
-/*
-DELIMITER //
-CREATE TRIGGER trigger_after_update_production_order
-AFTER UPDATE ON production_orders
-FOR EACH ROW
-BEGIN
-	
-	DECLARE v_location_id INT DEFAULT 0;
-	DECLARE v_location_name VARCHAR(100) DEFAULT '';
-
-	IF NEW.order_type='client' THEN
-		IF  NEW.qty <> OLD.qty THEN
-			-- ACTUALIZAMOS EL COMPROMETIDO DE LA PRODUCCION
-			UPDATE inventory_movements 
-			SET qty  = NEW.qty
-			WHERE reference_type = 'order'
-			AND movement_type = 'out'
-			AND item_type = 'product'
-			AND reference_id = NEW.id
-			AND description = 'Production order';
-
-			-- REVERTIMOS LOS MOVIMIENTOS DE INSUMOS DE INVENTARIO
-			DELETE FROM inventory_movements 
-			WHERE reference_type = 'order'
-			AND movement_type = 'out'
-			AND item_type = 'input'
-			AND reference_id = NEW.id
-			AND description = 'Production order';
-
-			-- OBTENEMOS LA LOCATION
-			SELECT
-				l.id, l.name
-			INTO
-				v_location_id, v_location_name
-			FROM production_orders AS po
-			JOIN purchased_orders_products AS pop
-			ON pop.id = po.order_id
-			JOIN purchased_orders_products_locations_production_lines AS poplpl
-			ON poplpl.purchase_order_product_id = pop.id
-			JOIN production_lines AS pl
-			ON pl.id = poplpl.production_line_id
-			JOIN locations_production_lines AS lpl
-			ON lpl.production_line_id = pl.id
-			JOIN locations AS l
-			ON l.id = lpl.location_id
-			WHERE po.id = NEW.id
-			AND po.order_type = 'client';
-
-			-- REALIZAMOS EL MOVIMIENTO DE INVENTARIO
-            -- 	! ESTE MOVIMIENTO NO DEBE ESTAR, YA QUE YA SE DENTRO DE UN TRIGGER
-			CALL movements_inputs_production(
-				NEW.order_id,
-				NEW.product_id,
-				v_location_id,
-				v_location_name,
-				NEW.qty,
-				NEW.id,
-				'Production order'
-			);
-		END IF;
-	ELSE
-		IF  NEW.qty <> OLD.qty THEN
-
-			-- ACTUALIZAMOS EL COMPROMETIDO DE LA PRODUCCION
-			UPDATE inventory_movements 
-			SET qty  = NEW.qty
-			WHERE reference_type = 'production'
-			AND movement_type = 'in'
-			AND item_type = 'product'
-			AND reference_type = NEW.id
-			AND description = 'Internal production';
-
-			-- REVERTIMOS LOS MOVIMIENTOS DE INSUMOS DE INVENTARIO
-			DELETE FROM inventory_movements 
-			WHERE reference_type = 'production'
-			AND movement_type = 'out'
-			AND item_type = 'input'
-			AND reference_id = NEW.id
-			AND description = 'Internal production';
-
-			-- OBTENEMOS LA LOCATION
-			SELECT
-				l.id, l.name
-			INTO
-				v_location_id, v_location_name
-			FROM production_orders AS po
-			JOIN internal_product_production_orders AS ippo
-			ON ippo.id = po.order_id
-			JOIN internal_production_orders_lines_products AS ipolp
-			ON ipolp.internal_product_production_order_id = ippo.id
-			JOIN production_lines AS pl
-			ON pl.id = ipolp.production_line_id
-			JOIN locations_production_lines AS lpl
-			ON lpl.production_line_id = pl.id
-			JOIN locations AS l
-			ON l.id = lpl.location_id
-			WHERE po.id = NEW.id
-			AND po.order_type = 'internal';
-
-			-- EFECTUAR MOVIMIENTOS DE INSUMOS PARA ORDEN DE PRODUCCION
-			-- 	! ESTE MOVIMIENTO NO DEBE ESTAR, YA QUE YA SE DENTRO DE UN TRIGGER
-            CALL movements_inputs_production(
-				NEW.order_id,
-				NEW.product_id,
-				v_location_id,
-				v_location_name,
-				NEW.qty,
-				NEW.id,
-				'Internal production'
-			);
-		END IF;
-	END IF;
-    
-END //
-DELIMITER ;
-*/
-
-/*
-DELIMITER //
-CREATE TRIGGER trigger_after_delete_production_orders
-BEFORE DELETE ON production_orders
-FOR EACH ROW
-BEGIN
-	-- CALL revert_movements_production_order_after_delete(OLD.id);
-END //
-DELIMITER ;
-*/
-
-
--- DELIMITER //
--- CREATE TRIGGER trigger_after_create_production_order
--- AFTER INSERT ON production_orders
--- FOR EACH ROW
--- BEGIN
-	
--- 	DECLARE v_location_id INT DEFAULT 0;
--- 	DECLARE v_location_name VARCHAR(100) DEFAULT '';
-
--- 	IF NEW.order_type='client' THEN
-
--- 		-- OBTENEMOS LA LOCATION
--- 		SELECT
--- 			l.id, l.name
--- 		INTO
--- 			v_location_id, v_location_name
--- 		FROM production_orders AS po
--- 		JOIN purchased_orders_products AS pop
--- 		ON pop.id = po.order_id
--- 		JOIN purchased_orders_products_locations_production_lines AS poplpl
--- 		ON poplpl.purchase_order_product_id = pop.id
--- 		JOIN production_lines AS pl
--- 		ON pl.id = poplpl.production_line_id
--- 		JOIN locations_production_lines AS lpl
--- 		ON lpl.production_line_id = pl.id
--- 		JOIN locations AS l
--- 		ON l.id = lpl.location_id
--- 		WHERE po.id = NEW.id
--- 		AND po.order_type = 'client';
-
--- 		INSERT INTO inventory_movements(
--- 			location_id, location_name, 
--- 			item_type, item_id, item_name,
--- 			qty, movement_type, reference_id, reference_type,
--- 			description, is_locked
--- 		)
--- 		VALUES (
--- 			v_location_id, v_location_name,  
--- 			'product', NEW.product_id, NEW.product_name,
--- 			NEW.qty , 'out', NEW.id , 'order',
--- 			'Production order', 1
--- 		);
-
--- 		-- REALIZAMOS EL MOVIMIENTO DE INVENTARIO
--- 		CALL movements_inputs_production(
--- 			NEW.order_id,
--- 			NEW.product_id,
--- 			v_location_id,
--- 			v_location_name,
--- 			NEW.qty,
--- 			NEW.id,
--- 			'Production order'
--- 		);
--- 	ELSE
--- 		-- OBTENEMOS LA LOCATION
--- 		SELECT
--- 			l.id, l.name
--- 		INTO
--- 			v_location_id, v_location_name
--- 		FROM production_orders AS po
--- 		JOIN internal_product_production_orders AS ippo
--- 		ON ippo.id = po.order_id
--- 		JOIN internal_production_orders_lines_products AS ipolp
--- 		ON ipolp.internal_product_production_order_id = ippo.id
--- 		JOIN production_lines AS pl
--- 		ON pl.id = ipolp.production_line_id
--- 		JOIN locations_production_lines AS lpl
--- 		ON lpl.production_line_id = pl.id
--- 		JOIN locations AS l
--- 		ON l.id = lpl.location_id
--- 		WHERE po.id = NEW.id
--- 		AND po.order_type = 'internal';
-
--- 		INSERT INTO inventory_movements (
--- 			location_id, location_name, 
--- 			item_type, item_id, item_name,
--- 			qty, movement_type, reference_id, reference_type,
--- 			description, is_locked
--- 		)
--- 		VALUES (
--- 			in_location_id, in_location_name,  
--- 			'product', NEW.product_id, NEW.product_name,
--- 			NEW.qty, 'in', NEW.id , 'production',
--- 			'Internal production', 1
--- 		);
-
--- 		-- EFECTUAR MOVIMIENTOS DE INSUMOS PARA ORDEN DE PRODUCCION
--- 		CALL movements_inputs_production(
--- 			NEW.order_id,
--- 			NEW.product_id,
--- 			v_location_id,
--- 			v_location_name,
--- 			NEW.qty,
--- 			NEW.id,
--- 			'Internal production'
--- 		);
--- 	END IF;
-    
--- END //
--- DELIMITER ;
-
-
-
--- DELIMITER //
--- CREATE TRIGGER trigger_before_delete_update_status_production_order
--- BEFORE DELETE ON productions
--- FOR EACH ROW
--- BEGIN
-
--- 	DECLARE v_inventory_movement_id INT DEFAULT 0;
-
--- 	SELECT id
--- 	INTO v_inventory_movement_id
--- 	FROM inventory_movements
--- 	WHERE production_id = OLD.id
--- 	LIMIT 1;
-
--- 	UPDATE inventory_movements
--- 	SET is_locked = 1
--- 	WHERE id = v_inventory_movement_id;
-
--- END//
--- DELIMITER ; 
-
--- DELIMITER //
--- CREATE TRIGGER trigger_delete_update_status_production_order
--- AFTER DELETE ON productions
--- FOR EACH ROW
--- BEGIN
--- 	DECLARE v_order_type VARCHAR(100) DEFAULT '';
--- 	DECLARE v_order_id INT DEFAULT 0;
-	
--- 	DECLARE v_inventory_movement_id INT DEFAULT 0;
--- 	SELECT id
--- 	INTO v_inventory_movement_id
--- 	FROM inventory_movements
--- 	WHERE production_id = OLD.id
--- 	LIMIT 1;
--- 		DELETE inventory_movements
--- 	WHERE id = v_inventory_movement_id;
--- 	CALL validate_production_order_completed(OLD.production_order_id);
--- 	SELECT order_type, order_id INTO v_order_type, v_order_id FROM production_orders WHERE id = OLD.production_order_id;
--- 	CALL validate_order_completed(v_order_id, v_order_type);
--- END//
--- DELIMITER ; 
-
+DROP TRIGGER IF EXISTS trigger_before_delete_update_status_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_before_delete_update_status_production_order
 BEFORE DELETE ON productions
@@ -663,6 +343,7 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP TRIGGER IF EXISTS trigger_after_delete_update_status_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_after_delete_update_status_production_order
 AFTER DELETE ON productions
@@ -704,6 +385,7 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP TRIGGER IF EXISTS trigger_update_update_status_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_update_update_status_production_order
 AFTER UPDATE ON productions
@@ -759,16 +441,11 @@ BEGIN
 END //
 DELIMITER ;
 
-
-
-/****************************************
-*		TABLE productions orders		*
-****************************************/
-
 /************************************************************
 *		TABLE shipping_orders_purchased_order_products		*
 ************************************************************/
 
+DROP TRIGGER IF EXISTS trigger_create_shipping_orders_purchased_order_products;
 DELIMITER //
 CREATE TRIGGER trigger_create_shipping_orders_purchased_order_products
 AFTER INSERT ON shipping_orders_purchased_order_products
@@ -799,6 +476,7 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP TRIGGER IF EXISTS trigger_delete_shipping_orders_purchased_order_products;
 DELIMITER //
 CREATE TRIGGER trigger_delete_shipping_orders_purchased_order_products
 AFTER DELETE ON shipping_orders_purchased_order_products
@@ -829,8 +507,12 @@ BEGIN
 END //
 DELIMITER ;
 
-/**/
 
+/****************************************
+*		TABLE inventory_transfers		*
+*****************************************/
+
+DROP TRIGGER IF EXISTS trigger_create_inventory_transfers;
 DELIMITER //
 CREATE TRIGGER trigger_create_inventory_transfers
 AFTER INSERT ON inventory_transfers
@@ -847,7 +529,7 @@ BEGIN
 END //
 DELIMITER ;
 
-
+DROP TRIGGER IF EXISTS trigger_update_inventory_transfers;
 DELIMITER //
 CREATE TRIGGER trigger_update_inventory_transfers
 AFTER UPDATE ON inventory_transfers
@@ -861,7 +543,7 @@ BEGIN
 END //
 DELIMITER ;
 
-
+DROP TRIGGER IF EXISTS trigger_delete_inventory_transfers;
 DELIMITER //
 CREATE TRIGGER trigger_delete_inventory_transfers
 AFTER DELETE ON inventory_transfers
@@ -881,6 +563,7 @@ DELIMITER ;
 *					Shipping orders							*
 ************************************************************/
 
+DROP TRIGGER IF EXISTS delete_shipping_order;
 DELIMITER //
 CREATE TRIGGER delete_shipping_order
 BEFORE DELETE ON shipping_orders
@@ -903,7 +586,7 @@ DELIMITER ;
 *					Production lines products				*
 ************************************************************/
 
-
+DROP TRIGGER IF EXISTS trigger_after_create_production_lines_products;
 DELIMITER //
 CREATE TRIGGER trigger_after_create_production_lines_products
 AFTER INSERT ON production_lines_products
@@ -919,6 +602,7 @@ END //
 *						scrap								*
 ************************************************************/
 
+DROP TRIGGER IF EXISTS trigger_after_insert_scrap;
 DELIMITER //
 CREATE TRIGGER trigger_after_insert_scrap
 AFTER INSERT ON scrap
@@ -986,6 +670,8 @@ BEGIN
 END //
 DELIMITER ;
 
+
+DROP TRIGGER IF EXISTS trigger_after_delete_scrap;
 DELIMITER // 
 CREATE TRIGGER trigger_after_delete_scrap
 AFTER DELETE ON scrap
@@ -1016,6 +702,7 @@ END //
 DELIMITER ;
 
 
+DROP TRIGGER IF EXISTS trigger_after_update_scrap;
 DELIMITER //
 CREATE TRIGGER trigger_after_update_scrap
 AFTER UPDATE ON scrap

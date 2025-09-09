@@ -30,7 +30,7 @@ import type {
     RowAction
 } from "../../../../components/ui/table/types";
 import DeleteModal
-    from "./modals/delete/DeleteModal";
+    from "./../../../../components/ui/modal/deleteModal/DeleteModal";
 import type {
     IPartialProduction
 } from "../.././../../interfaces/production";
@@ -67,6 +67,7 @@ import AddModalProductionOrderGeneric
     from "././context/AddModalProductionOrderGeneric";
 import AddModal from "./wizard/add/AddModal";
 import EditModal from "./wizard/edit/EditModal";
+import useProductionOrderById from "../../../../modelos/production_orders/hooks/useProductionOrderById";
 
 const ProductionOrderModel = () => {
 
@@ -88,7 +89,7 @@ const ProductionOrderModel = () => {
     const [
         productionOrderRecord,
         setproductionOrderRecord
-    ] = useState<IProductionOrder>(
+    ] = useState<IProductionOrder | null>(
         defaultValueProductionOrder);
 
     // ? Estados para el control de la apertura de los modales
@@ -136,7 +137,6 @@ const ProductionOrderModel = () => {
             }
             setServerError(null);
             fetchs();
-            setIsActiveAddModal(false);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -145,27 +145,25 @@ const ProductionOrderModel = () => {
         }
     };
 
-    const handleUpdate = async (productionOrder: IPartialProduction) => {
+    const handleUpdate = async (productionOrder: IPartialProductionOrder) => {
         setLoading(true);
         try {
-            const update_values_po =
-                await diffObjects(
-                    productionOrderRecord,
-                    productionOrder
-                );
-            if (Object.keys(update_values_po).length > 0) {
-                const response = await updateProductionOrderInDB(
-                    productionOrderRecord.id,
-                    update_values_po,
-                    dispatch
-                );
-                if (!response) {
-                    return;
-                }
+            if (!productionOrderRecord) {
+                return;
+            }
+            const response = await updateProductionOrderInDB(
+                productionOrderRecord.id,
+                {
+                    ...productionOrder,
+                    qty: Number(productionOrder.qty)
+                },
+                dispatch
+            );
+            if (!response) {
+                return;
             }
             setServerError(null);
             fetchs();
-            setIsActiveEditModal(false);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -177,6 +175,9 @@ const ProductionOrderModel = () => {
     const handleDelete = async () => {
         setLoading(true);
         try {
+            if (!productionOrderRecord) {
+                return;
+            }
             const response =
                 await deleteProductionOrderInDB(
                     productionOrderRecord.id,
@@ -206,6 +207,7 @@ const ProductionOrderModel = () => {
     const toggleActiveEditModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
+        console.log(`record`, record);
         setproductionOrderRecord({ ...record, qty: Number(record.qty) });
         setIsActiveEditModal(!isActiveEditModal);
     }
@@ -376,11 +378,28 @@ const ProductionOrderModel = () => {
         );
     }
 
+
+    const {
+        productionOrderById,
+        loadingProductionOrderById,
+        refetchProductionOrderById,
+    } = useProductionOrderById(productionOrderRecord?.id)
+
     // * ******************** Efectos secundarios ******************** */
 
     useEffect(() => {
         fetchs();
     }, []);
+
+
+    const getColumns = () => {
+        return columnsProductionOrders({ onClickEdit });
+    }
+
+    const onClickEdit = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        console.log("Diobar guapo");
+    }
 
     return (
         <>
@@ -392,7 +411,7 @@ const ProductionOrderModel = () => {
                     modelName="Production"
 
                     // distribucion de columnas y rows
-                    columns={columnsProductionOrders}
+                    columns={getColumns()}
                     data={productionOrders}
                     getRowId={
                         (
@@ -423,7 +442,9 @@ const ProductionOrderModel = () => {
                 />
                 {
                     isActiveDeleteModal && <DeleteModal
-                        onClose={setIsActiveDeleteModal}
+                        title="Eliminar Orden de Producción"
+                        message="¿Estás seguro de eliminar esta orden de producción?"
+                        onClose={() => setIsActiveDeleteModal(false)}
                         onDelete={handleDelete}
                     />
                 }
@@ -442,15 +463,18 @@ const ProductionOrderModel = () => {
                     )
                 }
                 {
-                    isActiveEditModal && (
+                    isActiveEditModal && !loadingProductionOrderById && productionOrderRecord && (
                         <AddModalProductionOrderGeneric
                             mode="update"
                             currentStep={3}
-                            totalSteps={4}
+                            totalSteps={3}
+                            data={productionOrderById ?? undefined}
                         >
                             <EditModal
                                 onClose={() => setIsActiveEditModal(false)}
-                                onCreate={handleUpdate}
+                                onUpdate={handleUpdate}
+                                onDelete={handleDelete}
+                                onRefetch={refetchProductionOrderById}
                             />
                         </AddModalProductionOrderGeneric>
                     )

@@ -1,8 +1,8 @@
 USE u482698715_shau_erp;
 
-DROP PROCEDURE IF EXISTS sp_revert_movement_inventory_pop;
+DROP PROCEDURE IF EXISTS sp_revert_movement_inventory_ippo;
 DELIMITER //
-CREATE PROCEDURE sp_revert_movement_inventory_pop(
+CREATE PROCEDURE sp_revert_movement_inventory_ippo(
     IN in_ippo_id INT,
     IN in_product_id INT,
     IN in_product_name VARCHAR(100)
@@ -21,6 +21,7 @@ BEGIN
     -- VARIABLES DE INVENTARIO Y PRODUCCION
     DECLARE v_production_allocation DECIMAL(14,4) DEFAULT 0.00;
     DECLARE v_production_qty DECIMAL(14,4) DEFAULT 0.00;
+    
 
     -- VARIABLES DE LA LOGICA
     DECLARE v_done INT DEFAULT 0;

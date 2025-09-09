@@ -27,6 +27,12 @@
     width: 100%;
 }
 
+.disabled {
+    /* estilos */
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
 
 .dropDown {
 

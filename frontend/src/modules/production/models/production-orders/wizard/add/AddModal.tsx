@@ -25,6 +25,7 @@ import CancelModalCustom from "../../../../../../components/ui/modal/custom-moda
 interface IAddModalProps {
     onClose: () => void;
     onCreate: (data: IPartialProductionOrder) => void
+
 }
 
 const AddModal = ({
@@ -143,7 +144,7 @@ const AddModal = ({
                     state.current_step === 3 && (
                         <Step3 
                             onCancel={toggleCancelProcessModal}
-                            onBack={handleOnClickCloseAddModal}
+                            onBack={onClose}
                             onCreate={onCreate}
                         />
                     )

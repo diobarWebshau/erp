@@ -13,6 +13,7 @@ const validateProductionOrderMiddleware = async (req, res, next) => {
             result =
                 await validatePartialSafeParseAsync(body);
         }
+        console.log("entro");
         if (!result.success) {
             console.log(result.error.errors);
             const formattedErrors = result.error.errors.map(err => ({

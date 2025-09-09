@@ -47,7 +47,6 @@ const fetchPurchasedOrdersFromDB = async (
 };
 
 
-
 const getAllDetailsPurchasedOrderByIdInDB = async (
     dispatch: AppDispatchRedux,
     id: number

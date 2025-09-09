@@ -1,0 +1,18 @@
+2025-09-08 09:56:26 [[31MERROR[39M]: uncaughtException: Cannot add or update a child row: a foreign key constraint fails (`u482698715_shau_erp`.`inventory_movements`, CONSTRAINT `inventory_movements_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL)
+Error
+    at Query.run (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:336:17)
+2025-09-08 10:00:58 [[31MERROR[39M]: uncaughtException: Cannot add or update a child row: a foreign key constraint fails (`u482698715_shau_erp`.`inventory_movements`, CONSTRAINT `inventory_movements_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL)
+Error
+    at Query.run (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:336:17)
+2025-09-08 10:06:05 [[31MERROR[39M]: uncaughtException: Cannot add or update a child row: a foreign key constraint fails (`u482698715_shau_erp`.`inventory_movements`, CONSTRAINT `inventory_movements_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL)
+Error
+    at Query.run (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:336:17)

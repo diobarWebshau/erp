@@ -18,7 +18,6 @@ import type { IPartialProductionOrder } from "../../../../../interfaces/producti
 
 // * ****************** Reducer  ******************/ 
 
-
 const AddModalProductionOrderReducer = produce(
     (
         draft: Draft<AddModalProductionOrderState>,
@@ -49,6 +48,20 @@ const AddModalProductionOrderReducer = produce(
                 break;
             case AddModalProductionOrderActionsTypes.NEXT_STEP:
                 draft.current_step += 1;
+                break;
+            case AddModalProductionOrderActionsTypes.SET_DRAFT_PRODUCTION_ORDER:
+                Object.assign(draft.draft, action.payload);
+                break;
+            case AddModalProductionOrderActionsTypes.UPDATE_DRAFT_PRODUCTION_ORDER:
+                Object.assign(draft.draft, action.payload);
+                break;
+            case AddModalProductionOrderActionsTypes.REMOVE_DRAFT_ATTRIBUTES:
+                action.payload.forEach((attribute) => {
+                    delete draft.draft[attribute as keyof IPartialProductionOrder];
+                });
+                break;
+            case AddModalProductionOrderActionsTypes.CLEAR:
+                draft.draft = {};
                 break;
         }
     }

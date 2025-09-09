@@ -8,10 +8,48 @@
     grid-template:
         "header" max-content
         "body" 1fr
-        "footer" max-content 
-        / 100%;
+        "footer" max-content / 100%;
     padding-inline: 2rem;
     padding-top: 1rem;
+    gap: 1rem;
+}
+
+
+.headerSection {
+    grid-area: header;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+}
+
+.headerSection h2 {
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+
+.bodySection {
+    grid-area: body;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.iconButton {
+    width: 15px;
+    height: 15px;
+    color: var(--color-theme-primary);
+}
+
+/* *************** body section *************** */
+
+.externalContainerGenericTable {
+    width: 100%;
+    width: auto;
+    background-color: var(--color-theme-font-white);
 }
 
 /* *************** Footer *************** */
@@ -44,11 +82,7 @@
 }
 
 
-
-/* ************** Select Product *************** */
-
-
-/* ? selectSearchMultiCheck */
+/* *  selectSearchMultiCheck */
 
 .selectSearchMultiCheckContainer {
     gap: 5rem;
@@ -56,7 +90,7 @@
 
 .selectSearchMultiCheckInput {
     /* dimension */
-    height: 44px;
+    height: 45px;
 
     /* distribuccion box */
     border-radius: 10px;
@@ -241,25 +275,72 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
 }
 
 
-.bodySection{
+
+
+/* *************** Disponibilidad *************** */
+
+.baseAvailable {
+    /* dimension */
+    height: 30px;
+    width: 100px;
+    /* distribucion flex */
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+
+    border-radius: 15px;
+}
+
+.highStock {
+    /* estilos */
+    background: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}
+
+.lowStock {
+    /* estilos */
+    background: var(--color-warning-light);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+}
+
+.unavailable {
+    /* estilos */
+    background: var(--color-alert-light);
+    color: var(--color-alert);
+    border: 1px solid var(--color-alert);
+}
+
+
+/* * Input Memoizado del qty */
+
+.ContainerInputMemorizado {
+    height: 44px;
+}
+
+.InputMemorizado {
+    height: 44px;
+    font-size: 14px;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-theme-border-table);
+    color: var(--color-theme-font-black);
+}
+
+/* * MOdal de confirmacion */
+
+
+.containerModalButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 1rem;
 }
 
-.containerSelect h2{
-    font-size: 24px;
+.iconButtonModal{
     color: var(--color-theme-primary);
-}
-
-
-.containerSelect{
-    display: flex;
-    flex-direction: column;
-}
-
-.iconButton{
-    width: 15px;
-    height: 15px;
-    color: var(--color-theme-primary);
+    width: 30px;
+    height: 30px;
 }

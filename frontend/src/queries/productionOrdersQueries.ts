@@ -94,9 +94,12 @@ const updateProductionOrderInDB = async (
             body: JSON.stringify(data),
         });
 
+        console.log(response);
         if (!response.ok) {
             const errorText =
                 await response.json();
+
+            console.log(errorText);
 
             if (response.status >= 500)
                 throw new Error(

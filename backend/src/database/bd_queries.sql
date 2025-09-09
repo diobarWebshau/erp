@@ -1926,3 +1926,131 @@ SELECT * FROM production_lines_products;
     
     
     
+
+SELECT
+  JSON_OBJECT(
+    'location', JSON_OBJECT(
+      'id', l.id,
+      'name', l.name,
+      'description', l.description,
+      'is_active', l.is_active,
+      'created_at', l.created_at,
+      'updated_at', l.updated_at
+    ),
+    'production_line', JSON_OBJECT(
+      'id', pl.id,
+      'name', pl.name,
+      'is_active', pl.is_active,
+      'created_at', pl.created_at,
+      'updated_at', pl.updated_at
+    ),
+    'purchase_order', JSON_OBJECT(
+      'id', pos.id,
+      'order_code', pos.order_code,
+      'delivery_date', pos.delivery_date,
+      'status', pos.status,
+      'client_id', pos.client_id,
+      'company_name', pos.company_name,
+      'tax_id', pos.tax_id,
+      'email', pos.email,
+      'phone', pos.phone,
+      'city', pos.city,
+      'state', pos.state,
+      'country', pos.country,
+      'address', pos.address,
+      'payment_terms', pos.payment_terms,
+      'zip_code', pos.zip_code,
+      'tax_regimen', pos.tax_regimen,
+      'cfdi', pos.cfdi,
+      'payment_method', pos.payment_method,
+      'client_address_id', pos.client_address_id,
+      'shipping_address', pos.shipping_address,
+      'shipping_city', pos.shipping_city,
+      'shipping_state', pos.shipping_state,
+      'shipping_country', pos.shipping_country,
+      'shipping_zip_code', pos.shipping_zip_code,
+      'total_price', pos.total_price,
+      'created_at', pos.created_at,
+      'updated_at', pos.updated_at,
+      'purchased_order_products',
+        (
+          SELECT COALESCE(
+                   JSON_ARRAYAGG(
+                     JSON_OBJECT(
+                       'id', pop2.id,
+                       'product_id', pop2.product_id,
+                       'product_name', pop2.product_name,
+                       'qty', pop2.qty,
+                       'status', pop2.status,
+                       'recorded_price', pop2.recorded_price,
+                       'original_price', pop2.original_price
+                     )
+                   ),
+                   JSON_ARRAY()
+                 )
+          FROM purchased_orders_products AS pop2
+          WHERE pop2.purchase_order_id = pos.id
+        )
+    )
+  ) AS payload
+FROM production_orders AS po
+LEFT JOIN purchased_orders_products AS pop
+  ON pop.id = po.order_id
+LEFT JOIN purchased_orders AS pos
+  ON pos.id = pop.purchase_order_id
+LEFT JOIN purchased_orders_products_locations_production_lines AS poplpl
+  ON poplpl.purchase_order_product_id = pop.id
+LEFT JOIN production_lines AS pl
+  ON pl.id = poplpl.production_line_id
+LEFT JOIN locations_production_lines AS lpl
+  ON lpl.production_line_id = pl.id
+LEFT JOIN locations AS l
+  ON l.id = lpl.location_id
+WHERE po.id = 2
+  AND po.order_type = 'client'
+LIMIT 1;
+
+
+
+SELECT
+  JSON_OBJECT(
+    'location', JSON_OBJECT(
+      'id', l.id,
+      'name', l.name,
+      'description', l.description,
+      'is_active', l.is_active,
+      'created_at', l.created_at,
+      'updated_at', l.updated_at
+    ),
+    'production_line', JSON_OBJECT(
+      'id', pl.id,
+      'name', pl.name,
+      'is_active', pl.is_active,
+      'created_at', pl.created_at,
+      'updated_at', pl.updated_at
+    ),
+    'internal_order', JSON_OBJECT(
+      'id', ippo.id,
+      'product_id', ippo.product_id,
+      'product_name', ippo.product_name,
+      'qty', ippo.qty,
+      'status', ippo.status,
+      'location_id', ippo.location_id,
+      'location_name', ippo.location_name,
+      'created_at', ippo.created_at,
+      'updated_at', ippo.updated_at
+    )
+  )    
+FROM production_orders AS po
+LEFT JOIN internal_product_production_orders AS ippo 
+ON ippo.id = po.order_id
+LEFT JOIN internal_production_orders_lines_products AS ipolp
+ON ipolp.internal_product_production_order_id = ippo.id
+LEFT JOIN production_lines AS pl
+ON pl.id = ipolp.production_line_id
+LEFT JOIN locations_production_lines AS lpl
+ON lpl.production_line_id = pl.id
+LEFT JOIN locations AS l
+ON l.id = lpl.location_id
+WHERE po.id = 1
+AND po.order_type = 'internal';

@@ -304,6 +304,7 @@ create table purchased_orders(
         FOREIGN KEY(client_address_id) REFERENCES clients_addresses(id) ON DELETE
     SET NULL
 );
+
 CREATE TABLE purchased_orders_products(
     id INT AUTO_INCREMENT,
     purchase_order_id INT,
@@ -314,11 +315,10 @@ CREATE TABLE purchased_orders_products(
     original_price DECIMAL(14,4) NOT NULL,
     status VARCHAR(100) NOT NULL,
     PRIMARY KEY(id),
-    FOREIGN KEY(purchase_order_id) REFERENCES purchased_orders(id) ON DELETE
-    SET NULL,
-        FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE
-    SET NULL
+    FOREIGN KEY(purchase_order_id) REFERENCES purchased_orders(id) ON DELETE SET NULL,
+    FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE SET NULL
 );
+
 CREATE TABLE applied_product_discounts_client (
     id INT AUTO_INCREMENT,
     purchase_order_product_id INT UNIQUE,

@@ -60,7 +60,7 @@ BEGIN
                 SELECT id
                 FROM production_orders AS po
                 WHERE po.order_type = 'internal'
-                AND po.order_id = in_ippo_id
+                    AND po.order_id = in_ippo_id
             )
         )
         AND im.item_type IN (
@@ -77,7 +77,7 @@ BEGIN
         ON lpl.production_line_id = ippolp.production_line_id
     JOIN locations AS l
         ON l.id  = lpl.location_id
-    WHERE ippolp.internal_production_order_id = in_ippo_id
+    WHERE ippolp.internal_product_production_order_id = in_ippo_id
     LIMIT 1;
 
     -- inventario comprometido de produccion
@@ -142,7 +142,7 @@ BEGIN
         IF in_new_qty <= v_production_allocation THEN
             
             -- Calculamos la diferencia de la cantidad de producto a descomprometer
-            SET v_prod_diff_qty = v_new_qty - v_production_allocation;
+            SET v_prod_diff_qty = in_new_qty - v_production_allocation;
 
             -- Efectuamos el movimiento para descomprometer el inventario del producto en produccion
             INSERT INTO inventory_movements (
@@ -224,7 +224,7 @@ BEGIN
         ELSE
 
             -- Calculamos la diferencia de la cantidad de producto a comprometer            
-            SET v_prod_diff_qty = ABS(v_new_qty - v_production_allocation);
+            SET v_prod_diff_qty = ABS(in_new_qty - v_production_allocation);
 
             -- Efectuamos el movimiento para descomprometer el inventario del producto en produccion
             INSERT INTO inventory_movements (

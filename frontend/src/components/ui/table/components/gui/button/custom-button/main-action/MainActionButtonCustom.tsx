@@ -1,22 +1,22 @@
 import { cloneElement, type JSX } from "react";
 import FadeButton from "../../fade-button/FadeButton";
-import StyleModule from "./ActionMainButtonCustom.module.css"; // Ajusta ruta si es necesario
+import StyleModule from "./MainActionButtonCustom.module.css";
 
-interface IActionMainButtonCustomProps {
+interface IMainActionButtonCustomProps {
     onClick: () => void;
     label: string;
     icon: JSX.Element;
 }
 
-const ActionMainButtonCustom = ({
+const MainActionButtonCustom = ({
     onClick,
     label,
     icon
-}: IActionMainButtonCustomProps) => {
+}: IMainActionButtonCustomProps) => {
     
     // Clonamos el icono y le agregamos la clase deseada
     const iconWithClass = cloneElement(icon, {
-        className: [StyleModule.mainButtonIcon, icon.props.className].filter(Boolean).join(" ")
+        className: [StyleModule.mainActionButtonCustomIcon, icon.props.className].filter(Boolean).join(" ")
     });
 
     return (
@@ -25,12 +25,12 @@ const ActionMainButtonCustom = ({
             onClick={onClick}
             type="button"
             typeOrderIcon="first"
-            classNameButton={StyleModule.mainButton}
-            classNameLabel={StyleModule.mainButtonLabel}
-            classNameSpan={StyleModule.mainButtonSpan}
+            classNameButton={StyleModule.mainActionButtonCustom}
+            classNameLabel={StyleModule.mainActionButtonCustomLabel}
+            classNameSpan={StyleModule.mainActionButtonCustomSpan}
             icon={iconWithClass}
         />
     );
 };
 
-export default ActionMainButtonCustom;
+export default MainActionButtonCustom;

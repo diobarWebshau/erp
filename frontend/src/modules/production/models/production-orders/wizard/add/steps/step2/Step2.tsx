@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, FileCheck2, Search } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, FileCheck2, Search } from "lucide-react";
 import StyleModule from "./Step2.module.css";
 import { back_step, next_step, remove_attributes } from "../../../../context/AddModalProductionOrderActions";
 import { useAddModalProductionOrderDispatch, useAddModalProductionOrderState } from "../../../../context/AddModalProductionOrderHooks";
@@ -16,10 +16,10 @@ import InputToggle from "../../../../../../../../components/ui/table/components/
 import { update_production_order } from "../../../../context/AddModalProductionOrderActions";
 import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
 import WarningIcon from "../../../../../../../../components/icons/WarningIcon";
-import CancelButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/cancel/CancelButtonCustom";
-import BackButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/back/BackButttonCustom";
-import ActionMainButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/action-main/ActionMainButtonCustom";
 import ValidationContainer from "../../../../../../../../components/ui/table/components/gui/validation-container/ValidationContainer";
+import CriticalActionButton from "../../../../../../../../components/ui/table/components/gui/button/custom-button/critical-action/CriticalActionButton";
+import MainActionButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/main-action/MainActionButtonCustom";
+import TertiaryActionButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 
 const InputToggleMemorizado = memo(
     ({
@@ -229,6 +229,49 @@ const Step2 = ({
 
     useWhatChanged([state.data.product, state.data.location], ['product', 'location']);
 
+
+    const returnValidProductsOfPurchaseOrder = () => {
+        return state.data.purchase_order?.purchase_order_products?.filter(
+            (product) => {
+                const originalQty = product.production_summary?.purchased_order_product_qty ?? 0;
+                const productionOrderQty = product.production_summary?.production_order_qty ?? 0;
+                const productionQty = product.production_summary?.production_qty ?? 0;
+                if (productionQty + productionOrderQty < originalQty) {
+                    return product.product;
+                }
+            }
+        ) as IProduct[] ?? [];
+    };
+
+    const validateQty = () => {
+        if (state.data.order_type === "client") {
+            if (state.data.qty && state.data.qty > 0) {
+                const productoInPurchasedOrder =
+                    state.data.purchase_order?.purchase_order_products?.find(p => p?.product?.id === state.data.product?.id);
+
+                const productionOrderQty = productoInPurchasedOrder?.production_summary?.production_order_qty ?? 0;
+                const productionQty = productoInPurchasedOrder?.production_summary?.production_qty ?? 0;
+
+                const availableQty = productionOrderQty - productionQty;
+
+                if (state.data.qty > availableQty) {
+                    return `La cantidad no puede exceder la cantidad disponible para producir (${availableQty})`;
+                }
+                return null;
+
+            } else {
+                return "Debe ingresar una cantidad valida"
+            }
+        } else {
+            if (state.data.qty && state.data.qty > 0) {
+                return null;
+            } else {
+                return "Debe ingresar una cantidad valida"
+            }
+        }
+    }
+
+
     return (
         <div className={StyleModule.container}>
             <section className={StyleModule.headerSection}>
@@ -268,9 +311,7 @@ const Step2 = ({
                                 classNameEmptyMessage={`nunito-semibold ${StyleModule.selectSearchMultiCheckEmptyMessage}`}
                                 {...(state.data.order_type === "client"
                                     ? {
-                                        options: state.data.purchase_order?.purchase_order_products
-                                            ?.map(product => product.product)
-                                            ?.filter((p): p is IProduct => p !== undefined) // <-- Aquí filtras undefined y aseguras el tipo
+                                        options: returnValidProductsOfPurchaseOrder()
                                     }
                                     : { loadOptions: fetchProductsLike })}
                                 selected={state.data.product ? state.data.product : null}
@@ -295,7 +336,7 @@ const Step2 = ({
                             />
                         </ValidationContainer>
                     )}
-                    <ValidationContainer validation={state.data.qty && state.data.qty > 0 ? null : "Debe ingresar una cantidad valida"}>
+                    <ValidationContainer validation={validateQty()}>
                         <InputToggleMemorizado
                             value={state.data.qty}
                             onChange={hadnleOnChangeQuantity}
@@ -325,9 +366,16 @@ const Step2 = ({
                 )}
             </section>
             <section className={StyleModule.footerSection}>
-                <CancelButtonCustom onClick={onCancel} />
-                <BackButtonCustom onClick={handlerOnClickButtonBack} />
-                <ActionMainButtonCustom
+                <CriticalActionButton
+                    onClick={onCancel}
+                    label="Cancelar"
+                />
+                <TertiaryActionButtonCustom
+                    onClick={handlerOnClickButtonBack}
+                    label="Regresar"
+                    icon={<ChevronLeft />}
+                />
+                <MainActionButtonCustom
                     onClick={handlerOnClickButtonNext}
                     label="Siguiente"
                     icon={<ChevronRight />}
@@ -343,8 +391,12 @@ const Step2 = ({
 
                         children={() => (
                             <div className={StyleModule.containerModalButtons}>
-                                <BackButtonCustom onClick={handlerOnClickButtonBackModal} />
-                                <ActionMainButtonCustom
+                                <TertiaryActionButtonCustom
+                                    onClick={handlerOnClickButtonBackModal}
+                                    label="Regresar"
+                                    icon={<ChevronLeft />}
+                                />
+                                <MainActionButtonCustom
                                     onClick={handlerOnClickButtonContinue}
                                     label="Continuar"
                                     icon={<FileCheck2 />}

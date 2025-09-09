@@ -16,25 +16,32 @@ import StyleModule
 import type {
     IPartialProductionOrder
 } from "../../../../../../interfaces/productionOrder";
+import CancelModalCustom from "../../../../../../components/ui/modal/custom-modal/cancel/CancelModalCustom";
 import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";
-import CancelModalCustom from "../../../../../../components/ui/modal/custom-modal/cancel/CancelModalCustom";
 
 
 interface IEditModalProps {
     onClose: () => void;
-    onCreate: (data: IPartialProductionOrder) => void
+    onUpdate: (data: IPartialProductionOrder) => void
+    onDelete: (data: IPartialProductionOrder) => void
+    onRefetch: () => void
 }
 
-const EditModal = ({
+const EditModal = ({    
     onClose,
-    onCreate,
+    onUpdate,
+    onDelete,
+    onRefetch,
 }: IEditModalProps) => {
 
     // ? ************ Hooks de contexto ************/
 
     const state = useAddModalProductionOrderState();
+
+    console.log('Diobar ALERT');
+    console.log(state.data);
 
     // ? ************ Estados ************/
 
@@ -127,24 +134,21 @@ const EditModal = ({
             <main className={StyleModule.bodySection}>
                 {
                     state.current_step === 1 && (
-                        <Step1
-                            onCancel={toggleCancelProcessModal}
-                        />
+                        <Step1 />
                     )
                 }
                 {
                     state.current_step === 2 && (
-                        <Step2 
-                            onCancel={toggleCancelProcessModal}
+                        <Step2
+                            onUpdate={onUpdate}
+                            onRefetch={onRefetch}
                         />
                     )
                 }
                 {
                     state.current_step === 3 && (
-                        <Step3 
-                            onCancel={toggleCancelProcessModal}
-                            onBack={handleOnClickCloseAddModal}
-                            onCreate={onCreate}
+                        <Step3
+                            onDelete={() => console.log("Delete")}
                         />
                     )
                 }

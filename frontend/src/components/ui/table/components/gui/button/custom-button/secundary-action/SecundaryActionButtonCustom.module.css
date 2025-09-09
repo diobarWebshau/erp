@@ -1,4 +1,4 @@
-.secundaryButton {
+.secundaryActionButtonCustom {
     /* dimension */
     width: 200px;
     height: 45px;
@@ -10,7 +10,7 @@
     border: 1px solid var(--color-theme-border-table);
 }
 
-.secundaryButtonSpan {
+.secundaryActionButtonCustomSpan {
     /* dimension */
     width: 100%;
     height: 100%;
@@ -22,21 +22,21 @@
     align-items: center;
 }
 
-.secundaryButtonLabel {
+.secundaryActionButtonCustomLabel {
     color: var(--color-theme-primary);
 }
 
-.secundaryButtonIcon {
+.secundaryActionButtonCustomIcon {
     color: var(--color-theme-primary);
     width: 15px;
     height: 15px;
 }
 
-.secundaryButton:hover {
+.secundaryActionButtonCustom:hover {
     background-color: var(--color-theme-primary-light);
 }
 
-.secundaryButton:hover .secundaryButtonLabel,
-.secundaryButton:hover .secundaryButtonIcon {
+.secundaryActionButtonCustom:hover .secundaryActionButtonCustomLabel,
+.secundaryActionButtonCustom:hover .secundaryActionButtonCustomIcon {
     color: var(--color-theme-font-white);
 }

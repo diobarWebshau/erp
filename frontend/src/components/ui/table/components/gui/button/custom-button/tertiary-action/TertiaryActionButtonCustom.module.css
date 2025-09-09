@@ -1,4 +1,4 @@
-.backButton {
+.tertiaryActionButtonCustom {
     /* dimension */
     width: 200px;
     height: 45px;
@@ -8,7 +8,7 @@
     cursor: pointer;
 }
 
-.backButtonSpan {
+.tertiaryActionButtonCustomSpan {
     /* dimension */
     width: 100%;
     height: 100%;
@@ -20,27 +20,25 @@
     align-items: center;
 }
 
-/* ? Back Button */
-
-.backButton {
+.tertiaryActionButtonCustom {
     background-color: var(--color-theme-font-white);
 }
 
-.backButtonLabel {
+.tertiaryActionButtonCustomLabel {
     color: var(--color-theme-primary-light);
 }
 
-.backButtonIcon {
+.tertiaryActionButtonCustomIcon {
     color: var(--color-theme-primary-light);
     width: 15px;
     height: 15px;
 }
 
-.backButton:hover .backButtonLabel,
-.backButton:hover .backButtonIcon {
+.tertiaryActionButtonCustom:hover .tertiaryActionButtonCustomLabel,
+.tertiaryActionButtonCustom:hover .tertiaryActionButtonCustomIcon {
     color: var(--color-theme-primary);
 }
 
-.backButton:hover {
+.tertiaryActionButtonCustom:hover {
     border: 1px solid var(--color-theme-border-table);
 }

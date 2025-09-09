@@ -1,5 +1,5 @@
 
-import { Calendar, ChevronDown, CircleCheck, FileCheck2, Search } from "lucide-react";
+import { Calendar, ChevronDown, ChevronLeft, CircleCheck, FileCheck2, Search } from "lucide-react";
 import StyleModule from "./Step3.module.css";
 import { useAddModalProductionOrderDispatch, useAddModalProductionOrderState } from "../../../../context/AddModalProductionOrderHooks";
 import { back_step, remove_attributes, update_production_order } from "../../../../context/AddModalProductionOrderActions";
@@ -17,13 +17,12 @@ import InputToggle from "../../../../../../../../components/ui/table/components/
 import useProductionLinesForProductAtLocation from "../../../../../../../../modelos/locations/hooks/useProductionLinesForProductAtLocation";
 import ReactDayPickerField from "../../../../../../../../components/ui/general/field-react-day-picker/ReactDayPickerField";
 import StandardTextArea from "../../../../../../../../components/ui/table/components/gui/text-area/StandarTextArea";
-import CancelButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/cancel/CancelButtonCustom";
-import BackButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/back/BackButttonCustom";
-import ActionMainButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/action-main/ActionMainButtonCustom";
 import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
-import ActionSecundaryButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/action-secundary/ActionSecundaryButton";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../../../../../../store/store";
+import CriticalActionButton from "../../../../../../../../components/ui/table/components/gui/button/custom-button/critical-action/CriticalActionButton";
+import MainActionButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/main-action/MainActionButtonCustom";
+import TertiaryActionButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 
 interface IStep3Props {
     onCancel: () => void;
@@ -445,12 +444,19 @@ const Step3 = ({
                 </div>
             </section>
             <section className={StyleModule.footerSection}>
-                <CancelButtonCustom onClick={onCancel} />
-                <BackButtonCustom onClick={handlerOnClickButtonBack} />
-                <ActionMainButtonCustom
+                <CriticalActionButton
+                    onClick={onCancel}
+                    label="Cancelar"
+                />
+                <TertiaryActionButtonCustom
+                    onClick={handlerOnClickButtonBack}
+                    label="Regresar"
+                    icon={<ChevronLeft />}
+                />
+                <MainActionButtonCustom
                     onClick={handleToggleModalConfirm}
                     label="Confirmar Orden"
-                    icon={<FileCheck2 className={StyleModule.nextButtonIcon} />}
+                    icon={<FileCheck2 />}
                 />
             </section>
             {showModalConfirm &&
@@ -460,15 +466,15 @@ const Step3 = ({
                     icon={<CircleCheck className={StyleModule.customModalConfirmIcon} />}
                     children={() =>
                         <div className={StyleModule.containerInternalModalConfirm}>
-                            <ActionSecundaryButtonCustom
+                            <TertiaryActionButtonCustom
                                 onClick={onBack}
                                 label="Volver a producción"
-                                icon={<FileCheck2 className={StyleModule.nextButtonIcon} />}
+                                icon={<FileCheck2 />}
                             />
-                            <ActionMainButtonCustom
-                                onClick={() => { }}
+                            <MainActionButtonCustom
+                                onClick={onBack}
                                 label="Ver orden de producción"
-                                icon={<FileCheck2 className={StyleModule.nextButtonIcon} />}
+                                icon={<FileCheck2 />}
                             />
                         </div>
                     }

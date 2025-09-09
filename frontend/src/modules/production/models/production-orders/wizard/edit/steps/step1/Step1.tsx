@@ -1,108 +1,156 @@
-
-import {
-    ChevronDown,
-    ChevronRight, 
-    Search
-} from "lucide-react";
-import StyleModule
-    from "./Step1.module.css";
-import { useEffect, useRef, useState } from "react";
-import {
-    useAddModalProductionOrderDispatch,
-    useAddModalProductionOrderState
-} from "../../../../context/AddModalProductionOrderHooks";
-import SingleSelectSearchCheck
-    from "../../../../../../../../components/ui/table/components/gui/diobar/prueba/SingleSelectSearchCheck";
-import CustomSelectString
-    from "../../../../../../../../components/ui/table/components/gui/customSelectString/CustomSelect";
-import type { IProduct } from "../../../../../../../../interfaces/product";
-import type { IPurchasedOrder } from "../../../../../../../../interfaces/purchasedOrder";
+import { ChevronDown, ChevronLeft, FileCheck2, Search } from "lucide-react";
+import StyleModule from "./Step1.module.css";
+import { next_step, remove_draft_attributes, set_draft_production_order, update_draft_production_order } from "../../../../context/AddModalProductionOrderActions";
+import { useAddModalProductionOrderDispatch, useAddModalProductionOrderState } from "../../../../context/AddModalProductionOrderHooks";
+import useProductInventoryInput from "../../../../../../../../modelos/locations/hooks/useProductInventoryInput";
+import GenericTable from "../../../../../../../../components/ui/table/tableContext/GenericTable";
+import type { IInventoryInput } from "../../../../../../../../interfaces/inventoryInputs";
+import type { ColumnDef } from "@tanstack/react-table";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { ILocation } from "../../../../../../../../interfaces/locations";
-import CustomSelectObject
-    from "../../../../../../../../components/ui/table/components/gui/customSelectObject/CustomSelectObject";
-import useLocationsProducedOneProduct
-    from "../../../../../../../../modelos/locations/hooks/useLocationsProducedOneProduct";
-import {
-    next_step,
-    update_production_order,
-} from "../../../../context/AddModalProductionOrderActions";
-import StandarNumericField
-    from "../../../../../../../../components/ui/table/components/gui/text-field/standar-numeric-field/StandarNumericField";
-import CancelButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/cancel/CancelButtonCustom";
-import ActionMainButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/action-main/ActionMainButtonCustom";
+import type { IProduct } from "../../../../../../../../interfaces/product";
+import useLocationsProducedOneProduct from "../../../../../../../../modelos/locations/hooks/useLocationsProducedOneProduct";
+import SingleSelectSearchCheck from "../../../../../../../../components/ui/table/components/gui/diobar/prueba/SingleSelectSearchCheck";
+import CustomSelectObject from "../../../../../../../../components/ui/table/components/gui/customSelectObject/CustomSelectObject";
+import InputToggle from "../../../../../../../../components/ui/table/components/gui/inputss/inputToggle/InputToggle";
+import { update_production_order } from "../../../../context/AddModalProductionOrderActions";
+import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
+import WarningIcon from "../../../../../../../../components/icons/WarningIcon";
+import ValidationContainer from "../../../../../../../../components/ui/table/components/gui/validation-container/ValidationContainer";
+import CriticalActionButton from "../../../../../../../../components/ui/table/components/gui/button/custom-button/critical-action/CriticalActionButton";
+import MainActionButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/main-action/MainActionButtonCustom";
+import TertiaryActionButtonCustom from "../../../../../../../../components/ui/table/components/gui/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 
-type OrderType =
-    "Si, ligar a una orden de venta" |
-    "No, producir para inventario";
+const InputToggleMemorizado = memo(
+    ({
+        value,
+        onChange,
+    }: {
+        value: number | undefined;
+        onChange: (value: number) => void;
+    }) => {
+        return (
+            <InputToggle
+                value={value}
+                onChange={onChange}
+                min={1}
+                className={StyleModule.ContainerInputMemorizado}
+                classNameInput={`nunito-semibold ${StyleModule.InputMemorizado}`}
+            />
+        );
+    }
+);
 
-const orders: OrderType[] = [
-    "Si, ligar a una orden de venta",
-    "No, producir para inventario",
-]
 
-type FieldType =
-    "order_type" |
-    "product" |
-    "purchase_order" |
-    "location" |
-    "quantity";
+const Step1 = () => {
+    const dispatch = useAddModalProductionOrderDispatch();
+    const state = useAddModalProductionOrderState();
 
-type Step1Props = {
-    onCancel: () => void;
-};
+    const firstRender = useRef(true);
 
-const Step1 = ({
-    onCancel
-}: Step1Props) => {
-
-    const isFirstRender = useRef(true);
-
-    const state =
-        useAddModalProductionOrderState();
-
-    const dispatch =
-        useAddModalProductionOrderDispatch();
-
-    const [selectedProduct, setSelectedProduct] =
-        useState<IProduct | null>(state.data.product ?? null);
     const [openDropDownSelectProduct, setOpenDropDownSelectProduct] =
         useState(false);
     const [searchDropDownSelectProduct, setSearchDropDownSelectProduct] =
-        useState(state.data.product?.name ?? "");
+        useState(state.draft.product?.name ?? "");
+    const [isActiveModalConfirmation, setIsActiveModalConfirmation] =
+        useState<boolean>(false);
+
+    const columnsInventoryInputs: ColumnDef<IInventoryInput>[] = useMemo(
+        () => [
+            {
+                header: "SKU",
+                accessorKey: "input_id",
+            },
+            {
+                header: "Insumo",
+                accessorKey: "input_name",
+            },
+            {
+                header: "Requerido",
+                cell: ({ row }) => {
+                    const qty = row.original.equivalence * (state.draft.qty ?? 0);
+                    return qty;
+                }
+            },
+            {
+                header: "Disponibilidad",
+                cell: ({ row }) => {
+                    const available = row.original.available;
+                    let className = StyleModule.unavailable;
+
+                    if (available >= (state.draft?.qty ?? 0)) {
+                        if ((available - (state.draft?.qty ?? 0)) >= row.original.minimum_stock) {
+                            className = StyleModule.highStock;
+                        } else {
+                            className = StyleModule.lowStock;
+                        }
+                    }
+                    return (
+                        <span className={`${StyleModule.baseAvailable} ${className}`}>
+                            {available}
+                        </span>
+                    );
+                }
+            },
+        ], [[state.draft.qty, state.draft.product?.id, state.draft.location?.id]
+    ]);
 
 
-    const [selectedPurchaseOrder, setSelectedPurchaseOrder] =
-        useState<IPurchasedOrder | null>(
-            state.data.purchase_order ?? null
-        );
-    const [openDropDownSelectPurchaseOrder, setOpenDropDownSelectPurchaseOrder] =
-        useState(false);
-    const [searchDropDownSelectPurchaseOrder, setSearchDropDownSelectPurchaseOrder] =
-        useState(state.data.purchase_order?.order_code ?? "");
-    const [productsOfPurchaseOrder, setProductsOfPurchaseOrder] =
-        useState<IProduct[]>([]);
 
-    const [validationForm, setValidationForm] =
-        useState<Record<FieldType, string | null | undefined>>({
-            order_type: null,
-            product: null,
-            purchase_order: null,
-            location: null,
-            quantity: null,
-        });
-
-    const [selectedLocation, setSelectedLocation] =
-        useState<ILocation | null | undefined>(state.data.location ?? null);
-
-    const [quantity, setQuantity] = useState<number | undefined | null>(state.data?.qty ?? undefined);
-
-    const [orderType, setOrderType] = useState<OrderType | "Seleccione una opcion">(
-        state.data?.order_type === "client"
-            ? "Si, ligar a una orden de venta"
-            : state.data?.order_type === "internal"
-                ? "No, producir para inventario"
-                : "Seleccione una opcion"
+    const {
+        inventoryInputsProduct,
+        loadingInventoryInputsProduct,
+    } = useProductInventoryInput(
+        state.draft.product?.id ?? null,
+        state.draft.location?.id ?? null
     );
+
+    const {
+        locationsProducedProduct,
+        loadingLocationsProducedProduct,
+    } = useLocationsProducedOneProduct(state.draft.product?.id ?? null);
+
+    const hadnleOnChangeProduct = (product: IProduct | null) => {
+        if (product) {
+            dispatch(update_draft_production_order({
+                product: product,
+                product_id: product.id,
+            }))
+        }
+    };
+
+    const hadnleOnChangeQuantity = (value: number) => {
+        if (value && Number(value) > 0) {
+            dispatch(update_draft_production_order({
+                qty: value
+            }))
+        }
+    };
+
+    const handlerOnChangeLocation = (value: ILocation | null | undefined) => {
+        if (value) {
+            dispatch(update_draft_production_order({
+                location: value,
+            }))
+        }
+    };
+
+    const handlerOnClickButtonNext = () => {
+        const isFulfillable = inventoryInputsProduct.every(input => input.available >= ((state.draft.qty ?? 0) * input.equivalence));
+        if (isFulfillable) {
+            dispatch(next_step());
+        } else {
+            setIsActiveModalConfirmation(true);
+        }
+    };
+
+    const handlerOnClickButtonContinue = () => {
+        dispatch(next_step());
+    };
+
+    const handlerOnClickButtonBackModal = () => {
+        setIsActiveModalConfirmation(false);
+    };
 
     const fetchProductsLike = async (query: string): Promise<IProduct[]> => {
         if (!query || query.trim().length === 0) return [];
@@ -113,7 +161,7 @@ const Step1 = ({
             const response = await fetch(`http://localhost:3003/products/products/filter-exclude/${encodedQuery}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ excludeIds: [] }),
+                body: JSON.stringify({ excludeIds: [state.draft.product?.id ?? 0] }),
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -126,269 +174,71 @@ const Step1 = ({
         }
     };
 
-    const fetchPurchaseOrderLike = async (query: string): Promise<IPurchasedOrder[]> => {
-        if (!query || query.trim().length === 0) return [];
+    const handlerOnClickButtonCancel = () => {
+        dispatch(set_draft_production_order(state.data));
+        dispatch(next_step());
+    }
 
-        const encodedQuery = encodeURIComponent(query);
+    function useWhatChanged(deps: any[], depNames: string[]) {
+        // Referencia para guardar el valor anterior de las dependencias
+        const prevDeps = useRef<any[]>([]);
 
-        try {
-            console.log(encodedQuery);
-            const response = await fetch(`http://localhost:3003/sales/purchased-orders/like/${encodedQuery}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
+        useEffect(() => {
+            // Array para registrar los nombres de dependencias que cambiaron
+            const changes: string[] = [];
+
+            // Recorre cada dependencia y compara valor previo vs actual
+            deps.forEach((dep, idx) => {
+                // Si el valor previo es diferente al actual, marca que cambió
+                if (prevDeps.current[idx] !== dep) {
+                    changes.push(depNames[idx]);
+                }
             });
 
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            const products: IPurchasedOrder[] = await response.json();
-            console.log(products);
-            return products;
-        } catch (error) {
-            console.error("Error fetching purchase orders:", error);
-            return [];
-        }
-    };
-
-    const {
-        locationsProducedProduct,
-        loadingLocationsProducedProduct,
-    } = useLocationsProducedOneProduct(selectedProduct?.id ?? null);
-
-
-    const handleOnClickButtonNext = () => {
-        if (orderType === "Si, ligar a una orden de venta") {
-            if (selectedPurchaseOrder && selectedProduct && selectedLocation && quantity) {
-                dispatch(update_production_order({
-                    order_type: "client",
-                    order_id:
-                        selectedPurchaseOrder.purchase_order_products
-                            ?.find(
-                                product => product?.product?.id === selectedProduct.id
-                            )?.id ?? null,
-                    product_id: selectedProduct.id,
-                    status: "pending",
-                    product_name: selectedProduct.name,
-                    location: selectedLocation,
-                    product: selectedProduct,
-                    purchase_order: selectedPurchaseOrder,
-                    qty: quantity,
-
-                }));
-                dispatch(next_step());
+            if (firstRender.current) {
+                firstRender.current = false;
             } else {
-                if (!selectedPurchaseOrder) {
-                    setValidationForm((prev) => ({
-                        ...prev,
-                        purchase_order: "Por favor, selecciona una orden de venta",
-                    }));
-                }
-                if (!selectedProduct) {
-                    setValidationForm((prev) => ({
-                        ...prev,
-                        product: "Por favor, selecciona un producto",
-                    }));
-                }
-                if (!selectedLocation) {
-                    setValidationForm((prev) => ({
-                        ...prev,
-                        location: "Por favor, selecciona una ubicación",
-                    }));
-                }
-                if (!quantity || quantity <= 0) {
-                    setValidationForm((prev) => ({
-                        ...prev,
-                        quantity: "Por favor, ingresa una cantidad",
-                    }));
-                }
-
-            }
-        } else if (orderType === "No, producir para inventario") {
-            if (selectedProduct && selectedLocation && quantity) {
-                dispatch(update_production_order({
-                    order_type: "internal",
-                    product_id: selectedProduct.id,
-                    status: "pending",
-                    product_name: selectedProduct.name,
-                    location: selectedLocation,
-                    product: selectedProduct,
-                    qty: quantity,
-                }));
-                dispatch(next_step());
-
-            } else {
-                if (!selectedProduct) {
-                    setValidationForm((prev) => ({
-                        ...prev,
-                        product: "Por favor, selecciona un producto",
-                    }));
-                }
-                if (!selectedLocation) {
-                    setValidationForm((prev) => ({
-                        ...prev,
-                        location: "Por favor, selecciona una ubicación",
-                    }));
-                }
-                if (!quantity || quantity <= 0) {
-                    setValidationForm((prev) => ({
-                        ...prev,
-                        quantity: "Por favor, ingresa una cantidad",
-                    }));
+                if (changes.length > 0) {
+                    // if (changes.includes('product')) {
+                    //     if (state.draft.order_type === "client" && state.draft.purchase_order) {
+                    //         dispatch(update_production_order({
+                    //             order_id: state.draft.purchase_order.purchase_order_products?.find(
+                    //                 (p) => p.product?.id === state.draft.product?.id
+                    //             )?.id,
+                    //         }))
+                    //     }
+                    //     if (state.draft.location) {
+                    //         dispatch(remove_draft_attributes(['location']));
+                    //     }
+                    // }
+                    if (changes.includes('location')) {
+                        dispatch(remove_draft_attributes(['production_line']));
+                    }
                 }
             }
-        } else {
-            setValidationForm((prev) => ({
-                ...prev,
-                order_type: "Por favor, selecciona un tipo de orden de producción",
-            }));
-        }
-    };
+            // Actualiza los valores previos para la próxima comparación
+            prevDeps.current = deps;
+            // Nota: así, en el próximo render, prevDeps tendrá los valores actuales
+        }, deps); // El efecto se ejecuta cada vez que cambia cualquiera de las dependencias
+    }
 
-    const hadnleOnChangeProduct = (product: IProduct | null) => {
-        if (product) {
-            setSelectedProduct(product);
-            setValidationForm((prev) => ({
-                ...prev,
-                product: null,
-            }));
-        } else {
-            setValidationForm((prev) => ({
-                ...prev,
-                product: "Por favor, selecciona un producto",
-            }));
-        }
-    };
-
-
-    const hadnleOnChangePurchaseOrder = (purchaseOrder: IPurchasedOrder | null | undefined) => {
-        if (purchaseOrder) {
-            setSelectedPurchaseOrder(purchaseOrder);
-            setValidationForm((prev) => ({
-                ...prev,
-                purchase_order: null,
-            }));
-        } else {
-            purchaseOrder === null &&
-                setValidationForm((prev) => ({
-                    ...prev,
-                    purchase_order: "Por favor, selecciona una orden de compra",
-                }));
-        }
-    };
-
-    const hadnleOnChangeQuantity = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const quantitys = e.target.value;
-        if (quantitys && Number(quantitys) > 0) {
-            setQuantity(Number(quantitys));
-            setValidationForm((prev) => ({
-                ...prev,
-                quantity: null,
-            }));
-        } else {
-            setQuantity(undefined);
-        }
-    };
-
-
-    useEffect(() => {
-        if (orderType === "Si, ligar a una orden de venta") {
-            setProductsOfPurchaseOrder(
-                (selectedPurchaseOrder?.purchase_order_products
-                    ?.map(product => product?.product)
-                    ?? []) as IProduct[]
-            );
-        }
-    }, [selectedPurchaseOrder]);
-
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
-        setSearchDropDownSelectProduct("");
-        setSearchDropDownSelectPurchaseOrder("");
-        setSelectedProduct(null);
-        setSelectedPurchaseOrder(null);
-        setSelectedLocation(null);
-        setProductsOfPurchaseOrder([]);
-        setValidationForm((prev) => ({
-            ...prev,
-            location: null,
-            product: null,
-            purchase_order: null,
-            quantity: null,
-            order_type: null,
-        }));
-        setQuantity(undefined);
-    }, [orderType]);
+    useWhatChanged([state.draft.product, state.draft.location], ['product', 'location']);
 
     return (
         <div className={StyleModule.container}>
             <section className={StyleModule.headerSection}>
+                <h2 className="nunito-bold">Información del producto</h2>
             </section>
             <section className={StyleModule.bodySection}>
-                <div className={StyleModule.containerSelect}>
-                    <h2 className="nunito-bold">¿Asociar a una orden de venta?</h2>
-                    <CustomSelectString
-                        options={orders}
-                        defaultLabel="Seleccione una opcion"
-                        autoOpen={false}
-                        value={orderType ?? "Seleccione una opcion"}
-                        onChange={setOrderType}
-                        icon={<ChevronDown className={StyleModule.iconButton} />}
-                        classNameFieldContainer={StyleModule.customSelectFieldContainer}
-                        classNameToggleContainer={StyleModule.customSelectToggleContainer}
-                        classNameOption={StyleModule.customSelectOption}
-                    />
-                    {
-                        validationForm.order_type && (
-                            <p className="nunito-semibold">{validationForm.order_type}</p>
-                        )
-                    }
-                </div>
-                {
-                    orderType === "Si, ligar a una orden de venta" && (
-                        <div className={StyleModule.containerValidation}>
-                            <SingleSelectSearchCheck<IPurchasedOrder>
-                                rowId="order_code"
-                                search={searchDropDownSelectPurchaseOrder}
-                                setSearch={setSearchDropDownSelectPurchaseOrder}
-                                open={openDropDownSelectPurchaseOrder}
-                                setOpen={setOpenDropDownSelectPurchaseOrder}
-                                emptyMessage="No hay ordenes de compra"
-                                icon={<Search className={StyleModule.iconButton} />}
-                                placeholder="Seleccione una orden de compra..."
-                                classNameDropDownSelectItemInput={StyleModule.selectSearchMultiCheckDropDownSelectItemInput}
-                                classNameContainer={StyleModule.selectSearchMultiCheckContainer}
-                                classNameInputContainer={StyleModule.selectSearchMultiCheckInputContainer}
-                                classNameDropDown={StyleModule.selectSearchMultiCheckDropDown}
-                                classNameDropDownSelect={StyleModule.selectSearchMultiCheckDropDownSelect}
-                                classNameButtonInput={StyleModule.selectSearchMultiCheckButtonInput}
-                                classNameInput={`nunito-semibold ${StyleModule.selectSearchMultiCheckInput}`}
-                                classNameDropDownSelectItemSelected={`nunito-semibold ${StyleModule.selectSearchMultiCheckDropDownSelectItemSelected}`}
-                                classNameDropDownSearch={StyleModule.selectSearchMultiCheckDropDownSearch}
-                                classNameDropDownSearchItem={`nunito-semibold ${StyleModule.selectSearchMultiCheckDropDownSearchItem}`}
-                                classNameSeparator={StyleModule.selectSearchMultiCheckSeparator}
-                                classNameDropDownHeader={`nunito-bold ${StyleModule.selectSearchMultiCheckDropDownHeader}`}
-                                classNameEmptyMessage={`nunito-semibold ${StyleModule.selectSearchMultiCheckEmptyMessage}`}
-                                loadOptions={fetchPurchaseOrderLike}
-                                selected={selectedPurchaseOrder}
-                                setSelected={hadnleOnChangePurchaseOrder}
-                            />
-                            {
-                                validationForm.purchase_order && (
-                                    <p className="nunito-semibold">{validationForm.purchase_order}</p>
-                                )
-                            }
-                        </div>
-                    )
-                }
-                {(
-                    orderType === "Si, ligar a una orden de venta" &&
-                    selectedPurchaseOrder !== null ||
-                    orderType === "No, producir para inventario" &&
-                    selectedPurchaseOrder === null
-                ) && (
-                        <div className={StyleModule.containerValidation}>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "1rem",
+                    }}
+                >
+                    {!loadingLocationsProducedProduct && (
+                        <ValidationContainer validation={state.draft.product ? null : "Debe seleccionar un producto"}>
                             <SingleSelectSearchCheck<IProduct>
                                 rowId="name"
                                 search={searchDropDownSelectProduct}
@@ -411,75 +261,101 @@ const Step1 = ({
                                 classNameSeparator={StyleModule.selectSearchMultiCheckSeparator}
                                 classNameDropDownHeader={`nunito-bold ${StyleModule.selectSearchMultiCheckDropDownHeader}`}
                                 classNameEmptyMessage={`nunito-semibold ${StyleModule.selectSearchMultiCheckEmptyMessage}`}
-                                {...(orderType === "Si, ligar a una orden de venta" ? { options: productsOfPurchaseOrder } : { loadOptions: fetchProductsLike })}
-                                selected={selectedProduct}
+                                {...(state.draft.order_type === "client"
+                                    ? {
+                                        options: state.draft.purchase_order?.purchase_order_products
+                                            ?.map(product => product.product)
+                                            ?.filter((p): p is IProduct => p !== undefined) // <-- Aquí filtras undefined y aseguras el tipo
+                                    }
+                                    : { loadOptions: fetchProductsLike })}
+                                selected={state.draft.product ? state.draft.product : null}
                                 setSelected={hadnleOnChangeProduct}
+                                disabled
                             />
-                            {
-                                validationForm.product && (
-                                    <p className="nunito-semibold">{validationForm.product}</p>
-                                )
-                            }
-                        </div>
-                    )
-                }
-                {
-                    !loadingLocationsProducedProduct &&
-                    orderType !== null &&
-                    selectedProduct !== null && (
-                        <div className={StyleModule.containerValidation}>
-
+                        </ValidationContainer>
+                    )}
+                    {!loadingLocationsProducedProduct && (
+                        <ValidationContainer validation={state.draft.location ? null : "Debe seleccionar una ubicacion"}>
                             <CustomSelectObject
                                 options={locationsProducedProduct}
                                 labelKey="name"
                                 defaultLabel="Selecciona una ubicacion"
                                 autoOpen={false}
-                                onChange={setSelectedLocation}
-                                value={selectedLocation}
+                                onChange={handlerOnChangeLocation}
+                                value={state.draft.location}
                                 icon={<ChevronDown className={StyleModule.iconButton} />}
                                 classNameFieldContainer={StyleModule.customSelectFieldContainer}
                                 classNameToggleContainer={StyleModule.customSelectToggleContainer}
                                 classNameOption={StyleModule.customSelectOption}
-                            />
-                            {
-                                validationForm.location && (
-                                    <p className="nunito-semibold">{validationForm.location}</p>
-                                )
-                            }
-                        </div>
-                    )
-                }
-                {((orderType === "No, producir para inventario" && selectedProduct !== null && selectedLocation !== null) ||
-                    (orderType === "Si, ligar a una orden de venta" && selectedPurchaseOrder !== null && selectedProduct !== null && selectedLocation !== null)) && (
-                        <div className={StyleModule.containerValidation}>
-                            <StandarNumericField
-                                value={quantity || ''}
-                                onChange={hadnleOnChangeQuantity}
-                                required
-                                type="number"
-                                placeholder="Ingrese la cantidad"
-                                autoFocus
-                                id="quantity"
-                                name="quantity"
 
                             />
-                            {
-                                validationForm.quantity && (
-                                    <p className="nunito-semibold">{validationForm.quantity}</p>
-                                )
-                            }
-                        </div>
-                    )
-                }
+                        </ValidationContainer>
+                    )}
+                    <ValidationContainer validation={state.draft.qty && state.draft.qty > 0 ? null : "Debe ingresar una cantidad valida"}>
+                        <InputToggleMemorizado
+                            value={Number(Number(state.draft.qty).toFixed(0))}
+                            onChange={hadnleOnChangeQuantity}
+                        />
+                    </ValidationContainer>
+                </div>
+                {!loadingInventoryInputsProduct && state.draft.product && state.draft.location && (
+                    <div className={StyleModule.externalContainerGenericTable}>
+                        <GenericTable
+                            modelName="InventoryInputs"
+                            columns={columnsInventoryInputs}
+                            data={inventoryInputsProduct}
+                            onDeleteSelected={() => console.log("Delete selected")}
+                            getRowId={i => i.input_id.toString()}
+                            enableFilters={false}
+                            enablePagination={false}
+                            enableRowSelection={false}
+                            enableOptionsColumn={false}
+                            enableSorting={false}
+                            enableViews={false}
+                            enableRowEditClick={false}
+                            typeRowActions="icon"
+                            noResultsMessage="El producto no requiere de insumos"
+                            classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
+                        />
+                    </div>
+                )}
             </section>
             <section className={StyleModule.footerSection}>
-                <CancelButtonCustom onClick={onCancel} />
-                <ActionMainButtonCustom
-                    onClick={handleOnClickButtonNext}
-                    label="Siguiente"
-                    icon={<ChevronRight />}
+                <CriticalActionButton
+                    onClick={handlerOnClickButtonCancel}
+                    label="Cancelar"
+                />
+                <MainActionButtonCustom
+                    onClick={handlerOnClickButtonNext}
+                    label="Continuar"
+                    icon={<FileCheck2 />}
                 />
             </section>
+            {
+                isActiveModalConfirmation && (
+                    <CustomModal
+                        onClose={() => setIsActiveModalConfirmation(false)}
+                        title="Esta planta no cuenta con los insumos suficientes para la orden de producción. ¿Seguro que desea continuar?"
+                        icon={<WarningIcon className={StyleModule.iconButtonModal} />}
+                        message="Esta acción puede ocasionar conflictos"
+
+                        children={() => (
+                            <div className={StyleModule.containerModalButtons}>
+                                <TertiaryActionButtonCustom
+                                    onClick={handlerOnClickButtonBackModal}
+                                    label="Regresar"
+                                    icon={<ChevronLeft />}
+                                />
+                                <MainActionButtonCustom
+                                    onClick={handlerOnClickButtonContinue}
+                                    label="Continuar"
+                                    icon={<FileCheck2 />}
+                                />
+                            </div>
+                        )}
+                    />
+                )
+            }
         </div>
     );
 };

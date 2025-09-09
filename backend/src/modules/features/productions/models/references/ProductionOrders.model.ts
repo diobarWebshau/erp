@@ -4,6 +4,7 @@ import sequelize
     from "../../../../../mysql/configSequelize.js";
 import { ProductionAttributes } from "./Productions.model.js";
 import {
+    InternalProductProductionOrderAttributes,
     LocationAttributes, ProductAttributes,
     ProductionLineAttributes, PurchasedOrderAttributes
 } from "src/modules/types.js";
@@ -13,6 +14,13 @@ interface ExtraData {
     location: LocationAttributes;
     production_qty: number;
     production_line: ProductionLineAttributes;
+}
+
+interface ExtraData2 {
+    location: LocationAttributes;
+    production_line: ProductionLineAttributes;
+    purchase_order?: PurchasedOrderAttributes;
+    internal_order?: InternalProductProductionOrderAttributes;
 }
 
 interface ProductionOrderAttributes {
@@ -27,10 +35,12 @@ interface ProductionOrderAttributes {
     updated_at: Date,
     productions?: ProductionAttributes[],
     extra_data?: ExtraData,
+    extra_data2?: ExtraData2,
     location?: LocationAttributes
     product?: ProductAttributes
     purchase_order?: PurchasedOrderAttributes
     production_line?: ProductionLineAttributes
+    internal_order?: InternalProductProductionOrderAttributes
 }
 
 interface ProductionOrderCreationAttributes
