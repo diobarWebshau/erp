@@ -116,142 +116,192 @@
     grid-area: data;
 
     /* distribucion grid */
+    /* distribucion grid */
     display: grid;
-    grid-template-areas: "aside content";
-    grid-template-columns: auto 1fr;
-    grid-template-rows: 100%;
-
+    grid-template:
+        "aside content" 100%
+        / max-content 1fr;
+    gap: 0.5rem;
 
     /* estilos */
     background-color: var(--color-theme-background);
     border-radius: 15px;
     padding: 2rem;
 
-    /* animaciones y transiciones */
-    transition: grid-template-columns 0.4s cubic-bezier(.7, 0, .3, 1),
-        background-color 0.4s cubic-bezier(.7, 0, .3, 1);
-
 }
 
 /* ? *************** Aside *************** */
 
-/* Hace la custom property animable como <length> */
-@property --aside-w {
-    syntax: '<length>';
-    inherits: false;
-    initial-value: 240px;
-}
-
-/* ? *************** Aside *************** */
 .asideSection {
     grid-area: aside;
+
+    /* distribucion grid */
     display: grid;
-    grid-template-areas: "asideContent toggle";
+    grid-template:
+        "asideContent toggle" 100%
+        / max-content 45px;
+    gap: 0.5rem;
 
-    /* usamos la variable para el ancho del contenido */
-    grid-template-columns: auto auto;
-
-    /* animamos la variable, no la propiedad de grid */
-    transition:
-        --aside-w 0.4s cubic-bezier(.7, 0, .3, 1),
-        background-color 0.4s cubic-bezier(.7, 0, .3, 1);
-    /* opcional: ayuda a que el motor prepare la animación */
-    will-change: --aside-w;
-
+    /* distribucion box */
     border-bottom-left-radius: 15px;
     border-top-left-radius: 15px;
+
 }
 
-/* Estado expandido */
 .asideSectionExpand {
-    background-color: var(--color-theme-backgroundy);
-    --aside-w: 240px;
-    /* ajusta a tu gusto */
-}
 
-/* Estado colapsado */
-.asideSectionCollapse {
-    background-color: var(--color-theme-secondary-light);
-    --aside-w: 0px;
-}
+    /* distribucion grid */
+    grid-template-columns: max-content 45px;
 
-/* El contenido debe poder encogerse */
-.asideSection>.asideContent {
-    /* min-width: 0; */
-    overflow: hidden;
-}
-
-.asideSection {
-    /* distribución con respecto al padre grid */
-    grid-area: aside;
-
-    display: grid;
-    grid-template-areas: "asideContent toggle";
-
-    /* en vez de 1fr → 0px, animamos una length consistente */
-    grid-template-columns: minmax(0, 240px) auto;
-
-    /* animaciones y transiciones */
-    transition: grid-template-columns 0.4s cubic-bezier(.7, 0, .3, 1);
-}
-
-/* Estado expandido (ancho visible) */
-.asideSectionExpand {
+    /* estilos */
     background-color: var(--color-theme-background);
-    grid-template-columns: minmax(0, 240px) auto;
-    /* ajusta a tu ancho deseado */
 }
 
-/* Estado colapsado (ancho 0) */
 .asideSectionCollapse {
+
+    /* distribucion grid */
+    grid-template-columns: 0px 45px;
+
+    /* estilos */
     background-color: var(--color-theme-secondary-light);
-    grid-template-columns: minmax(0, 0px) auto;
+
+    gap: 0;
 }
 
-/* Asegura que el contenido pueda encogerse sin “empujar” el grid */
-.asideSection>.asideContent {
-    /* min-width: 0; */
-    overflow: hidden;
+
+
+.asideSectionExpand .asideContent {
+    visibility: visible;
+}
+
+.asideSectionExpand .asideContentCollapse {
+    display: none;
+    visibility: hidden;
 }
 
 
 /* ? *************** Aside Content *************** */
 
 .asideContent {
+
+    /* distribucion grid dentro del padre*/
     grid-area: asideContent;
-    overflow: hidden;
-}
 
-.asideContentCollapse{
-    display: none;
-}
-
-.asideContentItem {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "title" max-content
+        "data" max-content / 100%;
     gap: 0.5rem;
 }
 
-.asideContentItems{
+.asideContentExpand {
+    visibility: visible;
+}
+
+.asideContentCollapse {
+    visibility: hidden;
+}
+
+.asideContent>h3 {
+    /* distribucion grid dentro del padre*/
+    grid-area: title;
+}
+
+.asideContentItems {
+
+    /* distribucion grid dentro del padre*/
+    grid-area: data;
+
+    /* distribucion flex */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
+
+    /* distribucion box */
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+
+    /* estilos */
     background-color: var(--color-theme-font-white);
+}
+
+.asideContentItems>* {
+    /* dimension */
+    height: 44px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+
+    /* distribucion box */
+    padding-left: 0.5rem;
+    border: 1px solid var(--color-theme-border-table);
+    font-size: 14px;
+
+}
+
+.asideContentItems>*:first-child {
+
+    /* distribucion flex */
+    justify-content: start;
+    align-items: center;
+
+    /* distribucion box */
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+
+    /* estilos */
+    background-color: var(--color-theme-primary-light);
+    color: var(--color-theme-font-white);
+
+}
+
+.asideContentItems>*:last-child {
+    /* distribucion box */
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.asideContentItems>*:last-child>span {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.asideContentItem {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    align-items: center;
+    gap: 0.5rem;
+
+    /* distribucion border */
+    padding: 0.5rem;
+}
+
+.asideContentIcon {
+    color: var(--color-theme-primary);
+    width: 15px;
+    height: 15px;
 }
 
 /* ? *************** Aside Toggle *************** */
 
 .asideToggle {
-    grid-area: toggle;
     /* distribucion con respecto al padre grid */
+    grid-area: toggle;
+
+    /* distribucion flex */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .asideToggleIcon {
@@ -260,25 +310,98 @@
     color: var(--color-theme-primary);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* ? *************** Content *************** */
 
 .contentSection {
     /* distribucion con respecto al padre grid */
     grid-area: content;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    /* para que el scroll no se propague al padre */
+    overflow: hidden;
+
+}
+
+.contentSection>* {
+    min-width: 100%;
+}
+
+.contentSection .headerH3 {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+}
+
+.contentContent {
+
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: start;
+    gap: 0.5rem;
+
+    /* estilos */
+    overflow-x: auto;
+}
+
+.productionLineContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: 0.5rem;
+
+    /* estilos */
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.productionLineItemName {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 0.5rem;
+
+    background-color: var(--color-theme-primary-light);
+    color: var(--color-theme-font-white);
+}
+
+.productionLineItemIcon {
+    width: 15px;
+    height: 15px;
+    color: var(--color-theme-font-white);
+}
+
+.productionOrderContent{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: 0.5rem;
+}
+
+.productionOrderItem{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: 0.5rem;
+}
+
+
+/* ? *************** Content Header *************** */
+
+.headerH3 {
+    font-size: 20px;
+    color: var(--color-theme-primary);
 }

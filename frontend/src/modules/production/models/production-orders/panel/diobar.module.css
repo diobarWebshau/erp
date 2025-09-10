@@ -1,0 +1,56 @@
+/* ? *************** Aside *************** */
+
+/* Hace la custom property animable como <length> */
+@property --aside-w {
+    syntax: '<length>';
+    inherits: false;
+    initial-value: 240px;
+}
+
+/* ? *************** Aside *************** */
+.asideSection {
+    grid-area: aside;
+    display: grid;
+    grid-template-areas: "asideContent toggle";
+
+    /* usamos la variable para el ancho del contenido */
+    grid-template-columns: auto auto;
+
+    /* animamos la variable, no la propiedad de grid */
+    transition:
+        --aside-w 0.4s cubic-bezier(.7, 0, .3, 1),
+        background-color 0.4s cubic-bezier(.7, 0, .3, 1);
+    /* opcional: ayuda a que el motor prepare la animación */
+    will-change: --aside-w;
+
+    border-bottom-left-radius: 15px;
+    border-top-left-radius: 15px;
+
+}
+
+/* Estado expandido */
+.asideSectionExpand {
+    background-color: var(--color-theme-backgroundy);
+    --aside-w: 240px;
+    /* ajusta a tu gusto */
+}
+
+.asideSectionExpand .asideContent{
+    visibility: visible;
+}
+
+.asideSectionExpand .asideContentCollapse{
+    visibility: hidden;
+}
+
+/* Estado colapsado */
+.asideSectionCollapse {
+    background-color: var(--color-theme-secondary-light);
+    --aside-w: 0px;
+}
+
+/* El contenido debe poder encogerse */
+.asideSection>.asideContent {
+    /* min-width: 0; */
+    overflow: hidden;
+}

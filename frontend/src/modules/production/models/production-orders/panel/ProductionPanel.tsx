@@ -37,7 +37,254 @@ const ProductionPanel = ({
         {
             id: 4,
             name: "Location D"
+        },
+        {
+            id: 5,
+            name: "Location E"
         }
+    ]
+
+    const production_lines = [
+        {
+            id: 1,
+            name: "Linea A",
+            production_order: [
+                {
+                    id: 1,
+                    name: "#PO-0001",
+                    product: {
+                        id: 1,
+                        name: "Producto A",
+                        process: [
+                            {
+                                id: 1,
+                                name: "Proceso A"
+                            },
+                            {
+                                id: 2,
+                                name: "Proceso B"
+                            },
+                            {
+                                id: 3,
+                                name: "Proceso C"
+                            }
+                        ]
+                    },
+                    qty: 100
+                },
+                {
+                    id: 2,
+                    name: "#PO-0002",
+                    product: {
+                        id: 2,
+                        name: "Producto B",
+                        process: [
+                            {
+                                id: 1,
+                                name: "Proceso A"
+                            },
+                            {
+                                id: 2,
+                                name: "Proceso B"
+                            },
+                            {
+                                id: 3,
+                                name: "Proceso C"
+                            }
+                        ]
+
+                    },
+                    qty: 200
+                },
+                {
+                    id: 3,
+                    name: "#PO-0003",
+                    product: {
+                        id: 3,
+                        name: "Producto C",
+                        process: {
+                            id: 1,
+                            name: "Proceso A",
+                            process: [
+                                {
+                                    id: 1,
+                                    name: "Proceso A"
+                                },
+                                {
+                                    id: 2,
+                                    name: "Proceso B"
+                                },
+                                {
+                                    id: 3,
+                                    name: "Proceso C"
+                                }
+                            ]
+                        }
+                    },
+                    qty: 300
+                }
+            ]
+        },
+        {
+            id: 2,
+            name: "Linea B",
+            production_order: [
+                {
+                    id: 1,
+                    name: "#PO-0001",
+                    product: {
+                        id: 1,
+                        name: "Producto A",
+                        process: [
+                            {
+                                id: 1,
+                                name: "Proceso A"
+                            },
+                            {
+                                id: 2,
+                                name: "Proceso B"
+                            },
+                            {
+                                id: 3,
+                                name: "Proceso C"
+                            }
+                        ]
+                    },
+                    qty: 100
+                },
+                {
+                    id: 2,
+                    name: "#PO-0002",
+                    product: {
+                        id: 2,
+                        name: "Producto B",
+                        process: [
+                            {
+                                id: 1,
+                                name: "Proceso A"
+                            },
+                            {
+                                id: 2,
+                                name: "Proceso B"
+                            },
+                            {
+                                id: 3,
+                                name: "Proceso C"
+                            }
+                        ]
+
+                    },
+                    qty: 200
+                },
+                {
+                    id: 3,
+                    name: "#PO-0003",
+                    product: {
+                        id: 3,
+                        name: "Producto C",
+                        process: {
+                            id: 1,
+                            name: "Proceso A",
+                            process: [
+                                {
+                                    id: 1,
+                                    name: "Proceso A"
+                                },
+                                {
+                                    id: 2,
+                                    name: "Proceso B"
+                                },
+                                {
+                                    id: 3,
+                                    name: "Proceso C"
+                                }
+                            ]
+                        }
+                    },
+                    qty: 300
+                }
+            ]
+        },
+        {
+            id: 3,
+            name: "Linea C",
+            production_order: [
+                {
+                    id: 1,
+                    name: "#PO-0001",
+                    product: {
+                        id: 1,
+                        name: "Producto A",
+                        process: [
+                            {
+                                id: 1,
+                                name: "Proceso A"
+                            },
+                            {
+                                id: 2,
+                                name: "Proceso B"
+                            },
+                            {
+                                id: 3,
+                                name: "Proceso C"
+                            }
+                        ]
+                    },
+                    qty: 100
+                },
+                {
+                    id: 2,
+                    name: "#PO-0002",
+                    product: {
+                        id: 2,
+                        name: "Producto B",
+                        process: [
+                            {
+                                id: 1,
+                                name: "Proceso A"
+                            },
+                            {
+                                id: 2,
+                                name: "Proceso B"
+                            },
+                            {
+                                id: 3,
+                                name: "Proceso C"
+                            }
+                        ]
+
+                    },
+                    qty: 200
+                },
+                {
+                    id: 3,
+                    name: "#PO-0003",
+                    product: {
+                        id: 3,
+                        name: "Producto C",
+                        process: {
+                            id: 1,
+                            name: "Proceso A",
+                            process: [
+                                {
+                                    id: 1,
+                                    name: "Proceso A"
+                                },
+                                {
+                                    id: 2,
+                                    name: "Proceso B"
+                                },
+                                {
+                                    id: 3,
+                                    name: "Proceso C"
+                                }
+                            ]
+                        }
+                    },
+                    qty: 300
+                }
+            ]
+        },
     ]
 
     return (
@@ -71,38 +318,38 @@ const ProductionPanel = ({
                 </div>
                 <div className={StyleModule.dataSection}>
                     <aside className={` ${StyleModule.asideSection} ${isPanelExpand ? StyleModule.asideSectionExpand : StyleModule.asideSectionCollapse}`}>
-                        <section className={` ${!isPanelExpand ? StyleModule.asideContentCollapse : StyleModule.asideContent}`}>
-                            <h2 className="nunito-bold">
+                        <section className={` ${StyleModule.asideContent} ${isPanelExpand ? StyleModule.asideContentExpand : StyleModule.asideContentCollapse}`}>
+                            <h3 className={`${StyleModule.headerH3} nunito-bold`}>
                                 Planta de producción
-                            </h2>
-                            <div className={StyleModule.asideContentItems}>
+                            </h3>
+                            <div className={`nunito-bold ${StyleModule.asideContentItems}`}>
                                 <span>{locationSelected.name}</span>
-                                <span className={StyleModule.asideContentItem}>
-                                    <Factory />
+                                <span className={`${StyleModule.asideContentItem}`}>
+                                    <Factory className={StyleModule.asideContentIcon} />
                                     <p>{locationSelected.name}</p>
                                 </span>
-                                <span className={StyleModule.asideContentItem}>
-                                    <MapPin />
+                                <span className={`${StyleModule.asideContentItem}`}>
+                                    <MapPin className={StyleModule.asideContentIcon} />
                                     <p>Mexicali, Baja California</p>
                                 </span>
-                                <span className={StyleModule.asideContentItem}>
-                                    <CircleDot />
+                                <span className={`${StyleModule.asideContentItem}`}>
+                                    <CircleDot className={StyleModule.asideContentIcon} />
                                     <p>Activa</p>
                                 </span>
-                                <span className={StyleModule.asideContentItem}>
-                                    <Settings2 />
+                                <span className={`${StyleModule.asideContentItem}`}>
+                                    <Settings2 className={StyleModule.asideContentIcon} />
                                     <p>Lineas activas: 5 de 7</p>
                                 </span>
-                                <span className={StyleModule.asideContentItem}>
-                                    <Package2 />
+                                <span className={`${StyleModule.asideContentItem}`}>
+                                    <Package2 className={StyleModule.asideContentIcon} />
                                     <p>Produccion total de hoy: 12,400 unidades</p>
                                 </span>
-                                <span className={StyleModule.asideContentItem}>
-                                    <TrendingDown />
+                                <span className={`${StyleModule.asideContentItem}`}>
+                                    <TrendingDown className={StyleModule.asideContentIcon} />
                                     <p>Scrap promedio: 1.8% </p>
                                 </span>
-                                <span className={StyleModule.asideContentItem}>
-                                    <User />
+                                <span className={`${StyleModule.asideContentItem}`}>
+                                    <User className={StyleModule.asideContentIcon} />
                                     <span><p>Responsable:</p> <p>Jose Ramirez</p></span>
                                 </span>
                             </div>
@@ -120,10 +367,45 @@ const ProductionPanel = ({
                         </div>
                     </aside>
                     <section className={StyleModule.contentSection}>
-                        <h2 className="nunito-bold">
+                        <h3 className={`${StyleModule.headerH3} nunito-bold`}>
                             Lineas de producción
-                        </h2>
+                        </h3>
                         <div className={StyleModule.contentContent}>
+                            {
+                                production_lines.map((production_line) => {
+                                    return (
+                                        <div
+                                            key={production_line.id}
+                                            className={StyleModule.productionLineContent}
+                                        >
+                                            <div className={`nunito-bold ${StyleModule.productionLineItemName}`}>
+                                                <Settings2 className={StyleModule.productionLineItemIcon} />
+                                                <p>{production_line.name}</p>
+                                            </div>
+                                            <div className={`nunito-bold ${StyleModule.productionOrderContent}`}>
+                                                {
+                                                    production_line.production_order.map((production_order) => {
+                                                        return (
+                                                            <div className={StyleModule.productionOrderItem}>
+                                                                <div className={StyleModule.productionOrderItemTitle}>
+                                                                    <Package2 className={StyleModule.productionOrderItemIcon} />
+                                                                    <p>{production_order.name}</p>
+                                                                </div>
+                                                                <div className={StyleModule.productionOrderItemDescription}>
+                                                                    <span>{production_order.qty}</span>
+                                                                    <span>{production_order.product.name}</span>
+                                                                </div>
+                                                                <div className={StyleModule.productionOrderItemProcess}>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
                     </section>
                 </div>
