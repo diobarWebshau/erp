@@ -46,6 +46,7 @@ import {
 import GenericTable
     from "../../../../components/ui/table/tableContext/GenericTable";
 import type {
+    Row,
     Table
 } from "@tanstack/react-table";
 import InvertOnHoverButton
@@ -69,6 +70,7 @@ import AddModal from "./wizard/add/AddModal";
 import EditModal from "./wizard/edit/EditModal";
 import useProductionOrderById from "../../../../modelos/production_orders/hooks/useProductionOrderById";
 import ProductionPanel from "./panel/ProductionPanel";
+import ProductionPanel2 from "./panel/ProductionPanel copy";
 
 const ProductionOrderModel = () => {
 
@@ -89,7 +91,7 @@ const ProductionOrderModel = () => {
         useState<IProductionOrder[]>([])
     const [
         productionOrderRecord,
-        setproductionOrderRecord
+        setProductionOrderRecord
     ] = useState<IProductionOrder | null>(
         defaultValueProductionOrder);
 
@@ -211,19 +213,19 @@ const ProductionOrderModel = () => {
     const toggleActiveEditModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        setproductionOrderRecord({ ...record, qty: Number(record.qty) });
+        setProductionOrderRecord({ ...record, qty: Number(record.qty) });
         setIsActiveEditModal(!isActiveEditModal);
     }
     const toggleActiveDeleteModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        setproductionOrderRecord(record);
+        setProductionOrderRecord(record);
         setIsActiveDeleteModal(!isActiveDeleteModal);
     }
     const toggleActiveCheckPointModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        setproductionOrderRecord(record);
+        setProductionOrderRecord(record);
         setIsActiveCheckPointModal(!isActiveCheckPointModal);
     }
 
@@ -399,8 +401,9 @@ const ProductionOrderModel = () => {
         return columnsProductionOrders({ onClickContent });
     }
 
-    const onClickContent = (e: React.MouseEvent) => {
+    const onClickContent = (e: React.MouseEvent, row: Row<IProductionOrder>) => {
         e.stopPropagation();
+        setProductionOrderRecord(row.original);
         setIsActiveProductionPanel(true);
     }
 
@@ -486,6 +489,12 @@ const ProductionOrderModel = () => {
                         onClose={() => setIsActiveProductionPanel(false)}
                     />
                 }
+                {/* {
+                    isActiveProductionPanel && productionOrderRecord && <ProductionPanel2
+                        onClose={() => setIsActiveProductionPanel(false)}
+                        productionOrder={productionOrderRecord}
+                    />
+                } */}
             </div>
         </>
     );

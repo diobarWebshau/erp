@@ -2054,3 +2054,55 @@ LEFT JOIN locations AS l
 ON l.id = lpl.location_id
 WHERE po.id = 1
 AND po.order_type = 'internal';
+
+
+
+
+
+
+
+SELECT 
+  JSON_OBJECT(
+    'id', po.id,
+    'order_type', po.order_type,
+    'order_id', po.order_id,
+    'product_id', po.product_id,
+    'product_name', po.product_name,
+    'qty', po.qty,
+    'status', po.status,
+    'created_at', po.created_at,
+    'updated_at', po.updated_at,
+    'productions', (
+      SELECT 
+        COALESCE(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'id', p.id,
+              'product_id', p.product_id,
+              'product_name', p.product_name,
+              'qty', p.qty,
+              'created_at', p.created_at,
+              'updated_at', p.updated_at
+            )
+          ),
+          JSON_ARRAY()
+        )
+      FROM productions AS p
+      WHERE p.production_order_id = po.id
+    )
+  )
+FROM internal_product_production_orders AS ippo
+JOIN production_orders AS po
+  ON po.order_id  = ippo.id
+  AND po.order_type = 'internal'
+WHERE ippo.id = 1;
+
+
+SELECT pop.*
+FROM purchased_orders_products AS pop
+JOIN production_orders AS po
+  ON po.order_id = pop.id
+  AND po.order_type = 'client'
+WHERE pop.id = 1;
+
+

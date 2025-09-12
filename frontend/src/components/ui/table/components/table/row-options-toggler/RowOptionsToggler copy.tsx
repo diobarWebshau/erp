@@ -24,6 +24,7 @@ const RowOptionsToggler = ({
                         e.preventDefault();
                         action.onClick();
                     }}
+                    type="button"
                     disabled={action.disabled ? action.disabled() : false}
                     aria-label={action.label}
                     title={action.label}

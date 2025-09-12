@@ -1,7 +1,7 @@
 import { ArrowLeft, ChevronsLeft, ChevronsRight, CircleDot, Factory, Package2, Settings2, User, TrendingDown, MapPin, ChevronsDown, ChevronsUp } from "lucide-react";
 import TransparentButtonCustom from "../../../../../components/ui/table/components/gui/button/custom-button/transparent/TransparentButtonCustom";
 import StyleModule from "./ProductionPanel.module.css";
-import { useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useState, type CSSProperties, type MouseEvent } from "react";
 import {
     DndContext,
     closestCenter,
@@ -25,310 +25,35 @@ import BaseModal from "../../../../../components/ui/modal/baseGenericModal/BaseM
 import PopoverFloatingIUBase from "../../../../../components/ui/popover_floatingIU/PopoverFloatingIUBase";
 import GenericTable from "../../../../../components/ui/table/tableContext/GenericTable";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { IProductionOrder } from "../../../../../interfaces/productionOrder";
+import useLocationWithAllInformation from "../../../../../modelos/locations/hooks/useLocationsWithAllInformation";
+import type { ILocation } from "../../../../../interfaces/locations";
+import { fetchLocationsWithTypesFromDB } from "../../../../../queries/locationsQueries";
+import type { AppDispatchRedux } from "../../../../../store/store";
+import { useDispatch } from "react-redux";
+import type { IProductionLine } from "../../../../../interfaces/productionLines";
+import type { IPurchasedOrderProduct } from "../../../../../interfaces/purchasedOrdersProducts";
 
 interface IProductionPanel {
-    onClose: () => void;
+    onClose: () => void
+    productionOrder: IProductionOrder;
 }
-
-/* ===== Tipos (nombres únicos) ===== */
-
-interface PPDemoProcess {
-    id: number;
-    name: string;
-}
-
-interface PPDemoProduct {
-    sku: string,
-    id: number;
-    name: string;
-    process: PPDemoProcess[];
-}
-
-interface PPDemoOrder {
-    id: number;
-    name: string;
-    product: PPDemoProduct;
-    qty: number;
-}
-
-interface PPDemoProductionOrderProduct {
-    id: number,
-    purchased_order_id: number,
-    product_id: number,
-    product_name: string,
-    product: PPDemoProduct,
-    qty: number,
-}
-
-interface PPDemoLine {
-    id: number;
-    name: string;
-    production_order: PPDemoOrder[];
-}
-
-type PPDemoLines = PPDemoLine[];
-
-
-
-const locations = [
-    { id: 1, name: "Location A" },
-    { id: 2, name: "Location B" },
-    { id: 3, name: "Location C" },
-    { id: 4, name: "Location D" },
-    { id: 5, name: "Location E" },
-];
-
-// Datos iniciales
-const initialProductionLines: PPDemoLines = [
-    {
-        id: 1,
-        name: "Linea A",
-        production_order: [
-            {
-                id: 1,
-                name: "#PO-0001",
-                product: {
-                    sku: "SKU-0001",
-                    id: 1,
-                    name: "Producto A",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 100,
-            },
-            {
-                id: 2,
-                name: "#PO-0002",
-                product: {
-                    sku: "SKU-0002",
-                    id: 2,
-                    name: "Producto B",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 200,
-            },
-            {
-                id: 3,
-                name: "#PO-0003",
-                product: {
-                    sku: "SKU-0003",
-                    id: 3,
-                    name: "Producto C",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 300,
-            },
-            {
-                id: 4,
-                name: "#PO-0004",
-                product: {
-                    id: 3,
-                    sku: "SKU-0004",
-                    name: "Producto C",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 300,
-            },
-            {
-                id: 5,
-                name: "#PO-0005",
-                product: {
-                    id: 3,
-                    sku: "SKU-0005",
-                    name: "Producto C",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 300,
-            }
-        ],
-    },
-    {
-        id: 2,
-        name: "Linea B",
-        production_order: [
-            {
-                id: 1,
-                name: "#PO-0001",
-                product: {
-                    id: 1,
-                    sku: "SKU-0001",
-                    name: "Producto A",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 100,
-            },
-            {
-                id: 2,
-                name: "#PO-0002",
-                product: {
-                    id: 2,
-                    sku: "SKU-0002",
-                    name: "Producto B",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 200,
-            },
-            {
-                id: 3,
-                name: "#PO-0003",
-                product: {
-                    sku: "SKU-0003",
-                    id: 3,
-                    name: "Producto C",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 300,
-            },
-            // Duplicados de ejemplo
-            {
-                id: 4,
-                name: "#PO-0004",
-                product: {
-                    sku: "SKU-0004",
-                    id: 4,
-                    name: "Producto D",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 150,
-            },
-        ],
-    },
-    {
-        id: 3,
-        name: "Linea C",
-        production_order: [
-            {
-                id: 1,
-                name: "#PO-0001",
-                product: {
-                    id: 1,
-                    sku: "SKU-0001",
-                    name: "Producto A",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 100,
-            },
-            {
-                id: 2,
-                name: "#PO-0002",
-                product: {
-                    id: 2,
-                    sku: "SKU-0002",
-                    name: "Producto B",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 200,
-            },
-            {
-                id: 3,
-                name: "#PO-0003",
-                product: {
-                    id: 3,
-                    sku: "SKU-0003",
-                    name: "Producto C",
-                    process: [
-                        { id: 1, name: "Proceso A" },
-                        { id: 2, name: "Proceso B" },
-                        { id: 3, name: "Proceso C" },
-                    ],
-                },
-                qty: 300,
-            },
-        ],
-    },
-];
-
-
-const data: PPDemoProductionOrderProduct[] = [
-    {
-        id: 1,
-        product: {
-            id: 1,
-            sku: "SKU-0001",
-            name: "Producto A",
-            process: [
-                { id: 1, name: "Proceso A" },
-                { id: 2, name: "Proceso B" },
-                { id: 3, name: "Proceso C" },
-            ],
-        },
-        product_name: "Producto A",
-        product_id: 1,
-        purchased_order_id: 1,
-        qty: 100,
-    },
-    {
-        id: 2,
-        product: {
-            id: 2,
-            sku: "SKU-0002",
-            name: "Producto B",
-            process: [
-                { id: 1, name: "Proceso A" },
-                { id: 2, name: "Proceso B" },
-                { id: 3, name: "Proceso C" },
-            ],
-        },
-        product_name: "Producto B",
-        product_id: 2,
-        purchased_order_id: 1,
-        qty: 200,
-    }
-]
 
 /* ===================== Componente ===================== */
 
-const ProductionPanel = ({ onClose }: IProductionPanel) => {
+const ProductionPanel = ({
+    onClose,
+    productionOrder
+}: IProductionPanel) => {
+
+
+    const dispatch: AppDispatchRedux = useDispatch();
+
+    const [locations, setLocations] = useState<ILocation[]>();
     const [isPanelExpand, setIsPanelExpand] = useState<boolean>(false);
-    const [locationSelected, setLocationSelected] = useState<{ id: number; name: string }>({
-        id: 1,
-        name: "Location A",
-    });
-    const [selectedProductionOrder, setSelectedProductionOrder] = useState<PPDemoProductionOrderProduct | null>(null);
-    const [productionLines, setProductionLines] = useState<PPDemoLines>(initialProductionLines);
+    const [locationSelected, setLocationSelected] = useState<ILocation | null>(productionOrder?.extra_data?.location || null);
+    const [selectedProductionOrder, setSelectedProductionOrder] = useState<IProductionOrder | null>(null);
+    const [productionLines, setProductionLines] = useState<IProductionLine[]>();
     const [isActiveOrderView, setIsActiveOrderView] = useState(false);
     const [isActiveProductionLineView, setIsActiveProductionLineView] = useState(false);
 
@@ -340,9 +65,9 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
         setIsActiveOrderView((prev) => !prev);
     };
 
-    const columns: ColumnDef<PPDemoProductionOrderProduct>[] = [
+    const columns: ColumnDef<IPurchasedOrderProduct>[] = [
         {
-            accessorFn: (row) => row.product.sku,
+            accessorFn: (row) => row.product?.sku,
             header: "SKU",
         },
         {
@@ -362,6 +87,19 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
             },
         }
     ]
+    useEffect(() => {
+        const loadLocations = async () => {
+            const response = await fetchLocationsWithTypesFromDB(dispatch);
+            setLocations(response.length > 0 ? response : []);
+        };
+        loadLocations();
+    }, [dispatch]);
+
+    const {
+        locationWithAllInformation,
+        loadingLocationWithAllInformation,
+        refetchLocationWithAllInformation
+    } = useLocationWithAllInformation(locationSelected?.id || null);
 
     return (
         <div className={StyleModule.containerProductionPanel}>
@@ -373,7 +111,7 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
             <div className={StyleModule.mainSection}>
                 <div className={StyleModule.panelSection}>
                     {locations.map((location) => {
-                        const isSelected = locationSelected.id === location.id;
+                        const isSelected = locationSelected?.id === location.id;
                         return (
                             <div
                                 key={location.id}
@@ -391,10 +129,10 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
                         <section className={`${StyleModule.asideContent} ${isPanelExpand ? StyleModule.asideContentExpand : StyleModule.asideContentCollapse}`}>
                             <h3 className={`${StyleModule.headerH3} nunito-bold`}>Planta de producción</h3>
                             <div className={`nunito-bold ${StyleModule.asideContentItems}`}>
-                                <span>{locationSelected.name}</span>
+                                <span>{locationSelected?.name}</span>
                                 <span className={`${StyleModule.asideContentItem}`}>
                                     <Factory className={StyleModule.asideContentIcon} />
-                                    <p>{locationSelected.name}</p>
+                                    <p>{locationSelected?.name}</p>
                                 </span>
                                 <span className={`${StyleModule.asideContentItem}`}>
                                     <MapPin className={StyleModule.asideContentIcon} />
@@ -433,16 +171,16 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
                     <section className={StyleModule.contentSection}>
                         <h3 className={`${StyleModule.headerH3} nunito-bold`}>Lineas de producción</h3>
                         <div className={StyleModule.contentContent}>
-                            {productionLines.map((production_line) => {
+                            {locationWithAllInformation?.locations_production_lines?.map((lpl) => {
                                 return (
-                                    <div key={production_line.id} className={StyleModule.productionLineContent}>
+                                    <div key={lpl.production_line?.name} className={StyleModule.productionLineContent}>
                                         <PopoverFloatingIUBase
                                             placement="bottom-end"
                                             childrenTrigger={
                                                 // Aplica getReferenceProps en ESTE MISMO nodo (ver componente abajo)
                                                 <div className={`nunito-bold ${StyleModule.productionLineItemName}`}>
                                                     <Settings2 className={StyleModule.productionLineItemIcon} />
-                                                    <p>{production_line.name}</p>
+                                                    <p>{lpl.production_line?.name}</p>
                                                 </div>
                                             }
                                             childrenFloating={
@@ -450,7 +188,7 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
                                                     <div className={StyleModule.popoverFloatingContent}>
                                                         <span>
                                                             <Settings2 className={StyleModule.popoverFloatingIcon} />
-                                                            <p className="nunito-bold">{production_line.name}</p>
+                                                            <p className="nunito-bold">{lpl.production_line?.name}</p>
                                                         </span>
                                                         <span>
                                                             <CircleDot className={StyleModule.popoverFloatingIcon} />
@@ -458,7 +196,11 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
                                                         </span>
                                                         <span>
                                                             <Package2 className={StyleModule.popoverFloatingIcon} />
-                                                            <p className="nunito-bold">Producto 2</p>
+                                                            <p className="nunito-bold">{
+                                                                lpl.production_line?.production_lines_products?.find(
+                                                                    (plp) =>
+                                                                        plp.products?.id === lpl.production_line?.production_order?.[0].product_id)?.products?.name}
+                                                            </p>
                                                         </span>
                                                         <span>
                                                             <TrendingDown className={StyleModule.popoverFloatingIcon} />
@@ -470,12 +212,17 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
                                         />
                                         <DraggableProductionOrderContainer
                                             lineId={production_line.id}
-                                            items={production_line.production_order}
-                                            onItemsChange={(lineId, items) =>
+                                            items={production_line?.production_order}
+                                            onItemsChange={(lineId, items) => {
                                                 setProductionLines((prev) =>
-                                                    prev.map((ln) => (ln.id === lineId ? { ...ln, production_order: items } : ln))
-                                                )
-                                            }
+                                                    prev.map((line) => {
+                                                        if (line.id === lineId) {
+                                                            return { ...line, production_order: items };
+                                                        }
+                                                        return line;
+                                                    })
+                                                );
+                                            }}
                                             onClick={toggleOrderView}
                                         />
                                     </div>
@@ -521,8 +268,8 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
 
 interface DraggableProductionOrderContainerProps {
     lineId: number;
-    items: PPDemoOrder[];
-    onItemsChange: (lineId: number, items: PPDemoOrder[]) => void;
+    items: IProductionOrder[];
+    onItemsChange: (id: number, production_order: IProductionOrder[]) => void;
     className?: string;
     style?: CSSProperties;
     onClick?: () => void;

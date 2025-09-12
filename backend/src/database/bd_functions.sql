@@ -1350,6 +1350,109 @@ END //
 DELIMITER ;
 
 
+DROP FUNCTION IF EXISTS func_get_productions_of_order;
+DELIMITER //
+CREATE FUNCTION func_get_productions_of_order(
+	in_order_id INT,
+	in_order_type VARCHAR(100)
+)
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+	DECLARE v_object_json JSON DEFAULT JSON_ARRAY();
+
+	IF in_order_type = 'internal' THEN
+		
+		SELECT 
+			COALESCE(
+				JSON_OBJECT(
+					'id', po.id,
+					'order_type', po.order_type,
+					'order_id', po.order_id,
+					'product_id', po.product_id,
+					'product_name', po.product_name,
+					'qty', po.qty,
+					'status', po.status,
+					'created_at', po.created_at,
+					'updated_at', po.updated_at,
+					'productions', (
+						SELECT 
+							COALESCE(
+							JSON_ARRAYAGG(
+								JSON_OBJECT(
+								'id', p.id,
+								'product_id', p.product_id,
+								'product_name', p.product_name,
+								'qty', p.qty,
+								'created_at', p.created_at,
+								'updated_at', p.updated_at
+								)
+							),
+							JSON_ARRAY()
+							)
+						FROM productions AS p
+						WHERE p.production_order_id = po.id
+					)
+				), 
+				JSON_OBJECT()
+			)
+		INTO v_object_json
+		FROM internal_product_production_orders AS ippo
+		JOIN production_orders AS po
+			ON po.order_id  = ippo.id
+			AND po.order_type = in_order_type
+		WHERE ippo.id = in_order_id;
+
+	ELSE
+
+		SELECT 
+			COALESCE(
+				JSON_OBJECT(
+					'id', po.id,
+					'order_type', po.order_type,
+					'order_id', po.order_id,
+					'product_id', po.product_id,
+					'product_name', po.product_name,
+					'qty', po.qty,
+					'status', po.status,
+					'created_at', po.created_at,
+					'updated_at', po.updated_at,
+					'productions', (
+						SELECT 
+							COALESCE(
+							JSON_ARRAYAGG(
+								JSON_OBJECT(
+								'id', p.id,
+								'product_id', p.product_id,
+								'product_name', p.product_name,
+								'qty', p.qty,
+								'created_at', p.created_at,
+								'updated_at', p.updated_at
+								)
+							),
+							JSON_ARRAY()
+							)
+						FROM productions AS p
+						WHERE p.production_order_id = po.id
+					)
+				), 
+				JSON_OBJECT()
+			)
+		INTO v_object_json
+		FROM purchased_orders_products AS pop
+		JOIN production_orders AS po
+			ON po.order_id = pop.id
+			AND po.order_type = in_order_type
+		WHERE pop.id = in_order_id;
+
+	END IF;
+
+	RETURN v_object_json;
+		
+END //
+DELIMITER ;
+
 
 
 

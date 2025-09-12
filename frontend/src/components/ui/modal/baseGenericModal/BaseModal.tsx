@@ -1,8 +1,5 @@
 import type {
-    SetStateAction,
-    Dispatch,
     ReactNode,
-    MouseEvent,
 } from "react";
 import {
     X
@@ -12,11 +9,11 @@ import stylesModules
 import { createPortal } from "react-dom";
 
 interface IBaseModalProps<T> {
-    onClose: (e: MouseEvent<HTMLButtonElement>) => void;
+    onClose: () => void;
     children?: ((args?: T) => ReactNode) | ReactNode;
     childrenProps?: T
-    className: string
-    classNameCustomContainer: string
+    className?: string
+    classNameCustomContainer?: string
 }
 
 const BaseModal = <T,>(
@@ -24,8 +21,8 @@ const BaseModal = <T,>(
         onClose,
         children = () => null,
         childrenProps,
-        className,
-        classNameCustomContainer
+        className="",
+        classNameCustomContainer=""
     }: IBaseModalProps<T>
 ) => {
 
@@ -35,6 +32,7 @@ const BaseModal = <T,>(
                 <button
                     className={stylesModules.closeButton}
                     onClick={onClose}
+                    type="button"
                 >
                     <X className={stylesModules.icon} />
                 </button>

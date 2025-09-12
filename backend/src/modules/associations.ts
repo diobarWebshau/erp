@@ -527,14 +527,14 @@ product
 ProductModel.hasMany(
     InternalProductProductionOrderModel, {
     foreignKey: "product_id",
-    as: "product",
+    as: "internal_order",
 });
 
 InternalProductProductionOrderModel.belongsTo(
     ProductModel,
     {
         foreignKey: "product_id",
-        as: "internal_order",
+        as: "product",
         onDelete: "SET NULL"
     }
 );

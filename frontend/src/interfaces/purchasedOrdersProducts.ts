@@ -22,6 +22,7 @@ import type {
 import type {
     IPartialPurchasedOrderProductLocationProductionLine
 } from "./popProductionLines";
+import type { IPartialProductionOrder, IProductionOrder } from "./productionOrder";
 
 interface IProductionSummary {
     production_qty: number;
@@ -70,6 +71,7 @@ interface IPurchasedOrderProduct {
     production_summary?: IProductionSummary,
     stock_available?: IStockAvailable,
     shipping_summary?: IShippingSummary,
+    production_order?: IPartialProductionOrder,
 }
 
 interface IPurchasedOrderProductManager {

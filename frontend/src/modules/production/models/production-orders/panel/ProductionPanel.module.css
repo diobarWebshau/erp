@@ -1,407 +1,751 @@
 .containerProductionPanel {
-    /* posicionamiento */
-    position: absolute;
-    z-index: 1000;
+  /* posicionamiento */
+  position: absolute;
+  z-index: 1000;
 
-    /* dimension */
-    width: 100%;
-    height: 100%;
+  /* dimension */
+  width: 100%;
+  height: 100%;
 
-    /* distribucion grid */
-    display: grid;
-    grid-template:
-        "header" auto
-        "main" 1fr /
-        100%;
+  /* distribucion grid */
+  display: grid;
+  grid-template:
+    "header" auto
+    "main" 1fr / 100%;
 
-    /* estilos */
-    background-color: var(--color-theme-font-white);
+  /* estilos */
+  background-color: var(--color-theme-font-white);
 }
-
-
 
 /* *************** Header *************** */
 
 .headerSection {
-    /* distribucion con respecto al padre grid */
-    grid-area: header;
+  grid-area: header;
 
-    /* distribucion flex */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: start;
-
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
 }
 
 .headerSection>h1 {
-    /* estilos */
-    font-family: inherit;
-    font-size: 36px;
-    color: var(--color-theme-primary);
+  font-family: inherit;
+  font-size: 36px;
+  color: var(--color-theme-primary);
 }
 
 /* *************** Main *************** */
 
 .mainSection {
-    /* dimension */
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
 
+  grid-area: main;
 
-    /* distribucion con respecto al padre grid */
-    grid-area: main;
+  display: grid;
+  grid-template:
+    "panels" auto
+    "data" 1fr / 100%;
+  gap: 1rem;
 
-    /* distribucion flex */
-    display: grid;
-    grid-template:
-        "panels" auto
-        "data" 1fr / 100%;
-    gap: 1rem;
-
+  /* CLAVE para que la pista 1fr sea colapsable */
+  min-height: 0;
 }
-
 
 /* *************** Panel *************** */
 
 .panelSection {
-    /* distribucion con respecto al padre grid */
-    grid-area: panels;
+  grid-area: panels;
+  max-height: 100%;
 
-    display: flex;
-    flex-direction: row;
-    justify-content: start;
-    flex-wrap: wrap;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .panelSection>* {
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
 }
 
-
 .tabPanelSection {
-    height: 33px;
+  height: 33px;
 
-    background: transparent;
-    color: var(--color-theme-neutral-primary);
+  background: transparent;
+  color: var(--color-theme-neutral-primary);
 
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    border-radius: 15px;
-    border: 1px solid var(--color-theme-border-table);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  border: 1px solid var(--color-theme-border-table);
 }
 
 .tabPanelSection:hover:not(.tabPanelSectionSelected) {
-    cursor: pointer;
-    background-color: var(--color-theme-neutral-background);
-    color: var(--color-theme-neutral-primary);
+  cursor: pointer;
+  background-color: var(--color-theme-neutral-background);
+  color: var(--color-theme-neutral-primary);
 }
 
 .tabPanelSectionSelected {
-    background-color: var(--color-theme-primary-light);
-    color: var(--color-theme-font-white);
-    border-radius: 15px;
+  background-color: var(--color-theme-primary-light);
+  color: var(--color-theme-font-white);
+  border-radius: 15px;
 }
-
 
 /* *************** Data *************** */
 
 .dataSection {
-    /* distribucion con respecto al padre grid */
-    grid-area: data;
+  grid-area: data;
 
-    /* distribucion grid */
-    /* distribucion grid */
-    display: grid;
-    grid-template:
-        "aside content" 100%
-        / max-content 1fr;
-    gap: 0.5rem;
+  display: grid;
+  grid-template:
+    "aside content" 100% / max-content 1fr;
+  gap: 0.5rem;
 
-    /* estilos */
-    background-color: var(--color-theme-background);
-    border-radius: 15px;
-    padding: 2rem;
+  background-color: var(--color-theme-background);
+  border-radius: 15px;
+  padding: 2rem;
 
+  /* CLAVE: permitir colapso vertical hacia los hijos */
+  min-height: 0;
 }
 
 /* ? *************** Aside *************** */
 
 .asideSection {
-    grid-area: aside;
+  grid-area: aside;
 
-    /* distribucion grid */
-    display: grid;
-    grid-template:
-        "asideContent toggle" 100%
-        / max-content 45px;
-    gap: 0.5rem;
+  display: grid;
+  grid-template:
+    "asideContent toggle" 100% / max-content 45px;
+  gap: 0.5rem;
 
-    /* distribucion box */
-    border-bottom-left-radius: 15px;
-    border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-top-left-radius: 15px;
 
+  /* Importante para que no bloquee el colapso */
+  min-height: 0;
 }
 
 .asideSectionExpand {
-
-    /* distribucion grid */
-    grid-template-columns: max-content 45px;
-
-    /* estilos */
-    background-color: var(--color-theme-background);
+  grid-template-columns: max-content 45px;
+  background-color: var(--color-theme-background);
 }
 
 .asideSectionCollapse {
-
-    /* distribucion grid */
-    grid-template-columns: 0px 45px;
-
-    /* estilos */
-    background-color: var(--color-theme-secondary-light);
-
-    gap: 0;
+  grid-template-columns: 0px 45px;
+  background-color: var(--color-theme-secondary-light);
+  gap: 0;
 }
 
-
-
 .asideSectionExpand .asideContent {
-    visibility: visible;
+  visibility: visible;
 }
 
 .asideSectionExpand .asideContentCollapse {
-    display: none;
-    visibility: hidden;
+  display: none;
+  visibility: hidden;
 }
-
 
 /* ? *************** Aside Content *************** */
 
 .asideContent {
+  grid-area: asideContent;
 
-    /* distribucion grid dentro del padre*/
-    grid-area: asideContent;
-
-    /* distribucion grid */
-    display: grid;
-    grid-template:
-        "title" max-content
-        "data" max-content / 100%;
-    gap: 0.5rem;
+  display: grid;
+  grid-template:
+    "title" max-content
+    "data" max-content / 100%;
+  gap: 0.5rem;
 }
 
 .asideContentExpand {
-    visibility: visible;
+  visibility: visible;
 }
 
 .asideContentCollapse {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .asideContent>h3 {
-    /* distribucion grid dentro del padre*/
-    grid-area: title;
+  grid-area: title;
 }
 
 .asideContentItems {
+  grid-area: data;
 
-    /* distribucion grid dentro del padre*/
-    grid-area: data;
+  display: flex;
+  flex-direction: column;
 
-    /* distribucion flex */
-    display: flex;
-    flex-direction: column;
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
 
-    /* distribucion box */
-    border-top-right-radius: 15px;
-    border-top-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-    border-bottom-left-radius: 15px;
-
-    /* estilos */
-    background-color: var(--color-theme-font-white);
+  background-color: var(--color-theme-font-white);
 }
 
 .asideContentItems>* {
-    /* dimension */
-    height: 44px;
+  height: 44px;
 
-    /* distribucion flex */
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 
-    /* distribucion box */
-    padding-left: 0.5rem;
-    border: 1px solid var(--color-theme-border-table);
-    font-size: 14px;
-
+  padding-left: 0.5rem;
+  border: 1px solid var(--color-theme-border-table);
+  font-size: 14px;
 }
 
 .asideContentItems>*:first-child {
+  justify-content: start;
+  align-items: center;
 
-    /* distribucion flex */
-    justify-content: start;
-    align-items: center;
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
 
-    /* distribucion box */
-    border-top-right-radius: 15px;
-    border-top-left-radius: 15px;
-
-    /* estilos */
-    background-color: var(--color-theme-primary-light);
-    color: var(--color-theme-font-white);
-
+  background-color: var(--color-theme-primary-light);
+  color: var(--color-theme-font-white);
 }
 
 .asideContentItems>*:last-child {
-    /* distribucion box */
-    border-bottom-right-radius: 15px;
-    border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
 }
 
 .asideContentItems>*:last-child>span {
-    /* distribucion flex */
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .asideContentItem {
-    /* dimension */
-    width: 100%;
-
-    /* distribucion flex */
-    align-items: center;
-    gap: 0.5rem;
-
-    /* distribucion border */
-    padding: 0.5rem;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
 }
 
 .asideContentIcon {
-    color: var(--color-theme-primary);
-    width: 15px;
-    height: 15px;
+  color: var(--color-theme-primary);
+  width: 15px;
+  height: 15px;
 }
 
 /* ? *************** Aside Toggle *************** */
 
 .asideToggle {
-    /* distribucion con respecto al padre grid */
-    grid-area: toggle;
+  grid-area: toggle;
 
-    /* distribucion flex */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
 
 .asideToggleIcon {
-    width: 30px;
-    height: 30px;
-    color: var(--color-theme-primary);
+  width: 30px;
+  height: 30px;
+  color: var(--color-theme-primary);
 }
 
 /* ? *************** Content *************** */
 
 .contentSection {
-    /* distribucion con respecto al padre grid */
-    grid-area: content;
+  grid-area: content;
 
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
-    /* para que el scroll no se propague al padre */
-    overflow: hidden;
+  /* para que el scroll no se propague al padre */
+  overflow: hidden;
 
+  /* CLAVE: dejar colapsar a su hijo scrollable */
+  min-height: 0;
 }
 
 .contentSection>* {
-    min-width: 100%;
+  min-width: 100%;
 }
 
 .contentSection .headerH3 {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: auto;
-
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
 }
 
 .contentContent {
+  /* que ocupe el resto vertical disponible */
+  flex: 1 1 auto;
 
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 0;
+  /* distribucion */
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: start;
+  gap: 0.5rem;
 
-    /* distribucion flex */
-    display: flex;
-    flex-direction: row;
-    justify-content: start;
-    align-items: start;
-    gap: 0.5rem;
+  /* scroll horizontal para columnas de líneas */
+  overflow-y: hidden;
+  overflow-x: auto;
 
-    /* estilos */
-    overflow-x: auto;
+  /* CLAVE: permitir que las columnas internas colapsen */
+  min-height: 0;
+  max-width: 100%;
 }
 
-.productionLineContent {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: start;
-    gap: 0.5rem;
+/* ? *************** Contenedor de Linea de producción *************** */
 
-    /* estilos */
-    border-radius: 15px;
-    border: 1px solid var(--color-theme-border-table);
+.productionLineContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  gap: 0.5rem;
+
+  border-radius: 15px;
+  border: 1px solid var(--color-theme-border-table);
+
+  /* CLAVE: esta columna toma la altura disponible de su carril */
+  height: 100%;
+  min-height: 0;
+  /* permite que su hijo scrollable colapse */
 }
 
 .productionLineItemName {
-    display: flex;
-    flex-direction: row;
-    justify-content: start;
-    align-items: center;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+  height: 44px;
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
 
-    background-color: var(--color-theme-primary-light);
-    color: var(--color-theme-font-white);
+  background-color: var(--color-theme-primary-light);
+  color: var(--color-theme-font-white);
+  padding-left: 0.5rem;
+
+  /* header fijo */
+  flex: 0 0 auto;
 }
 
 .productionLineItemIcon {
-    width: 15px;
-    height: 15px;
-    color: var(--color-theme-font-white);
+  width: 15px;
+  height: 15px;
+  color: var(--color-theme-font-white);
 }
 
-.productionOrderContent{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: start;
-    gap: 0.5rem;
+.popoverFloating {
+  background-color: var(--color-theme-background);
+  border: 1px solid var(--color-theme-border-table);
+  border-radius: 15px;
+  padding: 0.5rem;
 }
 
-.productionOrderItem{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: start;
-    gap: 0.5rem;
+.popoverFloatingContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+
+  background-color: var(--color-theme-font-white);
+  border: 1px solid var(--color-theme-border-table);
+  border-radius: 15px;
+
+}
+
+.popoverFloatingContent>*:first-child{
+  background-color: var(--color-theme-primary-light);
+  color: var(--color-theme-font-white);
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+}
+
+.popoverFloatingContent>*:first-child .popoverFloatingIcon{
+  color: var(--color-theme-font-white);
+}
+
+.popoverFloatingContent>*:last-child{
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.popoverFloatingContent> * > p {
+  font-size: 12px;
+} 
+
+.popoverFloatingContent>* {
+  height: 44px;
+  width: 100%;
+  
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+
+  padding-left: 0.5rem;
+  border: 1px solid var(--color-theme-border-table);
+  font-size: 14px;
+  gap: 0.5rem;
+}
+
+.popoverFloatingIcon{
+  width: 15px;
+  height: 15px;
+  color: var(--color-theme-primary);
+}
+
+.productionLineContent>* {
+  width: 310px;
+}
+
+/* ? *************** Contenedor de Orden de producción *************** */
+
+.productionOrderContent {
+  display: flex;
+  flex-direction: column;
+
+  /* 👇 claves para el scroll */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* ✅ al inicio, no centrado */
+  justify-content: flex-start;
+  /* antes: center */
+  align-items: stretch;
+  /* opcional: asegura ancho completo */
+
+  /* (lo que ya tenías) */
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: var(--color-theme-font-white);
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+
+.productionOrderContent>* {
+  width: 100%;
+  border-radius: 15px;
+  border: 1px solid var(--color-theme-border-table);
+  padding-inline: 0.5rem;
+}
+
+.productionOrderItemTag {
+  border-radius: 15px;
+  padding-inline: 0.5rem;
+  font-size: 14px;
+}
+
+.productionOrderContent>*:first-child .productionOrderItemTitle .productionOrderItemIcon {
+  color: var(--color-success);
+}
+
+.productionOrderContent>*:first-child .productionOrderItemTitle .productionOrderItemTag {
+  background-color: var(--color-success);
+  color: var(--color-theme-font-white);
+}
+
+.productionOrderContent>*:not(:first-child) .productionOrderItemTitle .productionOrderItemIcon {
+  color: var(--color-theme-primary-light);
+}
+
+.productionOrderContent>*:not(:first-child) .productionOrderItemTitle .productionOrderItemTag {
+  background-color: var(--color-theme-primary-light);
+  color: var(--color-theme-font-white);
+}
+
+/* ? *************** Item de Orden de producción *************** */
+
+.productionOrderDescriptionContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.productionOrderItemIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-theme-primary);
+}
+
+.productionOrderDescriptionContainer button {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+  height: 100%;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+}
+
+.productionOrderDescriptionContainer button:focus {
+  outline: none;
+}
+
+.productionOrderItemDescription {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+
+}
+
+.productionOrderItemDescription dl {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 12px;
+}
+
+
+.productionOrderItemDescription dl dt {
+  color: var(--color-theme-primary);
+}
+
+
+.productionOrderItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.productionOrderItemTitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.productionOrderItemProcess {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+}
+
+.productionOrderItemProcess span {
+  font-size: 12px;
+}
+
+.productionOrderItemProcessList {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+}
+
+.containerProgressQtyProduction {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.containerProgressIsNotCompleted {
+  /* dimension */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0.2rem;
+  font-size: 12px;
+}
+
+.containerProgress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.progressBar {
+  width: 100%;
+  height: 40%;
+  background-color: var(--color-theme-neutral-background);
+}
+
+.labelProgressBar {
+  color: var(--color-theme-primary);
+}
+
+.sectionProgressBar {
+  background-color: var(--color-theme-primary);
+}
+
+.containerProgressText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.completedProgressTag {
+  /* dimension */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.2rem;
+
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+
+  /* dimension */
+  width: 120px;
+  height: 30px;
+
+  border-radius: 10px;
+  border: 1px solid var(--color-success);
 }
 
 
 /* ? *************** Content Header *************** */
 
 .headerH3 {
-    font-size: 20px;
-    color: var(--color-theme-primary);
+  font-size: 20px;
+  color: var(--color-theme-primary);
 }
+
+.root {
+  background-color: var(--mantine-color-gray-1);
+  /* 👇 fuerza la separación visible entre secciones */
+  display: flex;
+  gap: 0.1rem;
+  height: 6px;
+}
+
+/* forma de píldora en cada segmento */
+.section {
+  border-radius: 9999px;
+}
+
+.containerProgressMain {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.containerProgressTextMain {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* ? *************** Scroll  *************** */
+
+/*
+Selecciona el scrollbar en sí (el carril que aparece al hacer overflow). 
+width: define el grosor del scrollbar vertical. 
+height: define el grosor del scrollbar horizontal.
+*/
+.contentContent::-webkit-scrollbar,
+.productionLineContent::-webkit-scrollbar {
+  width: 8px;
+  /* para scroll vertical */
+  height: 8px;
+  /* para scroll horizontal */
+}
+
+/* 
+Define el fondo o carril del scrollbar. background: transparent lo hace invisible,
+para que solo el pulgar (thumb) sea visible.
+*/
+.contentContent::-webkit-scrollbar-track,
+.productionLineContent::-webkit-scrollbar-track {
+  /* estilos */
+  background: transparent;
+}
+
+/* es el "pulgar" del scrollbar — la parte que arrastras. */
+.contentContent::-webkit-scrollbar-thumb,
+.productionLineContent::-webkit-scrollbar-thumb {
+  /* distribucion box */
+  border-radius: 15px;
+  /* estilos */
+  background-color: var(--color-theme-primary);
+}
+
+/*
+Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) son para Chrome, Safari, Edge.
+  scrollbar-width: thin:
+      Controla el grosor del scrollbar.
+      Opciones: auto (normal), thin (más delgado), none (oculto).
+  scrollbar-color: <thumb> <track>:
+      #423DD9: color del pulgar (thumb).
+      transparent: fondo del carril (track).
+*/
+.contentContent,
+.productionLineContent {
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: var(--color-theme-primary) transparent;
+  /* Firefox */
+}
+
+.modalOrderView{
+  width: 750px;
+  padding: 1rem;
+}
+
+.modalOrderViewHeader{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.modalOrderViewHeader>h3{
+  font-size: 20px;
+  color: var(--color-theme-primary);
+}
+
+.modalOrderViewHeader>dl{
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modalOrderViewHeader>dl>dt{
+  font-size: 14px;
+  color: var(--color-theme-primary);
+}
+
+.modalOrderViewHeader>dl>dd{
+  font-size: 14px;
+  color: var(--color-theme-font-black);
+}
+

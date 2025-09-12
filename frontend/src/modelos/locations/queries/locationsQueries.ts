@@ -1,3 +1,4 @@
+import async from "react-select/async";
 import type { IInventoryInput } from "../../../interfaces/inventoryInputs";
 import type {
     IPartialLocation,
@@ -50,6 +51,40 @@ const fetchLocationsFromDB = async (
         throw error;
     }
 };
+
+const getLocationWithAllInformation = async (
+    id: number,
+    dispatch: AppDispatchRedux
+): Promise<ILocation | null> => {
+    try {
+        const response = await fetch(`${API_URL}/with-all-information/${id}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(
+                    `${errorText}`
+                );
+            }
+            dispatch(
+                setError({
+                    key: "getLocationWithAllInformation",
+                    message: errorText
+                })
+            );
+            return null;
+        }
+        dispatch(
+            clearError("getLocationWithAllInformation")
+        );
+        const data: ILocation = await response.json();
+        return data;
+    } catch (error: unknown) {
+        throw error;
+    }
+}
 
 const fetchLocationsWithTypesFromDB = async (
     dispatch: AppDispatchRedux
@@ -426,5 +461,6 @@ export {
     fetchLocationsWithTypesFromDB,
     getLocationsProducedOneProduct,
     getInventoryInputsOfProductInOneLocation,
-    getProductionLinesForProductAtLocation
+    getProductionLinesForProductAtLocation,
+    getLocationWithAllInformation
 };

@@ -2,6 +2,7 @@ import { DataTypes, Model, Optional }
     from "sequelize";
 import sequelize
     from "../../../../../mysql/configSequelize.js";
+import { ProductionOrderCreationAttributes } from "../references/ProductionOrders.model.js";
 
 interface InternalProductProductionOrderAttributes {
     id: number,
@@ -13,6 +14,7 @@ interface InternalProductProductionOrderAttributes {
     status: string,
     created_at: Date,
     updated_at: Date
+    production_order?: ProductionOrderCreationAttributes
 }
 
 // interface OrderProductBase {

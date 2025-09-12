@@ -7,7 +7,8 @@ import {
     AppliedProductDiscountRangeCreateAttributes,
     PurchasedOrderCreateAttributes,
     PurchasedOrdersProductsLocationsProductionLinesCreateAttributes,
-    ShippingOrderPurchaseOrderProductCreateAttributes
+    ShippingOrderPurchaseOrderProductCreateAttributes,
+    ProductionOrderCreationAttributes
 } from "../../../../../modules/types.js";
 
 interface ProductionSummary {
@@ -51,7 +52,8 @@ interface PurchaseOrderProductAttributes {
     applied_product_discount_client?: AppliedProductDiscountClientCreateAttributes,
     applied_product_discount_range?: AppliedProductDiscountRangeCreateAttributes,
     stock_available?: StockAvailable,
-    shipping_summary?: ShippingSummary
+    shipping_summary?: ShippingSummary,
+    production_order?: ProductionOrderCreationAttributes
 }
 
 interface PurchasedOrderProductManager {

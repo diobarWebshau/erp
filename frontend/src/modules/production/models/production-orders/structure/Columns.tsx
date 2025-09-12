@@ -1,5 +1,6 @@
 import type {
-    ColumnDef
+    ColumnDef,
+    Row
 } from "@tanstack/react-table";
 import type {
     IProductionOrder
@@ -8,7 +9,7 @@ import stylesModules from "./columns.module.css";
 import { Progress } from "@mantine/core";
 
 interface IColumnsProductionOrdersProps {
-    onClickContent  : (e: React.MouseEvent) => void;
+    onClickContent  : (e: React.MouseEvent, row: Row<IProductionOrder>) => void;
 }
 
 
@@ -43,7 +44,7 @@ const columnsProductionOrders = ({
                 const locationName = row.original.extra_data?.location.name;
                 return <div
                     className={stylesModules.containerTextDecoration}
-                    onClick={(e) => onClickContent(e)}
+                    onClick={(e) => onClickContent(e, row)}
                 >
                     {locationName}
                 </div>; 
@@ -70,7 +71,7 @@ const columnsProductionOrders = ({
                                 : stylesModules.containerProductionLineInactive}
                             `
                         }
-                        onClick={(e) => onClickContent(e)}
+                        onClick={(e) => onClickContent(e, row)}
                     >
                         {productionLineName}
                     </div>

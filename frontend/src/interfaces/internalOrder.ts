@@ -1,3 +1,5 @@
+import type { IPartialProductionOrder } from "./productionOrder";
+
 interface IInternalProductProductionOrder {
     id: number;
     product_id: number | null;
@@ -8,6 +10,7 @@ interface IInternalProductProductionOrder {
     location_name: string;
     created_at: string;
     updated_at: string;
+    production_order?: IPartialProductionOrder;
 }
 
 type IPartialInternalProductProductionOrder =

@@ -29,7 +29,6 @@ const useProductionOrderById = (
                         dispatch
                     );
 
-                console.log(`data`, data);
                 setProductionOrderById(data ? { ...data } : null);
             } else {
                 setProductionOrderById(null);

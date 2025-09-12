@@ -489,10 +489,12 @@ CREATE TABLE productions(
     product_id INT,
     product_name VARCHAR(100),
     qty DECIMAL(14, 4) NOT NULL,
+    process_id INT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
-    FOREIGN KEY(production_order_id) REFERENCES production_orders(id) ON DELETE CASCADE
+    FOREIGN KEY(production_order_id) REFERENCES production_orders(id) ON DELETE CASCADE,
+    FOREIGN KEY(process_id) REFERENCES processes(id) ON DELETE SET NULL
 );
 CREATE TABLE inventory_movements (
     -- fields
@@ -554,6 +556,23 @@ CREATE TABLE scrap (
     -- FKs reales solo donde tiene sentido:
     FOREIGN KEY(location_id) REFERENCES locations(id) ON DELETE SET NULL,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE production_line_queue (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    production_line_id INT NOT NULL,
+    production_order_id INT NOT NULL,         -- SIEMPRE apunta a production_orders.id
+    position DECIMAL(10,4) NOT NULL,          -- 10, 20, 30... para insertar entremedias
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uq_line_pos   (production_line_id, position),
+    UNIQUE KEY uq_line_order (production_line_id, production_order_id),
+
+    KEY ix_line     (production_line_id),
+    KEY ix_line_pos (production_line_id, position),
+
+    FOREIGN KEY (production_line_id) REFERENCES production_lines(id) ON DELETE CASCADE,
+    FOREIGN KEY (production_order_id) REFERENCES production_orders(id) ON DELETE CASCADE
 );
 
 /* EMPLEADO PARA PRUEBAS IGNORAR */

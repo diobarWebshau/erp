@@ -1,3 +1,4 @@
+import type { ILocationProductionLine } from "./locationsProductionLines";
 import type {
   ILocationType
 } from "./locationTypes";
@@ -10,6 +11,7 @@ interface ILocation {
   is_active: boolean,
   created_at: string,
   updated_at: string
+  locations_production_lines?: ILocationProductionLine[]
 }
 
 type IPartialLocation = Partial<ILocation>;

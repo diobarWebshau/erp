@@ -6,6 +6,7 @@ import type {
     IPartialProductionLineProduct,
     IProductionLineProductManager
 } from "./productionLinesProducts";
+import type { IPartialProductionOrder } from "./productionOrder";
 
 interface IProductionLine {
     id: number,
@@ -16,6 +17,7 @@ interface IProductionLine {
     location_production_line?: IPartialLocationProductionLine,
     production_lines_products?: IPartialProductionLineProduct[],
     production_lines_products_updated?: IProductionLineProductManager,
+    production_order?: IPartialProductionOrder[],
 }
 
 type IPartialProductionLine =
