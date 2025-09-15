@@ -233,21 +233,21 @@ BEGIN
 END //
 DELIMITER ;
 
-DROP TRIGGER IF EXISTS trigger_after_delete_production_orders;
-DELIMITER //
-CREATE TRIGGER trigger_after_delete_production_orders
-BEFORE DELETE ON production_orders
-FOR EACH ROW
-BEGIN
-	CALL sp_delete_production_order(
-		OLD.id,
-		OLD.order_id,
-		OLD.order_type,
-		OLD.product_id,
-		OLD.product_name
-	);
-END //
-DELIMITER ;
+-- DROP TRIGGER IF EXISTS trigger_after_delete_production_orders;
+-- DELIMITER //
+-- CREATE TRIGGER trigger_after_delete_production_orders
+-- BEFORE DELETE ON production_orders
+-- FOR EACH ROW
+-- BEGIN
+-- 	CALL sp_delete_production_order(
+-- 		OLD.id,
+-- 		OLD.order_id,
+-- 		OLD.order_type,
+-- 		OLD.product_id,
+-- 		OLD.product_name
+-- 	);
+-- END //
+-- DELIMITER ;
 
 /****************************************
 *		   TABLE productions			*

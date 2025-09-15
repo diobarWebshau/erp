@@ -2122,7 +2122,7 @@ INSERT INTO productions (
     1,           -- production_order_id
     1,           -- product_id
     'Producto A',-- product_name
-    50,          -- qty
+    5,          -- qty
     3            -- process_id
 );
 

@@ -645,10 +645,10 @@ BEGIN
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    -- Log: muestra los valores que va a procesar
-    INSERT INTO debug_log (message)
-    SELECT CONCAT('JSON IN:', value)
-    FROM JSON_TABLE(pop_ids_json, '$[*]' COLUMNS (value JSON PATH '$')) AS jt;
+    -- -- Log: muestra los valores que va a procesar
+    -- INSERT INTO debug_log (message)
+    -- SELECT CONCAT('JSON IN:', value)
+    -- FROM JSON_TABLE(pop_ids_json, '$[*]' COLUMNS (value JSON PATH '$')) AS jt;
 
     OPEN cur;
 
@@ -658,8 +658,8 @@ BEGIN
             LEAVE read_loop;
         END IF;
 
-        SET @msg = CONCAT('pop', v_pop_id);
-        INSERT INTO debug_log (message) VALUES (@msg);
+        -- SET @msg = CONCAT('pop', v_pop_id);
+        -- INSERT INTO debug_log (message) VALUES (@msg);
         CALL process_purchased_order_product_single(v_pop_id);
 
     END LOOP;
@@ -1368,6 +1368,9 @@ BEGIN
 END //
 DELIMITER ;
 
+
+
+DROP PROCEDURE IF EXISTS handle_production_order_after_insert;
 DELIMITER //
 CREATE PROCEDURE handle_production_order_after_insert(
     IN in_id BIGINT,
@@ -1382,6 +1385,10 @@ BEGIN
     DECLARE v_location_name VARCHAR(100) DEFAULT '';
 
     IF in_order_type = 'client' THEN
+
+        INSERT INTO debug_log (message)
+        VALUES (CONCAT('Client Order ID: ', in_order_id));
+
         -- OBTENER LOCATION PARA CLIENT ORDER
         SELECT
             l.id, l.name
@@ -1398,6 +1405,9 @@ BEGIN
             ON l.id = lpl.location_id
         WHERE pop.id = in_order_id
         LIMIT 1;
+
+        INSERT INTO debug_log (message)
+        VALUES (CONCAT('Location ID: ', v_location_id, ', Location Name: ', v_location_name));
 
         -- INSERTAR MOVIMIENTO DE INVENTARIO
         INSERT INTO inventory_movements (
@@ -1425,6 +1435,11 @@ BEGIN
 
     ELSE
         -- OBTENER LOCATION PARA INTERNAL ORDER
+
+
+        INSERT INTO debug_log (message)
+        VALUES (CONCAT('Internal Order ID: ', in_order_id));
+
         SELECT
             l.id, l.name
         INTO
@@ -1441,18 +1456,21 @@ BEGIN
         WHERE ippo.id = in_order_id
         LIMIT 1;
 
+        INSERT INTO debug_log (message)
+        VALUES (CONCAT('Location ID: ', v_location_id, ', Location Name: ', v_location_name));
+
         -- INSERTAR MOVIMIENTO DE INVENTARIO
-        INSERT INTO inventory_movements (
-            location_id, location_name, 
-            item_type, item_id, item_name,
-            qty, movement_type, reference_id, reference_type,
-            description, is_locked
-        ) VALUES (
-            v_location_id, v_location_name,
-            'product', in_product_id, in_product_name,
-            in_qty, 'allocate', in_id, 'Internal Production Order',
-            'Production Allocation', 1
-        );
+        -- INSERT INTO inventory_movements (
+        --     location_id, location_name, 
+        --     item_type, item_id, item_name,
+        --     qty, movement_type, reference_id, reference_type,
+        --     description, is_locked
+        -- ) VALUES (
+        --     v_location_id, v_location_name,
+        --     'product', in_product_id, in_product_name,
+        --     in_qty, 'allocate', in_id, 'Internal Production Order',
+        --     'InternalProduction Allocation', 1
+        -- );
   
         -- LLAMAR A PROCEDIMIENTO DE INSUMOS
         CALL movements_inputs_production(

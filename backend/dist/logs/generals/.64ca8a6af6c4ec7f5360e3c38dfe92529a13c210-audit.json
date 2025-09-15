@@ -6,26 +6,6 @@
     "auditLog": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\.64ca8a6af6c4ec7f5360e3c38dfe92529a13c210-audit.json",
     "files": [
         {
-            "date": 1756222937128,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-08-26.log",
-            "hash": "8d5233fafcecfaac7dcb2d7691d1251e91297a95dcc2cc86d550767ae245bdff"
-        },
-        {
-            "date": 1756308430794,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-08-27.log",
-            "hash": "e20a68473b0dbc2fee35c3aed66200ed1cea3457def2326e3a638ec687e48a7f"
-        },
-        {
-            "date": 1756394729123,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-08-28.log",
-            "hash": "79d74fc2acf3dd6bec5d4377f65d7d7747e2e559676ac64beb3abfc14dcac264"
-        },
-        {
-            "date": 1756480542673,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-08-29.log",
-            "hash": "3a65123cdf650519abbaab0c2c8706acdf1e3c9e4014fe15fa658a8f15f9f269"
-        },
-        {
             "date": 1756826815256,
             "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-02.log",
             "hash": "ae20fc3876c1397387eb35cb3a7225ac08c33815a72d70dc07e8029872e889e3"
@@ -44,6 +24,11 @@
             "date": 1757431210419,
             "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-09.log",
             "hash": "bce3297badbd336f9d9cb461dc4ccfb35f9231c02854250ad1602bad1ae1ff6d"
+        },
+        {
+            "date": 1757949175402,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-15.log",
+            "hash": "419b3b6c9ea5f076f4f81ce0a718d0925d94c68381762460ff6b4b61f43d770b"
         }
     ],
     "hashType": "sha256"

@@ -6,26 +6,6 @@
     "auditLog": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\.5b48b145f4e12972c31cb0b74565f722d31b91ba-audit.json",
     "files": [
         {
-            "date": 1756222937135,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-08-26.log",
-            "hash": "845ffb157341dcd9769ed12b4b898e6e9bdf5fccb8a57e4e07317b8e61f51190"
-        },
-        {
-            "date": 1756308430801,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-08-27.log",
-            "hash": "55ba76e486d2182277aca42598300c7cc551483a6428be5755d40901c0060774"
-        },
-        {
-            "date": 1756394729131,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-08-28.log",
-            "hash": "d9522f42a4688817af9b87e2eb28ff3af6bb9d8eed5e68a9204a1e1bd14bf003"
-        },
-        {
-            "date": 1756480542680,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-08-29.log",
-            "hash": "bfaf5e9693f899017b9a563a6c129bd0ce94db575c272601db4164135e01159d"
-        },
-        {
             "date": 1756826815264,
             "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-02.log",
             "hash": "3bb716ca3eac7ef475642b1418d41c70b8db6dbf59cbf1315625b9310fd8a8b5"
@@ -44,6 +24,11 @@
             "date": 1757431210426,
             "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-09.log",
             "hash": "3bd212d6346ffbcc63cf71d7109dedae43fe57319a9f5f0c0a22677446afb089"
+        },
+        {
+            "date": 1757949175412,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-15.log",
+            "hash": "71369143fdfd775cc4b40bbffc8f30afece054b5baa2ac6813681326100806bc"
         }
     ],
     "hashType": "sha256"

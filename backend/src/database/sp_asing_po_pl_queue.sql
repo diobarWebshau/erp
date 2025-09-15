@@ -28,14 +28,12 @@ BEGIN
         LIMIT 1;
     END IF;
 
-    SET @msg = CONCAT('production_line_id: ', v_production_line_id);
-    INSERT INTO debug_log (message) VALUES (@msg);
+    -- SET @msg = CONCAT('production_line_id: ', v_production_line_id);
+    -- INSERT INTO debug_log (message) VALUES (@msg);
 
     -- Insertar en la cola
     IF v_production_line_id > 0 THEN
     
-    
-
         -- Bloquear posiciones de esa línea
         SELECT IFNULL(MAX(position), 0)
         INTO v_last_position

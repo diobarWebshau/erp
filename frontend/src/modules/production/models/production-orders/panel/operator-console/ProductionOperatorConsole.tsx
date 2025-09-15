@@ -4,7 +4,7 @@ import TransparentButtonCustom from "../../../../../../components/ui/table/compo
 import StyleModule from "./ProductionOperatorConsole.module.css"
 import myImage from '../../../../../../assets/user.png';
 import FadeButton from "../../../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
-import { useState, type CSSProperties, type MouseEvent } from "react";
+import { memo, useState, type CSSProperties, type MouseEvent } from "react";
 import type { IProductionOrder } from "../../../../../../interfaces/productionOrder";
 import type { IPurchasedOrderProduct } from "../../../../../../interfaces/purchasedOrdersProducts";
 import type { IInternalProductProductionOrder } from "../../../../../../interfaces/internalOrder";
@@ -21,13 +21,12 @@ const ProductionOperatorConsole = ({
     onClose
 }: IProductionOperatorConsole) => {
 
-    const [isProductionStarted, setIsProductionStarted] = useState<boolean>(false);
 
     type PropsGroupProgress = {
         productionOrder: IProductionOrder;
     };
 
-    const GroupProgress = ({ productionOrder }: PropsGroupProgress) => {
+    const GroupProgress = memo(({ productionOrder }: PropsGroupProgress) => {
         // Determinar el tipo de orden
         const order: IPurchasedOrderProduct | IInternalProductProductionOrder =
             productionOrder?.order_type === 'internal'
@@ -99,51 +98,51 @@ const ProductionOperatorConsole = ({
                 ))}
             </ul>
         );
-    };
+    });
 
 
 
-    interface PropsSingleProgress {
-        value: number;
-        total: number;
-    }
+    // interface PropsSingleProgress {
+    //     value: number;
+    //     total: number;
+    // }
 
-    const SingleProgress = (
-        {
-            value,
-            total
-        }: PropsSingleProgress
-    ) => {
-        return (
-            <div
-                className={`nunito-bold ${StyleModule.containerProgressSingleMain}`}
-            >
-                <span className={StyleModule.containerProgressSingle}>
-                    <Progress
-                        radius="lg"
-                        size="md"
-                        value={value}
-                        striped
-                        animated
-                        classNames={{
-                            root: StyleModule.progressBarSingle,
-                            label: StyleModule.labelProgressBarSingle,
-                            section: StyleModule.sectionProgressBarSingle,
-                        }}
-                    />
-                </span>
-                <span className={StyleModule.containerProgressTextSingle}>
-                    {value}/{total}
-                </span>
-            </div>
-        )
-    }
+    // const SingleProgress = memo((
+    //     {
+    //         value,
+    //         total
+    //     }: PropsSingleProgress
+    // ) => {
+    //     return (
+    //         <div
+    //             className={`nunito-bold ${StyleModule.containerProgressSingleMain}`}
+    //         >
+    //             <span className={StyleModule.containerProgressSingle}>
+    //                 <Progress
+    //                     radius="lg"
+    //                     size="md"
+    //                     value={value}
+    //                     striped
+    //                     animated
+    //                     classNames={{
+    //                         root: StyleModule.progressBarSingle,
+    //                         label: StyleModule.labelProgressBarSingle,
+    //                         section: StyleModule.sectionProgressBarSingle,
+    //                     }}
+    //                 />
+    //             </span>
+    //             <span className={StyleModule.containerProgressTextSingle}>
+    //                 {value}/{total}
+    //             </span>
+    //         </div>
+    //     )
+    // });
 
     interface PropsSegmentedProgress {
         productionOrder: IProductionOrder;
     }
 
-    function SegmentedProgress({ productionOrder }: PropsSegmentedProgress) {
+    const SegmentedProgress = memo(({ productionOrder }: PropsSegmentedProgress) => {
         const productions = productionOrder?.productions ?? [];
         const processes = productionOrder.product?.product_processes ?? [];
         const totalOrderQty = Number(productionOrder?.qty) || 0;
@@ -192,7 +191,7 @@ const ProductionOperatorConsole = ({
                 </Text>
             </Group>
         );
-    }
+    });
 
 
     /* ===================== Drag & Drop: Container ===================== */
@@ -220,7 +219,7 @@ const ProductionOperatorConsole = ({
                     <DraggableProductionOrderItem
                         key={item.id}
                         productionLineQueue={item}
-                        // onClick={() => onClick(item.production_order as IProductionOrder)}
+                    // onClick={() => onClick(item.production_order as IProductionOrder)}
                     />
                 ))}
             </ul>
@@ -235,10 +234,8 @@ const ProductionOperatorConsole = ({
         // onClick: (productionOrder: IProductionOrder) => void;
     }
 
-    const DraggableProductionOrderItem = ({
+    const DraggableProductionOrderItem = memo(({
         productionLineQueue,
-        style,
-        // onClick
     }: DraggableProductionOrderItemProps) => {
 
 
@@ -257,18 +254,18 @@ const ProductionOperatorConsole = ({
                     className={StyleModule.productionOrderItemTitle}
                 >
                     <Package2 className={StyleModule.productionOrderItemIcon} />
-                    <div className={`nunito-bold ${StyleModule.productionOrderItemTag}`}>123456</div>
+                    <div className={`nunito-bold ${StyleModule.productionOrderItemTag}`}>{productionLineQueue.production_order?.id}</div>
                 </div>
 
                 <div className={StyleModule.productionOrderDescriptionContainer}>
                     <div className={StyleModule.productionOrderItemDescription}>
                         <dl className="nunito-bold">
                             <dt>Cantidad:</dt>
-                            <dd>10</dd>
+                            <dd>{Number(productionLineQueue.production_order?.qty)}</dd>
                         </dl>
                         <dl className="nunito-bold">
                             <dt>Producto:</dt>
-                            <dd>SeaAgri Corse 1lb</dd>
+                            <dd>{productionLineQueue.production_order?.product?.name}</dd>
                         </dl>
                     </div>
                     <button
@@ -297,12 +294,91 @@ const ProductionOperatorConsole = ({
                 </div>
             </li>
         );
-    };
+    });
+
+
+    interface PropsProductionConsole {
+        productionOrder: IProductionOrder;
+    }
+
+    const ProductionConsole = ({
+        productionOrder
+    }: PropsProductionConsole) => {
+
+        const [isProductionStarted, setIsProductionStarted] =
+            useState<boolean>(false);
+
+        return (
+            <div className={StyleModule.consoleContainer}>
+                <div className={StyleModule.consoleHeader}>
+                    <div className={`nunito-semibold ${StyleModule.consoleHeaderTitle}`}>
+                        <dl>
+                            <dt>Orden:</dt>
+                            <dd>{Number(productionOrder?.id) ?? 'N/A'}</dd>
+                        </dl>
+                        <dl>
+                            <dt>Cantidad:</dt>
+                            <dd>
+                                <span>{Number(productionOrder?.qty) ?? 'N/A'}</span>
+                                <span>/</span>
+                                <span>{Number(productionOrder?.extra_data?.production_qty) ?? 'N/A'}</span>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div className={StyleModule.separator}></div>
+                </div>
+                <div className={`nunito-semibold ${StyleModule.consoleBody}`}>
+                    <span>{productionOrder?.product?.name ?? 'N/A'}</span>
+                    <span>{Number(productionOrder?.extra_data?.production_qty) ?? 'N/A'}</span>
+                </div>
+                <div className={StyleModule.consoleControls}>
+                    <FadeButton
+                        type="button"
+                        label={isProductionStarted ? "Pausar" : "Iniciar"}
+                        icon={isProductionStarted ? <Pause className={StyleModule.iconButtonMain} /> : <Play className={StyleModule.iconButtonMain} />}
+                        typeOrderIcon="first"
+                        classNameButton={`${StyleModule.buttonBase} ${isProductionStarted ? StyleModule.buttonPause : StyleModule.buttonStart}`}
+                        classNameSpan={StyleModule.buttonSpan}
+                        classNameLabel={`nunito-bold ${isProductionStarted ? StyleModule.buttonLabelPause : StyleModule.buttonLabelStart}`}
+                        onClick={() => setIsProductionStarted(!isProductionStarted)}
+                    />
+                    <div className={StyleModule.buttonContainerGroup}>
+                        <FadeButton
+                            label="Merma"
+                            typeOrderIcon="first"
+                            type="button"
+                            icon={<Plus className={StyleModule.iconButton} />}
+                            classNameButton={StyleModule.buttonMerma}
+                            classNameSpan={StyleModule.buttonSpan}
+                            classNameLabel={`nunito-bold ${StyleModule.buttonLabelMerma}`}
+                        />
+                        <FadeButton
+                            label="Checkpoint"
+                            typeOrderIcon="first"
+                            type="button"
+                            icon={<Flag className={StyleModule.iconButton} />}
+                            classNameButton={StyleModule.buttonCheckpoint}
+                            classNameSpan={StyleModule.buttonSpan}
+                            classNameLabel={`nunito-bold ${StyleModule.buttonLabelCheckpoint}`}
+                        />
+                        <FadeButton
+                            label="Finalizar"
+                            type="button"
+                            typeOrderIcon="first"
+                            icon={<Check className={StyleModule.iconButtonFinish} />}
+                            classNameButton={StyleModule.buttonFinish}
+                            classNameSpan={StyleModule.buttonSpan}
+                            classNameLabel={`nunito-bold ${StyleModule.buttonLabelFinish}`}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     const {
         loadingProductionLineById,
         productionLineById,
-        refetchProductionLineById
     } = useProductionLineById(1);
 
     console.log("productionLineById", productionLineById);
@@ -332,79 +408,22 @@ const ProductionOperatorConsole = ({
                         <div className={StyleModule.productionLineContent}>
                             <div className={`nunito-bold ${StyleModule.productionLineItemName}`}>
                                 <Settings2 className={StyleModule.productionLineItemIcon} />
-                                <p>Linea de producción</p>
+                                <p>{productionLineById?.name}</p>
                             </div>
                             {
                                 !loadingProductionLineById &&
-                                    <DraggableProductionOrderContainer
-                                        items={productionLineById?.production_line_queue as IProductionLineQueue[]}
-                                        // onClick={(productionOrder) => toggleOrderViewSetup(productionOrder)}
-                                    />
+                                <DraggableProductionOrderContainer
+                                    items={productionLineById?.production_line_queue as IProductionLineQueue[]}
+                                // onClick={(productionOrder) => toggleOrderViewSetup(productionOrder)}
+                                />
                             }
-                            
+
                         </div>
                     </div>
                 </section>
-                <div className={StyleModule.consoleContainer}>
-                    <div className={StyleModule.consoleHeader}>
-                        <div className={`nunito-semibold ${StyleModule.consoleHeaderTitle}`}>
-                            <dl>
-                                <dt>Orden:</dt>
-                                <dd>123456</dd>
-                            </dl>
-                            <dl>
-                                <dt>Cantidad:</dt>
-                                <dd>
-                                    <span>{10}</span>
-                                    <span>/</span>
-                                    <span>{20}</span>
-                                </dd>
-                            </dl>
-                        </div>
-                        <div className={StyleModule.separator}></div>
-                    </div>
-                    <div className={`nunito-semibold ${StyleModule.consoleBody}`}>
-                        <span>SeaAgri Corse 1lb</span>
-                        <span>10,000</span>
-                    </div>
-                    <div className={StyleModule.consoleControls}>
-                        <FadeButton
-                            label={isProductionStarted ? "Pausar" : "Iniciar"}
-                            icon={isProductionStarted ? <Pause className={StyleModule.iconButtonMain} /> : <Play className={StyleModule.iconButtonMain} />}
-                            typeOrderIcon="first"
-                            classNameButton={`${StyleModule.buttonBase} ${isProductionStarted ? StyleModule.buttonPause : StyleModule.buttonStart}`}
-                            classNameSpan={StyleModule.buttonSpan}
-                            classNameLabel={`nunito-bold ${isProductionStarted ? StyleModule.buttonLabelPause : StyleModule.buttonLabelStart}`}
-                            onClick={() => setIsProductionStarted(!isProductionStarted)}
-                        />
-                        <div className={StyleModule.buttonContainerGroup}>
-                            <FadeButton
-                                label="Merma"
-                                typeOrderIcon="first"
-                                icon={<Plus className={StyleModule.iconButton} />}
-                                classNameButton={StyleModule.buttonMerma}
-                                classNameSpan={StyleModule.buttonSpan}
-                                classNameLabel={`nunito-bold ${StyleModule.buttonLabelMerma}`}
-                            />
-                            <FadeButton
-                                label="Checkpoint"
-                                typeOrderIcon="first"
-                                icon={<Flag className={StyleModule.iconButton} />}
-                                classNameButton={StyleModule.buttonCheckpoint}
-                                classNameSpan={StyleModule.buttonSpan}
-                                classNameLabel={`nunito-bold ${StyleModule.buttonLabelCheckpoint}`}
-                            />
-                            <FadeButton
-                                label="Finalizar"
-                                typeOrderIcon="first"
-                                icon={<Check className={StyleModule.iconButtonFinish} />}
-                                classNameButton={StyleModule.buttonFinish}
-                                classNameSpan={StyleModule.buttonSpan}
-                                classNameLabel={`nunito-bold ${StyleModule.buttonLabelFinish}`}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <ProductionConsole
+                    productionOrder={productionLineById?.production_line_queue?.[0]?.production_order as IProductionOrder}
+                />
             </div>
         </div>
     )

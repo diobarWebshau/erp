@@ -240,6 +240,9 @@ class ProductionOrdersController {
 
         let orderId: number | null = order_id;
 
+
+        console.log(`Empieza la creacion de la orden de produccion`);
+
         try {
 
             // usamos el tipo base de cualquier modelo Sequelize
@@ -386,7 +389,6 @@ class ProductionOrdersController {
 
             }
 
-
             if (production_line) {
                 console.log("Si tiene linea de produccion");
 
@@ -464,12 +466,14 @@ class ProductionOrdersController {
 
             transaction.commit();
 
+            console.log('Termino la creacion de la orden de produccion');
+
             res.status(201).json(po);
         } catch (error: unknown) {
             await transaction.rollback();
             if (error instanceof Error) {
                 console.error(`
-                        An unexpected error ocurred ${error}`);
+                    An unexpected error ocurred ${error}`);
                 next(error);
             } else {
                 console.error(`
@@ -477,6 +481,7 @@ class ProductionOrdersController {
             }
         } finally {
             if (po_id && product && isSucessfull) {
+                console.log('Se empieza a ejecutar el stored procedure');
                 await sequelize.query(
                     `CALL handle_production_order_after_insert(:id, :order_id, :order_type, :product_id, :product_name, :qty)`,
                     {
@@ -490,6 +495,7 @@ class ProductionOrdersController {
                         },
                     }
                 );
+                console.log('Se termino de ejecutar el stored procedure');
             }
         }
     }

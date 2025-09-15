@@ -13,6 +13,9 @@
     "header" auto
     "main" 1fr / 100%;
 
+  min-height: max-content;
+  min-width: min-content;
+
   /* estilos */
   background-color: var(--color-theme-font-white);
 }

@@ -627,8 +627,8 @@ BEGIN
         IF done THEN
             LEAVE read_loop;
         END IF;
-        SET @msg = CONCAT('pop', v_pop_id);
-        INSERT INTO debug_log (message) VALUES (@msg);
+        -- SET @msg = CONCAT('pop', v_pop_id);
+        -- INSERT INTO debug_log (message) VALUES (@msg);
         -- Aquí llamas al procedimiento ya definido para un solo ID
         CALL process_purchased_order_product_single(v_pop_id);
 

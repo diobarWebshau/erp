@@ -299,7 +299,7 @@ const ProductionSequencingBoard = ({
                                                     await reorderLineQueueBackend(lineId, productionOrders);
                                                     
                                                     // 3) Refetch para traer ya ordenado desde el server
-                                                    await refetchLocationWithAllInformation();
+                                                    // await refetchLocationWithAllInformation();
                                                 } catch (err) {
                                                     console.error("Error reordenando cola:", err);
                                                     // aquí puedes disparar tu toast/notificación
@@ -321,7 +321,10 @@ const ProductionSequencingBoard = ({
                 >
                     <div className={StyleModule.modalOrderView}>
                         <div className={StyleModule.modalOrderViewHeader}>
-                            <h3>Orden de venta</h3>
+                            {selectedProductionOrder.order_type === "internal"
+                                ? <h3>Orden Interna</h3>
+                                : <h3>Orden de venta</h3>
+                            }
                             <dl className="nunito-bold">
                                 <dt>Fecha de orden: </dt>
                                 <dd>{new Date().toLocaleDateString()}</dd>
@@ -376,6 +379,89 @@ const ProductionSequencingBoard = ({
 interface DraggableProductionOrderContainerProps {
     lineId: number;
     items: IProductionLineQueue[];
+    onItemsChange: (id: number, production_order: IProductionLineQueue[]) => Promise<void> | void;
+    className?: string;
+    style?: CSSProperties;
+    onClick: (productionOrder: IProductionOrder) => void;
+  }
+  
+  const DraggableProductionOrderContainer = ({
+    lineId,
+    items,
+    onItemsChange,
+    style,
+    onClick,
+  }: DraggableProductionOrderContainerProps) => {
+    // Estado local controlando el orden mostrado en UI
+    const [localItems, setLocalItems] = useState<IProductionLineQueue[]>(items); // -- estado local para controlar el orden mostrado en UI
+    const [saving, setSaving] = useState(false); // Este estado es para feedback visual opcional
+  
+    // Sincroniza cuando cambie la fuente (p.ej. refetch)
+    useEffect(() => {
+      setLocalItems(items);
+    }, [items]);
+  
+    const sensors = useSensors(useSensor(PointerSensor));
+  
+    const handleDragEnd = async (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+  
+      const prev = localItems; // para rollback
+      const oldIndex = prev.findIndex((i) => i.id === active.id);
+      const newIndex = prev.findIndex((i) => i.id === over.id);
+  
+      // 1) Actualiza inmediatamente la UI
+      const moved = arrayMove(prev, oldIndex, newIndex);
+      setLocalItems(moved);
+  
+      // 2) Persiste en backend (y haz rollback si falla)
+      try {
+        setSaving(true);
+        await onItemsChange(lineId, moved);
+      } catch (err) {
+        console.error("Fallo al persistir reorden:", err);
+        setLocalItems(prev); // rollback
+      } finally {
+        setSaving(false);
+      }
+    };
+  
+    return (
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToParentElement, restrictToVerticalAxis]}
+      >
+        {/* Importante: SortableContext con los IDs del estado local */}
+        <SortableContext items={localItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+          <ul
+            className={StyleModule.productionOrderContent}
+            style={{
+              listStyle: "none",
+              opacity: saving ? 0.8 : 1, // feedback visual opcional
+              ...style,
+            }}
+          >
+            {localItems.map((item) => (
+              <DraggableProductionOrderItem
+                key={item.id}
+                productionLineQueue={item}
+                onClick={() => onClick(item.production_order as IProductionOrder)}
+              />
+            ))}
+          </ul>
+        </SortableContext>
+      </DndContext>
+    );
+  };
+
+/* ===================== Drag & Drop: Container ===================== */
+/*
+interface DraggableProductionOrderContainerProps {
+    lineId: number;
+    items: IProductionLineQueue[];
     onItemsChange: (id: number, production_order: IProductionLineQueue[]) => void;
     className?: string;
     style?: CSSProperties;
@@ -386,7 +472,6 @@ const DraggableProductionOrderContainer = ({
     lineId,
     items,
     onItemsChange,
-    className,
     style,
     onClick
 }: DraggableProductionOrderContainerProps) => {
@@ -430,7 +515,7 @@ const DraggableProductionOrderContainer = ({
         </DndContext>
     );
 };
-
+*/
 
 type PropsGroupProgress = {
     productionOrder: IProductionOrder;

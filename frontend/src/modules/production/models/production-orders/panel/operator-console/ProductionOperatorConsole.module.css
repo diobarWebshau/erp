@@ -16,6 +16,8 @@
 
     /* estilos */
     background-color: var(--color-theme-font-white);
+
+    min-width: min-content;
 }
 
 /* *************** Header *************** */
@@ -99,6 +101,8 @@
     padding-top: 1rem;
     padding-inline: 3rem;
     padding-bottom: 3rem;
+
+    min-width: min-content;
 }
 
 /* ? *************** Console Header *************** */
@@ -206,6 +210,7 @@
         / 100%;
     gap: 0.5rem;
 
+    min-width: min-content;
 }
 
 .iconButton {
@@ -226,8 +231,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.5rem;
+
 }
 
 
@@ -296,7 +302,6 @@
 
 .buttonFinish {
     background-color: var(--color-theme-font-white);
-    border: 3px solid var(--color-success);
 }
 
 .buttonLabelFinish {
@@ -355,8 +360,6 @@
     gap: 0.5rem;
 
     min-height: 0;
-
-    border: 1px solid red;
 }
 
 
@@ -379,8 +382,6 @@
     align-self: stretch; 
     /* 👈 CLAVE para que el hijo este limitado para ya no crecer */
     max-height: 100%;
-
-    border: 4px solid green;
 
 }
 

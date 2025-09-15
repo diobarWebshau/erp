@@ -1,7 +1,6 @@
-
-DROP PROCEDURE IF EXISTS sp_update_movement_inventory_po_pop_update_fix;
+DROP PROCEDURE IF EXISTS sp_update_movement_inventory_production_order;
 DELIMITER //
-CREATE PROCEDURE sp_update_movement_inventory_po_pop_update_fix(
+CREATE PROCEDURE sp_update_movement_inventory_production_order(
   IN in_po_id INT,
   IN in_order_type VARCHAR(100),
   IN in_order_id INT,
@@ -10,17 +9,42 @@ CREATE PROCEDURE sp_update_movement_inventory_po_pop_update_fix(
   IN in_product_name VARCHAR(100)
 )
 BEGIN
+    IF in_order_type = 'client' THEN
+        CALL sp_update_movement_production_order_client(
+            in_po_id,
+            in_order_type,
+            in_order_id,
+            in_new_qty,
+            in_product_id,
+            in_product_name
+        );
+    -- ELSE -- para orden interna
+        --  Todo: Esta logica se hace dentro del trigger de update de internal_product_production_order
+    END IF;
+END //
+DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_update_movement_production_order_client;
+DELIMITER //
+CREATE PROCEDURE sp_update_movement_production_order_client(
+    IN in_po_id INT,
+    IN in_order_type VARCHAR(100),
+    IN in_order_id INT,
+    IN in_new_qty INT,
+    IN in_product_id INT,
+    IN in_product_name VARCHAR(100)
+)
+BEGIN
     -- VARIABLES NECESARIAS PARA GENERAR EL MOVIMIENTO
     DECLARE v_location_id INT DEFAULT 0;
     DECLARE v_location_name VARCHAR(100) DEFAULT '';
-    DECLARE v_input_id INT DEFAULT 0;
-    DECLARE v_input_name VARCHAR(100) DEFAULT '';
 
     -- VARIABLES DE INPUT DEL PRODUCTO
+    DECLARE v_input_id INT DEFAULT 0;
+    DECLARE v_input_name VARCHAR(100) DEFAULT '';
     DECLARE v_equivalence DECIMAL(14,4) DEFAULT 0.00;
 
-    -- VARIABLES DE INVENTARIO Y PRODUvCCION
+    -- VARIABLES DE INVENTARIO Y PRODUCCION
     DECLARE v_production_allocation DECIMAL(14,4) DEFAULT 0.00;
 
     -- VARIABLES DE LA LOGICA
@@ -63,8 +87,6 @@ BEGIN
     WHERE poplpl.purchase_order_product_id = in_order_id
     LIMIT 1;
 
-    -- OBTENEMOS EL INVENTARIO COMPROMETIDO EN PRODUCCION DEL PRODUCTO 
-
     -- inventario comprometido de produccion
     SELECT
         IFNULL(SUM(im.qty), 0)
@@ -79,8 +101,12 @@ BEGIN
         AND im.item_type = 'product'
     LIMIT 1;
 
-    -- OBTENER LA DIFERENCIA
-    SET v_diff_prod = (in_new_qty - v_production_allocation);
+    -- calculamos la diferencia a ajustar
+    IF v_production_allocation > in_new_qty THEN
+        SET v_diff_prod = (in_new_qty - v_production_allocation);
+    ELSE
+        SET v_diff_prod = (in_new_qty + v_production_allocation);
+    END IF;
 
     -- Creamos el movimiento de ajuste de inventario comprometido
     INSERT INTO inventory_movements (
@@ -159,6 +185,5 @@ BEGIN
 
     -- Eliminamos la tabla temporal
     DROP TEMPORARY TABLE IF EXISTS temp_inventory_movements_pop;
-        
 END //
 DELIMITER ;
