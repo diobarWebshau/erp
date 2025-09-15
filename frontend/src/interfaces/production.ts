@@ -3,6 +3,7 @@ interface IProduction {
     production_order_id: number;
     product_id: number | null;
     product_name: string | null;
+    process_id: number | null;
     qty: number;
     scrap: number;
     created_at: string;
@@ -13,6 +14,7 @@ type IPartialProduction = Partial<IProduction>;
 
 const defaultValueProduction: IProduction = {
     id: 0,
+    process_id: null,
     production_order_id: 0,
     product_id: null,
     product_name: null,
@@ -23,6 +25,7 @@ const defaultValueProduction: IProduction = {
 };
 
 const defaultValuePartialProduction: IPartialProduction = {
+    process_id: null,
     production_order_id: 0,
     product_id: null,
     product_name: null,

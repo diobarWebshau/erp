@@ -1,5 +1,5 @@
 import Production from "./productions/index.js";
 const Features = {
-    Production,
+    Production
 };
 export default Features;

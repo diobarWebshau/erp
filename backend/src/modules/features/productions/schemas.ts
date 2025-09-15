@@ -43,6 +43,9 @@ import {
 import {
     shippingOrderPurchaseOrderProductSchema
 } from "./schemas/ShippingOrderPurchasedOrderProduct.schema.js"
+import {
+    productionLineQueueSchema
+} from "./schemas/ProductionLineQueue.schema.js"
 
 export {
     inputSchema,
@@ -60,4 +63,5 @@ export {
     productProcessSchema,
     purchasedOrderProductLocationProductionLineSchema,
     shippingOrderPurchaseOrderProductSchema,
+    productionLineQueueSchema
 }

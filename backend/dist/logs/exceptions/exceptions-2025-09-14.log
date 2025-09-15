@@ -1,0 +1,60 @@
+2025-09-14 11:53:45 [[31MERROR[39M]: uncaughtException: productionOrders is not iterable
+TypeError: productionOrders is not iterable
+    at reorderProductionLineQueueOptimizadaTablaTemporal (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:241:26)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:280:10)
+2025-09-14 11:56:08 [[31MERROR[39M]: uncaughtException: productionOrders is not iterable
+TypeError: productionOrders is not iterable
+    at reorderProductionLineQueueOptimizadaTablaTemporal (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:242:26)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:280:10)
+2025-09-14 11:57:17 [[31MERROR[39M]: uncaughtException: productionOrders is not iterable
+TypeError: productionOrders is not iterable
+    at reorderProductionLineQueueOptimizadaTablaTemporal (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:242:26)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:280:10)
+2025-09-14 11:57:22 [[31MERROR[39M]: uncaughtException: productionOrders is not iterable
+TypeError: productionOrders is not iterable
+    at reorderProductionLineQueueOptimizadaTablaTemporal (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:242:26)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:280:10)
+2025-09-14 11:58:41 [[31MERROR[39M]: uncaughtException: productionOrders is not iterable
+TypeError: productionOrders is not iterable
+    at reorderProductionLineQueueOptimizadaTablaTemporal (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:242:26)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:421:3)
+    at next (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\router\index.js:280:10)

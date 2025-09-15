@@ -2,6 +2,7 @@
     /* distribucion box */
     background-color: transparent;
     border: none;
+    cursor: pointer;
 }
 
 .transparentButtonCustomSpan {

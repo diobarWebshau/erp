@@ -1,0 +1,36 @@
+2025-09-12 11:03:31 [[31MERROR[39M]: uncaughtException: Cannot add or update a child row: a foreign key constraint fails (`u482698715_shau_erp`.`inventory_movements`, CONSTRAINT `inventory_movements_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL)
+Error
+    at Query.run (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:336:17)
+2025-09-12 11:32:08 [[31MERROR[39M]: uncaughtException: Cannot add or update a child row: a foreign key constraint fails (`u482698715_shau_erp`.`inventory_movements`, CONSTRAINT `inventory_movements_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL)
+Error
+    at Query.run (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:339:17)
+2025-09-12 11:34:05 [[31MERROR[39M]: uncaughtException: Cannot add or update a child row: a foreign key constraint fails (`u482698715_shau_erp`.`inventory_movements`, CONSTRAINT `inventory_movements_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL)
+Error
+    at Query.run (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionOrder.controller.js:339:17)
+2025-09-12 13:50:49 [[31MERROR[39M]: uncaughtException: Operation timeout
+SequelizeConnectionAcquireTimeoutError: Operation timeout
+    at ConnectionManager.getConnection (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\abstract\connection-manager.js:206:15)
+    at async Transaction.prepareEnvironment (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\transaction.js:85:24)
+    at async Sequelize.transaction (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:500:7)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:46:29)
+2025-09-12 13:50:49 [[31MERROR[39M]: uncaughtException: Operation timeout
+SequelizeConnectionAcquireTimeoutError: Operation timeout
+    at ConnectionManager.getConnection (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\abstract\connection-manager.js:206:15)
+    at async Transaction.prepareEnvironment (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\transaction.js:85:24)
+    at async Sequelize.transaction (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:500:7)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:46:29)
+2025-09-12 13:50:50 [[31MERROR[39M]: uncaughtException: Operation timeout
+SequelizeConnectionAcquireTimeoutError: Operation timeout
+    at ConnectionManager.getConnection (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\abstract\connection-manager.js:206:15)
+    at async Transaction.prepareEnvironment (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\transaction.js:85:24)
+    at async Sequelize.transaction (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:500:7)
+    at async create (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductionLineQueue.js:46:29)

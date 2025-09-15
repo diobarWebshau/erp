@@ -1,4 +1,12 @@
+import type { IProduct } from "./product";
 import type { IPartialProductionOrder } from "./productionOrder";
+
+interface IProductionSummaryInternal {
+    production_qty: number;
+    production_order_qty: number;
+    internal_production_order_qty: number;
+}
+
 
 interface IInternalProductProductionOrder {
     id: number;
@@ -11,6 +19,8 @@ interface IInternalProductProductionOrder {
     created_at: string;
     updated_at: string;
     production_order?: IPartialProductionOrder;
+    product?: IProduct;
+    production_summary?: IProductionSummaryInternal;
 }
 
 type IPartialInternalProductProductionOrder =

@@ -87,6 +87,8 @@ import {
     ProductInputManager,
     ProductProcessManager,
     ShippingOrderPurchaseOrderProductManager,
+    ProductionLineQueueAttributes,
+    ProductionLineQueueCreateAttributes
 } from "./features/types.js"
 
 export type {
@@ -171,5 +173,7 @@ export type {
     ScrapAttributes,
     ScrapCreateAttributes,
     PurchaseOrderProductAttributes,
-    PurchaseOrderProductCreateAttributes
+    PurchaseOrderProductCreateAttributes,
+    ProductionLineQueueAttributes,
+    ProductionLineQueueCreateAttributes
 };

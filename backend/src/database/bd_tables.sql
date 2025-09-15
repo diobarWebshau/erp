@@ -299,10 +299,8 @@ create table purchased_orders(
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
-    FOREIGN KEY(client_id) REFERENCES clients(id) ON DELETE
-    SET NULL,
-        FOREIGN KEY(client_address_id) REFERENCES clients_addresses(id) ON DELETE
-    SET NULL
+    FOREIGN KEY(client_id) REFERENCES clients(id) ON DELETE SET NULL,
+    FOREIGN KEY(client_address_id) REFERENCES clients_addresses(id) ON DELETE SET NULL
 );
 
 CREATE TABLE purchased_orders_products(
@@ -438,9 +436,9 @@ CREATE TABLE purchased_orders_products_locations_production_lines(
     production_line_id INT,
     purchase_order_product_id INT,
     PRIMARY KEY(id),
-    FOREIGN KEY(production_line_id) REFERENCES production_lines(id) ON DELETE
-    SET NULL,
-        FOREIGN KEY(purchase_order_product_id) REFERENCES purchased_orders_products(id) ON DELETE CASCADE
+    FOREIGN KEY(production_line_id) REFERENCES production_lines(id) ON DELETE SET NULL,
+    FOREIGN KEY(purchase_order_product_id) REFERENCES purchased_orders_products(id) ON DELETE CASCADE,
+    UNIQUE(production_line_id, purchase_order_product_id)
 );
 CREATE TABLE internal_product_production_orders (
     id INT AUTO_INCREMENT,
@@ -454,10 +452,8 @@ CREATE TABLE internal_product_production_orders (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE
-    SET NULL,
-        FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE
-    SET NULL
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL
 );
 CREATE TABLE internal_production_orders_lines_products(
     id INT AUTO_INCREMENT,
@@ -465,7 +461,8 @@ CREATE TABLE internal_production_orders_lines_products(
     production_line_id INT,
     PRIMARY KEY(id),
     FOREIGN KEY(internal_product_production_order_id) REFERENCES internal_product_production_orders(id) ON DELETE CASCADE,
-    FOREIGN KEY(production_line_id) REFERENCES production_lines(id) ON DELETE CASCADE
+    FOREIGN KEY(production_line_id) REFERENCES production_lines(id) ON DELETE CASCADE,
+    UNIQUE(internal_product_production_order_id, production_line_id)
 );
 CREATE TABLE production_orders(
     -- fields
@@ -559,17 +556,33 @@ CREATE TABLE scrap (
 );
 
 CREATE TABLE production_line_queue (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     production_line_id INT NOT NULL,
     production_order_id INT NOT NULL,         -- SIEMPRE apunta a production_orders.id
-    position DECIMAL(10,4) NOT NULL,          -- 10, 20, 30... para insertar entremedias
+    position BIGINT NULL,          -- 10, 20, 30... para insertar entremedias
+    -- los valores NULL son para cuando ya no esta en cola la orden
+    -- los valores NULL no se comtemplan en la restriccion uq_line_pos
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE KEY uq_line_pos   (production_line_id, position),
     UNIQUE KEY uq_line_order (production_line_id, production_order_id),
+    
+    -- Formas de declarar indices
+    KEY ix_line  (production_line_id),
+    INDEX ix_line_pos (production_line_id, position),
+    /*
 
-    KEY ix_line     (production_line_id),
-    KEY ix_line_pos (production_line_id, position),
+        Estándar de naming → en muchos equipos se sigue:
+
+        pk_... para claves primarias
+
+        fk_... para claves foráneas
+
+        uq_... para restricciones únicas
+
+        ix_... para índices normales
+
+    */
 
     FOREIGN KEY (production_line_id) REFERENCES production_lines(id) ON DELETE CASCADE,
     FOREIGN KEY (production_order_id) REFERENCES production_orders(id) ON DELETE CASCADE

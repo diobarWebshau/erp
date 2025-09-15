@@ -1,6 +1,6 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import sequelize from "../../../../mysql/configSequelize.js";
-import { LocationModel, LocationTypeModel, LocationLocationTypeModel, ProductionLineModel, LocationsProductionLinesModel, ProductionLineProductModel, ProductModel, PurchasedOrdersProductsLocationsProductionLinesModel, InternalProductionOrderLineProductModel, PurchaseOrderProductModel, InternalProductProductionOrderModel, ProductProcessModel, ProcessModel } from "../../../associations.js";
+import { LocationModel, LocationTypeModel, LocationLocationTypeModel, ProductionLineModel, LocationsProductionLinesModel, ProductionLineProductModel, ProductModel, ProductProcessModel, ProcessModel, ProductionLineQueueModel, ProductionOrderModel, ProductionModel } from "../../../associations.js";
 import { Op, QueryTypes, Transaction } from "sequelize";
 class LocationController {
     static getAll = async (req, res, next) => {
@@ -184,6 +184,60 @@ class LocationController {
                                 attributes: ProductionLineModel.getAllFields(),
                                 include: [
                                     {
+                                        model: ProductionLineQueueModel,
+                                        as: "production_line_queue",
+                                        required: false,
+                                        attributes: ProductionLineQueueModel.getAllFields(),
+                                        separate: true, // 👈 esto permite que order funcione dentro del include
+                                        order: [["position", "ASC"]],
+                                        include: [
+                                            {
+                                                model: ProductionOrderModel,
+                                                as: "production_order",
+                                                required: false,
+                                                attributes: [
+                                                    ...ProductionOrderModel.getAllFields(),
+                                                    [
+                                                        sequelize.fn("func_get_order_of_production_order", sequelize.col("production_order.id"), // ✅ usa alias local
+                                                        sequelize.col("production_order.order_id"), // ✅ usa alias local
+                                                        sequelize.col("production_order.order_type")),
+                                                        "order"
+                                                    ]
+                                                ],
+                                                include: [
+                                                    {
+                                                        model: ProductionModel,
+                                                        as: "productions",
+                                                        required: false,
+                                                        attributes: ProductionModel.getAllFields(),
+                                                    },
+                                                    {
+                                                        model: ProductModel,
+                                                        as: "product",
+                                                        required: false,
+                                                        attributes: ProductModel.getAllFields(),
+                                                        include: [
+                                                            {
+                                                                model: ProductProcessModel,
+                                                                as: "product_processes",
+                                                                required: false,
+                                                                attributes: ProductProcessModel.getAllFields(),
+                                                                include: [
+                                                                    {
+                                                                        model: ProcessModel,
+                                                                        as: "process",
+                                                                        required: false,
+                                                                        attributes: ProcessModel.getAllFields()
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    {
                                         model: ProductionLineProductModel,
                                         as: "production_lines_products",
                                         required: false,
@@ -194,85 +248,11 @@ class LocationController {
                                                 as: "products",
                                                 required: false,
                                                 attributes: ProductModel.getAllFields(),
-                                                include: [
-                                                    {
-                                                        model: ProductProcessModel,
-                                                        as: "product_processes",
-                                                        required: false,
-                                                        separate: true,
-                                                        order: [["sort_order", "ASC"]],
-                                                        attributes: ProductProcessModel.getAllFields(),
-                                                        include: [
-                                                            {
-                                                                model: ProcessModel,
-                                                                as: "process",
-                                                                required: false,
-                                                                attributes: ProcessModel.getAllFields(),
-                                                            },
-                                                        ],
-                                                    },
-                                                ],
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        model: PurchasedOrdersProductsLocationsProductionLinesModel,
-                                        as: "purchase_order_product_location_production_line",
-                                        required: false,
-                                        attributes: PurchasedOrdersProductsLocationsProductionLinesModel.getAllFields(),
-                                        include: [
-                                            {
-                                                model: PurchaseOrderProductModel,
-                                                as: "purchase_order_product",
-                                                required: false,
-                                                attributes: [
-                                                    ...PurchaseOrderProductModel.getAllFields(),
-                                                    [
-                                                        sequelize.fn("func_get_productions_of_order", sequelize.col("location_production_line->production_line->purchase_order_product_location_production_line->purchase_order_product.id"), sequelize.literal("'client'")),
-                                                        "production_order",
-                                                    ],
-                                                ],
-                                                include: [
-                                                    {
-                                                        model: ProductModel,
-                                                        as: "product",
-                                                        required: false,
-                                                        attributes: ProductModel.getAllFields(),
-                                                    },
-                                                ],
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        model: InternalProductionOrderLineProductModel,
-                                        as: "internal_production_order_line_product",
-                                        required: false,
-                                        attributes: InternalProductionOrderLineProductModel.getAllFields(),
-                                        include: [
-                                            {
-                                                model: InternalProductProductionOrderModel,
-                                                as: "internal_product_production_order",
-                                                required: false,
-                                                attributes: [
-                                                    ...InternalProductProductionOrderModel.getAllFields(),
-                                                    [
-                                                        sequelize.fn("func_get_productions_of_order", sequelize.col("location_production_line->production_line->internal_production_order_line_product->internal_product_production_order.id"), sequelize.literal("'internal'")),
-                                                        "production_order",
-                                                    ],
-                                                ],
-                                                include: [
-                                                    {
-                                                        model: ProductModel,
-                                                        as: "product",
-                                                        required: false,
-                                                        attributes: ProductModel.getAllFields(),
-                                                    },
-                                                ],
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
                         ],
                     },
                 ],
@@ -281,73 +261,7 @@ class LocationController {
                 res.status(200).json([]);
                 return;
             }
-            // ===================== Normalización en backend =====================
-            const safeParse = (val) => {
-                if (val == null)
-                    return null;
-                if (typeof val === "string") {
-                    try {
-                        return JSON.parse(val);
-                    }
-                    catch {
-                        return val;
-                    }
-                }
-                return val;
-            };
-            const toNumber = (v) => (v == null ? 0 : typeof v === "number" ? v : Number(v));
             const data = response.toJSON();
-            (data.location_production_line ?? []).forEach((lp) => {
-                const pl = lp?.production_line;
-                if (!pl)
-                    return;
-                // CLIENT (purchase_order_product_location_production_line)
-                const clients = (pl.purchase_order_product_location_production_line ?? []).map((row) => {
-                    const pop = row?.purchase_order_product;
-                    const po = safeParse(pop?.production_order);
-                    // Producto preferente: el que viene en purchase_order_product.product
-                    // (si no, podrías intentar buscarlo en production_lines_products)
-                    const product = pop?.product;
-                    return {
-                        // id único de UI (prefijo 1 para distinguir de internal)
-                        id: Number(`1${row.id}`),
-                        production_order_id: po?.id ?? null,
-                        order_type: (po?.order_type ?? "client"),
-                        product_id: pop?.product_id ?? po?.product_id ?? null,
-                        product_name: pop?.product_name ?? po?.product_name ?? "",
-                        qty: toNumber(pop?.qty ?? po?.qty ?? 0),
-                        status: po?.status ?? pop?.status ?? "pending",
-                        productions: po?.productions ?? [],
-                        product, // incluye sku, processes ya ordenados por separate+order
-                    };
-                });
-                // INTERNAL (internal_production_order_line_product)
-                const internals = (pl.internal_production_order_line_product ?? []).map((row) => {
-                    const ipo = row?.internal_product_production_order;
-                    const po = safeParse(ipo?.production_order);
-                    const product = ipo?.product;
-                    return {
-                        // id único de UI (prefijo 2 para distinguir de client)
-                        id: Number(`2${row.id}`),
-                        production_order_id: po?.id ?? null,
-                        order_type: (po?.order_type ?? "internal"),
-                        product_id: ipo?.product_id ?? po?.product_id ?? null,
-                        product_name: ipo?.product_name ?? po?.product_name ?? "",
-                        qty: toNumber(ipo?.qty ?? po?.qty ?? 0),
-                        status: po?.status ?? ipo?.status ?? "pending",
-                        productions: po?.productions ?? [],
-                        product,
-                    };
-                });
-                // Combina y (opcional) ordena por production_order_id asc
-                const combined = [...clients, ...internals].sort((a, b) => (a.production_order_id ?? 0) - (b.production_order_id ?? 0));
-                // Asigna el array normalizado
-                pl.production_order = combined;
-                // Remueve los arreglos crudos para simplificar el payload
-                delete pl.purchase_order_product_location_production_line;
-                delete pl.internal_production_order_line_product;
-            });
-            // ===================== /Normalización =====================
             res.status(200).json(data);
         }
         catch (error) {

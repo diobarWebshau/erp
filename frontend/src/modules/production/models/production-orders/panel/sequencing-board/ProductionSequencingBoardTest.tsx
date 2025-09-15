@@ -1,5 +1,5 @@
 import { ArrowLeft, ChevronsLeft, ChevronsRight, CircleDot, Factory, Package2, Settings2, User, TrendingDown, MapPin, ChevronsDown, ChevronsUp } from "lucide-react";
-import TransparentButtonCustom from "../../../../../components/ui/table/components/gui/button/custom-button/transparent/TransparentButtonCustom";
+import TransparentButtonCustom from "../../../../../../components/ui/table/components/gui/button/custom-button/transparent/TransparentButtonCustom";
 import StyleModule from "./ProductionPanel.module.css";
 import { useState, type CSSProperties, type MouseEvent } from "react";
 import {
@@ -17,13 +17,15 @@ import {
     verticalListSortingStrategy,
     useSortable,
 } from "@dnd-kit/sortable";
+
 import { CSS } from "@dnd-kit/utilities";
-import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { restrictToParentElement, restrictToHorizontalAxis, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { Progress } from "@mantine/core";
+// SegmentedProgress.tsx (Mantine v7)
 import { Group, Text } from '@mantine/core';
-import BaseModal from "../../../../../components/ui/modal/baseGenericModal/BaseModal";
-import PopoverFloatingIUBase from "../../../../../components/ui/popover_floatingIU/PopoverFloatingIUBase";
-import GenericTable from "../../../../../components/ui/table/tableContext/GenericTable";
+import BaseModal from "../../../../../../components/ui/modal/baseGenericModal/BaseModal";
+import PopoverFloatingIUBase from "../../../../../../components/ui/popover_floatingIU/PopoverFloatingIUBase";
+import GenericTable from "../../../../../../components/ui/table/tableContext/GenericTable";
 import type { ColumnDef } from "@tanstack/react-table";
 
 interface IProductionPanel {
@@ -321,7 +323,7 @@ const data: PPDemoProductionOrderProduct[] = [
 
 /* ===================== Componente ===================== */
 
-const ProductionPanel = ({ onClose }: IProductionPanel) => {
+const ProductionSequencingBoardTest = ({ onClose }: IProductionPanel) => {
     const [isPanelExpand, setIsPanelExpand] = useState<boolean>(false);
     const [locationSelected, setLocationSelected] = useState<{ id: number; name: string }>({
         id: 1,
@@ -357,7 +359,7 @@ const ProductionPanel = ({ onClose }: IProductionPanel) => {
             header: "Producción",
             cell: (row) => {
                 return (
-                    <SingleProgress />
+                    <SingleProgress />                
                 );
             },
         }
@@ -798,4 +800,4 @@ const DraggableProductionOrderItem = ({
     );
 };
 
-export default ProductionPanel;
+export default ProductionSequencingBoardTest;

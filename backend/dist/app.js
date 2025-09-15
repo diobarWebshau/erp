@@ -110,6 +110,8 @@ const createApp = () => {
         .createInventoryMovementsRouter());
     app.use("/production/production-orders", Features.Production
         .createProductionOrderRouter());
+    app.use("/production/production-line-queue", Features.Production
+        .createProductionLineQueueRouter());
     app.use(errorMiddleware);
     return app;
 };

@@ -54,8 +54,39 @@ import {
     InputTypeModel,
     ProcessModel,
     InputModel,
-    InventoryMovementModel, 
+    InventoryMovementModel,
+    ProductionLineQueueModel,
 } from "./features/associations.js"
+
+
+
+// production_line_queue → production_line (FK está aquí)
+ProductionLineQueueModel.belongsTo(ProductionLineModel, {
+    foreignKey: "production_line_id",
+    as: "production_line",
+    onDelete: "CASCADE"
+});
+
+// production_line → production_line_queue (tiene muchas filas en la cola)
+ProductionLineModel.hasMany(ProductionLineQueueModel, {
+    foreignKey: "production_line_id",
+    as: "production_line_queue",
+    onDelete: "CASCADE"
+});
+
+// production_line_queue → production_order (FK está aquí)
+ProductionLineQueueModel.belongsTo(ProductionOrderModel, {
+    foreignKey: "production_order_id",
+    as: "production_order",
+    onDelete: "CASCADE"
+});
+
+// production_order → production_line_queue (solo puede estar en una cola)
+ProductionOrderModel.hasOne(ProductionLineQueueModel, {
+    foreignKey: "production_order_id",
+    as: "production_order_queue",
+    onDelete: "CASCADE"
+});
 
 
 /****************************************
@@ -638,8 +669,6 @@ ProductionModel.belongsTo(
     onDelete: "CASCADE",
     as: "production_order"
 });
-
-
 
 ProductionOrderModel.belongsTo(
     ProductModel, {
@@ -4645,4 +4674,5 @@ export {
     InputModel,
     InventoryMovementModel,
     ScrapModel,
+    ProductionLineQueueModel
 };

@@ -34,15 +34,19 @@ const useProductionLineById = (id: number | undefined) => {
         );
         try {
             if (id) {
+                console.log("entro" );
                 const data =
-                    await fetchProductionLineDetails(
-                        id,
-                        dispatch
-                    );
+                await fetchProductionLineDetails(
+                    id,
+                    dispatch
+                );
                 setProductionLinesById(data);
+                console.log("data", data);
             } else {
+                console.log("entro else" );
                 setProductionLinesById(null);
             }
+            console.log("salgo" );
         } catch (err: unknown) {
             const msg = err instanceof Error
                 ? { validation: err.message }

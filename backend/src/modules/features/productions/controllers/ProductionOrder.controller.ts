@@ -386,6 +386,58 @@ class ProductionOrdersController {
 
             }
 
+
+            if (production_line) {
+                console.log("Si tiene linea de produccion");
+
+                const responseProductionLine =
+                    await ProductionLineModel.findByPk(production_line.id);
+                if (!responseProductionLine) {
+                    await transaction.rollback();
+                    res.status(404).json({
+                        validation: "Production line no existe"
+                    });
+                    return;
+                }
+
+                if (order_type === "internal") {
+                    console.log("asigno la linea de produccion a la orden de produccion interna")
+                    const responseInternalProductionOrderLineProduct =
+                        await InternalProductionOrderLineProductModel.create({
+                            internal_product_production_order_id: orderId,
+                            production_line_id: production_line.id
+                        }, { transaction });
+
+                    if (!responseInternalProductionOrderLineProduct) {
+                        await transaction.rollback();
+                        res.status(500).json({
+                            validation:
+                                `No se pudo asignar la orden de produccion` +
+                                ` interna a la linea de produccion`
+                        });
+                        return;
+                    }
+                } else {
+                    console.log("asigno la linea de produccion a la orden de produccion interna")
+                    const responsePurchasedOrdersProductsLocationsProductionLines =
+                        await PurchasedOrdersProductsLocationsProductionLinesModel.create({
+                            purchase_order_product_id: orderId,
+                            production_line_id: production_line.id
+                        }, { transaction });
+
+                    if (!responsePurchasedOrdersProductsLocationsProductionLines) {
+                        await transaction.rollback();
+                        res.status(500).json({
+                            validation:
+                                `No se pudo asignar la orden de produccion` +
+                                ` asociado a una orden de compra a la linea `
+                                + `de produccion`
+                        });
+                        return;
+                    }
+                }
+            }
+
             const response: ProductionOrderModel
                 = await ProductionOrderModel.create({
                     order_id: orderId,
@@ -406,54 +458,6 @@ class ProductionOrdersController {
             }
 
             const po = response.toJSON();
-
-            if (production_line) {
-
-                const responseProductionLine =
-                    await ProductionLineModel.findByPk(production_line.id);
-                if (!responseProductionLine) {
-                    await transaction.rollback();
-                    res.status(404).json({
-                        validation: "Production line no existe"
-                    });
-                    return;
-                }
-
-                if (order_type === "internal") {
-                    const responseInternalProductionOrderLineProduct =
-                        await InternalProductionOrderLineProductModel.create({
-                            internal_product_production_order_id: orderId,
-                            production_line_id: production_line.id
-                        }, { transaction });
-
-                    if (!responseInternalProductionOrderLineProduct) {
-                        await transaction.rollback();
-                        res.status(500).json({
-                            validation:
-                                `No se pudo asignar la orden de produccion` +
-                                ` interna a la linea de produccion`
-                        });
-                        return;
-                    }
-                } else {
-                    const responsePurchasedOrdersProductsLocationsProductionLines =
-                        await PurchasedOrdersProductsLocationsProductionLinesModel.create({
-                            purchase_order_product_id: po.id,
-                            production_line_id: production_line.id
-                        }, { transaction });
-
-                    if (!responsePurchasedOrdersProductsLocationsProductionLines) {
-                        await transaction.rollback();
-                        res.status(500).json({
-                            validation:
-                                `No se pudo asignar la orden de produccion` +
-                                ` asociado a una orden de compra a la linea `
-                                + `de produccion`
-                        });
-                        return;
-                    }
-                }
-            }
 
             isSucessfull = true;
             po_id = po.id;

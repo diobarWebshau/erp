@@ -219,6 +219,20 @@ DELIMITER ;
 *		TABLE productions_orders		*
 ****************************************/
 
+DROP TRIGGER IF EXISTS trigger_create_production_order;
+DELIMITER //
+CREATE TRIGGER trigger_create_production_order
+AFTER INSERT ON production_orders
+FOR EACH ROW
+BEGIN
+	CALL sp_assign_production_order_to_queue(
+		NEW.id,
+		NEW.order_id,
+		NEW.order_type
+	);
+END //
+DELIMITER ;
+
 DROP TRIGGER IF EXISTS trigger_after_delete_production_orders;
 DELIMITER //
 CREATE TRIGGER trigger_after_delete_production_orders
@@ -238,7 +252,7 @@ DELIMITER ;
 /****************************************
 *		   TABLE productions			*
 ****************************************/
-
+/*
 DROP TRIGGER IF EXISTS trigger_create_update_status_production_order;
 DELIMITER //
 CREATE TRIGGER trigger_create_update_status_production_order
@@ -440,7 +454,7 @@ BEGIN
 	END IF;
 END //
 DELIMITER ;
-
+*/
 /************************************************************
 *		TABLE shipping_orders_purchased_order_products		*
 ************************************************************/

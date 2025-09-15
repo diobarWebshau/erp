@@ -2,6 +2,7 @@
 import type {
     IPartialLocationProductionLine
 } from "./locationsProductionLines";
+import type { IPartialProductionLineQueue } from "./productionLineQueue";
 import type {
     IPartialProductionLineProduct,
     IProductionLineProductManager
@@ -18,6 +19,7 @@ interface IProductionLine {
     production_lines_products?: IPartialProductionLineProduct[],
     production_lines_products_updated?: IProductionLineProductManager,
     production_order?: IPartialProductionOrder[],
+    production_line_queue?: IPartialProductionLineQueue[],
 }
 
 type IPartialProductionLine =

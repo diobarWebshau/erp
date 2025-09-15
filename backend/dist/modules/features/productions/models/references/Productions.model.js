@@ -10,7 +10,7 @@ class ProductionModel extends Model {
         return [
             "id", "production_order_id",
             "product_name", "product_id",
-            "qty", "created_at",
+            "process_id", "qty", "created_at",
             "updated_at"
         ];
     }
@@ -36,6 +36,13 @@ ProductionModel.init({
         type: DataTypes.INTEGER,
         references: {
             model: "products",
+            key: "id"
+        }
+    },
+    process_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: "processes",
             key: "id"
         }
     },

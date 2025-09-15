@@ -69,8 +69,9 @@ import AddModalProductionOrderGeneric
 import AddModal from "./wizard/add/AddModal";
 import EditModal from "./wizard/edit/EditModal";
 import useProductionOrderById from "../../../../modelos/production_orders/hooks/useProductionOrderById";
-import ProductionPanel from "./panel/ProductionPanel";
-import ProductionPanel2 from "./panel/ProductionPanel copy";
+// import ProductionPanel from "./panel/ProductionPanel";
+import ProductionSequencingBoard from "./panel/sequencing-board/ProductionSequencingBoard";
+import ProductionOperatorConsole from "./panel/operator-console/ProductionOperatorConsole";
 
 const ProductionOrderModel = () => {
 
@@ -104,7 +105,9 @@ const ProductionOrderModel = () => {
         useState<boolean>(false);
     const [isActiveCheckPointModal, setIsActiveCheckPointModal] =
         useState<boolean>(false);
-    const [isActiveProductionPanel, setIsActiveProductionPanel] =
+    const [isActiveProductionOperatorConsole, setIsActiveProductionOperatorConsole] =
+        useState<boolean>(false);
+    const [isActiveProductionSequencingBoard, setIsActiveProductionSequencingBoard] =
         useState<boolean>(false);
 
     // * ******************** Funciones de operaciones CRUD ******************** */
@@ -404,7 +407,7 @@ const ProductionOrderModel = () => {
     const onClickContent = (e: React.MouseEvent, row: Row<IProductionOrder>) => {
         e.stopPropagation();
         setProductionOrderRecord(row.original);
-        setIsActiveProductionPanel(true);
+        setIsActiveProductionSequencingBoard(true);
     }
 
     return (
@@ -446,6 +449,7 @@ const ProductionOrderModel = () => {
                     classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
 
                 />
+                <button onClick={() => setIsActiveProductionOperatorConsole(true)}>Open</button>
                 {
                     isActiveDeleteModal && <DeleteModal
                         title="Eliminar Orden de Producción"
@@ -484,17 +488,22 @@ const ProductionOrderModel = () => {
                         </AddModalProductionOrderGeneric>
                     )
                 }
-                {
-                    isActiveProductionPanel && <ProductionPanel
-                        onClose={() => setIsActiveProductionPanel(false)}
-                    />
-                }
                 {/* {
-                    isActiveProductionPanel && productionOrderRecord && <ProductionPanel2
-                        onClose={() => setIsActiveProductionPanel(false)}
-                        productionOrder={productionOrderRecord}
+                    isActiveProductionOperatorConsole && <ProductionOperatorConsole
+                        onClose={() => setIsActiveProductionOperatorConsole(false)}
                     />
                 } */}
+                {
+                    isActiveProductionSequencingBoard && productionOrderRecord && <ProductionSequencingBoard
+                        onClose={() => setIsActiveProductionSequencingBoard(false)}
+                        productionOrder={productionOrderRecord}
+                    />
+                }
+                {
+                    isActiveProductionOperatorConsole && <ProductionOperatorConsole
+                        onClose={() => setIsActiveProductionOperatorConsole(false)}
+                    />
+                }
             </div>
         </>
     );

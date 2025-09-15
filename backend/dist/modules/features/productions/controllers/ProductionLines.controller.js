@@ -1,5 +1,5 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
-import { ProductionLineModel, ProductModel, ProductionLineProductModel, LocationsProductionLinesModel, LocationModel } from "../../../associations.js";
+import { ProductionLineModel, ProductModel, ProductionLineProductModel, LocationsProductionLinesModel, LocationModel, ProductionLineQueueModel, ProductionOrderModel, ProductionModel, ProductProcessModel, ProcessModel } from "../../../associations.js";
 import { Op, QueryTypes, Transaction } from "sequelize";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { formatImagesDeepRecursive } from "../../../../scripts/formatWithBase64.js";
@@ -26,7 +26,79 @@ class ProductionLinesController {
     static getById = async (req, res, next) => {
         const { id } = req.params;
         try {
-            const response = await ProductionLineModel.findOne({ where: { id: id } });
+            const response = await ProductionLineModel.findByPk(id, {
+                attributes: ProductionLineModel.getAllFields(),
+                include: [
+                    {
+                        model: ProductionLineQueueModel,
+                        as: "production_line_queue",
+                        required: false,
+                        attributes: ProductionLineQueueModel.getAllFields(),
+                        separate: true, // 👈 esto permite que order funcione dentro del include
+                        order: [["position", "ASC"]],
+                        include: [
+                            {
+                                model: ProductionOrderModel,
+                                as: "production_order",
+                                required: false,
+                                attributes: [
+                                    ...ProductionOrderModel.getAllFields(),
+                                    [
+                                        sequelize.fn("func_get_order_of_production_order", sequelize.col("production_order.id"), // ✅ usa alias local
+                                        sequelize.col("production_order.order_id"), // ✅ usa alias local
+                                        sequelize.col("production_order.order_type")),
+                                        "order"
+                                    ]
+                                ],
+                                include: [
+                                    {
+                                        model: ProductionModel,
+                                        as: "productions",
+                                        required: false,
+                                        attributes: ProductionModel.getAllFields(),
+                                    },
+                                    {
+                                        model: ProductModel,
+                                        as: "product",
+                                        required: false,
+                                        attributes: ProductModel.getAllFields(),
+                                        include: [
+                                            {
+                                                model: ProductProcessModel,
+                                                as: "product_processes",
+                                                required: false,
+                                                attributes: ProductProcessModel.getAllFields(),
+                                                include: [
+                                                    {
+                                                        model: ProcessModel,
+                                                        as: "process",
+                                                        required: false,
+                                                        attributes: ProcessModel.getAllFields()
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        model: ProductionLineProductModel,
+                        as: "production_lines_products",
+                        required: false,
+                        attributes: ProductionLineProductModel.getAllFields(),
+                        include: [
+                            {
+                                model: ProductModel,
+                                as: "products",
+                                required: false,
+                                attributes: ProductModel.getAllFields(),
+                            }
+                        ]
+                    }
+                ]
+            });
             if (!response) {
                 res.status(200).json({ validation: "Produnction line no found" });
                 return;

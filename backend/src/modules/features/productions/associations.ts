@@ -33,6 +33,8 @@ import InventoryMovementModel
     from "./models/references/InventoryMovement.model.js";
 import ProductionOrderModel
     from "./models/references/ProductionOrders.model.js";
+import ProductionLineQueueModel
+    from "./models/references/ProductionLineQueue.js";
 
 
 export {
@@ -55,4 +57,5 @@ export {
     InputTypeModel,
     ProcessModel,
     InputModel,
+    ProductionLineQueueModel,
 };

@@ -14,6 +14,7 @@ interface ProductionAttributes {
     production_order_id: number,
     product_id: number,
     product_name: string,
+    process_id: number,
     qty: number,
     created_at: Date,
     updated_at: Date,
@@ -37,7 +38,7 @@ class ProductionModel
         return [
             "id", "production_order_id",
             "product_name", "product_id",
-            "qty", "created_at",
+            "process_id", "qty", "created_at",
             "updated_at"
         ];
     }
@@ -65,6 +66,13 @@ ProductionModel.init({
         type: DataTypes.INTEGER,
         references: {
             model: "products",
+            key: "id"
+        }
+    },
+    process_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: "processes",
             key: "id"
         }
     },

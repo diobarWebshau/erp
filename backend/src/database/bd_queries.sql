@@ -2061,7 +2061,10 @@ AND po.order_type = 'internal';
 
 
 
-SELECT 
+
+
+
+SELECT
   JSON_OBJECT(
     'id', po.id,
     'order_type', po.order_type,
@@ -2091,18 +2094,53 @@ SELECT
       WHERE p.production_order_id = po.id
     )
   )
-FROM internal_product_production_orders AS ippo
-JOIN production_orders AS po
-  ON po.order_id  = ippo.id
-  AND po.order_type = 'internal'
-WHERE ippo.id = 1;
-
-
-SELECT pop.*
 FROM purchased_orders_products AS pop
 JOIN production_orders AS po
   ON po.order_id = pop.id
   AND po.order_type = 'client'
 WHERE pop.id = 1;
 
+SELECT * FROM internal_production_orders_lines_products;
+SELECT * FROM debug_log;
+SELECT * FROM production_line_queue;
+SELECT * FROM production_orders;
 
+SHOW TRIGGERS LIKE 'productions';
+
+
+SHOW CREATE TABLE productions;
+
+describe productions;
+
+INSERT INTO productions (
+    production_order_id,
+    product_id,
+    product_name,
+    qty,
+    process_id
+) VALUES (
+    1,           -- production_order_id
+    1,           -- product_id
+    'Producto A',-- product_name
+    50,          -- qty
+    3            -- process_id
+);
+
+
+
+    SELECT 
+        IFNULL(SUM(p.qty), 0),
+        IFNULL(SUM(s.qty), 0)
+    FROM production_orders AS po
+    LEFT JOIN productions AS p
+        ON p.production_order_id = po.order_id
+    LEFT JOIN scrap AS s
+        ON s.reference_id = po.id
+        AND s.reference_type = 'Production'
+    WHERE po.id = 4
+        AND po.order_type = 'internal';
+        
+	SELECT * FROM productions;
+
+
+SELECT * from products_processes;

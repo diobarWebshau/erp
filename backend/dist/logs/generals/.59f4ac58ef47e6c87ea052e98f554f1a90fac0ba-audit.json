@@ -6,16 +6,6 @@
     "auditLog": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\.59f4ac58ef47e6c87ea052e98f554f1a90fac0ba-audit.json",
     "files": [
         {
-            "date": 1756570617759,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-08-30.log",
-            "hash": "ebaa5d1eb2cdb26757fd1bc056922700b328d71a72cb24b97bfda62a0e02af42"
-        },
-        {
-            "date": 1756623673038,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-08-31.log",
-            "hash": "182bfdc26f23dc8703094f4b5c748125414e2ad3cc2f63c87e32d456e5742225"
-        },
-        {
             "date": 1756739347157,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-01.log",
             "hash": "264c741b2a59cdc6f96750528678aaccb92fc2785d6e2884b0b955b12cf4d965"
@@ -59,6 +49,21 @@
             "date": 1757686892776,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-12.log",
             "hash": "2565446e909fc50db952659317535fa4c911462a764ab8b70b16350331403969"
+        },
+        {
+            "date": 1757774879085,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-13.log",
+            "hash": "3d04fc77da673c47fce8978a9b2274a51f4fb80f28c88d2aa8fffecb5ea5f6e8"
+        },
+        {
+            "date": 1757860295702,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-14.log",
+            "hash": "32b77e152db137ea84a5303f4508dcd274ed6922bafd4efc3228c681fc6ef353"
+        },
+        {
+            "date": 1757919641723,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-15.log",
+            "hash": "42384595acaa44967bce210195d0a0f04fd59f5ebb82b37eb451bfcf6f0ad369"
         }
     ],
     "hashType": "sha256"

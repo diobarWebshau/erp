@@ -710,6 +710,58 @@ BEGIN
 END //
 DELIMITER ;
 
+
+
+DROP FUNCTION IF EXISTS func_get_production_summary_of_ippo;
+DELIMITER //
+CREATE FUNCTION func_get_production_summary_of_ippo(
+    in_ippo_id INT
+)
+RETURNS JSON
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+	DECLARE v_production_summary JSON;
+	DECLARE v_internal_production_order_qty DECIMAL(14,4);
+	DECLARE v_production_order_qty DECIMAL(14,4);
+	DECLARE v_production_qty DECIMAL(14,4);
+
+	SELECT
+		IFNULL(ippo.qty, 0),
+		IFNULL(po_sum.production_order_qty, 0),
+		IFNULL(p_sum.production_qty, 0)
+	INTO
+		v_internal_production_order_qty,
+		v_production_order_qty,
+		v_production_qty
+	FROM internal_product_production_orders ippo
+	LEFT JOIN (
+		SELECT order_id, SUM(qty) AS production_order_qty
+		FROM production_orders
+		WHERE order_type = 'internal'
+		AND status NOT IN ('cancel')
+		GROUP BY order_id
+	) po_sum ON po_sum.order_id = ippo.id
+	LEFT JOIN (
+		SELECT po.order_id, SUM(p.qty) AS production_qty
+		FROM productions p
+		JOIN production_orders po ON p.production_order_id = po.id
+		WHERE po.order_type = 'internal'
+		AND po.status NOT IN ('cancel')
+		GROUP BY po.order_id
+	) p_sum ON p_sum.order_id = ippo.id
+	WHERE ippo.id = in_ippo_id;
+
+	SET v_production_summary = JSON_OBJECT(
+		"internal_production_order_qty", v_internal_production_order_qty,
+		"production_order_qty", v_production_order_qty,
+		"production_qty", v_production_qty
+	);
+
+	RETURN v_production_summary;
+END //
+DELIMITER ;
+
 DROP FUNCTION IF EXISTS funct_get_stock_available_of_pop_on_location;
 DELIMITER //
 CREATE FUNCTION funct_get_stock_available_of_pop_on_location(
@@ -1076,12 +1128,12 @@ BEGIN
     SELECT 
         IFNULL(SUM(p.qty), 0),
         IFNULL(SUM(s.qty), 0)
-    INTO 
-        v_production_qty,
-        v_scrap_qty
+	INTO
+		v_production_qty,
+		v_scrap_qty
     FROM production_orders AS po
     LEFT JOIN productions AS p
-        ON p.id = po.order_id
+        ON p.production_order_id = po.id
     LEFT JOIN scrap AS s
         ON s.reference_id = po.id
         AND s.reference_type = 'Production'
@@ -1350,6 +1402,8 @@ END //
 DELIMITER ;
 
 
+
+
 DROP FUNCTION IF EXISTS func_get_productions_of_order;
 DELIMITER //
 CREATE FUNCTION func_get_productions_of_order(
@@ -1455,9 +1509,266 @@ DELIMITER ;
 
 
 
+DROP FUNCTION IF EXISTS func_get_order_of_production_order;
+DELIMITER //
+CREATE FUNCTION func_get_order_of_production_order(
+	in_production_order_id INT,
+	in_order_id INT,
+	in_order_type VARCHAR(100)
+)
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+
+	DECLARE v_order_json JSON DEFAULT JSON_OBJECT();
+
+	IF in_order_type = 'internal' THEN
+
+		SELECT
+			JSON_OBJECT(
+				'id', ippo.id,
+				'product_id', ippo.product_id,
+				'product_name', ippo.product_name,
+				'qty', ippo.qty,
+				'location_id', ippo.location_id,
+				'location_name', ippo.location_name,
+				'status', ippo.status,
+				'created_at', ippo.created_at,
+				'updated_at', ippo.updated_at, 
+				'product', (
+					SELECT 
+						JSON_OBJECT(
+							'id', p.id,
+							'name', p.name,
+							'description', p.description,
+							'type', p.type,
+							'sku', p.sku,
+							'active', p.active,
+							'sale_price', p.sale_price,
+							'photo', p.photo,
+							'created_at', p.created_at,
+							'updated_at', p.updated_at,
+							'product_processes', (
+								SELECT 
+									COALESCE(
+										JSON_ARRAYAGG(
+											JSON_OBJECT(
+												'id', pp.id,
+												'process_id', pp.process_id,
+												'product_id', pp.product_id,
+												'sort_order', pp.sort_order,
+												'process', (
+													SELECT 
+														JSON_OBJECT(
+															'id', pr.id,
+															'name', pr.name,
+															'created_at', pr.created_at,
+															'updated_at', pr.updated_at
+														)
+													FROM processes AS pr
+													WHERE pr.id = pp.process_id
+												)
+											)
+										),
+										JSON_ARRAY()
+									)
+								FROM products_processes AS pp
+								WHERE pp.product_id = p.id
+							)
+						)
+					FROM products AS p
+					WHERE p.id = ippo.product_id
+				),
+				'production_summary', (
+					SELECT func_get_production_summary_of_ippo(
+						ippo.id
+					)
+				)
+			)
+		INTO v_order_json
+		FROM internal_product_production_orders AS ippo
+		WHERE ippo.id = in_order_id;
+		
+	ELSE
+
+		SELECT
+			JSON_OBJECT(
+				'id', pop.id,
+				'purchase_order_id', pop.purchase_order_id,
+				'product_id', pop.product_id,
+				'product_name', pop.product_name,
+				'qty', pop.qty,
+				'recorded_price', pop.recorded_price,
+				'original_price', pop.original_price,
+				'status', pop.status,
+				'purchase_order', (
+					SELECT 
+						JSON_OBJECT(
+							'id', pos.id,
+							'order_code', pos.order_code,
+							'delivery_date', pos.delivery_date,
+							'status', pos.status,
+
+							'client_id', pos.client_id,
+							'company_name', pos.company_name,
+							'tax_id', pos.tax_id,
+							'email', pos.email,
+							'phone', pos.phone,
+							'city', pos.city,
+							'state', pos.state,
+							'country', pos.country,
+							'address', pos.address,
+							'zip_code', pos.zip_code,
+							'payment_terms', pos.payment_terms,
+							'tax_regimen', pos.tax_regimen,
+							'cfdi', pos.cfdi,
+							'payment_method', pos.payment_method,
+							
+							'client_address_id', pos.client_address_id,
+							'shipping_address', pos.shipping_address,
+							'shipping_city', pos.shipping_city,
+							'shipping_state', pos.shipping_state,
+							'shipping_country', pos.shipping_country,
+							'shipping_zip_code', pos.shipping_zip_code,
+							
+							'total_price', pos.total_price,
+							'created_at', pos.created_at,
+							'updated_at', pos.updated_at,
+							'purchase_order_products', (
+								SELECT 
+									JSON_ARRAYAGG(
+										JSON_OBJECT(
+											'id', pop.id,
+											'purchase_order_id', pop.purchase_order_id,
+											'product_id', pop.product_id,
+											'product_name', pop.product_name,
+											'qty', pop.qty,
+											'recorded_price', pop.recorded_price,
+											'original_price', pop.original_price,
+											'status', pop.status,
+											'production_summary', (
+												SELECT func_get_production_summary_of_pop(pop.id)
+											), 
+											'product', (
+												SELECT 
+													JSON_OBJECT(
+														'id', p.id,
+														'name', p.name,
+														'description', p.description,
+														'type', p.type,
+														'sku', p.sku,
+														'active', p.active,
+														'sale_price', p.sale_price,
+														'photo', p.photo,
+														'created_at', p.created_at,
+														'updated_at', p.updated_at,
+														'product_processes', (
+															SELECT 
+																COALESCE(
+																	JSON_ARRAYAGG(
+																		JSON_OBJECT(
+																			'id', pp.id,
+																			'process_id', pp.process_id,
+																			'product_id', pp.product_id,
+																			'sort_order', pp.sort_order,
+																			'process', (
+																				SELECT 
+																					JSON_OBJECT(
+																						'id', pr.id,
+																						'name', pr.name,
+																						'created_at', pr.created_at,
+																						'updated_at', pr.updated_at
+																					)
+																				FROM processes AS pr
+																				WHERE pr.id = pp.process_id
+																			)
+																		)
+																	),
+																	JSON_ARRAY()
+																)
+															FROM products_processes AS pp
+															WHERE pp.product_id = p.id
+														)
+													)
+												FROM products AS p
+												WHERE p.id = pop.product_id
+											)
+										)
+									)
+								FROM purchased_orders_products AS pop
+								WHERE pop.purchase_order_id = pos.id
+							)
+						)
+					FROM purchased_orders AS pos
+					WHERE pos.id = pop.purchase_order_id
+				),
+				'product', (
+					SELECT 
+						JSON_OBJECT(
+							'id', p.id,
+							'name', p.name,
+							'description', p.description,
+							'type', p.type,
+							'sku', p.sku,
+							'active', p.active,
+							'sale_price', p.sale_price,
+							'photo', p.photo,
+							'created_at', p.created_at,
+							'updated_at', p.updated_at,
+							'product_processes', (
+								SELECT 
+									COALESCE(
+										JSON_ARRAYAGG(
+											JSON_OBJECT(
+												'id', pp.id,
+												'process_id', pp.process_id,
+												'product_id', pp.product_id,
+												'sort_order', pp.sort_order,
+												'process', (
+													SELECT 
+														JSON_OBJECT(
+															'id', pr.id,
+															'name', pr.name,
+															'created_at', pr.created_at,
+															'updated_at', pr.updated_at
+														)
+													FROM processes AS pr
+													WHERE pr.id = pp.process_id
+												)
+											)
+										),
+										JSON_ARRAY()
+									)
+								FROM products_processes AS pp
+								WHERE pp.product_id = p.id
+							)
+						)
+					FROM products AS p
+					WHERE p.id = pop.product_id
+				)
+			)
+		INTO v_order_json
+		FROM purchased_orders_products AS pop
+		WHERE pop.id = in_order_id;
+
+	END IF;
+
+	RETURN v_order_json;
+
+END //
+DELIMITER ;
 
 
 
+
+
+
+
+
+SELECT func_get_productions_of_order(
+	1, 'client'
+);
 
 
 SELECT get_extra_date_purchased_order_detail(1, 'client');

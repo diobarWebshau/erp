@@ -1,0 +1,16 @@
+### GET ALL
+GET http://localhost:3003/production/production-line-queue
+
+
+### GET BY ID
+GET http://localhost:3003/production/production-line-queue/id/1
+
+
+### CREATE
+POST http://localhost:3003/production/production-line-queue
+Content-Type: application/json
+
+{
+    "production_line_id": 1,
+    "production_order_id": 1
+}

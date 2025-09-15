@@ -47,7 +47,7 @@ class ProductionsController {
         }
     };
     static create = async (req, res, next) => {
-        const { production_order_id, product_id, qty } = req.body;
+        const { production_order_id, product_id, qty, process_id } = req.body;
         try {
             if (!(qty > 0)) {
                 res.status(400).json({
@@ -146,7 +146,8 @@ class ProductionsController {
                 production_order_id,
                 product_id,
                 product_name: product.name,
-                qty
+                qty,
+                process_id
             });
             if (!response) {
                 res.status(400).json({

@@ -17,10 +17,11 @@ import ProcessModel from "./models/base/Processes.model.js";
 import InputTypeModel from "./models/base/InputTypes.model.js";
 import InventoryMovementModel from "./models/references/InventoryMovement.model.js";
 import ProductionOrderModel from "./models/references/ProductionOrders.model.js";
+import ProductionLineQueueModel from "./models/references/ProductionLineQueue.js";
 export { 
 // PRODUCTION
 ProductionModel, ProductionOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ProductionLineProductModel, InternalProductProductionOrderModel, InternalProductionOrderLineProductModel, PurchaseOrderProductController, InventoryMovementModel, 
 // LOCATION V PRODUCTION
 LocationsProductionLinesModel, ProductionLineModel, 
 // PRODUCTS V PRODUCTION
-ProductProcessModel, ProductInputModel, InputTypeModel, ProcessModel, InputModel, };
+ProductProcessModel, ProductInputModel, InputTypeModel, ProcessModel, InputModel, ProductionLineQueueModel, };

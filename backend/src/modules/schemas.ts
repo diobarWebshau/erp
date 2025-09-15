@@ -14,6 +14,7 @@ import {
     productProcessSchema,
     purchasedOrderProductLocationProductionLineSchema,
     shippingOrderPurchaseOrderProductSchema,
+    productionLineQueueSchema
 } from "./features/schemas.js";
 
 import {
@@ -88,5 +89,6 @@ export {
     roleSchema,
     rolePermissionSchema,
     userSchema,
-    ScrapSchema
+    ScrapSchema,
+    productionLineQueueSchema
 }

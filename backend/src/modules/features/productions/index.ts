@@ -38,6 +38,8 @@ import createInventoryMovementsRouter
     from "./routers/InventoryMovements.router.js";
 import createProductionOrderRouter
     from "./routers/ProductionOrder.router.js";
+import createProductionLineQueueRouter
+    from "./routers/ProductionLineQueue.router.js";
 
 const Production = {
     createClientVProduction,
@@ -60,6 +62,7 @@ const Production = {
     createProductVProductionController,
     createInventoryMovementsRouter,
     createProductionOrderRouter,
+    createProductionLineQueueRouter,
 }
 
 export default Production;

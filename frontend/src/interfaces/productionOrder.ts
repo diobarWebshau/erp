@@ -4,6 +4,7 @@ import type { IProduct } from "./product";
 import type { IProduction } from "./production";
 import type { IProductionLine } from "./productionLines";
 import type { IPurchasedOrder } from "./purchasedOrder";
+import type { IPurchasedOrderProduct } from "./purchasedOrdersProducts";
 
 interface ExtraData {
     scrap_qty: number;
@@ -34,9 +35,8 @@ interface IProductionOrder {
     productions?: IProduction[];
     location?: ILocation;
     product?: IProduct;
-    purchase_order?: IPurchasedOrder;
     production_line?: IProductionLine;
-    internal_order?: IInternalProductProductionOrder;
+    order?: IPurchasedOrderProduct | IInternalProductProductionOrder;
 }
 
 type IPartialProductionOrder = Partial<IProductionOrder>;

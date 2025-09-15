@@ -4,6 +4,12 @@ import sequelize
     from "../../../../../mysql/configSequelize.js";
 import { ProductionOrderCreationAttributes } from "../references/ProductionOrders.model.js";
 
+interface ProductionSummary {
+    production_qty: number;
+    production_order_qty: number;
+    internal_production_order_qty: number;
+}
+
 interface InternalProductProductionOrderAttributes {
     id: number,
     product_id: number,
@@ -14,7 +20,8 @@ interface InternalProductProductionOrderAttributes {
     status: string,
     created_at: Date,
     updated_at: Date
-    production_order?: ProductionOrderCreationAttributes
+    production_order?: ProductionOrderCreationAttributes,
+    production_summary?: ProductionSummary
 }
 
 // interface OrderProductBase {

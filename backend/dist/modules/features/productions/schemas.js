@@ -13,4 +13,5 @@ import { productionOrderSchema } from "./schemas/ProductionOrder.schema.js";
 import { productProcessSchema } from "./schemas/ProductProcess.schema.js";
 import { purchasedOrderProductLocationProductionLineSchema } from "./schemas/PurchasedOrderProductLocationProductionLine.schema.js";
 import { shippingOrderPurchaseOrderProductSchema } from "./schemas/ShippingOrderPurchasedOrderProduct.schema.js";
-export { inputSchema, inputTypeSchema, internalProductionOrderLineProductSchema, internalProductProductionOrderSchema, InventoryMovementSchema, locationProductionLineSchema, processSchema, productInputSchema, productionSchema, poductionLineProductSchema, productionLineSchema, productionOrderSchema, productProcessSchema, purchasedOrderProductLocationProductionLineSchema, shippingOrderPurchaseOrderProductSchema, };
+import { productionLineQueueSchema } from "./schemas/ProductionLineQueue.schema.js";
+export { inputSchema, inputTypeSchema, internalProductionOrderLineProductSchema, internalProductProductionOrderSchema, InventoryMovementSchema, locationProductionLineSchema, processSchema, productInputSchema, productionSchema, poductionLineProductSchema, productionLineSchema, productionOrderSchema, productProcessSchema, purchasedOrderProductLocationProductionLineSchema, shippingOrderPurchaseOrderProductSchema, productionLineQueueSchema };

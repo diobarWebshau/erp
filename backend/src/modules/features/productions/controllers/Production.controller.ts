@@ -81,7 +81,7 @@ class ProductionsController {
         async (req: Request, res: Response, next: NextFunction) => {
             const {
                 production_order_id,
-                product_id, qty
+                product_id, qty, process_id
             } = req.body;
             try {
                 if (!(qty > 0)) {
@@ -206,7 +206,8 @@ class ProductionsController {
                     production_order_id,
                     product_id,
                     product_name: product.name,
-                    qty
+                    qty,
+                    process_id
                 });
                 if (!response) {
                     res.status(400).json({

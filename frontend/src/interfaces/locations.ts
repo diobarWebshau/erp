@@ -11,7 +11,7 @@ interface ILocation {
   is_active: boolean,
   created_at: string,
   updated_at: string
-  locations_production_lines?: ILocationProductionLine[]
+  location_production_line?: ILocationProductionLine[]
 }
 
 type IPartialLocation = Partial<ILocation>;

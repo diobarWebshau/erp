@@ -229,6 +229,10 @@ const createApp = (): Express => {
         Features.Production
             .createProductionOrderRouter());
 
+    app.use("/production/production-line-queue",
+        Features.Production
+            .createProductionLineQueueRouter());
+
     app.use(errorMiddleware);
 
     return app;
