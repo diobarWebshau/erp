@@ -112,6 +112,8 @@ const createApp = () => {
         .createProductionOrderRouter());
     app.use("/production/production-line-queue", Features.Production
         .createProductionLineQueueRouter());
+    app.use("/production/products-inputs-processes", Features.Production
+        .createProductInputProcessRouter());
     app.use(errorMiddleware);
     return app;
 };

@@ -30,7 +30,7 @@ import {
     AddModal,
 } from "./modals";
 import DeleteModal
-    from "./../../../../components/ui/modal/deleteModal/DeleteModal";
+    from "../../../../comp/primitives/modal/deleteModal/DeleteModal";
 import type {
     RowAction,
 } from "../../../../components/ui/table/types";

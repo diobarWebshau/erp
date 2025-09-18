@@ -18,6 +18,7 @@ import {
     InputModel,
     InventoryMovementModel,
     ProductionLineQueueModel,
+    ProductInputProcessModel,
 } from "./productions/associations.js";
 
 export {
@@ -38,4 +39,5 @@ export {
     InputModel,
     InventoryMovementModel,
     ProductionLineQueueModel,
+    ProductInputProcessModel
 }

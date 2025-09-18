@@ -7,6 +7,7 @@ import type {
 } from "../../../../../interfaces/productionOrder";
 import stylesModules from "./columns.module.css";
 import { Progress } from "@mantine/core";
+import SingleProgressBarMantine from "../../../../../comp/external/mantine/progress-bar/single-progress-bar/SingleProgressBarMantine";
 
 interface IColumnsProductionOrdersProps {
     onClickContent  : (e: React.MouseEvent, row: Row<IProductionOrder>) => void;
@@ -90,25 +91,10 @@ const columnsProductionOrders = ({
             cell: ({ row }) => {
                 const productionQty = Number(Number(row.original.extra_data?.production_qty).toFixed(2)) ?? 0;
                 const total_order = Number(Number(row.original.qty).toFixed(2)) ?? 0;
-                return <div className={stylesModules.containerProgressIsNotCompleted}>
-                    <span className={stylesModules.containerProgress}>
-                        <Progress
-                            radius="lg"
-                            size="md"
-                            value={productionQty}
-                            striped
-                            animated
-                            classNames={{
-                                root: stylesModules.progressBar,
-                                label: stylesModules.labelProgressBar,
-                                section: stylesModules.sectionProgressBar,
-                            }}
-                        />
-                    </span>
-                    <span className={stylesModules.containerProgressText}>
-                        {productionQty} / {total_order}
-                    </span>
-                </div>
+                return <SingleProgressBarMantine
+                    value={productionQty}
+                    total={total_order}
+                />
             }
         },
         {

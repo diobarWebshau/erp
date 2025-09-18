@@ -56,8 +56,45 @@ import {
     InputModel,
     InventoryMovementModel,
     ProductionLineQueueModel,
+    ProductInputProcessModel,
 } from "./features/associations.js"
 
+/*
+    En Sequelize (y en cualquier ORM con asociaciones), la regla de oro es:
+
+    El modelo que contiene la clave foránea (foreignKey) usa belongsTo.
+
+    El modelo referenciado (la tabla “padre”) usa hasOne o hasMany dependiendo de la cardinalidad.
+
+*/
+
+// Un registro de products_inputs_processes pertenece a un product_input
+ProductInputProcessModel.belongsTo(ProductInputModel, {
+    foreignKey: "product_input_id",
+    as: "product_input",
+    onDelete: "CASCADE"
+});
+
+// Un registro de products_inputs_processes pertenece a un product_process
+ProductInputProcessModel.belongsTo(ProductProcessModel, {
+    foreignKey: "product_process_id",
+    as: "product_process",
+    onDelete: "CASCADE"
+});
+
+// Un product_input puede estar en muchas relaciones products_inputs_processes
+ProductInputModel.hasMany(ProductInputProcessModel, {
+    foreignKey: "product_input_id",
+    as: "input_processes",
+    onDelete: "CASCADE"
+});
+
+// Un product_process puede estar en muchas relaciones products_inputs_processes
+ProductProcessModel.hasMany(ProductInputProcessModel, {
+    foreignKey: "product_process_id",
+    as: "process_inputs",
+    onDelete: "CASCADE"
+});
 
 
 // production_line_queue → production_line (FK está aquí)
@@ -4674,5 +4711,6 @@ export {
     InputModel,
     InventoryMovementModel,
     ScrapModel,
-    ProductionLineQueueModel
+    ProductionLineQueueModel,
+    ProductInputProcessModel
 };

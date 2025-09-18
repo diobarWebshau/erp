@@ -14,7 +14,8 @@ import {
     productProcessSchema,
     purchasedOrderProductLocationProductionLineSchema,
     shippingOrderPurchaseOrderProductSchema,
-    productionLineQueueSchema
+    productionLineQueueSchema,
+    productInputProcessSchema
 } from "./productions/schemas.js"
 
 export {
@@ -33,5 +34,6 @@ export {
     productProcessSchema,
     purchasedOrderProductLocationProductionLineSchema,
     shippingOrderPurchaseOrderProductSchema,
-    productionLineQueueSchema
+    productionLineQueueSchema,
+    productInputProcessSchema
 }

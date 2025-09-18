@@ -17,7 +17,7 @@ import InputToggle from "../../../../../../../../components/ui/table/components/
 import useProductionLinesForProductAtLocation from "../../../../../../../../modelos/locations/hooks/useProductionLinesForProductAtLocation";
 import ReactDayPickerField from "../../../../../../../../components/ui/general/field-react-day-picker/ReactDayPickerField";
 import StandardTextArea from "../../../../../../../../components/ui/table/components/gui/text-area/StandarTextArea";
-import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
+import CustomModal from "../../../../../../../../comp/primitives/modal/customModal/CustomModal";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../../../../../../store/store";
 import CriticalActionButton from "../../../../../../../../components/ui/table/components/gui/button/custom-button/critical-action/CriticalActionButton";

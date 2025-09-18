@@ -16,7 +16,7 @@ import StyleModule
 import type {
     IPartialProductionOrder
 } from "../../../../../../interfaces/productionOrder";
-import CancelModalCustom from "../../../../../../components/ui/modal/custom-modal/cancel/CancelModalCustom";
+import CancelModalCustom from "../../../../../../comp/primitives/modal/custom-modal/cancel/CancelModalCustom";
 import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";

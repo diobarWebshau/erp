@@ -50,11 +50,11 @@ import type {
     RowAction
 } from "../../../../../../../../components/ui/table/types";
 import BaseModal
-    from "../../../../../../../../components/ui/modal/baseGenericModal/BaseModal";
+    from "../../../../../../../../comp/primitives/modal/baseGenericModal/BaseModal";
 import AddProductModal
     from "./modal/AddProductModal";
 import DeleteModal
-    from "../../../../../../../../components/ui/modal/deleteModal/DeleteModal";
+    from "../../../../../../../../comp/primitives/modal/deleteModal/DeleteModal";
 import InputToggle
     from "../../../../../../../../components/ui/table/components/gui/inputss/inputToggle/InputToggle";
 import InputConditionalIcon
@@ -69,12 +69,12 @@ import {
     isValidDate,
     parseMySQLTimestampToDate
 } from "../../../../../../../../utils/fomatted_data_mysql/formtated_date_mysql";
-import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
+import CustomModal from "../../../../../../../../comp/primitives/modal/customModal/CustomModal";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../../../../../../store/store";
 import { Progress } from "@mantine/core";
 
-const InputToggleMemorizado = memo(
+const InputToggleMemoized = memo(
     ({
         value,
         onChange,
@@ -87,6 +87,9 @@ const InputToggleMemorizado = memo(
                 value={value}
                 onChange={onChange}
                 min={1}
+                onlyCommitOnBlur={true}
+                className={styleModule.ContainerInputMemorizado}
+                classNameInput={`nunito-semibold ${styleModule.InputMemorizado}`}
             />
         );
     }
@@ -237,7 +240,7 @@ const Step3 = ({
 
                     return (
                         <div>
-                            <InputToggleMemorizado
+                            <InputToggleMemoized
                                 value={qty}
                                 onChange={onChangeQty}
                             />

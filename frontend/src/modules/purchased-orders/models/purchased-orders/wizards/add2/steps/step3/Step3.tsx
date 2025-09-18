@@ -51,11 +51,11 @@ import type {
     RowAction
 } from "../../../../../../../../components/ui/table/types";
 import BaseModal
-    from "../../../../../../../../components/ui/modal/baseGenericModal/BaseModal";
+    from "../../../../../../../../comp/primitives/modal/baseGenericModal/BaseModal";
 import AddProductModal
     from "./modal/AddProductModal";
 import DeleteModal
-    from "../../../../../../../../components/ui/modal/deleteModal/DeleteModal";
+    from "../../../../../../../../comp/primitives/modal/deleteModal/DeleteModal";
 import InputToggle
     from "../../../../../../../../components/ui/table/components/gui/inputss/inputToggle/InputToggle";
 import InputConditionalIcon
@@ -69,7 +69,7 @@ import {
     formatDateTimeForMySQL,
     isValidDate
 } from "../../../../../../../../utils/fomatted_data_mysql/formtated_date_mysql";
-import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
+import CustomModal from "../../../../../../../../comp/primitives/modal/customModal/CustomModal";
 
 
 const InputToggleMemoized = memo(

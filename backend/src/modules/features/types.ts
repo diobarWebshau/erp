@@ -33,7 +33,9 @@ import {
     ProductProcessManager,
     ShippingOrderPurchaseOrderProductManager,
     ProductionLineQueueAttributes,
-    ProductionLineQueueCreateAttributes
+    ProductionLineQueueCreateAttributes,
+    ProductInputProcessAttributes,
+    ProductInputProcessCreateAttributes
 } from "./productions/types.js"
 
 
@@ -72,5 +74,7 @@ export type {
     ProductProcessManager,
     ShippingOrderPurchaseOrderProductManager,
     ProductionLineQueueAttributes,
-    ProductionLineQueueCreateAttributes
+    ProductionLineQueueCreateAttributes,
+    ProductInputProcessAttributes,
+    ProductInputProcessCreateAttributes
 }

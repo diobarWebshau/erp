@@ -1,7 +1,7 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { QueryTypes, Transaction } from "sequelize";
-import { InternalProductProductionOrderModel, ProductionOrderModel, ProductModel, PurchaseOrderProductModel, ProductionModel, InternalProductionOrderLineProductModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, ProductionLineQueueModel, } from "../../../associations.js";
+import { InternalProductProductionOrderModel, ProductionOrderModel, ProductModel, PurchaseOrderProductModel, ProductionModel, InternalProductionOrderLineProductModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, ProductionLineQueueModel, InventoryMovementModel, } from "../../../associations.js";
 class ProductionOrdersController {
     static getAll = async (req, res, next) => {
         try {
@@ -687,6 +687,18 @@ class ProductionOrdersController {
                         transaction
                     });
                 }
+                const inventoryMovement = await InventoryMovementModel.update({
+                    location_id: location.id,
+                    location_name: location.name
+                }, {
+                    where: {
+                        reference_id: relationship.id,
+                        reference_type: relationship.order_type === 'client'
+                            ? 'Production Order'
+                            : 'Internal Production Order'
+                    },
+                    transaction: transaction
+                });
                 const validateProductionLineQueue = await ProductionLineQueueModel.findOne({
                     where: {
                         production_line_id: production_line.id,

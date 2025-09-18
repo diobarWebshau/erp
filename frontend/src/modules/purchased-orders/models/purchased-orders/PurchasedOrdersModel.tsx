@@ -67,7 +67,7 @@ import ModalAddGeneric
 import ModalEditGeneric
     from "./wizards/edit2/context/ModalEditGeneric";
 import DeleteModal
-    from "../../../../components/ui/modal/deleteModal/DeleteModal";
+    from "../../../../comp/primitives/modal/deleteModal/DeleteModal";
 
 
 const PurchasedOrderModel = () => {

@@ -35,7 +35,8 @@ import ProductionOrderModel
     from "./models/references/ProductionOrders.model.js";
 import ProductionLineQueueModel
     from "./models/references/ProductionLineQueue.js";
-
+import ProductInputProcessModel
+    from "./models/junctions/products_inputs_processes.model.js";
 
 export {
     // PRODUCTION
@@ -58,4 +59,5 @@ export {
     ProcessModel,
     InputModel,
     ProductionLineQueueModel,
+    ProductInputProcessModel
 };

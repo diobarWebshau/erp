@@ -253,6 +253,25 @@ DELIMITER ;
 /****************************************
 *		   TABLE productions			*
 ****************************************/
+
+
+DROP TRIGGER IF EXISTS trigger_create_production;
+DELIMITER //
+CREATE TRIGGER trigger_create_production
+AFTER INSERT ON productions
+FOR EACH ROW
+BEGIN
+	CALL sp_apply_process_input_consumption(
+		NEW.id,
+		NEW.production_order_id,
+		NEW.product_id,
+		NEW.process_id,
+		NEW.qty
+	);
+END //
+DELIMITER ;
+
+
 /*
 DROP TRIGGER IF EXISTS trigger_create_update_status_production_order;
 DELIMITER //

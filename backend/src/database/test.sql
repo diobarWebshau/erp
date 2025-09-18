@@ -156,7 +156,7 @@ RETURNS JSON
 NOT DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE v_json JSON DEFAULT DEFAULT JSON_ARRAY();
+	DECLARE v_json JSON DEFAULT JSON_ARRAY();
 	SELECT
 		JSON_ARRAYAGG(
 			JSON_OBJECT(
@@ -198,40 +198,40 @@ SELECT VERSION();
 
 
 -- COALESCE: primer NO-NULL (N argumentos)
-COALESCE(NULL, NULL, 5, 9)        -- 5
-COALESCE(NULL, 'abc')             -- 'abc'
-COALESCE(NULL, NULL)              -- NULL
+SELECT COALESCE(NULL, NULL, 5, 9);        -- 5
+SELECT COALESCE(NULL, 'abc');             -- 'abc'
+SELECT COALESCE(NULL, NULL);              -- NULL
 
 -- IFNULL: como COALESCE pero solo 2 args
-IFNULL(NULL, 'X')                 -- 'X'
-IFNULL(10, 0)                     -- 10
+SELECT IFNULL(NULL, 'X');             -- 'X'
+SELECT IFNULL(10, 0);                     -- 10
 
 -- GREATEST: máximo (si hay NULL, devuelve NULL)
-GREATEST(3, 8, 5)                 -- 8
-GREATEST(10, NULL, 2)             -- NULL
-GREATEST(COALESCE(10,0)-COALESCE(12,0), 0)  -- 0  (evitar negativos)
+SELECT GREATEST(3, 8, 5);                -- 8
+SELECT GREATEST(10, NULL, 2);             -- NULL
+SELECT GREATEST(COALESCE(10,0)-COALESCE(12,0), 0);  -- 0  (evitar negativos)
 
 -- LEAST: mínimo
-LEAST(3, 8, 5)                    -- 3
-LEAST(GREATEST(120, 0), 100)      -- 100  (clamp a [0,100])
+SELECT LEAST(3, 8, 5);       -- 3
+SELECT LEAST(GREATEST(120, 0), 100);      -- 100  (clamp a [0,100])
 
 -- NULLIF: devuelve NULL si a = b, si no devuelve a
-NULLIF(5, 5)                      -- NULL
-NULLIF(5, 0)                      -- 5
+SELECT NULLIF(5, 5);                      -- NULL
+SELECT NULLIF(5, 0);                      -- 5
 
 -- ISNULL (MySQL): 1 si es NULL, 0 si no
-ISNULL(NULL)                      -- 1
-ISNULL('hi')                      -- 0
+SELECT ISNULL(NULL);                      -- 1
+SELECT ISNULL('hi');                      -- 0
 
 -- IF: condicional ternario
-IF(10 > 5, 'ok', 'no')            -- 'ok'
-IF(NULL IS NULL, 'yes', 'no')     -- 'yes'
+SELECT IF(10 > 5, 'ok', 'no');            -- 'ok'
+SELECT IF(NULL IS NULL, 'yes', 'no');     -- 'yes'
 
 -- CASE: condiciones múltiples
-CASE WHEN 90 >= 90 THEN 'A'
+SELECT CASE WHEN 90 >= 90 THEN 'A'
      WHEN 90 >= 80 THEN 'B'
      ELSE 'C'
-END                               -- 'A'
+END;                               -- 'A'
 
 -- LEAD / LAG (ventana): siguiente / anterior valor
 -- Si qty = [20,10,5] por stage ASC:

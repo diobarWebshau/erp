@@ -13,6 +13,7 @@ CREATE TABLE location_types(
     PRIMARY KEY(id)
 );
 
+
 CREATE TABLE locations(
     id INT AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -22,6 +23,7 @@ CREATE TABLE locations(
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id)
 );
+
 
 CREATE TABLE locations_location_types(
     id INT AUTO_INCREMENT,
@@ -33,6 +35,7 @@ CREATE TABLE locations_location_types(
     INDEX idx_locations_location_types_location_id (location_id),
     INDEX idx_locations_location_types_location_id_type_id (location_type_id, location_id)
 );
+
 -- CLIENTS
 CREATE TABLE clients(
     id INT AUTO_INCREMENT,
@@ -374,6 +377,7 @@ CREATE TABLE processes(
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id)
 );
+DROP TABLE IF EXISTS products_inputs;
 CREATE TABLE products_inputs(
     id INT AUTO_INCREMENT,
     product_id INT,
@@ -382,8 +386,10 @@ CREATE TABLE products_inputs(
     PRIMARY KEY(id),
     FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY(input_id) REFERENCES inputs(id) ON DELETE CASCADE,
-    UNIQUE(product_id, input_id)
+    UNIQUE(product_id, input_id),
+    INDEX ix_products_inputs_id_product (id, product_id)
 );
+DROP TABLE IF EXISTS products_processes;
 CREATE TABLE products_processes(
     id INT AUTO_INCREMENT,
     product_id INT,
@@ -392,7 +398,8 @@ CREATE TABLE products_processes(
     PRIMARY KEY(id),
     FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY(process_id) REFERENCES processes(id) ON DELETE CASCADE,
-    UNIQUE(product_id, process_id) -- UNIQUE(product_id, sort_order)
+    UNIQUE(product_id, process_id), -- UNIQUE(product_id, sort_order)
+    INDEX ix_products_inputs_id_product (id, product_id)
 );
 -- LOCATION V --> PRODUCTION
 CREATE TABLE production_lines(
@@ -588,6 +595,32 @@ CREATE TABLE production_line_queue (
     FOREIGN KEY (production_order_id) REFERENCES production_orders(id) ON DELETE CASCADE
 );
 
+DROP TABLE IF EXISTS products_inputs_processes;
+CREATE TABLE products_inputs_processes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  product_input_id INT NOT NULL,
+  product_process_id INT NOT NULL,
+
+  qty DECIMAL(18,6) NOT NULL DEFAULT 0,  -- consumo en ESTA etapa por 1 ud del producto
+
+  CONSTRAINT fk_pip_input_same_product
+    FOREIGN KEY (product_input_id, product_id)
+    REFERENCES products_inputs(id, product_id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_pip_process_same_product
+    FOREIGN KEY (product_process_id, product_id)
+    REFERENCES products_processes(id, product_id)
+    ON DELETE CASCADE,
+
+  UNIQUE KEY uq_pip (product_id, product_process_id, product_input_id),
+  KEY ix_pip_product (product_id),
+  KEY ix_pip_input   (product_input_id),
+  KEY ix_pip_process (product_process_id)
+);
+
+
 /* EMPLEADO PARA PRUEBAS IGNORAR */
 INSERT INTO operations(name)
 VALUES ('create'),
@@ -616,10 +649,6 @@ SELECT * FROM purchased_orders_products;
 SELECT * FROM purchased_orders;
 
 SELECT CONNECTION_ID();
-
-
-
-
 
 -- 10 direcciones para client_id = 1
 INSERT INTO clients_addresses (client_id, address, city, state, country, zip_code) VALUES

@@ -27,7 +27,7 @@ import {
 import useClientAddresses
     from "../../hooks/client-addresses/useClientAddresses";
 import CustomModal
-    from "../../../../../../components/ui/modal/customModal/CustomModal";
+    from "../../../../../../comp/primitives/modal/customModal/CustomModal";
 import WarningIcon
     from "../../../../../../components/icons/WarningIcon";
 import type { IPartialPurchasedOrder } from "../../../../../../interfaces/purchasedOrder";

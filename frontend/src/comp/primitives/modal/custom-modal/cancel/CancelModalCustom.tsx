@@ -1,9 +1,8 @@
-import type { ReactNode } from "react";
 import CustomModal from "../../customModal/CustomModal";
 import StyleModule from "./CancelModalCustom.module.css";
-import FadeButton from "../../../table/components/gui/button/fade-button/FadeButton";
+import FadeButton from "../../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
 import { CircleX, X } from "lucide-react";
-import WarningIcon from "../../../../../assets/icons/warning-icon.svg";
+import type { JSX } from "react";
 
 interface ICancelModalProps {
     onClose: () => void;

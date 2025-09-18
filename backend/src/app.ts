@@ -233,6 +233,10 @@ const createApp = (): Express => {
         Features.Production
             .createProductionLineQueueRouter());
 
+    app.use("/production/products-inputs-processes",
+        Features.Production
+            .createProductInputProcessRouter());
+
     app.use(errorMiddleware);
 
     return app;

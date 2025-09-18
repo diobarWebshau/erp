@@ -11,9 +11,10 @@
     position: sticky;
     top: 0;
     z-index: 2;
-
+    
     /* estilos */
     color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-border-table);
 }
 
 .thTableHeader > * {

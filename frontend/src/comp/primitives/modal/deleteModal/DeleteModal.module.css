@@ -1,0 +1,161 @@
+.container {
+    /* dimension */
+    width: 30%;
+    height: 25%;
+
+}
+
+.containerCustom {
+    /* distribucion flex */
+    justify-content: center;
+    align-items: center;
+    gap: 5%;
+
+}
+
+.closeButton {
+    /* posicionamiento */
+    position: absolute;
+    top: 0.3rem;
+    right: 0.3rem;
+
+    /* estilos */
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+}
+
+.closeButton {
+    color: var(--color-theme-primary);
+}
+
+.content {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem;
+
+}
+
+.title {
+    /* estilos */
+    font-size: 24px;
+    color: var(--color-theme-font-black);
+}
+
+.error {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    /* estilos */
+    color: red;
+}
+
+
+/*?  Container buttons */
+
+.containerButtons {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+
+    /* estilos */
+    font-size: 14px;
+}
+
+.containerButtons>* {
+    /* dimension */
+    width: 200px;
+    height: 45px;
+
+    /* distribucion box */
+    background-color: var(--color-theme-font-white);
+    border-radius: 10px;
+
+    /* estilos */
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.deleteButtonSpan,
+.cancelButtonSpan {
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.iconCancel,
+.iconDelete {
+    /* dimension */
+    width: 15px;
+    height: 15px;
+}
+
+.deleteButtonLabel {
+    /* estilos */
+    color: var(--color-theme-font-white);
+}
+
+.cancelButtonLabel {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+.iconDelete {
+    /* estilos */
+    color: var(--color-theme-font-white);
+}
+
+.iconCancel {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+
+.cancelButton:hover {
+    /* estilos */
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.cancelButton:hover .cancelButtonLabel,
+.cancelButton:hover .iconCancel {
+    /* estilos */
+    color: var(--color-alert);
+}
+
+.deleteButton {
+    background-color: var(--color-alert);
+}
+
+.deleteButton:hover {
+    /* estilos */
+    background-color: var(--color-alert-2);
+}
+
+
+/*?  Container warning icon */
+
+.containerWarningIcon {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.warningIcon {
+    /* estilos */
+    color: var(--color-theme-primary);
+}

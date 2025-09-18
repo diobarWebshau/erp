@@ -12,6 +12,7 @@ import {
     sendMultipleInternalProductionOrderLinesProduct,
     sendMultiplePurchasedOrderProductLocations,
     sendMultipleInventoryMovement,
+    sendMultipleProductsInputsProcesses,
 } from "./modules2/features/production/index.js"
 
 import insertDataCoresModules from "./modules2/core/index.js"
@@ -42,6 +43,7 @@ try {
     await sendMultipleInputs(),
     await sendMultipleProductProcesses(),
     await sendMultipleProductsInputs(),
+    await sendMultipleProductsInputsProcesses(),
 
     // creacion de lineas de produccion
     await sendMultipleProductionLines();

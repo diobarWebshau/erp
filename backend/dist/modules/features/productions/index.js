@@ -19,6 +19,7 @@ import createPurchaseOrdersProductsRouter from "./routers/PurchasedOrderProduct.
 import createInventoryMovementsRouter from "./routers/InventoryMovements.router.js";
 import createProductionOrderRouter from "./routers/ProductionOrder.router.js";
 import createProductionLineQueueRouter from "./routers/ProductionLineQueue.router.js";
+import createProductInputProcessRouter from "./routers/ProductsInputsProcesses.router.js";
 const Production = {
     createClientVProduction,
     createInputsRouter,
@@ -41,5 +42,6 @@ const Production = {
     createInventoryMovementsRouter,
     createProductionOrderRouter,
     createProductionLineQueueRouter,
+    createProductInputProcessRouter,
 };
 export default Production;

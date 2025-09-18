@@ -14,7 +14,7 @@ import SingleSelectSearchCheck from "../../../../../../../../components/ui/table
 import CustomSelectObject from "../../../../../../../../components/ui/table/components/gui/customSelectObject/CustomSelectObject";
 import InputToggle from "../../../../../../../../components/ui/table/components/gui/inputss/inputToggle/InputToggle";
 import { update_production_order } from "../../../../context/AddModalProductionOrderActions";
-import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
+import CustomModal from "../../../../../../../../comp/primitives/modal/customModal/CustomModal";
 import WarningIcon from "../../../../../../../../components/icons/WarningIcon";
 import ValidationContainer from "../../../../../../../../components/ui/table/components/gui/validation-container/ValidationContainer";
 import CriticalActionButton from "../../../../../../../../components/ui/table/components/gui/button/custom-button/critical-action/CriticalActionButton";

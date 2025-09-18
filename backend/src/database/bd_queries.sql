@@ -2122,8 +2122,8 @@ INSERT INTO productions (
     1,           -- production_order_id
     1,           -- product_id
     'Producto A',-- product_name
-    5,          -- qty
-    3            -- process_id
+    3,          -- qty
+    3           -- process_id
 );
 
 
@@ -2180,3 +2180,53 @@ SELECT * from products_processes;
             
             
 SELECT * FROM internal_product_production_orders;
+
+
+SELECT
+	p.id AS product_id,
+    p.name AS product_name,
+    i.name AS input_name,
+    pi.equivalence,
+    pr.id AS process_id,
+    pr.name AS process_name,
+    pip.qty as consumable_qty
+FROM products_inputs_processes AS pip
+JOIN products AS p
+    ON p.id = pip.product_id
+JOIN products_inputs AS pi
+    ON pi.id = pip.product_input_id
+JOIN inputs AS i
+    ON i.id = pi.input_id
+JOIN products_processes AS pp
+    ON pp.id = pip.product_process_id
+JOIN processes AS pr
+    ON pr.id = pp.process_id
+WHERE p.id = 1;
+
+
+
+
+    SELECT pp.*
+    FROM products_processes pp
+    WHERE pp.product_id = 1
+    AND pp.sort_order = (
+        SELECT MAX(sort_order)
+        FROM products_processes
+        WHERE product_id = 1
+    )
+    LIMIT 1;
+    
+    
+	SELECT 
+        (
+            SELECT pp.process_id
+            FROM products_processes pp
+            WHERE pp.product_id = 1
+            AND pp.sort_order = (
+                SELECT MAX(sort_order)
+                FROM products_processes
+                WHERE product_id = 1
+            )
+            LIMIT 1
+        ) = 3;
+

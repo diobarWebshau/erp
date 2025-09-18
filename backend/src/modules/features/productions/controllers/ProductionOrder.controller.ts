@@ -24,6 +24,7 @@ import {
     PurchasedOrdersProductsLocationsProductionLinesModel,
     ProductionLineModel,
     ProductionLineQueueModel,
+    InventoryMovementModel,
 } from "../../../associations.js";
 import {
     ProductionOrderAttributes
@@ -893,6 +894,7 @@ class ProductionOrdersController {
                 })
                 console.log(`actualizo registro de internal_product_production_order`)
                 console.log(responseUpdateInternalProductProductionOrder[0])
+
             }
 
             if (production_line) {
@@ -915,6 +917,19 @@ class ProductionOrdersController {
                             transaction
                         });
                 }
+
+                const inventoryMovement = await InventoryMovementModel.update({
+                    location_id: location.id,
+                    location_name: location.name
+                }, {
+                    where: {
+                        reference_id: relationship.id,
+                        reference_type: relationship.order_type === 'client'
+                            ? 'Production Order'
+                            : 'Internal Production Order'
+                    },
+                    transaction: transaction
+                });
 
                 const validateProductionLineQueue =
                     await ProductionLineQueueModel.findOne({

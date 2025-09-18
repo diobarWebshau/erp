@@ -15,9 +15,9 @@ import {
     CircleX, Trash2, X
 } from "lucide-react";
 import FadeButton
-    from "../../table/components/gui/button/fade-button/FadeButton";
+    from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
 import WarningIcon
-    from "../../../icons/WarningIcon";
+    from "../../../../components/icons/WarningIcon";
 import BaseModal from "../baseGenericModal/BaseModal";
 
 interface IDeleteModalProps {

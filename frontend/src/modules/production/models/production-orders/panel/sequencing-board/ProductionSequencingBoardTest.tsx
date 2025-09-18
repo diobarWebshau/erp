@@ -23,7 +23,7 @@ import { restrictToParentElement, restrictToHorizontalAxis, restrictToVerticalAx
 import { Progress } from "@mantine/core";
 // SegmentedProgress.tsx (Mantine v7)
 import { Group, Text } from '@mantine/core';
-import BaseModal from "../../../../../../components/ui/modal/baseGenericModal/BaseModal";
+import BaseModal from "../../../../../../comp/primitives/modal/baseGenericModal/BaseModal";
 import PopoverFloatingIUBase from "../../../../../../components/ui/popover_floatingIU/PopoverFloatingIUBase";
 import GenericTable from "../../../../../../components/ui/table/tableContext/GenericTable";
 import type { ColumnDef } from "@tanstack/react-table";

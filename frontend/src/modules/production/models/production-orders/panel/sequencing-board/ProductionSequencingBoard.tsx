@@ -24,7 +24,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { Progress } from "@mantine/core";
 import { Group, Text } from '@mantine/core';
-import BaseModal from "../../../../../../components/ui/modal/baseGenericModal/BaseModal";
+import BaseModal from "../../../../../../comp/primitives/modal/baseGenericModal/BaseModal";
 import PopoverFloatingIUBase from "../../../../../../components/ui/popover_floatingIU/PopoverFloatingIUBase";
 import GenericTable from "../../../../../../components/ui/table/tableContext/GenericTable";
 import type { ColumnDef } from "@tanstack/react-table";

@@ -1,0 +1,46 @@
+### GET - Listar todas
+GET http://localhost:3003/production/products-inputs-processes
+
+### GET - Por ID
+GET http://localhost:3003/production/products-inputs-processes/id/1
+
+### POST - Crear relación (consumo por proceso)
+POST http://localhost:3003/production/products-inputs-processes
+Content-Type: application/json
+
+{
+  "product_id": 1,
+  "product_input_id": 1,
+  "product_process_id": 1,
+  "qty": 1.5
+}
+
+### POST - Otro proceso del mismo insumo (ejemplo)
+POST http://localhost:3003/production/products-inputs-processes
+Content-Type: application/json
+
+{
+  "product_id": 1,
+  "product_input_id": 1,
+  "product_process_id": 2,
+  "qty": 2.0
+}
+
+### PATCH - Actualizar relación (p. ej., ajustar qty)
+PATCH http://localhost:3003/production/products-inputs-processes/1
+Content-Type: application/json
+
+{
+  "qty": 2.25
+}
+
+### PATCH - Cambiar proceso/insumo (opcional)
+PATCH http://localhost:3003/production/products-inputs-processes/1
+Content-Type: application/json
+
+{
+  "product_process_id": 13
+}
+
+### DELETE - Eliminar relación
+DELETE http://localhost:3003/production/products-inputs-processes/1

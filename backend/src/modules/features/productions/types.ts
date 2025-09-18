@@ -65,6 +65,10 @@ import {
     ProductionLineQueueAttributes,
     ProductionLineQueueCreateAttributes
 } from "./models/references/ProductionLineQueue.js";
+import {
+    ProductInputProcessAttributes,
+    ProductInputProcessCreateAttributes,
+} from "./models/junctions/products_inputs_processes.model.js";
 export type {
     InputTypeAttributes,
     InputTypeCreateAttributes,
@@ -100,5 +104,7 @@ export type {
     ProductProcessCreateAttributes,
     ProductProcessManager,
     ProductionLineQueueAttributes,
-    ProductionLineQueueCreateAttributes
+    ProductionLineQueueCreateAttributes,
+    ProductInputProcessAttributes,
+    ProductInputProcessCreateAttributes
 }

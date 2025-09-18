@@ -423,8 +423,6 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
 .ContainerInputMemorizado {
     /* dimension */
     width: 100%;
-
-    
     display: flex;
 }
 

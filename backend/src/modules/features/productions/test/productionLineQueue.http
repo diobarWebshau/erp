@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### UPDATE
-PATH http://localhost:3003/production/production-line-queue/1
+PATCH http://localhost:3003/production/production-line-queue/1
 Content-Type: application/json
 
 {

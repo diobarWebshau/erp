@@ -26,6 +26,8 @@ import sendMultiplePurchasedOrderProductLocations
     from "./purchased_orders_products_production_lines/many.js";
 import sendMultipleInventoryMovement
     from "./inventory-movements/many.js";
+import sendMultipleProductsInputsProcesses
+    from "./products_inputs_processes/many.js";
 
 export {
     sendMultipleInputs,
@@ -42,4 +44,5 @@ export {
     sendMultipleInternalProductionOrderLinesProduct,
     sendMultiplePurchasedOrderProductLocations,
     sendMultipleInventoryMovement,
+    sendMultipleProductsInputsProcesses,
 }

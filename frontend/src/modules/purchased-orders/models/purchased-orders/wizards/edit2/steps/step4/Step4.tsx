@@ -39,7 +39,7 @@ import {
 import formatDateToDMY
     from "../../../../../../../../components/ui/table/utils/formatDateToDMY";
 import DeleteModal
-    from "../../../../../../../../components/ui/modal/deleteModal/DeleteModal";
+    from "../../../../../../../../comp/primitives/modal/deleteModal/DeleteModal";
 import {
     useSelector
 } from "react-redux";
