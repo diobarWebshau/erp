@@ -56,7 +56,7 @@ BEGIN
             FROM universe
             GROUP BY process_id
         ) u
-    )
+    ),
     /* Acumulado hecho por proceso en esta OP */
     done AS (
         SELECT 
@@ -95,8 +95,8 @@ BEGIN
         SELECT
         w.stage,
         w.process_id,
-        GREATEST(w.qty_done - w.next_qty, 0) AS in_stage_now, -- GREATEST toma el valor maximo de una columna GREATEST(columna, valor por defecto)
-        GREATEST(w.qty_done - t.finished_qty, 0) AS passed_excluding_finished -
+        GREATEST(w.qty_done - w.next_qty, 0) AS in_stage_now,
+        GREATEST(w.qty_done - t.finished_qty, 0) AS passed_excluding_finished 
         FROM with_next w
         CROSS JOIN totals t
         WHERE w.stage < w.max_stage

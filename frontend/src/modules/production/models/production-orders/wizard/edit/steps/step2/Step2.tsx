@@ -2,7 +2,7 @@
 import { Calendar, ChevronDown, Pencil, Search } from "lucide-react";
 import StyleModule from "./Step2.module.css";
 import { useAddModalProductionOrderDispatch, useAddModalProductionOrderState } from "../../../../context/AddModalProductionOrderHooks";
-import { back_step, next_step, update_draft_production_order, remove_draft_attributes, update_production_order } from "../../../../context/AddModalProductionOrderActions";
+import { back_step, next_step, update_draft_production_order, remove_draft_attributes, update_production_order, set_production_order } from "../../../../context/AddModalProductionOrderActions";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { IPartialProductionOrder } from "../../../../../../../../interfaces/productionOrder";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
@@ -58,6 +58,7 @@ const Step2 = ({
     const handlerOnChangeSelectedLocation = (
         location: ILocation | null | undefined) => {
         if (location) {
+            console.log("location", location);
             dispatch(update_draft_production_order({
                 location: location,
             }))
@@ -166,7 +167,10 @@ const Step2 = ({
         const {
             productionLinesForProductAtLocation,
             loadingProductionLinesForProductAtLocation,
-        } = useProductionLinesForProductAtLocation(state.draft.location?.id ?? null, state.draft.product?.id ?? null);
+        } = useProductionLinesForProductAtLocation(
+            state.draft.product?.id ?? null,
+            state.draft.location?.id ?? null
+        );
 
         return (
             <div className={StyleModule.externalContainerCustomSelectObject}>
@@ -230,6 +234,7 @@ const Step2 = ({
             } else {
                 if (changes.length > 0) {
                     if (changes.includes('location')) {
+                        
                         dispatch(remove_draft_attributes(['production_line']));
                         dispatch(back_step());
                     }
@@ -375,6 +380,7 @@ const Step2 = ({
             onUpdate(state.draft);
             if (!(Object.keys(validationError).length > 0)) {
                 // setShowModalConfirm(!showModalConfirm);
+                dispatch(set_production_order(state.draft));
                 dispatch(next_step());
             }
         }
@@ -439,7 +445,7 @@ const Step2 = ({
                 />
                 <TertiaryActionButtonCustom
                     onClick={handleToggleModalConfirm}
-                    label="Editar"
+                    label="Guardar"
                     icon={<Pencil />}
                 />
             </section>

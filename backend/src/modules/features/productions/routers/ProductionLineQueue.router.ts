@@ -14,6 +14,9 @@ const createProductionLineQueueRouter = (): Router => {
         ProductionLineQueueController.create);
     productionLineQueueRouter.patch("/reorder/:production_line_id",
         ProductionLineQueueController.reorderProductionLineQueueOptimizadaTablaTemporal);
+    productionLineQueueRouter.patch("/:id",
+        validateProductionLineQueueMiddleware,
+        ProductionLineQueueController.update);
     return productionLineQueueRouter;
 }
 

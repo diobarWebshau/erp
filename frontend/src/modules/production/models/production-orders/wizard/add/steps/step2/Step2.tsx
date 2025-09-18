@@ -344,25 +344,23 @@ const Step2 = ({
                     </ValidationContainer>
                 </div>
                 {!loadingInventoryInputsProduct && state.data.product && state.data.location && (
-                    <div className={StyleModule.externalContainerGenericTable}>
-                        <GenericTable
-                            modelName="InventoryInputs"
-                            columns={columnsInventoryInputs}
-                            data={inventoryInputsProduct}
-                            onDeleteSelected={() => console.log("Delete selected")}
-                            getRowId={i => i.input_id.toString()}
-                            enableFilters={false}
-                            enablePagination={false}
-                            enableRowSelection={false}
-                            enableOptionsColumn={false}
-                            enableSorting={false}
-                            enableViews={false}
-                            enableRowEditClick={false}
-                            typeRowActions="icon"
-                            noResultsMessage="El producto no requiere de insumos"
-                            classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
-                        />
-                    </div>
+                    <GenericTable
+                        modelName="InventoryInputs"
+                        columns={columnsInventoryInputs}
+                        data={inventoryInputsProduct}
+                        onDeleteSelected={() => console.log("Delete selected")}
+                        getRowId={i => i.input_id.toString()}
+                        enableFilters={false}
+                        enablePagination={false}
+                        enableRowSelection={false}
+                        enableOptionsColumn={false}
+                        enableSorting={false}
+                        enableViews={false}
+                        enableRowEditClick={false}
+                        typeRowActions="icon"
+                        noResultsMessage="El producto no requiere de insumos"
+                        classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
+                    />
                 )}
             </section>
             <section className={StyleModule.footerSection}>

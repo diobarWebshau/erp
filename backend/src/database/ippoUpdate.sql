@@ -174,7 +174,7 @@ BEGIN
     ELSE
 
         -- Calculamos la diferencia de la cantidad de producto a comprometer            
-        SET v_prod_diff_qty = ABS(in_new_qty - v_production_allocation);
+        SET v_prod_diff_qty = ABS(in_new_qty - in_old_qty);
 
         -- Abrimos el cursor para poder iterar sobre los inputs del producto
         OPEN cur_inputs_product;

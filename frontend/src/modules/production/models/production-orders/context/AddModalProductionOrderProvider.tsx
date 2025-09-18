@@ -56,6 +56,8 @@ const ProviderAddModalProductionOrder = ({
 
 
     useEffect(() => {
+        console.log('se actualizo data porque cambio ')
+        console.log(`data`, data);
         if (data) {
             // console.log('se actualizo data porque cambio ')
             // console.log(`data`, data);

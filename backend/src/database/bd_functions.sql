@@ -1105,11 +1105,10 @@ END //
 DELIMITER ;
 
 
-USE u482698715_shau_erp;
-
 DROP FUNCTION IF EXISTS func_get_extra_data_production_order;
 DELIMITER //
 CREATE FUNCTION func_get_extra_data_production_order(
+    in_po_id INT,
     in_order_id INT,
     in_order_type VARCHAR(100)
 )
@@ -1174,45 +1173,46 @@ BEGIN
         LEFT JOIN locations AS l
             ON l.id = lpl.location_id
         WHERE 
-            po.id = in_order_id
+            po.id = in_po_id
             AND po.order_type = in_order_type;
 
     ELSE
 
         -- Obtener datos extra de la orden de produccion
-        SELECT 
-            JSON_OBJECT(
-                'id', l.id,
-                'name', l.name,
-                'description', l.description,
-                'is_active', l.is_active,
-                'created_at', l.created_at,
-                'updated_at', l.updated_at
-            ),
-            JSON_OBJECT(
-                'id', pl.id,
-                'name', pl.name,
-                'is_active', pl.is_active,
-                'created_at', pl.created_at,
-                'updated_at', pl.updated_at
-            )
-        INTO 
-            v_location,
-            v_production_line
-        FROM production_orders AS po
-        LEFT JOIN internal_product_production_orders AS ippo
-            ON ippo.id = po.order_id
-        LEFT JOIN internal_production_orders_lines_products AS ipolp
-            ON ipolp.internal_product_production_order_id = ippo.id
-        LEFT JOIN production_lines AS pl
-            ON pl.id = ipolp.production_line_id
-        LEFT JOIN locations_production_lines AS lpl
-            ON lpl.production_line_id = pl.id
-        LEFT JOIN locations AS l
-            ON l.id = lpl.location_id
-        WHERE 
-            po.id = in_order_id
-            AND po.order_type = in_order_type;
+      	SELECT 
+			/* location desde la orden interna */
+			JSON_OBJECT(
+				'id', l.id,
+				'name', l.name,
+				'description', l.description,
+				'is_active', l.is_active,
+				'created_at', l.created_at,
+				'updated_at', l.updated_at
+			) AS location_json,
+
+			/* línea de producción */
+			JSON_OBJECT(
+				'id', pl.id,
+				'name', pl.name,
+				'is_active', pl.is_active,
+				'created_at', pl.created_at,
+				'updated_at', pl.updated_at
+			) AS line_json
+		INTO 
+			v_location,
+			v_production_line
+		FROM production_orders AS po
+		JOIN internal_product_production_orders AS ippo
+			ON ippo.id = po.order_id
+		LEFT JOIN internal_production_orders_lines_products AS ipolp
+			ON ipolp.internal_product_production_order_id = ippo.id
+		LEFT JOIN production_lines AS pl
+			ON pl.id = ipolp.production_line_id
+		LEFT JOIN locations AS l
+			ON l.id = ippo.location_id
+		WHERE po.id = in_po_id
+		AND po.order_type = in_order_type
+		LIMIT 1;
 
     END IF;
 
@@ -1388,13 +1388,12 @@ BEGIN
 			ON ipolp.internal_product_production_order_id = ippo.id
 		LEFT JOIN production_lines AS pl
 			ON pl.id = ipolp.production_line_id
-		LEFT JOIN locations_production_lines AS lpl
-			ON lpl.production_line_id = pl.id
 		LEFT JOIN locations AS l
-			ON l.id = lpl.location_id
+			ON l.id = ippo.location_id
 		WHERE ippo.id = in_order_id
 			AND po.order_type = in_order_type
 		LIMIT 1;
+
 	END IF;
 
 	RETURN v_extra_data;
@@ -1763,17 +1762,6 @@ DELIMITER ;
 
 
 
-
-
-
-SELECT func_get_productions_of_order(
-	1, 'client'
-);
-
-
-SELECT get_extra_date_purchased_order_detail(1, 'client');
-select func_get_product_production_locations(1);
-select func_get_extra_data_production_order(1, 'internal');
 
 
 

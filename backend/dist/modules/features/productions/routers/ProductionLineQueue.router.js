@@ -7,6 +7,7 @@ const createProductionLineQueueRouter = () => {
     productionLineQueueRouter.get("/id/:id", ProductionLineQueueController.getById);
     productionLineQueueRouter.post("/", validateProductionLineQueueMiddleware, ProductionLineQueueController.create);
     productionLineQueueRouter.patch("/reorder/:production_line_id", ProductionLineQueueController.reorderProductionLineQueueOptimizadaTablaTemporal);
+    productionLineQueueRouter.patch("/:id", validateProductionLineQueueMiddleware, ProductionLineQueueController.update);
     return productionLineQueueRouter;
 };
 export default createProductionLineQueueRouter;

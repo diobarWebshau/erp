@@ -23,6 +23,7 @@ import {
     InternalProductionOrderLineProductModel,
     PurchasedOrdersProductsLocationsProductionLinesModel,
     ProductionLineModel,
+    ProductionLineQueueModel,
 } from "../../../associations.js";
 import {
     ProductionOrderAttributes
@@ -76,7 +77,7 @@ class ProductionOrdersController {
                             ...ProductionOrderModel.getAllFields(),
                             [
                                 sequelize.literal(
-                                    "func_get_extra_data_production_order(`ProductionOrderModel`.`id`, `ProductionOrderModel`.`order_type`)"
+                                    "func_get_extra_data_production_order(`ProductionOrderModel`.`id`, `ProductionOrderModel`.`order_id`, `ProductionOrderModel`.`order_type`)"
                                 ),
                                 "extra_data"
                             ]
@@ -124,7 +125,7 @@ class ProductionOrdersController {
                             ...ProductionOrderModel.getAllFields(),
                             [
                                 sequelize.literal(
-                                    "func_get_extra_data_production_order(`ProductionOrderModel`.`id`, `ProductionOrderModel`.`order_type`)"
+                                    "func_get_extra_data_production_order(`ProductionOrderModel`.`id`, `ProductionOrderModel`.`order_id`, `ProductionOrderModel`.`order_type`)"
                                 ),
                                 "extra_data"
                             ],
@@ -881,6 +882,8 @@ class ProductionOrdersController {
                 console.log("Registro encontrado ******************************************************************************");
                 console.log(responsedasdasd?.toJSON());
                 console.log("******************************************************************************");
+                console.log(relationship);
+
                 const responseUpdateInternalProductProductionOrder = await InternalProductProductionOrderModel.update({
                     location_id: location.id,
                     location_name: location.name,
@@ -911,6 +914,52 @@ class ProductionOrdersController {
                             where: { internal_product_production_order_id: relationship.order_id },
                             transaction
                         });
+                }
+
+                const validateProductionLineQueue =
+                    await ProductionLineQueueModel.findOne({
+                        where: {
+                            production_line_id: production_line.id,
+                            production_order_id: id
+                        },
+                        transaction
+                    });
+
+                // 1️⃣ Bloquear todas las filas de la línea de producción
+                await ProductionLineQueueModel.findAll({
+                    where: { production_line_id: production_line.id },
+                    lock: transaction.LOCK.UPDATE,
+                    transaction
+                });
+
+                // 1️⃣ Bloquear todas las filas de la línea de producción
+                const maxPosition = await ProductionLineQueueModel.max("position", {
+                    where: { production_line_id: production_line.id },
+                    transaction
+                });
+
+                const updateData = {
+                    production_line_id: production_line.id,
+                    position: (maxPosition ? (Number(maxPosition) + 10) : 10)
+                }
+
+                const responseUpdateQueue = await ProductionLineQueueModel.update(
+                    updateData,
+                    {
+                        where: { production_order_id: relationship.order_id },
+                        transaction
+                    });
+
+                console.log(`actualizo registro de production_line_queue`)
+                console.log(responseUpdateQueue[0])
+
+                if (responseUpdateQueue[0] === 0) {
+                    await transaction.rollback();
+                    res.status(400).json({
+                        validation:
+                            "No changes were made to the production order"
+                    });
+                    return;
                 }
             }
 

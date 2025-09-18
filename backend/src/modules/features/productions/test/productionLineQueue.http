@@ -14,3 +14,12 @@ Content-Type: application/json
     "production_line_id": 1,
     "production_order_id": 1
 }
+
+### UPDATE
+PATH http://localhost:3003/production/production-line-queue/1
+Content-Type: application/json
+
+{
+    "position": 1
+}
+

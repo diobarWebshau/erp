@@ -148,8 +148,9 @@ const ProductionSequencingBoard = ({
     const {
         locationWithAllInformation,
         loadingLocationWithAllInformation,
-        refetchLocationWithAllInformation
     } = useLocationWithAllInformation(locationSelected?.id || null);
+
+    console.log("locationWithAllInformation", locationWithAllInformation);
 
 
     function extractProductionOrderId(item: IProductionLineQueue): number {

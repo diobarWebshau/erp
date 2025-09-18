@@ -73,7 +73,7 @@ const Step1 = ({
 
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] =
         useState<IPurchasedOrder | null>(
-            state.data.purchase_order ?? null
+            state.data?.purchase_order  ?? null
         );
     const [openDropDownSelectPurchaseOrder, setOpenDropDownSelectPurchaseOrder] =
         useState(false);

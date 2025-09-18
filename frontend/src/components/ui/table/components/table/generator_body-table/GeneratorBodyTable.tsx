@@ -16,6 +16,8 @@ interface GeneratorBodyTableProps<T> {
     className?: string;
     expandedComponent?: React.ReactNode;
     isExpanded?: boolean;
+    isHasFooter?: boolean;
+    isHasPagination?: boolean;
 }
 
 const GeneratorBodyTable = <T,>({
@@ -26,6 +28,8 @@ const GeneratorBodyTable = <T,>({
     className = "",
     expandedComponent,
     isExpanded = false,
+    isHasFooter = false,
+    isHasPagination = false,
 }: GeneratorBodyTableProps<T>) => {
 
     const [isExpandedRow, setIsExpandedRow] =
@@ -58,7 +62,12 @@ const GeneratorBodyTable = <T,>({
     };
 
     return (
-        <tbody className={`nunito-semibold ${className} ${stylesModules.tableBody}`}>
+        <tbody className={`nunito-semibold 
+            ${className} 
+            ${stylesModules.tableBody}
+            ${((isHasFooter && !isHasPagination) && (!isHasPagination && !isHasFooter)) ? stylesModules.tableBodyWithFooter : ""}
+        `}
+        >
             {
                 table?.getRowModel().rows.length > 0 ? (
                     table?.getRowModel().rows.map((row) => (

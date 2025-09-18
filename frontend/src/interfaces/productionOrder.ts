@@ -35,6 +35,7 @@ interface IProductionOrder {
     productions?: IProduction[];
     location?: ILocation;
     product?: IProduct;
+    purchase_order?: IPurchasedOrder;
     production_line?: IProductionLine;
     order?: IPurchasedOrderProduct | IInternalProductProductionOrder;
 }

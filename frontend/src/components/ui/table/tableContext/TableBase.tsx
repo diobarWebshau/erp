@@ -773,6 +773,9 @@ const TableBase = <T,>({
     return (
         < div
             className={`${stylesModules.container} ${classNameGenericTableContainer}`}
+            style={{
+                gap: extraComponents ? "1rem" : "0rem"
+            }}
         >
             <section
                 className={`${stylesModules.FeaturesContainer} ${classNameExtraComponents}`}
@@ -785,13 +788,26 @@ const TableBase = <T,>({
                     </div>
                 )}
             </section>
-            <section className={`${stylesModules.containerTableMain}`}
+            <section
+                className={
+                    ` ${stylesModules.containerTableMain} 
+                    ${enablePagination || footerComponents
+                        ? stylesModules.containerTableMainWithFooterOrPagination
+                        : stylesModules.containerTableMainWithoutFooterOrPagination} `
+                }
                 style={{
-                    gap: enablePagination ? "0rem" : "1rem"
-                }}>
-
+                    gap: footerComponents ? "1rem" : "0rem"
+                }}
+                >
                 <section
-                    className={`${stylesModules.containerTable} ${classNameTableContainer}`}
+                    className={
+                        `${stylesModules.containerTable} ${classNameTableContainer} `
+                        +
+                        `${((footerComponents && !enablePagination) || (!enablePagination && !footerComponents)) ? stylesModules.containerTableBorderRadius : ""}`
+                    }
+                    style={{
+                        backgroundColor: "white"
+                    }}
                 >
                     {table?.getRowModel()?.rows?.length > 0 ? (
                         <section className={stylesModules.tableContainer}>
@@ -824,6 +840,8 @@ const TableBase = <T,>({
                                             className={`${stylesModules.tableBody} ${classNameTableBody}`}
                                             expandedComponent={expandedComponent}
                                             isExpanded={isExpanded}
+                                            isHasFooter={footerComponents ? true : false}
+                                            isHasPagination={enablePagination}
                                         />
                                     )}
                             </table>
@@ -831,7 +849,10 @@ const TableBase = <T,>({
 
                     ) : (
                         <table
-                            className={`${stylesModules.table} ${classNameTable}`}
+                            className={
+                                `${stylesModules.table} ${classNameTable} ` +
+                                `${footerComponents ? stylesModules.tableWithoutFooter : ""}`
+                            }
                         >
                             {
                                 table?.getRowModel()?.rows?.length >= 0 && (
@@ -859,6 +880,8 @@ const TableBase = <T,>({
                                         className={`${stylesModules.tableBody} ${classNameTableBody}`}
                                         expandedComponent={expandedComponent}
                                         isExpanded={isExpanded}
+                                        isHasFooter={enablePagination ? true : false}
+                                        isHasPagination={footerComponents ? true : false}
                                     />
                                 )}
                         </table>

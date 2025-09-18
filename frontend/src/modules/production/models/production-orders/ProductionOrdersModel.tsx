@@ -171,6 +171,7 @@ const ProductionOrderModel = () => {
                 return;
             }
             setServerError(null);
+            console.log("hago el refetch");
             await refetchProductionOrderById();
             await fetchs();
         } catch (error) {

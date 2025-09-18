@@ -43,10 +43,11 @@
     border: 1px solid var(--color-theme-border-table);
 }
 
-.dateFieldInvalid {
-    /* estilos */
-    border: 1px solid var(--color-alert);
-}
+/*
+    .dateFieldInvalid {
+        border: 1px solid var(--color-alert);
+    }
+*/
 
 .dateInput:focus {
     outline: none;

@@ -41,11 +41,14 @@ const useProductionLinesForProductAtLocation = (
         );
         try {
             if (product_id && location_id) {
+                console.log("product_id", product_id);
+                console.log("location_id", location_id);
                 const data = await getProductionLinesForProductAtLocation(
                     product_id,
                     location_id,
                     dispatchRedux
                 );
+                console.log("productionLines", data);
                 setProductionLinesForProductAtLocation(data);
             } else {
                 setProductionLinesForProductAtLocation([]);

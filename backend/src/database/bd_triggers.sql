@@ -184,7 +184,8 @@ BEGIN
 			NEW.id,
 			NEW.product_id,
 			NEW.product_name,
-			NEW.qty
+			NEW.qty,
+            OLD.qty
 		);
 	END IF;
 

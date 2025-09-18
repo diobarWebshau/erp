@@ -47,10 +47,6 @@ const PaginationControls = <T,>(
         dispatch(set_page_index(0));
     }
 
-    console.log(`
-        ${state.paginationState.pageIndex * state.paginationState.pageSize}-
-    `)
-
     return (
         <>
             <div className={`${StyleModule.container} ${className}`}>

@@ -2144,3 +2144,39 @@ INSERT INTO productions (
 
 
 SELECT * from products_processes;
+
+
+
+
+  SELECT 
+            JSON_OBJECT(
+                'id', l.id,
+                'name', l.name,
+                'description', l.description,
+                'is_active', l.is_active,
+                'created_at', l.created_at,
+                'updated_at', l.updated_at
+            ),
+            JSON_OBJECT(
+                'id', pl.id,
+                'name', pl.name,
+                'is_active', pl.is_active,
+                'created_at', pl.created_at,
+                'updated_at', pl.updated_at
+            )
+        FROM production_orders AS po
+        LEFT JOIN internal_product_production_orders AS ippo
+            ON ippo.id = po.order_id
+        LEFT JOIN internal_production_orders_lines_products AS ipolp
+            ON ipolp.internal_product_production_order_id = ippo.id
+        LEFT JOIN production_lines AS pl
+            ON pl.id = ipolp.production_line_id
+        LEFT JOIN locations_production_lines AS lpl
+            ON lpl.production_line_id = pl.id
+        LEFT JOIN locations AS l
+            ON l.id = lpl.location_id
+        WHERE po.id = 2
+            AND po.order_type = 'internal';
+            
+            
+SELECT * FROM internal_product_production_orders;

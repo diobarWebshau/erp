@@ -111,66 +111,52 @@ class ProductionLineQueueController {
     static update = async (req, res, next) => {
         const { id } = req.params;
         const body = req.body;
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
+        });
         try {
             const validateProductionLineQueue = await ProductionLineQueueModel.findByPk(id);
+            const editableFields = ProductionLineQueueModel.getEditableFields();
+            const update_values = collectorUpdateFields(editableFields, body);
             if (!validateProductionLineQueue) {
                 res.status(200).json({
                     validation: "Production line queue not found"
                 });
                 return;
             }
-            const editableFields = ProductionLineQueueModel.getEditableFields();
-            const update_values = collectorUpdateFields(editableFields, body);
-            const response = await ProductionLineQueueModel.update(update_values, { where: { id: id }, individualHooks: true });
-            if (!(response[0] > 0)) {
-                res.status(200).json({
-                    validation: "No changes were made to the production line queue"
+            const relationship = validateProductionLineQueue.toJSON();
+            // 1️⃣ Bloquear todas las filas de la línea de producción
+            await ProductionLineQueueModel.findAll({
+                where: { production_line_id: relationship.production_line_id },
+                lock: transaction.LOCK.UPDATE,
+                transaction
+            });
+            // 1️⃣ Bloquear todas las filas de la línea de producción
+            const maxPosition = await ProductionLineQueueModel.max("position", {
+                where: { production_line_id: relationship.production_line_id },
+                transaction
+            });
+            const updateData = {
+                ...update_values,
+                position: (maxPosition ? (Number(maxPosition) + 10) : 10)
+            };
+            const response = await ProductionLineQueueModel.update(updateData, {
+                where: { id },
+                transaction
+            });
+            if (response[0] === 0) {
+                await transaction.rollback();
+                res.status(400).json({
+                    message: "The production line queue could not be updated"
                 });
                 return;
             }
+            await transaction.commit();
             res.status(200).json({
                 message: "Production line queue updated successfully"
             });
         }
         catch (error) {
-            if (error instanceof Error) {
-                next(error);
-            }
-            else {
-                console.error(`An unexpected error occurred: ${error}`);
-            }
-        }
-    };
-    static reorderProductionLineQueue2 = async (req, res, next) => {
-        const { production_line_id } = req.params;
-        const { productionOrders } = req.body;
-        const transaction = await sequelize.transaction({
-            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
-        });
-        try {
-            // 1️⃣ Bloquear todas las filas de la línea de producción
-            await ProductionLineQueueModel.findAll({
-                where: { production_line_id },
-                lock: transaction.LOCK.UPDATE,
-                transaction
-            });
-            // 2️⃣ Construir posiciones definitivas directamente
-            // usando un gap suficiente (ej. 10) para futuras inserciones intermedias
-            const normalizedGap = 10;
-            const updates = productionOrders.map((item, index) => ({
-                id: item.production_order_id,
-                position: (index + 1) * normalizedGap
-            }));
-            // 3️⃣ Actualizar en batch usando Promise.all para eficiencia
-            await Promise.all(updates.map(u => ProductionLineQueueModel.update({ position: u.position }, {
-                where: { production_order_id: u.id, production_line_id },
-                transaction
-            })));
-            await transaction.commit();
-            res.status(200).json({ message: "Queue reordered successfully" });
-        }
-        catch (error) {
-            await transaction.rollback();
             if (error instanceof Error) {
                 next(error);
             }

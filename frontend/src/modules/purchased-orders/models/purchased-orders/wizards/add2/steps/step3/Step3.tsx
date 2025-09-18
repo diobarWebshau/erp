@@ -72,7 +72,7 @@ import {
 import CustomModal from "../../../../../../../../components/ui/modal/customModal/CustomModal";
 
 
-const InputToggleMemorizado = memo(
+const InputToggleMemoized = memo(
     ({
         value,
         onChange,
@@ -85,10 +85,14 @@ const InputToggleMemorizado = memo(
                 value={value}
                 onChange={onChange}
                 min={1}
+                onlyCommitOnBlur={true}
+                className={styleModule.ContainerInputMemorizado}
+                classNameInput={`nunito-semibold ${styleModule.InputMemorizado}`}
             />
         );
     }
 );
+
 
 const InputConditionalIconMemorizado = memo(
     ({
@@ -244,10 +248,13 @@ const Step3 = ({
                     };
 
                     return (
-                        <InputToggleMemorizado
-                            value={qty}
-                            onChange={onChangeQty}
-                        />
+                        <div>
+
+                            <InputToggleMemoized
+                                value={qty}
+                                onChange={onChangeQty}
+                            />
+                        </div>
                     );
                 }
             },
