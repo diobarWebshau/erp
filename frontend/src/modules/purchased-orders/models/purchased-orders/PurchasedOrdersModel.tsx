@@ -30,7 +30,7 @@ import type {
     RowAction
 } from "../../../../components/ui/table/types";
 import {
-    Download, Edit, Eraser,
+    Download, Eraser,
     Plus, Search, Trash2
 } from "lucide-react";
 import usePurchasedOrderProducts
@@ -393,13 +393,7 @@ const PurchasedOrderModel = () => {
                 
                 extraComponents={
                     (table) => ExtraComponents(table)}
-                getRowId={
-                    (
-                        row: IPurchasedOrder,
-                        index: number
-                    ) => row.id.toString()
-                }
-
+                getRowId={(row: IPurchasedOrder) => row.id.toString()}
                 classNameGenericTableContainer={StyleModule.genericTableContainer}
 
             />

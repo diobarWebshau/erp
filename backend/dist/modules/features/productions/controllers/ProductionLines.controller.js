@@ -36,6 +36,11 @@ class ProductionLinesController {
                         attributes: ProductionLineQueueModel.getAllFields(),
                         separate: true, // 👈 esto permite que order funcione dentro del include
                         order: [["position", "ASC"]],
+                        where: {
+                            position: {
+                                [Op.ne]: null
+                            }
+                        },
                         include: [
                             {
                                 model: ProductionOrderModel,

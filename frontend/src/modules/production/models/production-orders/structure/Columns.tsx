@@ -6,11 +6,10 @@ import type {
     IProductionOrder
 } from "../../../../../interfaces/productionOrder";
 import stylesModules from "./columns.module.css";
-import { Progress } from "@mantine/core";
 import SingleProgressBarMantine from "../../../../../comp/external/mantine/progress-bar/single-progress-bar/SingleProgressBarMantine";
 
 interface IColumnsProductionOrdersProps {
-    onClickContent  : (e: React.MouseEvent, row: Row<IProductionOrder>) => void;
+    onClickContent: (e: React.MouseEvent, row: Row<IProductionOrder>) => void;
 }
 
 
@@ -48,7 +47,7 @@ const columnsProductionOrders = ({
                     onClick={(e) => onClickContent(e, row)}
                 >
                     {locationName}
-                </div>; 
+                </div>;
             },
             meta: {
                 hidden: false,
@@ -89,13 +88,26 @@ const columnsProductionOrders = ({
             accessorFn: (row) => row.extra_data?.production_qty,
             header: "Progreso",
             cell: ({ row }) => {
-                const productionQty = Number(Number(row.original.extra_data?.production_qty).toFixed(2)) ?? 0;
-                const total_order = Number(Number(row.original.qty).toFixed(2)) ?? 0;
-                return <SingleProgressBarMantine
-                    value={productionQty}
-                    total={total_order}
-                />
+                const productionBreakdown = row.original.production_breakdown;
+                const allStages = productionBreakdown?.all_stages;
+                // Encuentra el objeto con el valor más alto
+                const maxItem = allStages?.reduce((prev, current) =>
+                    current.stage > prev.stage ? current : prev
+                );
+
+                return (
+                    <div className={stylesModules.containerProgressQtyProduction}>
+                        <SingleProgressBarMantine
+                            value={Number(maxItem?.done_at_stage)}
+                            total={Number(productionBreakdown?.order_qty)}
+                            classNameLabel={stylesModules.labelProgressBarTable}
+                            classNameRoot={stylesModules.rootProgressBarTable}
+                            classNameSection={stylesModules.sectionProgressBarTable}
+                        />
+                    </div>
+                );
             }
+
         },
         {
             accessorFn: (row) => row.extra_data?.scrap_qty,

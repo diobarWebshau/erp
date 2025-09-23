@@ -1583,6 +1583,27 @@ BEGIN
 					SELECT func_get_production_summary_of_ippo(
 						ippo.id
 					)
+				), 
+				'production_order', (
+					SELECT 
+						JSON_OBJECT(
+							'id', po.id,
+							'order_type', po.order_type,
+							'order_id', po.order_id,
+							'product_id', po.product_id,
+							'product_name', po.product_name,
+							'qty', po.qty,
+							'status', po.status,
+							'created_at', po.created_at,
+							'updated_at', po.updated_at,
+							'production_breakdown', (
+								SELECT func_get_order_progress_snapshot(
+									po.id
+								)
+							)
+						)
+					FROM production_orders AS po
+					WHERE po.id = in_production_order_id
 				)
 			)
 		INTO v_order_json
@@ -1745,6 +1766,27 @@ BEGIN
 						)
 					FROM products AS p
 					WHERE p.id = pop.product_id
+				),
+				'production_order', (
+					SELECT 
+						JSON_OBJECT(
+							'id', po.id,
+							'order_type', po.order_type,
+							'order_id', po.order_id,
+							'product_id', po.product_id,
+							'product_name', po.product_name,
+							'qty', po.qty,
+							'status', po.status,
+							'created_at', po.created_at,
+							'updated_at', po.updated_at,
+							'production_breakdown', (
+								SELECT func_get_order_progress_snapshot(
+									po.id
+								)
+							)
+						)
+					FROM production_orders AS po
+					WHERE po.id = in_production_order_id
 				)
 			)
 		INTO v_order_json

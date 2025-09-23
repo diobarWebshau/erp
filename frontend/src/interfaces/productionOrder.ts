@@ -6,6 +6,36 @@ import type { IProductionLine } from "./productionLines";
 import type { IPurchasedOrder } from "./purchasedOrder";
 import type { IPurchasedOrderProduct } from "./purchasedOrdersProducts";
 
+
+interface IProductionBreakdown {
+    finished: number;
+    order_id: number;
+    order_qty: number;
+    all_stages: IAllStage[];
+    order_type: string;
+    product_id: number;
+    not_started: number;
+    open_stages: IOpenStage[];
+    remaining_qty: number;
+    open_wip_total: number;
+}
+
+interface IAllStage {
+    stage: number;
+    process_id: number;
+    wip_at_stage: number;
+    done_at_stage: number;
+    next_stage_done: number;
+}
+
+interface IOpenStage {
+    stage: number;
+    process_id: number;
+    in_stage_now: number;
+    passed_excluding_finished: number;
+}
+
+
 interface ExtraData {
     scrap_qty: number;
     location: ILocation;
@@ -38,6 +68,7 @@ interface IProductionOrder {
     purchase_order?: IPurchasedOrder;
     production_line?: IProductionLine;
     order?: IPurchasedOrderProduct | IInternalProductProductionOrder;
+    production_breakdown?: IProductionBreakdown;
 }
 
 type IPartialProductionOrder = Partial<IProductionOrder>;
@@ -66,6 +97,9 @@ const defaultValuePartialProductionOrder: IPartialProductionOrder = {
 export type {
     IProductionOrder,
     IPartialProductionOrder,
+    IProductionBreakdown,
+    IAllStage,
+    IOpenStage
 };
 
 export {

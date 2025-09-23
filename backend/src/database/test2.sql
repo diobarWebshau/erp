@@ -1,9 +1,16 @@
 USE u482698715_shau_erp;
 
-DROP PROCEDURE IF EXISTS sp_get_order_progress_snapshot;
+DROP FUNCTION IF EXISTS func_get_order_progress_snapshot;
 DELIMITER //
-CREATE PROCEDURE sp_get_order_progress_snapshot(IN in_po_id INT)
+CREATE FUNCTION func_get_order_progress_snapshot(
+	in_po_id INT
+)
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
 BEGIN
+    DECLARE v_json JSON;
+
     DECLARE v_order_qty   DECIMAL(14,4) DEFAULT 0;
     DECLARE v_product_id  INT;
     DECLARE v_order_type  VARCHAR(32);
@@ -157,9 +164,16 @@ BEGIN
             ORDER BY stage
             ) AS js2
         ), JSON_ARRAY())
-    ) AS breakdown;
+    ) AS breakdown  
+    INTO v_json;
+
+    RETURN v_json;
 END//
 DELIMITER ;
 
 
-CALL sp_get_order_progress_snapshot(1);
+-- CALL sp_get_order_progress_snapshot(1);
+
+
+SELECT func_get_order_progress_snapshot(1);
+

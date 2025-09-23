@@ -11,7 +11,7 @@ import {
     defaultValueInventoryDetails,
 } from "../../../../interfaces/inventories";
 import GenericTable
-    from "../../../../components/ui/table/Table copy 2";
+    from "../../../../components/ui/table/tableContext/GenericTable";
 import {
     useDispatch
 } from "react-redux";
@@ -26,11 +26,12 @@ import {
 } from "../../../../queries/inventoryMovementsQueries"
 import type {
     RowAction,
-    TopButtonAction
 } from "../../../../components/ui/table/types";
 import {
     Plus, Minus,
-    CirclePlus
+    Search,
+    Eraser,
+    Download
 } from "lucide-react";
 import StockInModal
     from "./modals/stock-in/StockInModal";
@@ -46,6 +47,13 @@ import type {
 import {
     createInventoryTransferInDB
 } from "../../../../queries/inventoryTransferQueries";
+import { useTableDispatch, useTableState } from "../../../../components/ui/table/tableContext/tableHooks";
+import StyleModule from "./InventoriesModel.module.css";
+import FadeButton from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
+import InvertOnHoverButton from "../../../../components/ui/table/components/gui/button/Invert-on-hover-button/InvertOnHoverButton";
+import InputSearch from "../../../../components/ui/table/components/gui/input/input-text-search/input";
+import { reset_column_filters } from "../../../../components/ui/table/tableContext/tableActions";
+import type { Table } from "@tanstack/react-table";
 
 const InventoriesModel = () => {
 
@@ -67,6 +75,8 @@ const InventoriesModel = () => {
     const [isActiveStockOutModal, setIsActiveStockOutModal] =
         useState<boolean>(false);
     const [isActiveTransferModal, setIsActiveTransferModal] =
+        useState<boolean>(false);
+    const [isActiveAddModal, setIsActiveAddModal] =
         useState<boolean>(false);
 
     const fetchs = async () => {
@@ -162,6 +172,11 @@ const InventoriesModel = () => {
         setIsActiveTransferModal(!isActiveTransferModal);
     }
 
+    const toggleActiveAddModal = () => {
+        setServerError(null);
+        console.log("entro");
+        setIsActiveAddModal(!isActiveAddModal);
+    }
 
     const toggleActiveStockInModal = (record: IInventoryDetails) => {
         setServerError(null);
@@ -188,29 +203,105 @@ const InventoriesModel = () => {
         },
     ];
 
-    const extraButtons: TopButtonAction<IInventoryDetails>[] = [
-        {
-            label: "Transfer",
-            onClick: toggleActiveTransferModal,
-            icon: <CirclePlus size={15} />
-        }
-    ];
-
+    const ExtraComponents = (table: Table<IInventoryDetails>) => {
+        const state = useTableState();
+        const dispatch = useTableDispatch();
+        return (
+            <div
+                className={StyleModule.containerExtraComponents}
+            >
+                <div
+                    className={`nunito-medium ${StyleModule.firstBlock}`}
+                >
+                    <h1 className="nunito-bold">Inventario</h1>
+                    <FadeButton
+                        label="Agregar inventario"
+                        onClick={toggleActiveAddModal}
+                        icon={<Plus className={StyleModule.plusIconShippingOrderModel} />}
+                        typeOrderIcon="first"
+                        classNameButton={StyleModule.fadeButtonExtraComponents}
+                        classNameSpan={StyleModule.fadeButtonSpanExtraComponents}
+                    />
+                </div>
+                <div
+                    className={`nunito-semibold ${StyleModule.secondBlock}`}
+                >
+                    <InputSearch
+                        type="text"
+                        placeholder="Buscar"
+                        value={""}
+                        onChange={(e) => console.log(e.target.value)}
+                        icon={<Search className={StyleModule.searchIconExtraComponents} />}
+                        classNameContainer={StyleModule.InputSearchContainerExtraComponents}
+                        classNameInput={StyleModule.InputSearchInputExtraComponents}
+                        classNameButton={StyleModule.InputSearchButtonExtraComponents}
+                    />
+                    <div
+                        className={`nunito-medium ${StyleModule.containerButtons}`}
+                    >
+                        <InvertOnHoverButton
+                            label="Limpiar filtros"
+                            onClick={() => {
+                                console.log("clear filters")
+                                console.log(state.columnFiltersState)
+                                console.log(state.columnFiltersState.length <= 0)
+                                dispatch(reset_column_filters())
+                            }}
+                            disabled={state.columnFiltersState.length <= 0}
+                            icon={<Eraser className={StyleModule.trash2IconExtraComponents} />}
+                            typeOrderIcon="first"
+                            classNameButton={StyleModule.toggleInverseButtonExtraComponents}
+                            classNameSpan={StyleModule.toggleInverseButtonSpanExtraComponents}
+                            classNameLabel={StyleModule.toggleInverseButtonLabelExtraComponents}
+                        />
+                        <InvertOnHoverButton
+                            label="Exportar tabla"
+                            onClick={() => console.log("exporting table")}
+                            icon={<Download className={StyleModule.downloadIconExtraComponents} />}
+                            typeOrderIcon="first"
+                            classNameButton={StyleModule.toggleInverseButtonExtraComponents}
+                            classNameSpan={StyleModule.toggleInverseButtonSpanExtraComponents}
+                            classNameLabel={StyleModule.toggleInverseButtonLabelExtraComponents}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     useEffect(() => {
         fetchs();
     }, []);
 
     return (
-        <>
+        <div className={StyleModule.containerInventoriesModel}>
             <GenericTable
+                modelName="Inventories"
+
+                // distribucion de columnas y 
                 columns={columnsInventoryDetails}
                 data={inventories}
+                getRowId={(
+                    row: IInventoryDetails,
+                ) => `temp-inv_id-${row.inventory_id.toString()}-locationId-${row?.location_id?.toString()}-prod_id-${row?.item_type?.toString()}${row?.item_type?.toString()}`}
+
+                // funcionalidades habilitadas
+                enableFilters={true}
+                enablePagination={true}
+                enableRowSelection={false}
+                enableOptionsColumn={true}
+
+                // acciones de la tabla
+                onDeleteSelected={() => console.log("Delete selected")}
+                typeRowActions="icon"
                 rowActions={rowActions}
-                onDeleteSelected={
-                    () => console.log("borrado selectivo")}
-                modelName="Internal order"
-                extraButtons={extraButtons}
+
+                // componentes extra
+                extraComponents={(table) => ExtraComponents(table)}
+
+                // estilos
+                classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
+
             />
             {
                 isActiveStockInModal && < StockInModal
@@ -232,7 +323,7 @@ const InventoriesModel = () => {
                     onTransfer={(value) => handleTransfer(value)}
                 />
             }
-        </>
+        </div>
     );
 }
 

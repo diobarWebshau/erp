@@ -366,30 +366,30 @@
 
 }
 
-.popoverFloatingContent>*:first-child{
+.popoverFloatingContent>*:first-child {
   background-color: var(--color-theme-primary-light);
   color: var(--color-theme-font-white);
   border-top-right-radius: 15px;
   border-top-left-radius: 15px;
 }
 
-.popoverFloatingContent>*:first-child .popoverFloatingIcon{
+.popoverFloatingContent>*:first-child .popoverFloatingIcon {
   color: var(--color-theme-font-white);
 }
 
-.popoverFloatingContent>*:last-child{
+.popoverFloatingContent>*:last-child {
   border-bottom-right-radius: 15px;
   border-bottom-left-radius: 15px;
 }
 
-.popoverFloatingContent> * > p {
+.popoverFloatingContent>*>p {
   font-size: 12px;
-} 
+}
 
 .popoverFloatingContent>* {
   height: 44px;
   width: 100%;
-  
+
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -401,7 +401,7 @@
   gap: 0.5rem;
 }
 
-.popoverFloatingIcon{
+.popoverFloatingIcon {
   width: 15px;
   height: 15px;
   color: var(--color-theme-primary);
@@ -544,6 +544,8 @@
   justify-content: start;
   align-items: center;
   gap: 0.5rem;
+
+  cursor: pointer;
 }
 
 .productionOrderItemProcess {
@@ -558,72 +560,7 @@
   font-size: 12px;
 }
 
-.productionOrderItemProcessList {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: start;
-}
 
-.containerProgressQtyProduction {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-
-.containerProgressListItem {
-  /* dimension */
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  gap: 0.2rem;
-  font-size: 12px;
-}
-
-
-.containerProgress {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-.progressBar {
-  width: 100%;
-  height: 40%;
-  background-color: var(--color-theme-neutral-background);
-}
-
-
-.containerProgressText {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.completedProgressTag {
-  /* dimension */
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 0.2rem;
-
-  background-color: var(--color-success-light);
-  color: var(--color-success);
-
-  /* dimension */
-  width: 120px;
-  height: 30px;
-
-  border-radius: 10px;
-  border: 1px solid var(--color-success);
-}
 
 
 /* ? *************** Content Header *************** */
@@ -633,33 +570,82 @@
   color: var(--color-theme-primary);
 }
 
-.root {
-  background-color: var(--mantine-color-gray-1);
-  /* 👇 fuerza la separación visible entre secciones */
-  display: flex;
-  gap: 0.1rem;
-  height: 6px;
-}
 
-/* forma de píldora en cada segmento */
-.section {
-  border-radius: 9999px;
-}
+/* ?  GroupProgressBar */
 
-.containerProgressMain {
+
+.productionOrderItemProcessList {
   width: 100%;
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: start;
+  gap: 0.2rem;
+
+  border: 2px solid var(--color-theme-border-table);
+  padding: 0.5rem;
+  border-radius: 15px;
 }
 
-.containerProgressTextMain {
+
+.containerProgressListItem {
+  /* dimension */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0.2rem;
+}
+
+.containerProgressListItem span {
+  font-size: 12px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: content;
+}
+
+.progressBarRoot {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+
+  width: 100%;
+  height: 100%;
+
+  border: 1px solid var(--color-theme-primary);
+}
+
+
+/* ? Segmented Progress */
+
+.groupSegmentedProgress {
+  width: 100%;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+}
+
+.rootSegmentedProgress {
+  flex-grow: 1;
+  flex-shrink: 1;
+  height: 50%;
+  flex-basis: 0;
+
+  gap: 0.1rem;
+
+  background-color: var(--color-theme-primary);
+  border: 1px solid var(--color-theme-primary);
+}
+
+
+.textSegmentedProgress {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+
+
   font-size: 12px;
   font-weight: 700;
 }
-
 
 /* ? *************** Scroll  *************** */
 
@@ -712,23 +698,26 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
   /* Firefox */
 }
 
-.modalOrderView{
+/* ? *************** Modal Order View *************** */
+
+.modalOrderView {
   width: 750px;
   padding: 1rem;
 }
 
-.modalOrderViewHeader{
+.modalOrderViewHeader {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-.modalOrderViewHeader>h3{
+
+.modalOrderViewHeader>h3 {
   font-size: 20px;
   color: var(--color-theme-primary);
 }
 
-.modalOrderViewHeader>dl{
+.modalOrderViewHeader>dl {
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -736,55 +725,28 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
   gap: 0.5rem;
 }
 
-.modalOrderViewHeader>dl>dt{
+.modalOrderViewHeader>dl>dt {
   font-size: 14px;
   color: var(--color-theme-primary);
 }
 
-.modalOrderViewHeader>dl>dd{
+.modalOrderViewHeader>dl>dd {
   font-size: 14px;
   color: var(--color-theme-font-black);
 }
 
+/* ? *************** ProgressBarTable *************** */
 
-
-/* *************** Progreso *************** */
-
-.containerProgressSingleMain {
-  /* dimension */
+.rootProgressBarTable {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-  gap: 0.2rem;
+
+  border: 1px solid var(--color-theme-primary);
 }
 
-.containerProgressSingle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  width: 66.66%;
-}
 
-.progressBarSingle {
-  width: 100%;
-  height: 40%;
-  background-color: var(--color-theme-neutral-background);
-}
 
-.labelProgressBarSingle {
-  color: var(--color-theme-primary);
-}
 
-.sectionProgressBarSingle {
-  background-color: var(--color-theme-primary);
-}
 
-.containerProgressTextSingle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 33.33%;
-}
+/* ejemplo */
+.isOverlay { box-shadow: 0 12px 28px rgba(0,0,0,.18); opacity: .98; }

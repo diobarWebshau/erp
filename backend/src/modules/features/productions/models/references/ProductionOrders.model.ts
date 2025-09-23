@@ -9,6 +9,34 @@ import {
     ProductionLineAttributes, PurchasedOrderAttributes
 } from "src/modules/types.js";
 
+interface ProductionBreakdown {
+    finished: number;
+    order_id: number;
+    order_qty: number;
+    all_stages: AllStage[];
+    order_type: string;
+    product_id: number;
+    not_started: number;
+    open_stages: OpenStage[];
+    remaining_qty: number;
+    open_wip_total: number;
+}
+
+interface AllStage {
+    stage: number;
+    process_id: number;
+    wip_at_stage: number;
+    done_at_stage: number;
+    next_stage_done: number;
+}
+
+interface OpenStage {
+    stage: number;
+    process_id: number;
+    in_stage_now: number;
+    passed_excluding_finished: number;
+}
+
 interface ExtraData {
     scrap_qty: number;
     location: LocationAttributes;
@@ -36,11 +64,12 @@ interface ProductionOrderAttributes {
     productions?: ProductionAttributes[],
     extra_data?: ExtraData,
     extra_data2?: ExtraData2,
-    location?: LocationAttributes
-    product?: ProductAttributes
-    purchase_order?: PurchasedOrderAttributes
-    production_line?: ProductionLineAttributes
-    internal_order?: InternalProductProductionOrderAttributes
+    location?: LocationAttributes,
+    product?: ProductAttributes,
+    purchase_order?: PurchasedOrderAttributes,
+    production_line?: ProductionLineAttributes,
+    internal_order?: InternalProductProductionOrderAttributes,
+    production_breakdown?: ProductionBreakdown
 }
 
 interface ProductionOrderCreationAttributes

@@ -88,9 +88,10 @@ class ProductionsController {
                         model: ProductionModel,
                         as: "productions",
                         attributes: ProductionModel.getAllFields(),
-                        // where: {
-                        //     production_order_id: production_order_id
-                        // }
+                        required: false,
+                        where: {
+                            process_id: process_id
+                        }
                     }]
             });
             if (!(validateQtyProductionOrder)) {
@@ -201,7 +202,8 @@ class ProductionsController {
                             attributes: ProductionModel.getAllFields(),
                             required: false, // sino se encuentra production, no retornara null
                             where: {
-                                id: { [Op.ne]: id }
+                                id: { [Op.ne]: id },
+                                process_id: relationship.process_id
                             }
                         }]
                 });

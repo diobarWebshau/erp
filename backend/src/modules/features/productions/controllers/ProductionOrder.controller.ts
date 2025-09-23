@@ -77,10 +77,20 @@ class ProductionOrdersController {
                         attributes: [
                             ...ProductionOrderModel.getAllFields(),
                             [
-                                sequelize.literal(
-                                    "func_get_extra_data_production_order(`ProductionOrderModel`.`id`, `ProductionOrderModel`.`order_id`, `ProductionOrderModel`.`order_type`)"
+                                sequelize.fn(
+                                    "func_get_extra_data_production_order",
+                                    sequelize.col(`ProductionOrderModel.id`),
+                                    sequelize.col(`ProductionOrderModel.order_id`),
+                                    sequelize.col(`ProductionOrderModel.order_type`)
                                 ),
                                 "extra_data"
+                            ],
+                            [
+                                sequelize.fn(
+                                    "func_get_order_progress_snapshot",
+                                    sequelize.col("ProductionOrderModel.id"),
+                                ),
+                                "production_breakdown"
                             ]
                         ],
                         include: [
@@ -575,7 +585,16 @@ class ProductionOrdersController {
                 if (update_values?.status === 'completed') {
                     const response = await ProductionOrderModel.findAll({
                         where: { id: id },
-                        attributes: ProductionOrderModel.getAllFields(),
+                        attributes: [
+                            ...ProductionOrderModel.getAllFields(),
+                            [
+                                sequelize.fn(
+                                    "func_get_order_progress_snapshot",
+                                    sequelize.col("ProductionOrderModel.id"),
+                                ),
+                                "production_breakdown"
+                            ]
+                        ],
                         include: [{
                             model: ProductionModel,
                             as: "productions",
@@ -591,20 +610,16 @@ class ProductionOrdersController {
                         });
                         return;
                     }
-                    const productionOrder: any = response[0].toJSON();
-                    const totalProduced =
-                        productionOrder
-                            .productions
-                            .reduce((sum: number, production: any) => {
-                                return sum + production.qty;
-                            }, 0);
+                    const productionOrder: ProductionOrderAttributes = response[0].toJSON();
+                    const finished = productionOrder?.production_breakdown?.order_qty || 0;
+                    const totalOrder = productionOrder.qty;
 
-                    if (totalProduced < productionOrder.qty) {
+                    if (finished <= totalOrder) {
                         res.status(400).json({
                             validation:
                                 `Cannot complete the production order. `
-                                + `Total produced (${totalProduced}) is less than `
-                                + `the required quantity (${productionOrder.qty}).`
+                                + `Total order quantity (${totalOrder}) is less than `
+                                + `the required quantity (${finished}).`
                         });
                         return;
                     }
@@ -734,7 +749,7 @@ class ProductionOrdersController {
             product: ProductAttributes,
             qty: number
         } = req.body;
-        const body = req.body;
+        const body = req.body as ProductionOrderAttributes;
 
         console.log("******************************************************************************");
         console.log(body);
@@ -834,17 +849,24 @@ class ProductionOrdersController {
             if (update_values?.status === 'completed') {
                 const response = await ProductionOrderModel.findAll({
                     where: { id: id },
-                    attributes: ProductionOrderModel.getAllFields(),
+                    attributes: [
+                        ...ProductionOrderModel.getAllFields(),
+                        [
+                            sequelize.fn(
+                                "func_get_order_progress_snapshot",
+                                sequelize.col("ProductionOrderModel.id"),
+                            ),
+                            "production_breakdown"
+                        ]
+                    ],
                     include: [{
                         model: ProductionModel,
                         as: "productions",
                         attributes: ProductionModel.getAllFields()
-                    }],
-                    transaction
+                    }]
                 });
 
                 if (!(response.length > 0)) {
-                    await transaction.rollback();
                     res.status(404).json({
                         validation:
                             "No productions found linked to "
@@ -852,21 +874,20 @@ class ProductionOrdersController {
                     });
                     return;
                 }
-                const productionOrder: any = response[0].toJSON();
-                const totalProduced =
-                    productionOrder
-                        .productions
-                        .reduce((sum: number, production: any) => {
-                            return sum + production.qty;
-                        }, 0);
+                const productionOrder: ProductionOrderAttributes = response[0].toJSON();
 
-                if (totalProduced < productionOrder.qty) {
-                    await transaction.rollback();
+                console.log("diobar revisa", productionOrder);
+                const finished = Number(productionOrder?.production_breakdown?.finished || 0);
+                const totalOrder = Number(productionOrder.qty);
+
+                console.log("diobar revisa", finished, totalOrder);
+
+                if (finished < totalOrder) {
                     res.status(400).json({
                         validation:
                             `Cannot complete the production order. `
-                            + `Total produced (${totalProduced}) is less than `
-                            + `the required quantity (${productionOrder.qty}).`
+                            + `Total order quantity (${totalOrder}) is less than `
+                            + `the required quantity (${finished}).`
                     });
                     return;
                 }
@@ -1008,6 +1029,8 @@ class ProductionOrdersController {
 
             isSuccessfully = true;
 
+            console.log("exitoso");
+
             res.status(200).json({
                 message: "Production order updated successfully"
             });
@@ -1019,8 +1042,9 @@ class ProductionOrdersController {
                 console.error(`An unexpected error occurred: ${error}`);
             }
         } finally {
+            console.log("finally");
             if (isSuccessfully) {
-                if (orderType === 'client') {
+                if (orderType === 'client' && body.qty) {
                     await sequelize.query(
                         `CALL sp_update_movement_inventory_po_pop_update_fix(:id, :qty, :product_id, :product_name)`,
                         {
@@ -1029,6 +1053,20 @@ class ProductionOrdersController {
                                 qty: qty,
                                 product_id: product.id,
                                 product_name: product.name,
+                            },
+                        }
+                    );
+                }
+                console.log(body.status)
+                if (body.status === 'completed') {
+                    console.log("******************************************************************************");
+                    console.log(`Se actualizo la cola `);
+                    console.log("******************************************************************************");
+                    await sequelize.query(
+                        `CALL sp_validate_queue_po_after_completed(:id)`,
+                        {
+                            replacements: {
+                                id: id
                             },
                         }
                     );

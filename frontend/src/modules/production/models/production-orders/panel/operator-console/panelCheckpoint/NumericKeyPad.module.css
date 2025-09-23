@@ -1,0 +1,215 @@
+.containerNumericKeyPad{
+    
+    /* posicionamiento */
+    position: absolute;
+    z-index: 1000;
+
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    min-width: min-content;
+    
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "back" auto
+        "header" auto
+        "panel" auto
+        "control" 1fr
+        "action" auto
+        / 100%;
+    gap: 1rem;
+
+    padding-bottom: 3rem;
+
+    /* estilos */
+    background-color: var(--color-theme-background);
+}
+
+.backSection{
+    grid-area: back;
+}
+
+.headerSection{
+    grid-area: header;
+}
+
+.panelSection{
+    grid-area: panel;
+}
+
+.controlSection{
+    grid-area: control;
+}
+
+.actionSection{
+    grid-area: action;
+}
+
+/* * ************** Back Section ************** */ 
+
+.backSection{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* * ************** Header Section ************** */ 
+
+.headerSection{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 60px;
+}
+
+
+/* * ************** Panel Section ************** */ 
+
+.panelSection{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;  
+}
+
+.panel{
+    width: 630px;
+    height: 140px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--color-theme-secondary-light);
+    border-radius: 15px;
+    font-size: 96px;
+}
+
+.panelSection button{
+    width: 140px;
+    height: 100%;
+
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.iconButtonPanel{
+    width: 100%;
+    height: 100%;
+}
+
+
+
+
+
+/* * ************** Action Section ************** */ 
+
+.actionSection{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;  
+}
+
+.spanButtonSection{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.cancelButtonSection, .saveButtonSection{
+    width: 360px;
+    height: 120px;
+
+    border-radius: 15px;
+}
+
+.cancelButtonSection{
+    background-color: var(--color-theme-font-white);
+}
+
+.saveButtonSection{
+    background-color: var(--color-success);
+}
+
+.cancelLabelButtonSection, .saveLabelButtonSection{
+   font-size: 48px;   
+}
+
+.cancelLabelButtonSection{
+    color: var(--color-alert-2);
+}
+
+
+.saveLabelButtonSection{
+    color: var(--color-theme-font-white);
+}
+
+.cancelButtonSection:hover{
+    border: 1px solid var(--color-theme-neutral);
+}
+
+/* * ************** Control Section ************** */
+
+.controlSection{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.controls{
+    width: 800px;
+    height: 360px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;  
+}
+
+.keyButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: var(--color-theme-font-white);
+    border: none;
+    cursor: pointer;
+
+    font-size: 48px;
+    border-radius: 15px;
+}
+
+.deleteControlIcon{
+    width: 40px;
+    height: 40px;
+}
+
+
+.keyButton:hover{
+    border: 1px solid var(--color-theme-neutral);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

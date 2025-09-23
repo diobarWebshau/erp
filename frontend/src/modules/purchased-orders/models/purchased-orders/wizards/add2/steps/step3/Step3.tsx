@@ -696,7 +696,7 @@ const Step3 = ({
                             (
                                 row: IPartialPurchasedOrderProduct,
                                 index: number
-                            ) => `temp-${index}`
+                            ) => `temp-${row.product?.id}`
                         }
                         data={state.data.purchase_order_products || []}
                         enableSorting={false}

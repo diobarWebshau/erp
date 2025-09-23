@@ -1,10 +1,11 @@
 import {
     ArrowLeft, ChevronsLeft, ChevronsRight, CircleDot,
     Factory, Package2, Settings2, User, TrendingDown,
-    MapPin, ChevronsDown, ChevronsUp } from "lucide-react";
+    MapPin, ChevronsDown, ChevronsUp
+} from "lucide-react";
 import TransparentButtonCustom from "../../../../../../components/ui/table/components/gui/button/custom-button/transparent/TransparentButtonCustom";
 import StyleModule from "./ProductionSequencingBoard.module.css";
-import { useEffect, useState, type CSSProperties, type MouseEvent } from "react";
+import { memo, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import {
     DndContext,
     closestCenter,
@@ -39,6 +40,7 @@ import type { IInternalProductProductionOrder } from "../../../../../../interfac
 import type { IPartialProductProcess } from "../../../../../../interfaces/productsProcesses";
 import type { IProductionLineQueue } from "../../../../../../interfaces/productionLineQueue";
 import { updateProductionLineQueue } from "../../../../../../modelos/productionLineQueue/query/ProductionLineQueue";
+import SingleProgressBarMantine from "../../../../../../comp/external/mantine/progress-bar/single-progress-bar/SingleProgressBarMantine";
 
 interface IProductionSequencingBoard {
     onClose: () => void
@@ -95,9 +97,10 @@ const ProductionSequencingBoard = ({
                 const order = productionOrder as IPurchasedOrderProduct;
 
                 return (
-                    <SingleProgress
+                    <SingleProgressBarMantine
                         value={order.production_summary?.production_qty || 0}
                         total={order.production_summary?.production_order_qty || 0}
+                        classNameRoot={StyleModule.rootProgressBarTable}
                     />
                 );
             },
@@ -123,12 +126,21 @@ const ProductionSequencingBoard = ({
             cell: (row) => {
                 const productionOrder = row.row.original;
 
+                const productionBreakdown = row.row.original.production_order?.production_breakdown;
+                const allStages = productionBreakdown?.all_stages;
+                // Encuentra el objeto con el valor más alto
+                const maxItem = allStages?.reduce((prev, current) =>
+                    current.stage > prev.stage ? current : prev
+                );
+
+
                 const order = productionOrder as IInternalProductProductionOrder;
 
                 return (
-                    <SingleProgress
-                        value={order.production_summary?.production_qty || 0}
-                        total={order.production_summary?.production_order_qty || 0}
+                    <SingleProgressBarMantine
+                        value={maxItem?.done_at_stage || 0}
+                        total={order.qty || 0}
+                        classNameRoot={StyleModule.rootProgressBarTable}
                     />
                 );
             },
@@ -149,8 +161,6 @@ const ProductionSequencingBoard = ({
         locationWithAllInformation,
         loadingLocationWithAllInformation,
     } = useLocationWithAllInformation(locationSelected?.id || null);
-
-    console.log("locationWithAllInformation", locationWithAllInformation);
 
 
     function extractProductionOrderId(item: IProductionLineQueue): number {
@@ -243,9 +253,8 @@ const ProductionSequencingBoard = ({
 
                     <section className={StyleModule.contentSection}>
                         <h3 className={`${StyleModule.headerH3} nunito-bold`}>Lineas de producción</h3>
-                        {loadingLocationWithAllInformation && <div>{`Lineas activas: ${!locationWithAllInformation?.location_production_line?.length}`}</div>}
                         <div className={StyleModule.contentContent}>
-                            { !loadingLocationWithAllInformation && locationWithAllInformation?.location_production_line?.map((lpl) => {
+                            {!loadingLocationWithAllInformation && locationWithAllInformation?.location_production_line?.map((lpl) => {
                                 return (
                                     <div key={lpl.production_line?.name} className={StyleModule.productionLineContent}>
                                         <PopoverFloatingIUBase
@@ -298,7 +307,7 @@ const ProductionSequencingBoard = ({
 
                                                     // 2) Llama a tu endpoint (sin tocar posiciones)
                                                     await reorderLineQueueBackend(lineId, productionOrders);
-                                                    
+
                                                     // 3) Refetch para traer ya ordenado desde el server
                                                     // await refetchLocationWithAllInformation();
                                                 } catch (err) {
@@ -375,148 +384,6 @@ const ProductionSequencingBoard = ({
     );
 };
 
-/* ===================== Drag & Drop: Container ===================== */
-
-interface DraggableProductionOrderContainerProps {
-    lineId: number;
-    items: IProductionLineQueue[];
-    onItemsChange: (id: number, production_order: IProductionLineQueue[]) => Promise<void> | void;
-    className?: string;
-    style?: CSSProperties;
-    onClick: (productionOrder: IProductionOrder) => void;
-  }
-  
-  const DraggableProductionOrderContainer = ({
-    lineId,
-    items,
-    onItemsChange,
-    style,
-    onClick,
-  }: DraggableProductionOrderContainerProps) => {
-    // Estado local controlando el orden mostrado en UI
-    const [localItems, setLocalItems] = useState<IProductionLineQueue[]>(items); // -- estado local para controlar el orden mostrado en UI
-    const [saving, setSaving] = useState(false); // Este estado es para feedback visual opcional
-  
-    // Sincroniza cuando cambie la fuente (p.ej. refetch)
-    useEffect(() => {
-      setLocalItems(items);
-    }, [items]);
-  
-    const sensors = useSensors(useSensor(PointerSensor));
-  
-    const handleDragEnd = async (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-  
-      const prev = localItems; // para rollback
-      const oldIndex = prev.findIndex((i) => i.id === active.id);
-      const newIndex = prev.findIndex((i) => i.id === over.id);
-  
-      // 1) Actualiza inmediatamente la UI
-      const moved = arrayMove(prev, oldIndex, newIndex);
-      setLocalItems(moved);
-  
-      // 2) Persiste en backend (y haz rollback si falla)
-      try {
-        setSaving(true);
-        await onItemsChange(lineId, moved);
-      } catch (err) {
-        console.error("Fallo al persistir reorden:", err);
-        setLocalItems(prev); // rollback
-      } finally {
-        setSaving(false);
-      }
-    };
-  
-    return (
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        modifiers={[restrictToParentElement, restrictToVerticalAxis]}
-      >
-        {/* Importante: SortableContext con los IDs del estado local */}
-        <SortableContext items={localItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-          <ul
-            className={StyleModule.productionOrderContent}
-            style={{
-              listStyle: "none",
-              opacity: saving ? 0.8 : 1, // feedback visual opcional
-              ...style,
-            }}
-          >
-            {localItems.map((item) => (
-              <DraggableProductionOrderItem
-                key={item.id}
-                productionLineQueue={item}
-                onClick={() => onClick(item.production_order as IProductionOrder)}
-              />
-            ))}
-          </ul>
-        </SortableContext>
-      </DndContext>
-    );
-  };
-
-/* ===================== Drag & Drop: Container ===================== */
-/*
-interface DraggableProductionOrderContainerProps {
-    lineId: number;
-    items: IProductionLineQueue[];
-    onItemsChange: (id: number, production_order: IProductionLineQueue[]) => void;
-    className?: string;
-    style?: CSSProperties;
-    onClick: (productionOrder: IProductionOrder) => void;
-}
-
-const DraggableProductionOrderContainer = ({
-    lineId,
-    items,
-    onItemsChange,
-    style,
-    onClick
-}: DraggableProductionOrderContainerProps) => {
-    const sensors = useSensors(useSensor(PointerSensor));
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-        if (over && active.id !== over.id) {
-            const oldIndex = items.findIndex((item) => item.id === active.id);
-            const newIndex = items.findIndex((item) => item.id === over.id);
-            const moved = arrayMove(items, oldIndex, newIndex);
-            console.log("moved", moved);
-            onItemsChange(lineId, moved);
-        }
-    };
-
-    return (
-        <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToParentElement, restrictToVerticalAxis]}
-        >
-            <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-                <ul
-                    className={StyleModule.productionOrderContent}
-                    style={{
-                        listStyle: "none",
-                        ...style,
-                    }}
-                >
-                    {items.map((item) => (
-                        <DraggableProductionOrderItem
-                            key={item.id}
-                            productionLineQueue={item}
-                            onClick={() => onClick(item.production_order as IProductionOrder)}
-                        />
-                    ))}
-                </ul>
-            </SortableContext>
-        </DndContext>
-    );
-};
-*/
 
 type PropsGroupProgress = {
     productionOrder: IProductionOrder;
@@ -541,23 +408,9 @@ const GroupProgress = ({ productionOrder }: PropsGroupProgress) => {
                     .filter((p: any) => Number(p.process_id) === Number(process.id))
                     .reduce((acc: number, p: any) => acc + (Number(p?.qty) || 0), 0);
 
-            // Calcular porcentaje con denominador seguro
-            const totalQty = Number(productionOrder?.qty) || 0;
-            const percentage = totalQty > 0 ? (qty_productions / totalQty) * 100 : 0;
-
-            // Definir color dinámico
-            const color =
-                percentage === 100
-                    ? 'teal' // completado
-                    : percentage > 0
-                        ? 'yellow' // en curso
-                        : 'gray.3'; // pendiente
-
             return {
                 ...process,
                 qty: Number(qty_productions),
-                percentage: Number(percentage),
-                color,
             };
         }
     );
@@ -571,68 +424,16 @@ const GroupProgress = ({ productionOrder }: PropsGroupProgress) => {
                 >
                     <span>{p.process?.name}</span>
 
-                    <span className={StyleModule.containerProgress}>
-                        <Progress
-                            radius="lg"
-                            size="md"
-                            value={p.percentage}
-                            color={p.color}
-                            animated
-                            striped
-                            classNames={{
-                                root: StyleModule.progressBar,
-                                label: StyleModule.labelProgressBar,
-                                section: StyleModule.sectionProgressBar,
-                            }}
-                        />
-                    </span>
-
-                    <span className={StyleModule.containerProgressText}>
-                        {p.qty}/{Number(productionOrder.qty)}
-                    </span>
+                    <SingleProgressBarMantine
+                        value={p.qty}
+                        total={Number(productionOrder.qty)}
+                        classNameRoot={StyleModule.progressBarRoot}
+                    />
                 </li>
             ))}
         </ul>
     );
 };
-
-
-
-interface PropsSingleProgress {
-    value: number;
-    total: number;
-}
-
-const SingleProgress = (
-    {
-        value,
-        total
-    }: PropsSingleProgress
-) => {
-    return (
-        <div
-            className={`nunito-bold ${StyleModule.containerProgressSingleMain}`}
-        >
-            <span className={StyleModule.containerProgressSingle}>
-                <Progress
-                    radius="lg"
-                    size="md"
-                    value={value}
-                    striped
-                    animated
-                    classNames={{
-                        root: StyleModule.progressBarSingle,
-                        label: StyleModule.labelProgressBarSingle,
-                        section: StyleModule.sectionProgressBarSingle,
-                    }}
-                />
-            </span>
-            <span className={StyleModule.containerProgressTextSingle}>
-                {value}/{total}
-            </span>
-        </div>
-    )
-}
 
 interface PropsSegmentedProgress {
     productionOrder: IProductionOrder;
@@ -656,7 +457,7 @@ function SegmentedProgress({ productionOrder }: PropsSegmentedProgress) {
         const ratio =
             totalOrderQty > 0 ? Math.min(qty / totalOrderQty, 1) : 0;
 
-        const color = ratio >= 1 ? "teal" : ratio > 0 ? "yellow" : "gray.3";
+        const color = ratio >= 1 ? "var(--color-success)" : ratio > 0 ? "var(--color-warning)" : "var(--color-theme-background)";
 
         return { id: pid, ratio, color };
     });
@@ -666,41 +467,305 @@ function SegmentedProgress({ productionOrder }: PropsSegmentedProgress) {
     const totalCompleted = summary.reduce((acc, s) => (s.ratio >= 1 ? acc + 1 : acc), 0);
 
     return (
-        <Group className={StyleModule.containerProgressMain}>
+        <Group className={StyleModule.groupSegmentedProgress}>
             <Progress.Root
-                w={280}
-                classNames={{ root: StyleModule.root, section: StyleModule.section }}
+                className={StyleModule.rootSegmentedProgress}
             >
                 {summary.map((s, i) => (
                     <Progress.Section
                         key={s.id ?? i}
                         value={Number(base.toFixed(3))}
                         color={s.color}
-                        animated
-                        striped
+                        {...(s.color !== "var(--color-theme-background)" && { animated: true })}
+                        {...(s.color !== "var(--color-theme-background)" && { striped: true })}
+                        className={StyleModule.sectionSegmentedProgress}
                     />
                 ))}
             </Progress.Root>
 
-            <Text className={StyleModule.containerProgressTextMain}>
+            <Text className={StyleModule.textSegmentedProgress}>
                 {totalCompleted}/{processSorted.length}
             </Text>
         </Group>
     );
 }
 
-/* ===================== Drag & Drop: Item ===================== */
+// /* ===================== Drag & Drop: Container ===================== */
+
+// interface DraggableProductionOrderContainerProps {
+//     lineId: number;
+//     items: IProductionLineQueue[];
+//     onItemsChange: (id: number, production_order: IProductionLineQueue[]) => Promise<void> | void;
+//     className?: string;
+//     style?: CSSProperties;
+//     onClick: (productionOrder: IProductionOrder) => void;
+// }
+
+// const DraggableProductionOrderContainer = ({
+//     lineId,
+//     items,
+//     onItemsChange,
+//     style,
+//     onClick,
+// }: DraggableProductionOrderContainerProps) => {
+//     // Estado local controlando el orden mostrado en UI
+//     const [localItems, setLocalItems] = useState<IProductionLineQueue[]>(items); // -- estado local para controlar el orden mostrado en UI
+//     const [saving, setSaving] = useState(false); // Este estado es para feedback visual opcional
+
+//     // Sincroniza cuando cambie la fuente (p.ej. refetch)
+//     useEffect(() => {
+//         setLocalItems(items);
+//     }, [items]);
+
+//     const sensors = useSensors(useSensor(PointerSensor));
+
+//     const handleDragEnd = async (event: DragEndEvent) => {
+//         const { active, over } = event;
+//         if (!over || active.id === over.id) return;
+
+//         const prev = localItems; // para rollback
+//         const oldIndex = prev.findIndex((i) => i.id === active.id);
+//         const newIndex = prev.findIndex((i) => i.id === over.id);
+
+//         // 1) Actualiza inmediatamente la UI
+//         const moved = arrayMove(prev, oldIndex, newIndex);
+//         setLocalItems(moved);
+
+//         // 2) Persiste en backend (y haz rollback si falla)
+//         try {
+//             setSaving(true);
+//             await onItemsChange(lineId, moved);
+//         } catch (err) {
+//             console.error("Fallo al persistir reorden:", err);
+//             setLocalItems(prev); // rollback
+//         } finally {
+//             setSaving(false);
+//         }
+//     };
+
+//     return (
+//         <DndContext
+//             sensors={sensors}
+//             collisionDetection={closestCenter}
+//             onDragEnd={handleDragEnd}
+//             modifiers={[restrictToParentElement, restrictToVerticalAxis]}
+//         >
+//             {/* Importante: SortableContext con los IDs del estado local */}
+//             <SortableContext items={localItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+//                 <ul
+//                     className={StyleModule.productionOrderContent}
+//                     style={{
+//                         listStyle: "none",
+//                         opacity: saving ? 0.8 : 1, // feedback visual opcional
+//                         ...style,
+//                     }}
+//                 >
+//                     {localItems.map((item) => (
+//                         <DraggableProductionOrderItem
+//                             key={item.id}
+//                             productionLineQueue={item}
+//                             onClick={() => onClick(item.production_order as IProductionOrder)}
+//                         />
+//                     ))}
+//                 </ul>
+//             </SortableContext>
+//         </DndContext>
+//     );
+// };
+
+
+// /* ===================== Drag & Drop: Item ===================== */
+
+// interface DraggableProductionOrderItemProps {
+//     productionLineQueue: IProductionLineQueue;
+//     style?: CSSProperties;
+//     onClick: (productionOrder: IProductionOrder) => void;
+// }
+
+
+// const DraggableProductionOrderItem = ({
+//     productionLineQueue,
+//     style,
+//     onClick
+// }: DraggableProductionOrderItemProps) => {
+
+//     const {
+//         attributes, listeners, setNodeRef,
+//         transform, transition
+//     } = useSortable({ id: productionLineQueue.id });
+
+//     const [isPanelExpand, setIsPanelExpand] = useState(false);
+
+//     const combinedStyle: CSSProperties = {
+//         transform: CSS.Transform.toString(transform),
+//         transition,
+//         cursor: "grab",
+//         ...style,
+//     };
+
+//     const handleOnClickToggle = (e: MouseEvent<HTMLButtonElement>) => {
+//         e.stopPropagation();
+//         setIsPanelExpand(!isPanelExpand);
+//     };
+
+//     return (
+//         <li
+//             key={productionLineQueue.id}
+//             ref={setNodeRef}
+//             style={combinedStyle}
+//             {...attributes} {...listeners}
+//             className={StyleModule.productionOrderItem}
+//         >
+//             <div
+//                 className={StyleModule.productionOrderItemTitle}
+//                 onPointerDown={(e) => e.stopPropagation()} // 👈 esto sí bloquea el inicio del drag
+//                 onClick={() => onClick(productionLineQueue.production_order as IProductionOrder)}
+//             >
+//                 <Package2 className={StyleModule.productionOrderItemIcon} />
+//                 <div className={`nunito-bold ${StyleModule.productionOrderItemTag}`}>{productionLineQueue.production_order?.order_id}</div>
+//             </div>
+
+//             <div className={StyleModule.productionOrderDescriptionContainer}>
+//                 <div className={StyleModule.productionOrderItemDescription}>
+//                     <dl className="nunito-bold">
+//                         <dt>Cantidad:</dt>
+//                         <dd>{productionLineQueue.production_order?.qty}</dd>
+//                     </dl>
+//                     <dl className="nunito-bold">
+//                         <dt>Producto:</dt>
+//                         <dd>{productionLineQueue.production_order?.order?.product_name}</dd>
+//                     </dl>
+//                 </div>
+//                 <button
+//                     onPointerDown={(e) => e.stopPropagation()} // 👈 esto sí bloquea el inicio del drag
+//                     onClick={(e) => handleOnClickToggle(e)}
+//                     type="button"
+//                 >
+//                     {
+//                         isPanelExpand
+//                             ? <ChevronsUp className={StyleModule.productionOrderItemIcon} />
+//                             : <ChevronsDown className={StyleModule.productionOrderItemIcon} />
+//                     }
+//                 </button>
+//             </div>
+//             <div className={StyleModule.productionOrderItemProcess}>
+//                 <span className="nunito-bold">Procesos:</span>
+//                 <SegmentedProgress
+//                     productionOrder={productionLineQueue.production_order as IProductionOrder}
+//                 />
+//                 {
+//                     isPanelExpand && (
+//                         <GroupProgress
+//                             productionOrder={productionLineQueue.production_order as IProductionOrder}
+//                         />
+//                     )
+//                 }
+//             </div>
+//         </li>
+//     );
+// };
+
+
+
+// /* ===================== Drag & Drop: Container ===================== */
+
+interface DraggableProductionOrderContainerProps {
+    lineId: number;
+    items: IProductionLineQueue[];
+    onItemsChange: (id: number, production_order: IProductionLineQueue[]) => Promise<void> | void;
+    className?: string;
+    style?: CSSProperties;
+    onClick: (productionOrder: IProductionOrder) => void;
+}
+
+const DraggableProductionOrderContainer = ({
+    lineId,
+    items,
+    onItemsChange,
+    style,
+    onClick,
+}: DraggableProductionOrderContainerProps) => {
+    const [localItems, setLocalItems] = useState<IProductionLineQueue[]>(items);
+    const [saving, setSaving] = useState(false);
+    const [isDragging, setIsDragging] = useState(false); // 👈 NUEVO estado global
+
+    useEffect(() => {
+        setLocalItems(items);
+    }, [items]);
+
+    const sensors = useSensors(useSensor(PointerSensor));
+
+    const handleDragStart = () => setIsDragging(true); // 👈 activamos estado global
+    const handleDragEnd = async (event: DragEndEvent) => {
+        setIsDragging(false); // 👈 desactivamos al terminar
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        const prev = localItems;
+        const oldIndex = prev.findIndex((i) => i.id === active.id);
+        const newIndex = prev.findIndex((i) => i.id === over.id);
+
+        const moved = arrayMove(prev, oldIndex, newIndex);
+        setLocalItems(moved);
+
+        try {
+            setSaving(true);
+            await onItemsChange(lineId, moved);
+        } catch (err) {
+            console.error("Fallo al persistir reorden:", err);
+            setLocalItems(prev); // rollback
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToParentElement, restrictToVerticalAxis]}
+        >
+            <SortableContext items={localItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+                <ul
+                    className={StyleModule.productionOrderContent}
+                    style={{
+                        listStyle: "none",
+                        opacity: saving ? 0.8 : 1,
+                        ...style,
+                    }}
+                >
+                    {localItems.map((item) => (
+                        <DraggableProductionOrderItem
+                            key={item.id}
+                            productionLineQueue={item}
+                            onClick={() => onClick(item.production_order as IProductionOrder)}
+                            forceCollapse={isDragging} // 👈 PASAMOS PROP
+                        />
+                    ))}
+                </ul>
+            </SortableContext>
+        </DndContext>
+    );
+};
+
+
+
+// /* ===================== Drag & Drop: Item ===================== */
 
 interface DraggableProductionOrderItemProps {
     productionLineQueue: IProductionLineQueue;
     style?: CSSProperties;
     onClick: (productionOrder: IProductionOrder) => void;
+    forceCollapse?: boolean; // 👈 NUEVO
 }
 
-const DraggableProductionOrderItem = ({
+const DraggableProductionOrderItem = memo(({
     productionLineQueue,
     style,
-    onClick
+    onClick,
+    forceCollapse = false
 }: DraggableProductionOrderItemProps) => {
 
     const {
@@ -709,6 +774,18 @@ const DraggableProductionOrderItem = ({
     } = useSortable({ id: productionLineQueue.id });
 
     const [isPanelExpand, setIsPanelExpand] = useState(false);
+    const wasExpandedRef = useRef(false);
+
+    // 👇 colapsar mientras hay drag global y restaurar al soltar
+    useEffect(() => {
+        if (forceCollapse) {
+            wasExpandedRef.current = isPanelExpand;
+            setIsPanelExpand(false);
+        } else if (wasExpandedRef.current) {
+            setIsPanelExpand(true);
+            wasExpandedRef.current = false;
+        }
+    }, [forceCollapse]);
 
     const combinedStyle: CSSProperties = {
         transform: CSS.Transform.toString(transform),
@@ -732,11 +809,13 @@ const DraggableProductionOrderItem = ({
         >
             <div
                 className={StyleModule.productionOrderItemTitle}
-                onPointerDown={(e) => e.stopPropagation()} // 👈 esto sí bloquea el inicio del drag
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={() => onClick(productionLineQueue.production_order as IProductionOrder)}
             >
                 <Package2 className={StyleModule.productionOrderItemIcon} />
-                <div className={`nunito-bold ${StyleModule.productionOrderItemTag}`}>{productionLineQueue.production_order?.order_id}</div>
+                <div className={`nunito-bold ${StyleModule.productionOrderItemTag}`}>
+                    {productionLineQueue.production_order?.order_id}
+                </div>
             </div>
 
             <div className={StyleModule.productionOrderDescriptionContainer}>
@@ -751,32 +830,31 @@ const DraggableProductionOrderItem = ({
                     </dl>
                 </div>
                 <button
-                    onPointerDown={(e) => e.stopPropagation()} // 👈 esto sí bloquea el inicio del drag
+                    onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => handleOnClickToggle(e)}
                     type="button"
                 >
-                    {
-                        isPanelExpand
-                            ? <ChevronsUp className={StyleModule.productionOrderItemIcon} />
-                            : <ChevronsDown className={StyleModule.productionOrderItemIcon} />
-                    }
+                    {isPanelExpand
+                        ? <ChevronsUp className={StyleModule.productionOrderItemIcon} />
+                        : <ChevronsDown className={StyleModule.productionOrderItemIcon} />}
                 </button>
             </div>
+
             <div className={StyleModule.productionOrderItemProcess}>
                 <span className="nunito-bold">Procesos:</span>
                 <SegmentedProgress
                     productionOrder={productionLineQueue.production_order as IProductionOrder}
                 />
-                {
-                    isPanelExpand && (
-                        <GroupProgress
-                            productionOrder={productionLineQueue.production_order as IProductionOrder}
-                        />
-                    )
-                }
+                {isPanelExpand && (
+                    <GroupProgress
+                        productionOrder={productionLineQueue.production_order as IProductionOrder}
+                    />
+                )}
             </div>
         </li>
     );
-};
+});
+
+
 
 export default ProductionSequencingBoard;

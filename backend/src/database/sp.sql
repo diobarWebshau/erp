@@ -224,5 +224,28 @@ END //
 DELIMITER ;
 
 
+DROP PROCEDURE IF EXISTS sp_validate_queue_po_after_completed;
+DELIMITER //
+CREATE PROCEDURE sp_validate_queue_po_after_completed(
+	in_production_order_id INT
+)
+BEGIN
 
+    DECLARE v_queue_id INT DEFAULT 0;
+
+    -- Obtenemos el id del registro de la cola asociado a la orden de produccion
+    SELECT 
+		IFNULL(id, 0)
+    INTO v_queue_id
+    FROM production_line_queue AS plq
+    WHERE plq.production_order_id = in_production_order_id
+    LIMIT 1;
+    -- Validamos que se obtuvo un registro
+    IF v_queue_id > 0 THEN
+		-- Actualizamos el registro de la cola
+		UPDATE production_line_queue AS pld SET position = NULL
+		WHERE pld.id = v_queue_id;
+	END IF;
+END //
+DELIMITER ;
 

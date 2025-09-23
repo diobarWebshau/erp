@@ -31,18 +31,12 @@ import type {
 } from "../../../../components/ui/table/types";
 import DeleteModal
     from "../../../../comp/primitives/modal/deleteModal/DeleteModal";
-import type {
-    IPartialProduction
-} from "../.././../../interfaces/production";
 import {
     clearAllErrors
 } from "../../../../store/slicer/errorSlicer"
 import type {
     AppDispatchRedux
 } from "../../../../store/store";
-import {
-    diffObjects
-} from "../../../../utils/validation-on-update/validationOnUpdate";
 import GenericTable
     from "../../../../components/ui/table/tableContext/GenericTable";
 import type {
@@ -148,8 +142,6 @@ const ProductionOrderModel = () => {
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -226,11 +218,11 @@ const ProductionOrderModel = () => {
         setProductionOrderRecord(record);
         setIsActiveDeleteModal(!isActiveDeleteModal);
     }
-    const toggleActiveCheckPointModal = (record: IProductionOrder) => {
-        dispatch(clearAllErrors());
-        setServerError(null);
-        setProductionOrderRecord(record);
-        setIsActiveCheckPointModal(!isActiveCheckPointModal);
+
+    const toggleActiveProductionOperatorConsole = async () => {
+        console.log("hola");
+        await fetchs();
+        setIsActiveProductionOperatorConsole(!isActiveProductionOperatorConsole);
     }
 
     // * ******************** Funciones de control de acciones de la tabla ******************** */
@@ -502,7 +494,7 @@ const ProductionOrderModel = () => {
                 }
                 {
                     isActiveProductionOperatorConsole && <ProductionOperatorConsole
-                        onClose={() => setIsActiveProductionOperatorConsole(false)}
+                        onClose={toggleActiveProductionOperatorConsole}
                     />
                 }
             </div>

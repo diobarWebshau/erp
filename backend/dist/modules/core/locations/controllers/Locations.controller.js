@@ -190,6 +190,11 @@ class LocationController {
                                         attributes: ProductionLineQueueModel.getAllFields(),
                                         separate: true, // 👈 esto permite que order funcione dentro del include
                                         order: [["position", "ASC"]],
+                                        where: {
+                                            position: {
+                                                [Op.ne]: null
+                                            }
+                                        },
                                         include: [
                                             {
                                                 model: ProductionOrderModel,
@@ -202,6 +207,10 @@ class LocationController {
                                                         sequelize.col("production_order.order_id"), // ✅ usa alias local
                                                         sequelize.col("production_order.order_type")),
                                                         "order"
+                                                    ],
+                                                    [
+                                                        sequelize.fn("func_get_order_progress_snapshot", sequelize.col("production_order.id")),
+                                                        "production_breakdown"
                                                     ]
                                                 ],
                                                 include: [
