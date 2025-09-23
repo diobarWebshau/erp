@@ -1,0 +1,7 @@
+.minimum_stock {
+    color: var(--color-red);
+}
+
+.available {
+    color: inherit;
+}

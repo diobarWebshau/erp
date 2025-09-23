@@ -4,6 +4,18 @@ GET http://localhost:3003/inventories/inventories HTTP/1.0
 ### getbyid
 GET http://localhost:3003/inventories/inventories/id/2 HTTP/1.0
 
+### getitems
+GET http://localhost:3003/inventories/inventories/items HTTP/1.0
+
+### getitemslike
+POST http://localhost:3003/inventories/inventories/items/like/p HTTP/1.0
+Content-Type: application/json
+
+{
+    "excludeProductIds": [1],
+    "excludeInputIds": [1]
+}
+
 ### POST
 POST http://localhost:3003/inventories/inventories/ HTTP/1.0
 Content-Type: application/json

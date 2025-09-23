@@ -6,11 +6,6 @@
     "auditLog": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\.5b48b145f4e12972c31cb0b74565f722d31b91ba-audit.json",
     "files": [
         {
-            "date": 1757431210426,
-            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-09.log",
-            "hash": "3bd212d6346ffbcc63cf71d7109dedae43fe57319a9f5f0c0a22677446afb089"
-        },
-        {
             "date": 1757949175412,
             "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-15.log",
             "hash": "71369143fdfd775cc4b40bbffc8f30afece054b5baa2ac6813681326100806bc"
@@ -24,6 +19,11 @@
             "date": 1758209437392,
             "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-18.log",
             "hash": "89d55b39b2901869f149ccc31a45c4fd527c1e53340b5db248e2ae4b2527b360"
+        },
+        {
+            "date": 1758641129533,
+            "name": "C:\\Users\\DiobarBaez\\Documents\\shauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-23.log",
+            "hash": "a219a78489e0ef535d2886c8e964a71284f5b28c0b9000e11547d3275f4b95f1"
         }
     ],
     "hashType": "sha256"

@@ -1,0 +1,53 @@
+.containerAddInventoryModal {
+    width: 100%;
+    height: 100%;
+    
+    display: grid;
+    grid-template: 
+     "header" auto
+     "main" 1fr /
+     100%;
+}
+
+.headerSection {
+    grid-area: header;
+}
+
+.mainContent {
+    grid-area: main;
+}
+
+
+/* *************** Header *************** */
+
+.headerSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.headerSection > h1 {
+    font-size: 36px;
+    color: var(--color-theme-primary);
+    
+}
+
+/* *************** Main Content *************** */
+
+.mainContent {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    
+    /* distribucion box */
+    border-radius: 15px;
+    padding-inline: 3rem;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+
+    /* estilos */
+    background: var(--color-theme-background);
+}

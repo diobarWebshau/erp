@@ -93,8 +93,6 @@ class ProductController {
             }
             const products = results.map(p => p.toJSON());
 
-
-
             const productsWithStock = await Promise.all(
                 products.map(async (product) => {
                     const stockSummary: { summary_location: ProductLocationAvailability }[] = await sequelize.query(

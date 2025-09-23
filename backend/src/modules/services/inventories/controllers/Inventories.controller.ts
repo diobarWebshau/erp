@@ -11,22 +11,11 @@ import collectorUpdateFields
 import sequelize
     from "../../../../mysql/configSequelize.js";
 import { QueryTypes } from "sequelize";
-
-interface IInventoryDetails {
-    stock: number,
-    item_id: number,
-    available: number,
-    commited: number,
-    item_name: string,
-    item_type: "product" | "input",
-    location_id: number,
-    inventory_id: number,
-    location_name: string,
-}
-
-interface IObjectInventoryDetails {
-    inventories: IInventoryDetails[]
-}
+import {
+    IInventoryDetails,
+    IItem,
+    IObjectInventoryDetails,
+} from "../models/base/Inventories.model.js";
 
 class InventoriesController {
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -166,6 +155,63 @@ class InventoriesController {
             const inventories: IInventoryDetails[] =
                 inventoriesObject.inventories;
             res.status(200).json(inventories);
+        } catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    }
+
+    static getAllItemsOnInventory = async (
+        req: Request, res: Response, next: NextFunction
+    ) => {
+        try {
+            type ItemsObject = {
+                items: IItem[]
+            }
+            const response: ItemsObject[] = await sequelize.query(
+                `SELECT funct_get_generic_items_with_locations() AS items`,
+                { type: QueryTypes.SELECT }
+            );
+            const items = response.shift() as ItemsObject;
+            res.status(200).json(items.items);
+        } catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    }
+
+    static getAllItemsLike = async (
+        req: Request, res: Response, next: NextFunction
+    ) => {
+        const { excludeProductIds = [], excludeInputIds = [] } = req.body;
+        const like = req.params.filter ?? null;
+        const contains = 0;    // 0 = prefijo (usa índice), 1 = contiene
+
+        try {
+            type ItemsObject = {
+                items: IItem[]
+            }
+
+            const response: ItemsObject[] = await sequelize.query(
+                'SELECT funct_get_generic_items_with_locations_like_with_exclude(:like, :contains, :exProd, :exInp) AS items',
+                {
+                    replacements: {
+                        like: like ?? null,
+                        contains: Number(contains) ? 1 : 0, // 0=prefijo, 1=contiene
+                        exProd: JSON.stringify(excludeProductIds), // ej [1,2,3]
+                        exInp: JSON.stringify(excludeInputIds),   // ej [5,6]
+                    },
+                    type: QueryTypes.SELECT,
+                }
+            );
+            const items = response.shift() as ItemsObject;
+            res.status(200).json(items.items);
         } catch (error) {
             if (error instanceof Error) {
                 next(error);

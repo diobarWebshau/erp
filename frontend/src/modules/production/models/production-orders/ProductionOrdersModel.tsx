@@ -220,7 +220,6 @@ const ProductionOrderModel = () => {
     }
 
     const toggleActiveProductionOperatorConsole = async () => {
-        console.log("hola");
         await fetchs();
         setIsActiveProductionOperatorConsole(!isActiveProductionOperatorConsole);
     }
@@ -393,6 +392,8 @@ const ProductionOrderModel = () => {
     }, []);
 
 
+    console.log(productionOrders)
+
     const getColumns = () => {
         return columnsProductionOrders({ onClickContent });
     }
@@ -418,7 +419,6 @@ const ProductionOrderModel = () => {
                     getRowId={
                         (
                             row: IProductionOrder,
-                            index: number
                         ) => row.id.toString()
                     }
 

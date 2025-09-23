@@ -268,9 +268,6 @@ BEGIN
 		NEW.process_id,
 		NEW.qty
 	);
-	CALL sp_validate_status_production_order(
-		NEW.production_order_id,
-	);
 END //
 DELIMITER ;
 

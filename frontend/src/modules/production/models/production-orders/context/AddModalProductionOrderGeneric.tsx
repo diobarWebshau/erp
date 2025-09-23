@@ -11,7 +11,7 @@ interface IModalProductionOrderGeneric {
     currentStep: number;
     totalSteps: number;
     data?: IPartialProductionOrder;
-    updated?: IPartialProductionOrder;
+    draft?: IPartialProductionOrder;
 }
 
 const ModalProductionOrderGeneric = ({
@@ -20,7 +20,7 @@ const ModalProductionOrderGeneric = ({
     currentStep,
     totalSteps,
     data,
-    updated
+    draft
 }: IModalProductionOrderGeneric) => {
     
     return (
@@ -29,7 +29,7 @@ const ModalProductionOrderGeneric = ({
             currentStep={currentStep}
             totalSteps={totalSteps}
             {...{data: data}}
-            {...{updated: updated}}
+            {...{draft: draft}}
         >
             {children}
         </ProviderAddModalProductionOrder>

@@ -1225,6 +1225,9 @@ BEGIN
       ili.item_id,
       ili.location_id,
       i.stock AS stock,
+      i.minimum_stock AS minimum_stock,
+      i.maximum_stock AS maximum_stock,
+      i.lead_time AS lead_time,
       i.id AS inventory_id,
       IFNULL(SUM(im.qty), 0) AS committed
     FROM inventories_locations_items AS ili
@@ -1315,11 +1318,14 @@ BEGIN
           ELSE NULL
         END,
         'stock', IFNULL(id.stock, 0),
-        'committed_qty', IFNULL(id.committed, 0),
+        'commited', IFNULL(id.committed, 0),
         /*
         'produced_qty', IFNULL(ip.produced, 0),
         'pending_production_qty', IFNULL(ii.qty, 0),
         */
+        'minimum_stock', IFNULL(id.minimum_stock, 0),
+        'maximum_stock', IFNULL(id.maximum_stock, 0),
+        'lead_time', IFNULL(id.lead_time, 0),
         'pending_production_qty', IFNULL(ii.qty, 0) - IFNULL(ip.produced, 0),
         'available', IFNULL(
           (IFNULL(id.stock, 0)-IFNULL(id.committed, 0)),
@@ -1738,9 +1744,9 @@ SELECT * FROM debug_log;
 -- CALL add_inventory_after_production('decrement', 2, 2, 800);
 
 
-    SELECT * FROM internal_product_production_orders;
-    
-    CALL get_order_summary_by_pop(1, 'internal');
+SELECT * FROM internal_product_production_orders;
+
+CALL get_order_summary_by_pop(1, 'internal');
 
     -- CALL revert_movements_production_order_after_delete(1);
 

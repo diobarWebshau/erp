@@ -9,6 +9,8 @@ const createInventoriesRouter = () => {
     InventoriesRouter.patch("/:id", validateInventoriesMiddleware, InventoriesController.update);
     InventoriesRouter.delete("/:id", InventoriesController.delete);
     InventoriesRouter.get("/details", InventoriesController.getInventoryDetails);
+    InventoriesRouter.get("/items", InventoriesController.getAllItemsOnInventory);
+    InventoriesRouter.post("/items/like/:filter", InventoriesController.getAllItemsLike);
     return InventoriesRouter;
 };
 export default createInventoriesRouter;

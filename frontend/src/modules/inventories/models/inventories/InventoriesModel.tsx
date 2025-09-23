@@ -1,59 +1,25 @@
-import {
-    useEffect, useState
-} from "react";
-import type {
-    AppDispatchRedux
-} from "../../../../store/store";
-import type {
-    IInventoryDetails
-} from "../../../../interfaces/inventories";
-import {
-    defaultValueInventoryDetails,
-} from "../../../../interfaces/inventories";
-import GenericTable
-    from "../../../../components/ui/table/tableContext/GenericTable";
-import {
-    useDispatch
-} from "react-redux";
-import {
-    columnsInventoryDetails
-} from "./structure/columns"
-import {
-    fetchInventoriesDetailsFromDB,
-} from "../../../../queries/inventoriesQueries"
-import {
-    createInventoryMovementInDB
-} from "../../../../queries/inventoryMovementsQueries"
-import type {
-    RowAction,
-} from "../../../../components/ui/table/types";
-import {
-    Plus, Minus,
-    Search,
-    Eraser,
-    Download
-} from "lucide-react";
-import StockInModal
-    from "./modals/stock-in/StockInModal";
-import StockOutModal
-    from "./modals/stock-out/StockOutModal";
-import type {
-    IPartialInventoryMovement
-} from "../../../../interfaces/inventoyMovements";
-import TransferModal from "./modals/transfer/TransferModal";
-import type {
-    IPartialInventoryTransfer
-} from "../../../../interfaces/inventoryTransfer";
-import {
-    createInventoryTransferInDB
-} from "../../../../queries/inventoryTransferQueries";
+import { useEffect, useState } from "react";
+import type { AppDispatchRedux } from "../../../../store/store";
+import type { IInventoryDetails } from "../../../../interfaces/inventories";
+import GenericTable from "../../../../components/ui/table/tableContext/GenericTable";
+import { useDispatch } from "react-redux";
+import { columnsInventoryDetails } from "./structure/columns.tsx"
+import { fetchInventoriesDetailsFromDB } from "../../../../queries/inventoriesQueries"
+import { createInventoryMovementInDB } from "../../../../queries/inventoryMovementsQueries"
+import type { RowAction } from "../../../../components/ui/table/types";
+import { Plus, Search, Eraser, Download, Pencil } from "lucide-react";
+import type { IPartialInventoryMovement } from "../../../../interfaces/inventoyMovements";
+import type { IPartialInventoryTransfer } from "../../../../interfaces/inventoryTransfer";
+import { createInventoryTransferInDB } from "../../../../queries/inventoryTransferQueries";
 import { useTableDispatch, useTableState } from "../../../../components/ui/table/tableContext/tableHooks";
 import StyleModule from "./InventoriesModel.module.css";
-import FadeButton from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
 import InvertOnHoverButton from "../../../../components/ui/table/components/gui/button/Invert-on-hover-button/InvertOnHoverButton";
+import FadeButton from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
 import InputSearch from "../../../../components/ui/table/components/gui/input/input-text-search/input";
 import { reset_column_filters } from "../../../../components/ui/table/tableContext/tableActions";
 import type { Table } from "@tanstack/react-table";
+import AddInventoryModal from "./wizards/add/AddInventoryModal.tsx";
+import InventoriesModuleProvider from "./context/InventoriesModuleProvider.tsx"
 
 const InventoriesModel = () => {
 
@@ -68,14 +34,14 @@ const InventoriesModel = () => {
     const [
         inventoriesRecord,
         setInventoriesRecord
-    ] = useState<IInventoryDetails>(defaultValueInventoryDetails);
+    ] = useState<IInventoryDetails | null>(null);
 
-    const [isActiveStockInModal, setIsActiveStockInModal] =
-        useState<boolean>(false);
-    const [isActiveStockOutModal, setIsActiveStockOutModal] =
-        useState<boolean>(false);
-    const [isActiveTransferModal, setIsActiveTransferModal] =
-        useState<boolean>(false);
+    // const [isActiveStockInModal, setIsActiveStockInModal] =
+    //     useState<boolean>(false);
+    // const [isActiveStockOutModal, setIsActiveStockOutModal] =
+    //     useState<boolean>(false);
+    // const [isActiveTransferModal, setIsActiveTransferModal] =
+    //     useState<boolean>(false);
     const [isActiveAddModal, setIsActiveAddModal] =
         useState<boolean>(false);
 
@@ -112,7 +78,6 @@ const InventoriesModel = () => {
             }
             setServerError(null);
             fetchs();
-            setIsActiveStockInModal(false);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -134,7 +99,6 @@ const InventoriesModel = () => {
             }
             setServerError(null);
             fetchs();
-            setIsActiveStockOutModal(false);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -157,7 +121,6 @@ const InventoriesModel = () => {
             }
             setServerError(null);
             fetchs();
-            setIsActiveTransferModal(false);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -166,40 +129,34 @@ const InventoriesModel = () => {
         }
     }
 
-    const toggleActiveTransferModal = () => {
-        setServerError(null);
-        console.log("entro");
-        setIsActiveTransferModal(!isActiveTransferModal);
-    }
+    // const toggleActiveTransferModal = () => {
+    //     setServerError(null);
+    //     console.log("entro");
+    //     setIsActiveTransferModal(!isActiveTransferModal);
+    // }
 
     const toggleActiveAddModal = () => {
         setServerError(null);
-        console.log("entro");
         setIsActiveAddModal(!isActiveAddModal);
     }
 
-    const toggleActiveStockInModal = (record: IInventoryDetails) => {
-        setServerError(null);
-        setInventoriesRecord(record);
-        setIsActiveStockInModal(!isActiveStockInModal);
-    }
+    // const toggleActiveStockInModal = (record: IInventoryDetails) => {
+    //     setServerError(null);
+    //     setInventoriesRecord(record);
+    //     setIsActiveStockInModal(!isActiveStockInModal);
+    // }
 
-    const toggleActiveStockOutModal = (record: IInventoryDetails) => {
-        setServerError(null);
-        setInventoriesRecord(record);
-        setIsActiveStockOutModal(!isActiveStockOutModal);
-    }
+    // const toggleActiveStockOutModal = (record: IInventoryDetails) => {
+    //     setServerError(null);
+    //     setInventoriesRecord(record);
+    //     setIsActiveStockOutModal(!isActiveStockOutModal);
+    // }
 
     const rowActions: RowAction<IInventoryDetails>[] = [
         {
-            label: "Stock in",
-            onClick: toggleActiveStockInModal,
-            icon: <Plus size={15} />
-        },
-        {
-            label: "Stock out",
-            onClick: toggleActiveStockOutModal,
-            icon: <Minus size={15} />
+            label: "Editar",
+            onClick: toggleActiveAddModal,
+            icon: <Pencil className={StyleModule.pencilIconRowActions} />
         },
     ];
 
@@ -303,7 +260,7 @@ const InventoriesModel = () => {
                 classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
 
             />
-            {
+            {/* {
                 isActiveStockInModal && < StockInModal
                     onClose={setIsActiveStockInModal}
                     onStockIn={(value) => handleStockIn(value)}
@@ -322,6 +279,17 @@ const InventoriesModel = () => {
                     onClose={setIsActiveTransferModal}
                     onTransfer={(value) => handleTransfer(value)}
                 />
+            } */}
+            {
+                isActiveAddModal &&
+                <InventoriesModuleProvider
+                    initialStep={1}
+                    totalSteps={2}
+                >
+                    <AddInventoryModal
+                        onClose={() => setIsActiveAddModal(false)}
+                    />
+                </InventoriesModuleProvider>
             }
         </div>
     );

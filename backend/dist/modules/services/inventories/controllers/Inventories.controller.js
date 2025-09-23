@@ -148,5 +148,46 @@ class InventoriesController {
             }
         }
     };
+    static getAllItemsOnInventory = async (req, res, next) => {
+        try {
+            const response = await sequelize.query(`SELECT funct_get_generic_items_with_locations() AS items`, { type: QueryTypes.SELECT });
+            const items = response.shift();
+            res.status(200).json(items.items);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            }
+            else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    };
+    static getAllItemsLike = async (req, res, next) => {
+        const { excludeProductIds = [], excludeInputIds = [] } = req.body;
+        const like = req.params.filter ?? null;
+        const contains = 0; // 0 = prefijo (usa índice), 1 = contiene
+        try {
+            const response = await sequelize.query('SELECT funct_get_generic_items_with_locations_like_with_exclude(:like, :contains, :exProd, :exInp) AS items', {
+                replacements: {
+                    like: like ?? null,
+                    contains: Number(contains) ? 1 : 0, // 0=prefijo, 1=contiene
+                    exProd: JSON.stringify(excludeProductIds), // ej [1,2,3]
+                    exInp: JSON.stringify(excludeInputIds), // ej [5,6]
+                },
+                type: QueryTypes.SELECT,
+            });
+            const items = response.shift();
+            res.status(200).json(items.items);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            }
+            else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    };
 }
 export default InventoriesController;

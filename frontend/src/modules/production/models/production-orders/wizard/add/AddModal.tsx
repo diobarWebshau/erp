@@ -98,8 +98,8 @@ const AddModal = ({
             aria-labelledby="modal-title"
             className={StyleModule.container}
         >
-            <header className={StyleModule.headerSection}>
-                <section
+            <div className={StyleModule.headerSection}>
+                <div
                     className={
                         `nunito-semibold `
                         + `${StyleModule.headerSectionControl}`
@@ -114,18 +114,18 @@ const AddModal = ({
                         classNameSpan={StyleModule.backButtonSpan}
                         classNameLabel={StyleModule.backButtonLabel}
                     />
-                </section>
-                <section
+                </div>
+                <div
                     className={
                         `nunito-bold `
                         + `${StyleModule.headerSectionTitle}`
                     }
                 >
                     <h1 id="modal-title">Agregar Orden de Producción</h1>
-                </section>
-            </header>
+                </div>
+            </div>
 
-            <main className={StyleModule.bodySection}>
+            <div className={StyleModule.bodySection}>
                 {
                     state.current_step === 1 && (
                         <Step1
@@ -149,8 +149,7 @@ const AddModal = ({
                         />
                     )
                 }
-            </main>
-            <footer className={StyleModule.footerSection}></footer>
+            </div>
             {
                 isActiveCancelProcessModal && (
                     <CancelModalCustom

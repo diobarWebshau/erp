@@ -137,11 +137,13 @@ const ProductionSequencingBoard = ({
                 const order = productionOrder as IInternalProductProductionOrder;
 
                 return (
-                    <SingleProgressBarMantine
-                        value={maxItem?.done_at_stage || 0}
-                        total={order.qty || 0}
-                        classNameRoot={StyleModule.rootProgressBarTable}
-                    />
+                    <div className={StyleModule.containerProgressBarTable}>
+                        <SingleProgressBarMantine
+                            value={maxItem?.done_at_stage || 0}
+                            total={order.qty || 0}
+                            classNameRoot={StyleModule.rootProgressBarTable}
+                        />
+                    </div>
                 );
             },
         }

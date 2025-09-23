@@ -1,3 +1,4 @@
+import { LocationAttributes } from "../../../../types";
 import sequelize
     from "../../../../../mysql/configSequelize.js";
 import { DataTypes, Model, Optional }
@@ -11,6 +12,34 @@ interface InventoryAttributes {
     lead_time: number,
     created_at: Date,
     updated_at: Date,
+}
+
+interface IInventoryDetails {
+    stock: number,
+    item_id: number,
+    available: number,
+    commited: number,
+    item_name: string,
+    item_type: "product" | "input",
+    location_id: number,
+    inventory_id: number,
+    minimum_stock: number,
+    maximum_stock: number,
+    lead_time: number,
+    location_name: string,
+}
+
+interface IObjectInventoryDetails {
+    inventories: IInventoryDetails[]
+}
+
+interface IItem {
+    id: string,
+    item_id: number,
+    item_name: string,
+    item_type: "product" | "input",
+    sku: string | null,
+    locations: LocationAttributes[]
 }
 
 interface InventoryCreationAttributes
@@ -78,7 +107,10 @@ InventoryModel.init({
 
 export type {
     InventoryAttributes,
-    InventoryCreationAttributes
+    InventoryCreationAttributes,
+    IInventoryDetails,
+    IObjectInventoryDetails,
+    IItem
 }
 
 export default InventoryModel;

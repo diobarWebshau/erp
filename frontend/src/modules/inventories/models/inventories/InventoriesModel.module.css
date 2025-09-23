@@ -216,7 +216,7 @@
 }
 
 
-/*  *************** Inventories Model ***************  */
+/* *  *************** Inventories Model ***************  */
 
 .containerInventoriesModel {
     /* dimension */
@@ -235,4 +235,14 @@
     /* dimension */
     width: 100%;
     height: 100%;
+}
+
+/*? Pencil icon */
+
+.pencilIconRowActions {
+    /* estilos */
+    color: var(--color-theme-primary);
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
 }

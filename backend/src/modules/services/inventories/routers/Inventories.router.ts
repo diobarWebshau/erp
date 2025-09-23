@@ -21,6 +21,12 @@ const createInventoriesRouter = (): Router => {
     InventoriesRouter.get("/details",
         InventoriesController.getInventoryDetails
     );
+    InventoriesRouter.get("/items",
+        InventoriesController.getAllItemsOnInventory
+    );
+    InventoriesRouter.post("/items/like/:filter",
+        InventoriesController.getAllItemsLike
+    );
     return InventoriesRouter;
 }
 

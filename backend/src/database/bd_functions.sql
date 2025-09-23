@@ -1800,6 +1800,319 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP FUNCTION IF EXISTS funct_get_generic_items_with_locations;
+DELIMITER //
+CREATE FUNCTION funct_get_generic_items_with_locations()
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+	DECLARE v_items_json JSON;
+	SELECT
+		COALESCE(
+			JSON_ARRAYAGG(
+				JSON_OBJECT(
+				'id',  CONCAT(t.item_type, '-', t.item_id), 
+				'item_id', t.item_id,
+				'item_name', t.item_name,
+				'item_type', t.item_type,
+				'sku', t.sku,
+				'locations', COALESCE(t.locations, JSON_ARRAY())
+				)
+			),
+			JSON_ARRAY()
+		)
+	INTO v_items_json
+	FROM (
+		SELECT
+			p.id AS item_id,
+			p.name AS item_name,
+			'product' AS item_type,
+			p.sku AS sku,
+			(
+				SELECT
+					COALESCE(
+						JSON_ARRAYAGG(
+							JSON_OBJECT(
+								'id', l.id,
+								'name', l.name,
+								'created_at', l.created_at,
+								'updated_at', l.updated_at
+							)
+						),
+						JSON_ARRAY()
+					)
+				FROM locations AS l
+				JOIN inventories_locations_items AS ili
+					ON ili.location_id = l.id
+				WHERE ili.item_id = p.id
+					AND ili.item_type = 'product'
+			) AS locations
+		FROM products AS p
+		UNION ALL
+		SELECT 
+			i.id AS item_id,
+			i.name AS item_name,
+			'input' AS item_type,
+			NULL AS sku,
+			(
+				SELECT 
+					COALESCE(
+						JSON_ARRAYAGG(
+							JSON_OBJECT(
+								'id', l.id,
+								'name', l.name,
+								'created_at', l.created_at,
+								'updated_at', l.updated_at
+							)
+						),
+						JSON_ARRAY()
+					)
+				FROM locations AS l
+				JOIN inventories_locations_items AS ili
+					ON ili.location_id = l.id
+				WHERE ili.item_id = i.id
+					AND ili.item_type = 'input'
+			) AS locations
+		FROM inputs AS i
+	) AS t;
+
+	RETURN v_items_json;
+END //
+DELIMITER ;
+
+
+DROP FUNCTION IF EXISTS funct_get_generic_items_with_locations_like;
+DELIMITER //
+CREATE FUNCTION funct_get_generic_items_with_locations_like(
+  p_like VARCHAR(255),   -- texto a buscar (opcional)
+  p_contains TINYINT     -- 0 = prefijo ('term%'), 1 = contiene ('%term%')
+)
+RETURNS JSON
+READS SQL DATA
+BEGIN
+  DECLARE v_items_json JSON;
+  DECLARE v_pat VARCHAR(255);
+
+  -- Patrón LIKE según p_contains; NULL => no se filtra
+  SET v_pat = CASE
+                WHEN p_like IS NULL OR p_like = '' THEN NULL
+                WHEN p_contains = 1 THEN CONCAT('%', p_like, '%')
+                ELSE CONCAT(p_like, '%')
+              END;
+
+  /* 1) Base unificada de items (products + inputs) con sus locations */
+  WITH base_t AS (
+    /* PRODUCTS */
+    SELECT
+      p.id   AS item_id,
+      p.name AS item_name,
+      'product' AS item_type,
+      p.sku  AS sku,
+      (
+        SELECT COALESCE(
+                 JSON_ARRAYAGG(
+                   JSON_OBJECT(
+                     'id',         l.id,
+                     'name',       l.name,
+                     'created_at', l.created_at,
+                     'updated_at', l.updated_at
+                   )
+                 ),
+                 JSON_ARRAY()
+               )
+        FROM locations AS l
+        JOIN inventories_locations_items AS ili
+          ON ili.location_id = l.id
+        WHERE ili.item_id = p.id
+          AND ili.item_type = 'product'
+      ) AS locations
+    FROM products AS p
+    WHERE v_pat IS NULL OR p.name LIKE v_pat OR p.sku LIKE v_pat
+
+    UNION ALL
+
+    /* INPUTS */
+    SELECT 
+      i.id   AS item_id,
+      i.name AS item_name,
+      'input' AS item_type,
+      NULL   AS sku,
+      (
+        SELECT COALESCE(
+                 JSON_ARRAYAGG(
+                   JSON_OBJECT(
+                     'id',         l.id,
+                     'name',       l.name,
+                     'created_at', l.created_at,
+                     'updated_at', l.updated_at
+                   )
+                 ),
+                 JSON_ARRAY()
+               )
+        FROM locations AS l
+        JOIN inventories_locations_items AS ili
+          ON ili.location_id = l.id
+        WHERE ili.item_id = i.id
+          AND ili.item_type = 'input'
+      ) AS locations
+    FROM inputs AS i
+    WHERE v_pat IS NULL OR i.name LIKE v_pat
+  ),
+  /* 2) Ordenamos aquí (compatible con todas las versiones) */
+  sorted_t AS (
+    SELECT *
+    FROM base_t
+    ORDER BY item_type, item_name
+  )
+  /* 3) Agregamos a JSON sin ORDER BY dentro del agregador */
+  SELECT
+    COALESCE(
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id',         CONCAT(s.item_type, '-', s.item_id),
+          'item_id',    s.item_id,
+          'item_name',  s.item_name,
+          'item_type',  s.item_type,
+          'sku',        s.sku,
+          'locations',  COALESCE(s.locations, JSON_ARRAY())
+        )
+      ),
+      JSON_ARRAY()
+    )
+  INTO v_items_json
+  FROM sorted_t AS s;
+
+  RETURN v_items_json;
+END //
+DELIMITER ;
+
+
+DROP FUNCTION IF EXISTS funct_get_generic_items_with_locations_like_with_exclude;
+DELIMITER //
+CREATE FUNCTION funct_get_generic_items_with_locations_like_with_exclude(
+  p_like VARCHAR(255),        -- texto a buscar (opcional)
+  p_contains TINYINT,         -- 0 = prefijo ('term%'), 1 = contiene ('%term%')
+  p_excl_products JSON,       -- JSON array de IDs de products a excluir, ej: [1,2,3]
+  p_excl_inputs  JSON         -- JSON array de IDs de inputs a excluir, ej: [5,6]
+)
+RETURNS JSON
+READS SQL DATA
+BEGIN
+  DECLARE v_items_json JSON;
+  DECLARE v_pat VARCHAR(255);
+
+  /* Patrón LIKE según p_contains; NULL => no se filtra */
+  SET v_pat = CASE
+                WHEN p_like IS NULL OR p_like = '' THEN NULL
+                WHEN p_contains = 1 THEN CONCAT('%', p_like, '%')
+                ELSE CONCAT(p_like, '%')
+              END;
+
+  /* 1) Expandimos los arrays JSON de exclusión a filas */
+  WITH
+  ex_prod AS (
+    SELECT CAST(j.id AS UNSIGNED) AS id
+    FROM JSON_TABLE(COALESCE(p_excl_products, JSON_ARRAY()), '$[*]'
+         COLUMNS (id JSON PATH '$')) j
+  ),
+  ex_inp AS (
+    SELECT CAST(j.id AS UNSIGNED) AS id
+    FROM JSON_TABLE(COALESCE(p_excl_inputs, JSON_ARRAY()), '$[*]'
+         COLUMNS (id JSON PATH '$')) j
+  ),
+  /* 2) Base unificada de items (products + inputs) con locations y filtros */
+  base_t AS (
+    /* PRODUCTS */
+    SELECT
+      p.id   AS item_id,
+      p.name AS item_name,
+      'product' AS item_type,
+      p.sku  AS sku,
+      (
+        SELECT COALESCE(
+                 JSON_ARRAYAGG(
+                   JSON_OBJECT(
+                     'id',         l.id,
+                     'name',       l.name,
+                     'created_at', l.created_at,
+                     'updated_at', l.updated_at
+                   )
+                 ),
+                 JSON_ARRAY()
+               )
+        FROM locations AS l
+        JOIN inventories_locations_items AS ili
+          ON ili.location_id = l.id
+        WHERE ili.item_id = p.id
+          AND ili.item_type = 'product'
+      ) AS locations
+    FROM products AS p
+    LEFT JOIN ex_prod xp ON xp.id = p.id
+    WHERE
+      xp.id IS NULL  /* excluir IDs */
+      AND (v_pat IS NULL OR p.name LIKE v_pat OR p.sku LIKE v_pat)
+
+    UNION ALL
+
+    /* INPUTS */
+    SELECT 
+      i.id   AS item_id,
+      i.name AS item_name,
+      'input' AS item_type,
+      NULL   AS sku,
+      (
+        SELECT COALESCE(
+                 JSON_ARRAYAGG(
+                   JSON_OBJECT(
+                     'id',         l.id,
+                     'name',       l.name,
+                     'created_at', l.created_at,
+                     'updated_at', l.updated_at
+                   )
+                 ),
+                 JSON_ARRAY()
+               )
+        FROM locations AS l
+        JOIN inventories_locations_items AS ili
+          ON ili.location_id = l.id
+        WHERE ili.item_id = i.id
+          AND ili.item_type = 'input'
+      ) AS locations
+    FROM inputs AS i
+    LEFT JOIN ex_inp xi ON xi.id = i.id
+    WHERE
+      xi.id IS NULL  /* excluir IDs */
+      AND (v_pat IS NULL OR i.name LIKE v_pat)
+  ),
+  /* 3) Ordenamos antes de agregar (compatible con todas las versiones) */
+  sorted_t AS (
+    SELECT *
+    FROM base_t
+    ORDER BY item_type, item_name
+  )
+  /* 4) Agregamos a JSON (sin ORDER BY dentro del agregador) */
+  SELECT
+    COALESCE(
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id',         CONCAT(s.item_type, '-', s.item_id),
+          'item_id',    s.item_id,
+          'item_name',  s.item_name,
+          'item_type',  s.item_type,
+          'sku',        s.sku,
+          'locations',  COALESCE(s.locations, JSON_ARRAY())
+        )
+      ),
+      JSON_ARRAY()
+    )
+  INTO v_items_json
+  FROM sorted_t AS s;
+
+  RETURN v_items_json;
+END //
+DELIMITER ;
+
 
 
 
