@@ -33,7 +33,9 @@ interface IInventoryDetails {
     maximum_stock: number,
     lead_time: number,
     location_name: string,
-    item?: IItem
+    item?: IItem,
+    qty?: number,
+    location?: ILocation | null
 }
 
 

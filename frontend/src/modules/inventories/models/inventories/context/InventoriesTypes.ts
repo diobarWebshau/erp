@@ -32,8 +32,8 @@ type InventoriesAction =
     | { type: typeof inventoriesActionsTypes.REMOVE_ITEMS, payload: number[] }
 
     // Acciones directas a un item del array de inventarios
-    | { type: typeof inventoriesActionsTypes.UPDATE_ITEM, payload: { id: number, attributes: IPartialInventoryDetails } }
-    | { type: typeof inventoriesActionsTypes.REMOVE_ATTRIBUTES_ITEM, payload: { id: number, attributes: string[] } }
+    | { type: typeof inventoriesActionsTypes.UPDATE_ITEM, payload: { id: string, attributes: IPartialInventoryDetails } }
+    | { type: typeof inventoriesActionsTypes.REMOVE_ATTRIBUTES_ITEM, payload: { id: string, attributes: string[] } }
 
     // Acciones de los steps
     | { type: typeof inventoriesActionsTypes.SET_STEP, payload: number }

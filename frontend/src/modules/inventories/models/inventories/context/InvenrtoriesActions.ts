@@ -36,14 +36,14 @@ const remove_items= (
 // ? Acciones directas a un item del array de inventarios
 
 const update_item= (
-    payload: { id: number, attributes: IPartialInventoryDetails }
+    payload: { id: string, attributes: IPartialInventoryDetails }
 ): InventoriesAction => ({
     type: inventoriesActionsTypes.UPDATE_ITEM,
     payload
 });  
 
 const remove_attributes_item= (
-    payload: { id: number, attributes: string[] }
+    payload: { id: string, attributes: string[] }
 ): InventoriesAction => ({
     type: inventoriesActionsTypes.REMOVE_ATTRIBUTES_ITEM,
     payload

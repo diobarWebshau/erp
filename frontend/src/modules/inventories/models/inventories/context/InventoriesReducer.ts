@@ -42,7 +42,7 @@ const InventoriesReducer = produce((
 
         case inventoriesActionsTypes.UPDATE_ITEM: {
             const { id, attributes } = action.payload;
-            const item = draft.data.find(it => it.id === id);
+            const item = draft.data.find(it => it.item?.id === id);
             if (item) {
                 Object.assign(item, attributes);
             }
@@ -50,7 +50,7 @@ const InventoriesReducer = produce((
         }
         case inventoriesActionsTypes.REMOVE_ATTRIBUTES_ITEM: {
             const { id, attributes } = action.payload;
-            const item = draft.data.find(it => it.id === id);
+            const item = draft.data.find(it => it.item?.id === id);
             if (item) {
                 for (const key of attributes) {
                     if (key === "id") continue;
