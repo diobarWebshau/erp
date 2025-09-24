@@ -73,6 +73,20 @@
     color: var(--color-theme-primary);
 }
 
+.containerExtraComponent {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconRowAction {
+    color: var(--color-alert);
+    width: 15px;
+    height: 15px;
+}
+
 /* *************** Footer Content *************** */
 
 .footerContent {

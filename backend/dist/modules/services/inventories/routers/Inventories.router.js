@@ -11,6 +11,7 @@ const createInventoriesRouter = () => {
     InventoriesRouter.get("/details", InventoriesController.getInventoryDetails);
     InventoriesRouter.get("/items", InventoriesController.getAllItemsOnInventory);
     InventoriesRouter.post("/items/like/:filter", InventoriesController.getAllItemsLike);
+    InventoriesRouter.post("/batch", InventoriesController.createBatch);
     return InventoriesRouter;
 };
 export default createInventoriesRouter;

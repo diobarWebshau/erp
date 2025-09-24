@@ -1,0 +1,33 @@
+.transparentButtonCustom {
+    /* distribucion box */
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.transparentButtonCustomSpan {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.transparentButtonCustomLabel {
+    color: var(--color-theme-primary-light);
+}
+
+.transparentButtonCustomIcon {
+    color: var(--color-theme-primary-light);
+    width: 15px;
+    height: 15px;
+}
+
+.transparentButtonCustom:hover .transparentButtonCustomLabel,
+.transparentButtonCustom:hover .transparentButtonCustomIcon {
+    color: var(--color-theme-primary);
+}

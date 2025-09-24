@@ -1,0 +1,99 @@
+.overlay {
+    /* posición absoluta en pantalla */
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    /* dimensiones */
+    width: 100vw;
+    height: 100vh;
+
+    /* distribución flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* capa superior */
+    z-index: 1000;
+
+    /* opcional: fondo semitransparente para oscurecer */
+    background-color: var(--color-overlay);
+}
+
+.container {
+    /* dimension */
+    /* todo: se configura desde el padre */
+    /* width: 670px;
+    height: 250px; */
+
+    /* posicionamiento */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+
+    /* distribucion box */
+    border-radius: 20px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+
+    /* estilos */
+    color: var(--color-theme-font-black);
+    overflow-y: auto;
+    background-color: var(--color-theme-background);
+
+}
+
+/*?  Header */
+
+.headerContainer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-theme-primary-light);
+    color: var(--color-theme-font-white);
+}
+
+.headerContainer h2 {
+    font-size: 24px;
+}
+
+
+.closeButton {
+    /* posicionamiento */
+    position: absolute;
+    top: 0.3rem;
+    right: 1rem;
+
+    /* estilos */
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+}
+
+.icon {
+    color: var(--color-theme-font-white);
+}
+
+
+/*?  Container children */
+
+.customContainer {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+}
+

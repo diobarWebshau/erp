@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { AppDispatchRedux } from "../../../../store/store";
-import type { IInventoryDetails } from "../../../../interfaces/inventories";
+import type { IInventoryDetails, IPartialInventoryDetails } from "../../../../interfaces/inventories";
 import GenericTable from "../../../../components/ui/table/tableContext/GenericTable";
 import { useDispatch } from "react-redux";
 import { columnsInventoryDetails } from "./structure/columns.tsx"
@@ -20,6 +20,11 @@ import { reset_column_filters } from "../../../../components/ui/table/tableConte
 import type { Table } from "@tanstack/react-table";
 import AddInventoryModal from "./wizards/add/AddInventoryModal.tsx";
 import InventoriesModuleProvider from "./context/InventoriesModuleProvider.tsx"
+import { createInventoryInBatchDB } from "../../../../modelos/inventories/query/inventoriesQueries.ts";
+import OptionsModal from "./modals/options/OptionsModal.tsx";
+import AddModal from "./modals/options/operations/add/AddModal.tsx";
+import RemoveModal from "./modals/options/operations/remove/RemoveModal.tsx";
+import TransferModal from "./modals/options/operations/transfer/TransferModal.tsx";
 
 const InventoriesModel = () => {
 
@@ -36,12 +41,14 @@ const InventoriesModel = () => {
         setInventoriesRecord
     ] = useState<IInventoryDetails | null>(null);
 
-    // const [isActiveStockInModal, setIsActiveStockInModal] =
-    //     useState<boolean>(false);
-    // const [isActiveStockOutModal, setIsActiveStockOutModal] =
-    //     useState<boolean>(false);
-    // const [isActiveTransferModal, setIsActiveTransferModal] =
-    //     useState<boolean>(false);
+    const [isActiveAddBatchModal, setIsActiveAddBatchModal] =
+        useState<boolean>(false);
+    const [isActiveOptionsModal, setIsActiveOptionsModal] =
+        useState<boolean>(false);
+    const [isActiveTransferModal, setIsActiveTransferModal] =
+        useState<boolean>(false);
+    const [isActiveRemoveModal, setIsActiveRemoveModal] =
+        useState<boolean>(false);
     const [isActiveAddModal, setIsActiveAddModal] =
         useState<boolean>(false);
 
@@ -56,6 +63,26 @@ const InventoriesModel = () => {
                 setInventories([])
             }
             setServerError(null);
+        } catch (error) {
+            if (error instanceof Error)
+                setServerError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateBatch = async (inventory: IPartialInventoryDetails[]) => {
+        setLoading(true);
+        try {
+            const response = await createInventoryInBatchDB(
+                inventory,
+                dispatch
+            );
+            if (!response) {
+                return;
+            }
+            setServerError(null);
+            fetchs();
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -129,33 +156,55 @@ const InventoriesModel = () => {
         }
     }
 
-    // const toggleActiveTransferModal = () => {
-    //     setServerError(null);
-    //     console.log("entro");
-    //     setIsActiveTransferModal(!isActiveTransferModal);
-    // }
+    const toggleActiveAddBatchModal = () => {
+        setServerError(null);
+        setIsActiveAddBatchModal(!isActiveAddBatchModal);
+    }
+
+    const toggleActiveOptionsModalSetup = (inventory: IInventoryDetails) => {
+        setServerError(null);
+        setInventoriesRecord(inventory);
+        setIsActiveOptionsModal(!isActiveOptionsModal);
+    }
+
+    const toggleActiveOptionsModal = () => {
+        setServerError(null);
+        setIsActiveOptionsModal(!isActiveOptionsModal);
+    }
 
     const toggleActiveAddModal = () => {
         setServerError(null);
         setIsActiveAddModal(!isActiveAddModal);
+        if (isActiveOptionsModal) {
+            setIsActiveOptionsModal(false);
+            return;
+        }
     }
 
-    // const toggleActiveStockInModal = (record: IInventoryDetails) => {
-    //     setServerError(null);
-    //     setInventoriesRecord(record);
-    //     setIsActiveStockInModal(!isActiveStockInModal);
-    // }
+    const toggleActiveRemoveModal = () => {
+        setServerError(null);
+        setIsActiveRemoveModal(!isActiveRemoveModal);
+        if (isActiveOptionsModal) {
+            setIsActiveOptionsModal(false);
+            return;
+        }
+    }
 
-    // const toggleActiveStockOutModal = (record: IInventoryDetails) => {
-    //     setServerError(null);
-    //     setInventoriesRecord(record);
-    //     setIsActiveStockOutModal(!isActiveStockOutModal);
-    // }
+    const toggleActiveTransferModal = () => {
+        setServerError(null);
+        setIsActiveTransferModal(!isActiveTransferModal);
+        if (isActiveOptionsModal) {
+            setIsActiveOptionsModal(false);
+            return;
+        }
+    }
+
+    
 
     const rowActions: RowAction<IInventoryDetails>[] = [
         {
             label: "Editar",
-            onClick: toggleActiveAddModal,
+            onClick: (row) => toggleActiveOptionsModalSetup(row),
             icon: <Pencil className={StyleModule.pencilIconRowActions} />
         },
     ];
@@ -173,7 +222,7 @@ const InventoriesModel = () => {
                     <h1 className="nunito-bold">Inventario</h1>
                     <FadeButton
                         label="Agregar inventario"
-                        onClick={toggleActiveAddModal}
+                        onClick={toggleActiveAddBatchModal}
                         icon={<Plus className={StyleModule.plusIconShippingOrderModel} />}
                         typeOrderIcon="first"
                         classNameButton={StyleModule.fadeButtonExtraComponents}
@@ -234,62 +283,71 @@ const InventoriesModel = () => {
         <div className={StyleModule.containerInventoriesModel}>
             <GenericTable
                 modelName="Inventories"
-
                 // distribucion de columnas y 
                 columns={columnsInventoryDetails}
                 data={inventories}
-                getRowId={(
-                    row: IInventoryDetails,
-                ) => `temp-inv_id-${row.inventory_id.toString()}-locationId-${row?.location_id?.toString()}-prod_id-${row?.item_type?.toString()}${row?.item_type?.toString()}`}
-
+                getRowId={
+                    (row: IInventoryDetails) =>
+                        `temp-inv_id-${row.inventory_id.toString()}` +
+                        `-locationId-${row?.location_id?.toString()}` +
+                        `-prod_id-${row?.item_type?.toString()}` +
+                        `${row?.item_type?.toString()}`}
                 // funcionalidades habilitadas
                 enableFilters={true}
                 enablePagination={true}
                 enableRowSelection={false}
                 enableOptionsColumn={true}
-
                 // acciones de la tabla
                 onDeleteSelected={() => console.log("Delete selected")}
                 typeRowActions="icon"
                 rowActions={rowActions}
-
                 // componentes extra
                 extraComponents={(table) => ExtraComponents(table)}
-
-                // estilos
                 classNameGenericTableContainer={StyleModule.containerGenericTableContainer}
 
             />
-            {/* {
-                isActiveStockInModal && < StockInModal
-                    onClose={setIsActiveStockInModal}
-                    onStockIn={(value) => handleStockIn(value)}
-                    record={inventoriesRecord}
-                />
-            }
             {
-                isActiveStockOutModal && <StockOutModal
-                    onClose={setIsActiveStockOutModal}
-                    onStockOut={(value) => handleStockOut(value)}
-                    record={inventoriesRecord}
-                />
-            }
-            {
-                isActiveTransferModal && <TransferModal
-                    onClose={setIsActiveTransferModal}
-                    onTransfer={(value) => handleTransfer(value)}
-                />
-            } */}
-            {
-                isActiveAddModal &&
+                isActiveAddBatchModal &&
                 <InventoriesModuleProvider
                     initialStep={1}
                     totalSteps={2}
                 >
                     <AddInventoryModal
-                        onClose={() => setIsActiveAddModal(false)}
+                        onClose={toggleActiveAddBatchModal}
+                        onCreate={handleCreateBatch}
                     />
                 </InventoriesModuleProvider>
+            }
+            {
+                isActiveOptionsModal &&
+                <OptionsModal
+                    onClose={toggleActiveOptionsModal}
+                    inventory={inventoriesRecord as IInventoryDetails}
+                    toggleAddModal={toggleActiveAddModal}
+                    toggleRemoveModal={toggleActiveRemoveModal}
+                    toggleTransferModal={toggleActiveTransferModal}
+                />
+            }
+            {
+                isActiveAddModal &&
+                <AddModal
+                    onClose={toggleActiveAddModal}
+                    inventory={inventoriesRecord as IInventoryDetails}
+                />
+            }
+            {
+                isActiveRemoveModal &&
+                <RemoveModal
+                    onClose={toggleActiveRemoveModal}
+                    inventory={inventoriesRecord as IInventoryDetails}
+                />
+            }
+            {
+                isActiveTransferModal &&
+                <TransferModal
+                    onClose={toggleActiveTransferModal}
+                    inventory={inventoriesRecord as IInventoryDetails}
+                />
             }
         </div>
     );

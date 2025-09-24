@@ -109,7 +109,7 @@ import {
     FloatingFocusManager,
 } from "@floating-ui/react";
 
-interface ObjectSelectCustomProps<T extends BaseRow> {
+interface ObjectSelectProps<T extends BaseRow> {
     value?: T | null | undefined; // valor seleccionado desde el padre
     options: T[];
     labelKey: keyof T;
@@ -138,7 +138,7 @@ const ObjectSelect = <T extends BaseRow>({
     classNameToggleContainer,
     classNameOption,
     classNameOptionSelected,
-}: ObjectSelectCustomProps<T>) => {
+}: ObjectSelectProps<T>) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // Label mostrado, derivado de `value`

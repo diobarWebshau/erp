@@ -150,6 +150,42 @@ const createInventoryInDB = async (
     }
 };
 
+
+const createInventoryInBatchDB = async (
+    data: IPartialInventory[],
+    dispatch: AppDispatchRedux
+): Promise<any> => {
+    try {
+        const response = await fetch(API_URL + "/batch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(errorText);
+            }
+            console.log(errorText);
+            dispatch(
+                setError({
+                    key: "createInventoryInBatch",
+                    message: errorText
+                })
+            );
+            return null;
+        }
+        dispatch(
+            clearError("createInventoryInBatch")
+        );
+        const result = await response.json();
+        return result;
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
 const updateInventoryInDB = async (
     id: number,
     data: IPartialInventory,
@@ -231,4 +267,5 @@ export {
     updateInventoryInDB,
     deleteInventoryInDB,
     fetchItemsFromDB,
+    createInventoryInBatchDB,
 };

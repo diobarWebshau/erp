@@ -1,4 +1,6 @@
 import {
+    // current, // para poder acceder al valor original del draft
+    // isDraft, // para verificar si el draft es un draft para acceder al valor original, y poder imprimirlo
     produce,
 } from "immer";
 import type {
@@ -34,7 +36,7 @@ const InventoriesReducer = produce((
             break;
         case inventoriesActionsTypes.REMOVE_ITEMS:
             draft.data = draft.data.filter(
-                (item) => item?.id && !action.payload.includes(item?.id)
+                (item) => item?.item?.id && !action.payload.includes(item?.item?.id.toString())
             );
             break;
 

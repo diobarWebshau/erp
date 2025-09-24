@@ -1,0 +1,17 @@
+/* *************** Input Toggle *************** */
+
+.container {
+    /* dimension */
+    width: 100%;
+
+
+    display: flex;
+}
+
+.input {
+    height: 30px;
+    font-size: 14px;
+    padding-inline: 1rem;
+    background-color: var(--color-theme-background);
+    border: 1px solid var(--color-theme-border-table);
+}

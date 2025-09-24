@@ -1,0 +1,48 @@
+.containerDialogModal {
+    width: 670px;
+    height: 213px;
+}
+
+.containerCustomDialogModal{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.content {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem;
+    text-align: center;
+}
+
+.title {
+    /* estilos */
+    font-size: 24px;
+    color: var(--color-theme-font-black);
+}
+
+/*?  Container warning icon */
+
+.containerIcon {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon {
+    color: var(--color-theme-primary);
+    width: 40px;
+    height: 40px;
+}
+
+

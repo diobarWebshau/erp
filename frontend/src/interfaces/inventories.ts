@@ -38,8 +38,6 @@ interface IInventoryDetails {
     location?: ILocation | null
 }
 
-
-
 type IPartialInventoryDetails = Partial<IInventoryDetails>;
 
 type IPartialInventory = Partial<IInventory>;

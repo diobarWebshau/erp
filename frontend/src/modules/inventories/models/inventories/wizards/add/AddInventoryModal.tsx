@@ -6,21 +6,31 @@ import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";
 import { useInventoriesState } from "./../../context/InventoiresHooks";
+import { useState } from "react";
+import WarningModal from "../../../../../../comp/primitives/modal2/dialog-modal/custom/warning/WarningModal";
+import type { IPartialInventoryDetails } from "../../../../../../interfaces/inventories";
 
 interface IAddInventoryModal {
+    onCreate: (inventory: IPartialInventoryDetails[]) => void;
     onClose: () => void;
 }
 
 const AddInventoryModal = ({
-    onClose
+    onClose,
+    onCreate
 }: IAddInventoryModal) => {
     const state = useInventoriesState();
+    const [showWarningModal, setShowWarningModal] = useState(false);
+
+    const toggleWarningModal = () => {
+        setShowWarningModal(!showWarningModal);
+    }
     return (
         <FullContainerModal>
             <div className={StyleModule.containerAddInventoryModal}>
                 <div className={StyleModule.headerSection}>
                     <TransparentButtonCustom
-                        onClick={onClose}
+                        onClick={toggleWarningModal}
                         icon={<ChevronLeft className={StyleModule.backButtonIcon} />}
                         label="Regresar"
                     />
@@ -29,21 +39,37 @@ const AddInventoryModal = ({
                 <div className={StyleModule.mainContent}>
                     {
                         state.current_step === 1 && (
-                            <Step1 />
+                            <Step1
+                                onCancel={toggleWarningModal}
+                            />
                         )
                     }
                     {
                         state.current_step === 2 && (
-                            <Step2 />
+                            <Step2 
+                                onCancel={toggleWarningModal}
+                            />
                         )
                     }
                     {
                         state.current_step === 3 && (
-                            <Step3 />
+                            <Step3 
+                                onLeave={onClose}
+                                onCancel={toggleWarningModal}
+                                onCreate={onCreate}
+                            />  
                         )
                     }
                 </div>
             </div>
+            {
+                showWarningModal && (
+                    <WarningModal
+                        onClose={toggleWarningModal}
+                        onLeave={onClose}
+                    />
+                )
+            }
         </FullContainerModal>
     );
 }

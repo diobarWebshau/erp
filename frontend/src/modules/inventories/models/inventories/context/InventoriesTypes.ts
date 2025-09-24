@@ -29,7 +29,7 @@ type InventoriesAction =
     // Acciones directas al array de inventarios
     | { type: typeof inventoriesActionsTypes.SET_INVENTORIES, payload: IPartialInventoryDetails[] }
     | { type: typeof inventoriesActionsTypes.ADD_ITEMS, payload: IPartialInventoryDetails[] }
-    | { type: typeof inventoriesActionsTypes.REMOVE_ITEMS, payload: number[] }
+    | { type: typeof inventoriesActionsTypes.REMOVE_ITEMS, payload: string[] }
 
     // Acciones directas a un item del array de inventarios
     | { type: typeof inventoriesActionsTypes.UPDATE_ITEM, payload: { id: string, attributes: IPartialInventoryDetails } }

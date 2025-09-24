@@ -1,4 +1,3 @@
-import async from "react-select/async";
 import type { IInventoryInput } from "../../../interfaces/inventoryInputs";
 import type {
     IPartialLocation,

@@ -27,6 +27,9 @@ interface IInventoryDetails {
     maximum_stock: number,
     lead_time: number,
     location_name: string,
+    location?: LocationAttributes
+    item?: IItem
+    qty?: number,
 }
 
 interface IObjectInventoryDetails {

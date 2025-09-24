@@ -27,6 +27,9 @@ const createInventoriesRouter = (): Router => {
     InventoriesRouter.post("/items/like/:filter",
         InventoriesController.getAllItemsLike
     );
+    InventoriesRouter.post("/batch",
+        InventoriesController.createBatch
+    );
     return InventoriesRouter;
 }
 

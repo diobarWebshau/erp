@@ -1,0 +1,42 @@
+.containerHeaderModal {
+    width: 400px;
+}
+
+.customContainerHeaderModal {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding-inline: 1rem;
+    padding-bottom: 2rem;
+    padding-top: 1rem;
+    gap: 1.5rem;
+}
+
+
+.customContainerHeaderModal h2 {
+    align-items: center;
+    color: var(--color-theme-font-black);
+}
+
+
+.containerButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.containerButtons>* {
+    width: 100%;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 1;
+}
+
+.criticalActionButton {
+    width: 100%;
+}
+
+.criticalActionButton{
+    width: 100%;
+}

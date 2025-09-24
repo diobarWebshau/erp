@@ -17,8 +17,8 @@ interface InventoryMovementModelAttributes {
     reference_type:
         'Production Order'| 'Order'| 'Transfer'|
         "Purchased"| "Scrap" | "Internal Production Order",
-    production_id: number,
-    description: string,
+    production_id: number | null,
+    description: string | null,
     is_locked: number,
     created_at: Date,
 }

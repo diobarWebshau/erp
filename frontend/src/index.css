@@ -41,6 +41,9 @@
   --color-theme-gradient-start: #5A63FF;
   --color-theme-gradient-end: #423DD9;
 
+  --color-gradient-purple:
+    linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
+
 
   --color-gradient-purple-white: linear-gradient(90deg,
       #423DD9 0%,

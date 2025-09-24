@@ -26,7 +26,7 @@ const add_items= (
 });
 
 const remove_items= (
-    payload: number[]
+    payload: string[]
 ): InventoriesAction => ({
     type: inventoriesActionsTypes.REMOVE_ITEMS,
     payload

@@ -1,7 +1,7 @@
-import { InventoryModel } from "../../../associations.js";
+import { InventoryLocationItemModel, InventoryModel, InventoryMovementModel } from "../../../associations.js";
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import sequelize from "../../../../mysql/configSequelize.js";
-import { QueryTypes } from "sequelize";
+import { QueryTypes, Transaction } from "sequelize";
 class InventoriesController {
     static getAll = async (req, res, next) => {
         try {
@@ -181,6 +181,96 @@ class InventoriesController {
             res.status(200).json(items.items);
         }
         catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            }
+            else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    };
+    static createBatch = async (req, res, next) => {
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
+        });
+        const inventories = req.body;
+        try {
+            const productsWithInventory = inventories.filter((inv) => inv.item?.locations.some((location) => location.id === inv.location_id));
+            const productsWithoutInventory = inventories.filter((inv) => inv.item?.locations.every((location) => location.id !== inv.location_id));
+            if (productsWithoutInventory.length > 0) {
+                const copyProductsWithoutInventory = [...productsWithoutInventory];
+                for (const inv of copyProductsWithoutInventory) {
+                    const inventory = {
+                        stock: 0,
+                        minimum_stock: inv.minimum_stock || 100,
+                        maximum_stock: inv.maximum_stock || 10000,
+                        lead_time: inv.lead_time || 10,
+                    };
+                    const responseCreateSlotOfInventory = await InventoryModel.create(inventory, { transaction });
+                    if (!responseCreateSlotOfInventory) {
+                        await transaction.rollback();
+                        res.status(400).json({
+                            validation: "No se pudo crear el registro de inventario "
+                        });
+                        return;
+                    }
+                    const inventoryRecord = responseCreateSlotOfInventory.toJSON();
+                    const inventoryLocationItem = {
+                        inventory_id: inventoryRecord.id,
+                        item_type: inv.item_type,
+                        item_id: inv.item_id,
+                        location_id: inv.location_id,
+                    };
+                    const responseCreateInventoryLocationItem = await InventoryLocationItemModel.create(inventoryLocationItem, { transaction });
+                    if (!responseCreateInventoryLocationItem) {
+                        await transaction.rollback();
+                        res.status(400).json({
+                            validation: `No se pudo asignar el registro de inventario ` +
+                                `${inv.item_name} a la ubicación ` +
+                                `${inv.location_name}`
+                        });
+                        return;
+                    }
+                }
+            }
+            const inventoriesUpdated = [
+                ...productsWithInventory,
+                ...productsWithoutInventory
+            ];
+            console.log(inventoriesUpdated);
+            const newInventoryMovements = inventoriesUpdated.map((inv) => {
+                const inventoryMovement = {
+                    item_id: inv.item_id,
+                    location_id: inv.location_id,
+                    item_type: inv.item_type,
+                    location_name: inv.location_name,
+                    item_name: inv.item_name,
+                    qty: inv.qty ?? 0,
+                    is_locked: 0,
+                    movement_type: "in",
+                    reference_type: "Purchased",
+                    description: null,
+                    production_id: null,
+                    reference_id: null,
+                };
+                return inventoryMovement;
+            });
+            const responseInventoryMovements = await InventoryMovementModel.bulkCreate(newInventoryMovements, { transaction });
+            if (responseInventoryMovements.length !== newInventoryMovements.length) {
+                await transaction.rollback();
+                res.status(400).json({
+                    validation: "No se pudo crear los movimientos de inventario"
+                });
+                return;
+            }
+            await transaction.commit();
+            console.log("Inventarios actualizados correctamente");
+            res.status(200).json({
+                message: "Inventarios actualizados correctamente"
+            });
+        }
+        catch (error) {
+            await transaction.rollback();
             if (error instanceof Error) {
                 next(error);
             }

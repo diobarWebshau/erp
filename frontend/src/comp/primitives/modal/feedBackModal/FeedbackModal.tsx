@@ -41,25 +41,7 @@ const FeedbackModal = (
                 >
                     <X className={stylesModules.icon} />
                 </button>
-                <div className={stylesModules.containerCheckIcon} >
-                    {
-                        icon && iconWithClass
-                    }
-                </div>
-                <div className={stylesModules.content}>
-                    {
-                        title &&
-                        <h2 className={`nunito-bold ${stylesModules.title}`}>
-                            {title}
-                        </h2>
-                    }
-                    {
-                        message &&
-                        <p className="nunito-semibold">
-                            {message}
-                        </p>
-                    }
-                </div>
+ 
             </div>
         </div>
     );
