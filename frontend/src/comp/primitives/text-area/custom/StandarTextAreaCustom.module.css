@@ -1,0 +1,11 @@
+/* *************** TextArea *************** */
+
+.containerTextArea {
+    /* dimension */
+    gap: 0.5rem;
+    height: auto;
+}
+
+.textArea {
+    font-size: 14px;
+}

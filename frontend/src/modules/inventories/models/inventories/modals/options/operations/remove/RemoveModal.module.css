@@ -10,13 +10,95 @@
     padding-inline: 1rem;
     padding-bottom: 2rem;
     padding-top: 1rem;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .criticalActionButton {
     width: 100%;
 }
 
-.criticalActionButton{
+.criticalActionButton {
     width: 100%;
 }
+
+.mainActionButton {
+    width: 100%;
+}   
+
+
+/* ? ******* header  ******* */
+
+.customContainerHeaderModal > h2 {
+    font-size: 24px;
+    color: var(--color-theme-font-black);
+}
+
+/* ? ******* Container Info ******* */
+
+.containerInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    font-size: 14px;
+}
+
+.containerInfo dl {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.containerInfo dt {
+    color: var(--color-theme-primary);
+}
+
+.containerInfo dd {
+    color: var(--color-theme-font-black);
+}
+
+
+/* ? ******* Container Input Field ******* */
+
+.containerInputField {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding-inline: 1rem;
+    padding-bottom: 0.4rem;
+    padding-top: 0.4rem;
+    background-color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 15px;
+}
+
+.containerInput{
+    width: 150px;
+}
+
+.containerInputField label {
+    font-size: 14px;
+    color: var(--color-theme-neutral-primary);
+}
+
+
+/* ? ******* Container Select ******* */
+
+.containerFieldSelect {
+    height: 44px !important;
+    background-color: var(--color-theme-font-white) !important;
+    color: var(--color-theme-neutral-primary) !important;
+}
+
+.containerOptionSelect {
+    height: 44px !important;   
+    color: var(--color-theme-neutral-primary);
+}
+
+
+

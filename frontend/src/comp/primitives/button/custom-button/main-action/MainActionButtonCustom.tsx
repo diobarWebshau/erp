@@ -6,12 +6,14 @@ interface IMainActionButtonCustomProps {
     onClick: () => void;
     label: string;
     icon: JSX.Element;
+    classNameButton?: string;
 }
 
 const MainActionButtonCustom = ({
     onClick,
     label,
-    icon
+    icon,
+    classNameButton
 }: IMainActionButtonCustomProps) => {
     
     // Clonamos el icono y le agregamos la clase deseada
@@ -25,7 +27,7 @@ const MainActionButtonCustom = ({
             onClick={onClick}
             type="button"
             typeOrderIcon="first"
-            classNameButton={StyleModule.mainActionButtonCustom}
+            classNameButton={`${classNameButton} ${StyleModule.mainActionButtonCustom}`}
             classNameLabel={StyleModule.mainActionButtonCustomLabel}
             classNameSpan={StyleModule.mainActionButtonCustomSpan}
             icon={iconWithClass}
