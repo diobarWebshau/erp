@@ -47,7 +47,7 @@ const OptionsModal = ({
             <CriticalActionButton
                 label="Cancelar"
                 onClick={onClose}
-                className={stylesModule.criticalActionButton}
+                classNameButton={stylesModule.criticalActionButton}
             />
         </HeaderModal>
     );

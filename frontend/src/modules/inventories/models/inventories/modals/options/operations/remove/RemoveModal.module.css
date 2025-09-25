@@ -23,12 +23,12 @@
 
 .mainActionButton {
     width: 100%;
-}   
+}
 
 
 /* ? ******* header  ******* */
 
-.customContainerHeaderModal > h2 {
+.customContainerHeaderModal>h2 {
     font-size: 24px;
     color: var(--color-theme-font-black);
 }
@@ -77,8 +77,13 @@
     border-radius: 15px;
 }
 
-.containerInput{
+.containerInput {
     width: 150px;
+}
+
+.input {
+    background-color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-primary);
 }
 
 .containerInputField label {
@@ -92,13 +97,9 @@
 .containerFieldSelect {
     height: 44px !important;
     background-color: var(--color-theme-font-white) !important;
-    color: var(--color-theme-neutral-primary) !important;
 }
 
 .containerOptionSelect {
-    height: 44px !important;   
-    color: var(--color-theme-neutral-primary);
+    height: 44px !important;
 }
-
-
 

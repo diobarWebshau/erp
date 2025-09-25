@@ -1,5 +1,5 @@
 import { cloneElement } from "react";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 import DialogModal from "../../base/DialogModal";
 import stylesModules from "./FeedBackModal.module.css";
 
@@ -9,6 +9,7 @@ interface IFeedBackModalProps {
     message?: string;
     icon?: JSX.Element;
     classNameContainerSize?: string;
+    messageCustom?: ReactNode;
 }
 
 const FeedBackModal = ({
@@ -16,7 +17,8 @@ const FeedBackModal = ({
     title,
     message,
     icon,
-    classNameContainerSize
+    classNameContainerSize,
+    messageCustom
 }: IFeedBackModalProps) => {
 
     // Clonamos el icono y le agregamos la clase deseada
@@ -47,6 +49,10 @@ const FeedBackModal = ({
                     <p className="nunito-semibold">
                         {message}
                     </p>
+                }
+                {
+                    messageCustom &&
+                    messageCustom
                 }
             </div>
         </DialogModal>

@@ -52,8 +52,10 @@ const AddModal = ({ onClose, inventory }: AddModalProps) => {
                     value={qty}
                     onChange={handleOnChangeQty}
                     classNameContainer={stylesModule.containerInput}
+                    classNameInput={stylesModule.input}
                 />
             </div>
+            
             <MainActionButtonCustom
                 label="Agregar"
                 onClick={onClose}
@@ -63,7 +65,7 @@ const AddModal = ({ onClose, inventory }: AddModalProps) => {
             <CriticalActionButton
                 label="Cancelar"
                 onClick={onClose}
-                className={stylesModule.criticalActionButton}
+                classNameButton={stylesModule.criticalActionButton}
             />
         </HeaderModal>
     );

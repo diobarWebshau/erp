@@ -184,7 +184,13 @@ const ObjectSelect = <T extends BaseRow>({
     return (
         <div className={`${styles.customSelect} ${classNameContainer}`}>
             <div
-                className={`nunito-semibold ${styles.fieldSelectContainer} ${value ? styles.fieldSelectContainerValidate : styles.fieldSelectContainerInvalid} ${classNameFieldContainer}`}
+                className={
+                    `nunito-semibold` +
+                    ` ${styles.fieldSelectContainer}` +
+                    ` ${value ? styles.fieldSelectContainerValidate : styles.fieldSelectContainerInvalid}` +
+                    ` ${classNameFieldContainer}` +
+                    ` ${!value && styles.fieldSelectDefault}`
+                }
                 ref={refs.setReference}
                 {...getReferenceProps()}
                 tabIndex={0}

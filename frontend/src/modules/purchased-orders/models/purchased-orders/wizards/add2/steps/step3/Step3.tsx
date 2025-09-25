@@ -71,7 +71,6 @@ import {
 } from "../../../../../../../../utils/fomatted_data_mysql/formtated_date_mysql";
 import CustomModal from "../../../../../../../../comp/primitives/modal/customModal/CustomModal";
 
-
 const InputToggleMemoized = memo(
     ({
         value,

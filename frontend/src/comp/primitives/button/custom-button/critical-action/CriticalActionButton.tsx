@@ -6,17 +6,17 @@ interface ICriticalActionButtonProps {
     onClick: () => void;
     label: string;
     icon?: React.ReactNode;
-    className?: string;
+    classNameButton?: string;
 }
 
-const CriticalActionButton = ({ onClick, label, icon, className }: ICriticalActionButtonProps) => {
+const CriticalActionButton = ({ onClick, label, icon, classNameButton }: ICriticalActionButtonProps) => {
     return (
         <FadeButton
             label={label}
             onClick={onClick}
             type="button"
             typeOrderIcon="first"
-            classNameButton={`${StyleModule.criticalActionButton} ${className}`}
+            classNameButton={`${StyleModule.criticalActionButton} ${classNameButton}`}
             classNameLabel={StyleModule.criticalActionButtonLabel}
             classNameSpan={StyleModule.criticalActionButtonSpan}
             icon={icon ?? <CircleX className={StyleModule.criticalActionButtonIcon} />}

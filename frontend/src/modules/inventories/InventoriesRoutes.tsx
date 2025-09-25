@@ -6,9 +6,7 @@ import {
     Suspense
 } from "react";
 
-const Loading =
-    lazy(() =>
-        import("../../components/load/loading/Loading.tsx"));
+import Loading from "../../components/load/loading/Loading.tsx";
 
 const Inventory =
     lazy(() =>

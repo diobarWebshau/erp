@@ -1017,67 +1017,37 @@ CREATE TRIGGER trigger_after_insert_scrap
 AFTER INSERT ON scrap
 FOR EACH ROW
 BEGIN
-	IF NEW.reference_type = 'production' THEN
+	IF NEW.reference_type = 'Production' THEN
 		INSERT INTO inventory_movements(
-			location_id,
-			location_name,
-			item_id,
-			item_type,
-			item_name,
-			qty,
-			movement_type,
-			reference_id,
-			reference_type,
-			production_id,
-			description,
-			is_locked
+			location_id, location_name,
+			item_id, item_type, item_name,
+			qty, movement_type, 
+			reference_id, reference_type, production_id,
+			description, is_locked
 		)
 		VALUES (
-			NEW.location_id,
-			NEW.location_name,
-			NEW.item_id,
-			NEW.item_type,
-			NEW.item_name,
-			NEW.qty,
-			'out',
-			NEW.id,
-			'scrap',
-			NEW.reference_id,
-			null,
-			0
+			NEW.location_id, NEW.location_name, 
+			NEW.item_id, NEW.item_type, NEW.item_name, 
+			NEW.qty, 'out', NEW.id, 'scrap', 
+			NEW.reference_id, null, 0
 		);
 	ELSE
 		INSERT INTO inventory_movements(
-			location_id,
-			location_name,
-			item_id,
-			item_type,
-			item_name,
-			qty,
-			movement_type,
-			reference_id,
-			reference_type,
-			production_id,
-			description,
-			is_locked
+			location_id, location_name, 
+			item_id, item_type, item_name,
+			qty, movement_type, 
+			reference_id, reference_type, production_id,
+			description, is_locked
 		)
 		VALUES (
-			NEW.location_id,
-			NEW.location_name,
-			NEW.item_id,
-			NEW.item_type,
-			NEW.item_name,
-			NEW.qty,
-			'out',
-			NEW.id,
-			'scrap',
-			null,
-			null, 
-			0
+			NEW.location_id,NEW.location_name,
+			NEW.item_id, NEW.item_type, NEW.item_name, 
+			NEW.qty, 'out', NEW.id, 'scrap', null,
+			null, 0
 		);
 	END IF;
 END //
-DELIMITER ;
+DELIMITER;
 
 DELIMITER // 
 CREATE TRIGGER trigger_after_delete_scrap

@@ -5,13 +5,17 @@ import CriticalActionButton from "../../../../../../../../comp/primitives/button
 import { useState } from "react";
 import NumericInputCustom from "../../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { Minus, Plus } from "lucide-react";
+import { Minus } from "lucide-react";
 import StandarSelectCustom from "../../../../../../../../comp/primitives/select/standar-select/custom/StandarSelectCustom";
 import StandarTextAreaCustom from "../../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
+import type { IPartialScrap } from "../../../../../../../../interfaces/scrap";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../../../../../../store/store";
 
 interface RemoveModalProps {
     onClose: () => void;
     inventory: IInventoryDetails;
+    onRemove: (scrap: IPartialScrap) => void;
 }
 
 const options = [
@@ -21,11 +25,19 @@ const options = [
     "Robado",
 ]
 
-const RemoveModal = ({ onClose, inventory }: RemoveModalProps) => {
+const RemoveModal = ({
+    onClose,
+    inventory,
+    onRemove
+}: RemoveModalProps) => {
+
+    const user = useSelector((state: RootState)=> state.auth);
+    
 
     const [qty, setQty] = useState<number>(1);
     const [reason, setReason] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
+
 
     const handleOnChangeQty = (value: number) => {
         setQty(value);
@@ -39,6 +51,26 @@ const RemoveModal = ({ onClose, inventory }: RemoveModalProps) => {
         setNotes(e.target.value);
     }
 
+    const handleOnClickButtonRemove = () => {
+        const scrap: IPartialScrap = {
+            // ITEM
+            item_id: inventory.item_id,
+            item_name: inventory.item_name,
+            item_type: inventory.item_type,
+            qty: qty,
+            // LOCATION
+            location_id: inventory.location_id,
+            location_name: inventory.location_name,
+            // INFO
+            reason: reason,
+            reference_id: null,
+            reference_type: "Inventory",
+            user_name: user.username,
+            user_id: user.userId,
+        }
+        onRemove(scrap);
+    }
+
     return (
         <HeaderModal
             onClose={onClose}
@@ -46,7 +78,7 @@ const RemoveModal = ({ onClose, inventory }: RemoveModalProps) => {
             className={stylesModule.containerHeaderModal}
             classNameCustomContainer={stylesModule.customContainerHeaderModal}
         >
-            
+
             <h2>{`${inventory.item_id} ${inventory.item_name}`}</h2>
 
             <div className={`nunito-bold ${stylesModule.containerInfo}`}>
@@ -74,6 +106,7 @@ const RemoveModal = ({ onClose, inventory }: RemoveModalProps) => {
                     value={qty}
                     onChange={handleOnChangeQty}
                     classNameContainer={stylesModule.containerInput}
+                    classNameInput={stylesModule.input}
                 />
             </div>
 
@@ -86,7 +119,7 @@ const RemoveModal = ({ onClose, inventory }: RemoveModalProps) => {
                 classNameFieldContainer={stylesModule.containerFieldSelect}
                 classNameOption={stylesModule.containerOptionSelect}
             />
-            
+
 
             <StandarTextAreaCustom
                 value={notes}
@@ -97,7 +130,7 @@ const RemoveModal = ({ onClose, inventory }: RemoveModalProps) => {
 
             <MainActionButtonCustom
                 label="Remover"
-                onClick={onClose}
+                onClick={handleOnClickButtonRemove}
                 icon={<Minus />}
                 classNameButton={stylesModule.mainActionButton}
             />
@@ -105,7 +138,7 @@ const RemoveModal = ({ onClose, inventory }: RemoveModalProps) => {
             <CriticalActionButton
                 label="Cancelar"
                 onClick={onClose}
-                className={stylesModule.criticalActionButton}
+                classNameButton={stylesModule.criticalActionButton}
             />
 
         </HeaderModal>

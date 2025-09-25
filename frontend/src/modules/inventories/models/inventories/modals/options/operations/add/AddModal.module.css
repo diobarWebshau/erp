@@ -81,6 +81,11 @@
     width: 150px;
 }
 
+.input {
+    background-color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-primary);
+}
+
 .containerInputField label {
     font-size: 14px;
     color: var(--color-theme-neutral-primary);

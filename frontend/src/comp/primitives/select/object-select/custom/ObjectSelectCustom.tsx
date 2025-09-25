@@ -10,6 +10,9 @@ interface ObjectSelectCustomProps<T extends BaseRow> {
     defaultLabel?: string;
     autoOpen?: boolean;
     onChange?: ((value: T | null | undefined) => void);
+    classNameFieldContainer?: string;
+    classNameToggleContainer?: string;
+    classNameOption?: string;
 }
 
 
@@ -20,6 +23,9 @@ const ObjectSelectCustom = <T extends BaseRow>({
     autoOpen = true,
     onChange,
     value,
+    classNameFieldContainer,
+    classNameToggleContainer,
+    classNameOption
 }: ObjectSelectCustomProps<T>) => {
 
 
@@ -32,9 +38,9 @@ const ObjectSelectCustom = <T extends BaseRow>({
             onChange={onChange}
             value={value}
             icon={<ChevronDown className={StyleModule.iconButton} />}
-            classNameFieldContainer={StyleModule.customSelectFieldContainer}
-            classNameToggleContainer={StyleModule.customSelectToggleContainer}
-            classNameOption={StyleModule.customSelectOption}
+            classNameFieldContainer={`${StyleModule.customSelectFieldContainer} ${classNameFieldContainer}`}
+            classNameToggleContainer={`${StyleModule.customSelectToggleContainer} ${classNameToggleContainer}`}
+            classNameOption={`${StyleModule.customSelectOption} ${classNameOption}`}
 
         />
     )

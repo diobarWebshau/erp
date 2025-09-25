@@ -246,3 +246,19 @@
     width: 15px;
     height: 15px;
 }
+
+
+
+/*? FeedBack Message Transfer */
+
+.feedBackMessage {
+    /* estilos */
+    font-size: 24px;
+    color: var(--color-theme-font-black);
+}
+
+.feedBackMessage span {
+    /* estilos */
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}

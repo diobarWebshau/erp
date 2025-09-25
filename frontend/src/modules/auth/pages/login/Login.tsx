@@ -26,6 +26,7 @@ import StandarTextField
     from "../../../../components/ui/table/components/gui/text-field/standar-text-field/StandarTextField.tsx";
 import StandarTextFieldPassword
     from "../../../../components/ui/table/components/gui/text-field/standar-text-field-password/StandarTextFieldPassword.tsx";
+import type{ PayloadSlice } from "./../../../../store/slicer/authSlicer.ts";
 
 import {
     EyeOff,
@@ -37,12 +38,6 @@ interface LoginData {
     username: string | undefined,
     password: string | undefined
 }
-
-interface Payload {
-    id: number,
-    username: string
-}
-
 
 const Login = () => {
     const dispatch: AppDispatchRedux = useDispatch();
@@ -71,7 +66,7 @@ const Login = () => {
                 console.log(res);
                 return;
             }
-            const payload: Payload = res.message;
+            const payload: PayloadSlice = res.message;
             dispatch(saveAuth(payload));
             if (rememberMe && username && password) {
                 localStorage.setItem('rememberedUser', username);

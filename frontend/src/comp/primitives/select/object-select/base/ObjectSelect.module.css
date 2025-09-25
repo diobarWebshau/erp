@@ -69,8 +69,8 @@
 .iconButton {
     /* posicionamiento */
     position: absolute;
-    right: 1%;
-    top: 25%;
+    right: 3%;
+    top: 30%;
 
     /* dimension */
     border: none;
@@ -131,4 +131,9 @@
 .selected {
     /* estilos */
     background: var(--color-theme-neutral-background);
+}
+
+.fieldSelectDefault {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
 }

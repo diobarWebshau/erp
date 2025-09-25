@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import { MultiSelectSearchCheck } from "../base/MultiSelectSearchCheck"
-import type { StrictStringKeys } from "../types";
+import type { StrictStringKeys } from "../../types";
 import styleModule from "./MultiSelectSearchCheckCustom.module.css";
 
 interface MultiProps<T> {
@@ -19,6 +19,7 @@ interface MultiProps<T> {
 }
 
 const MultiSelectSearchCheckCustom = <T,>(props: MultiProps<T>) => {
+
     return (
         <MultiSelectSearchCheck
             rowId={props.attribute}

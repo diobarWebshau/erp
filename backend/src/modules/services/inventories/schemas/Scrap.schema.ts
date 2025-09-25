@@ -6,9 +6,9 @@ const ScrapSchema = zod.object({
         "Inventory",
         "Shipping"
     ]),
-    reference_id: zod.number(),
-    location_id: zod.number().optional(),
-    location_name: zod.string().optional(),
+    reference_id: zod.number().optional(),
+    location_id: zod.number(),
+    location_name: zod.string(),
     item_id: zod.number(),
     item_type: zod.enum([
         "input",
@@ -16,9 +16,9 @@ const ScrapSchema = zod.object({
     ]),
     item_name: zod.string(),
     qty: zod.number(),
-    reason: zod.string(),
-    user_id: zod.number().optional(),
-    user_name: zod.string().optional()
+    reason: zod.string().optional(),
+    user_id: zod.number(),
+    user_name: zod.string()
 })
 
 const validateSafeParse = (input: object) => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { AppDispatchRedux } from "../../../../store/store";
 import type { IInventoryDetails, IPartialInventoryDetails } from "../../../../interfaces/inventories";
 import GenericTable from "../../../../components/ui/table/tableContext/GenericTable";
@@ -7,7 +7,7 @@ import { columnsInventoryDetails } from "./structure/columns.tsx"
 import { fetchInventoriesDetailsFromDB } from "../../../../queries/inventoriesQueries"
 import { createInventoryMovementInDB } from "../../../../queries/inventoryMovementsQueries"
 import type { RowAction } from "../../../../components/ui/table/types";
-import { Plus, Search, Eraser, Download, Pencil } from "lucide-react";
+import { Plus, Search, Eraser, Download, Pencil, Check, CircleCheck } from "lucide-react";
 import type { IPartialInventoryMovement } from "../../../../interfaces/inventoyMovements";
 import type { IPartialInventoryTransfer } from "../../../../interfaces/inventoryTransfer";
 import { createInventoryTransferInDB } from "../../../../queries/inventoryTransferQueries";
@@ -25,6 +25,9 @@ import OptionsModal from "./modals/options/OptionsModal.tsx";
 import AddModal from "./modals/options/operations/add/AddModal.tsx";
 import RemoveModal from "./modals/options/operations/remove/RemoveModal.tsx";
 import TransferModal from "./modals/options/operations/transfer/TransferModal.tsx";
+import FeedBackModal from "../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal.tsx";
+import { createScrapInDB } from "../../../../modelos/scrap/query/scrapQueries.ts";
+import type { IPartialScrap } from "../../../../interfaces/scrap";
 
 const InventoriesModel = () => {
 
@@ -51,6 +54,11 @@ const InventoriesModel = () => {
         useState<boolean>(false);
     const [isActiveAddModal, setIsActiveAddModal] =
         useState<boolean>(false);
+    const [isActiveFeedBackModal, setIsActiveFeedBackModal] =
+        useState<boolean>(false);
+    const [feedbackNode, setFeedbackNode] =
+        useState<ReactNode>(null);
+
 
     const fetchs = async () => {
         setLoading(true);
@@ -94,8 +102,6 @@ const InventoriesModel = () => {
     const handleStockIn = async (inventory: IPartialInventoryMovement) => {
         setLoading(true);
         try {
-            console.log(inventory);
-
             const response = await createInventoryMovementInDB(
                 inventory,
                 dispatch
@@ -113,19 +119,31 @@ const InventoriesModel = () => {
         }
     };
 
-    const handleStockOut = async (inventory: IPartialInventoryMovement) => {
+    const handleStockOut = async (scrap: IPartialScrap) => {
         setLoading(true);
         try {
-            console.log(inventory);
-            const response = await createInventoryMovementInDB(
-                inventory,
+            const response = await createScrapInDB(
+                scrap,
                 dispatch
             );
             if (!response) {
                 return;
             }
+            const messageScrap = (
+                <h2 className={`nunito-bold ${StyleModule.feedBackMessage}`}>
+                        Se han dado de baja {" "}
+                        <span>{scrap.qty}</span>{" "}
+                        unidades de{" "}
+                        <span>{scrap.item_name}</span>{" "}
+                        de{" "}
+                        <span>{scrap.location_name}</span>{" "}
+                </h2>
+            );
             setServerError(null);
             fetchs();
+            setIsActiveRemoveModal(false);
+            setFeedbackNode(messageScrap);
+            toggleActiveFeedBackModal();
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -137,8 +155,6 @@ const InventoriesModel = () => {
     const handleTransfer = async (transfer: IPartialInventoryTransfer) => {
         setLoading(true);
         try {
-
-            console.log(transfer);
             const response = await createInventoryTransferInDB(
                 transfer,
                 dispatch
@@ -148,6 +164,21 @@ const InventoriesModel = () => {
             }
             setServerError(null);
             fetchs();
+            setIsActiveTransferModal(false);
+            const messageTransfer = (
+                <h2 className={`nunito-bold ${StyleModule.feedBackMessage}`}>
+                    Se ha programado el movimiento de inventario de{" "}
+                    <span>{transfer.qty}</span>{" "}
+                    unidades de{" "}
+                    <span>{transfer.item_name}</span>{" "}
+                    de{" "}
+                    <span>{transfer.source_location?.name}</span>{" "}
+                    a{" "}
+                    <span>{transfer.destination_location?.name}</span>.
+                </h2>
+            );
+            setFeedbackNode(messageTransfer);
+            toggleActiveFeedBackModal();
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -199,7 +230,13 @@ const InventoriesModel = () => {
         }
     }
 
-    
+    const toggleActiveFeedBackModal = () => {
+        setServerError(null);
+        if (feedbackNode) {
+            setFeedbackNode(null);
+        }
+        setIsActiveFeedBackModal(!isActiveFeedBackModal);
+    }
 
     const rowActions: RowAction<IInventoryDetails>[] = [
         {
@@ -310,7 +347,7 @@ const InventoriesModel = () => {
                 isActiveAddBatchModal &&
                 <InventoriesModuleProvider
                     initialStep={1}
-                    totalSteps={2}
+                    totalSteps={3}
                 >
                     <AddInventoryModal
                         onClose={toggleActiveAddBatchModal}
@@ -340,6 +377,7 @@ const InventoriesModel = () => {
                 <RemoveModal
                     onClose={toggleActiveRemoveModal}
                     inventory={inventoriesRecord as IInventoryDetails}
+                    onRemove={handleStockOut}
                 />
             }
             {
@@ -347,6 +385,17 @@ const InventoriesModel = () => {
                 <TransferModal
                     onClose={toggleActiveTransferModal}
                     inventory={inventoriesRecord as IInventoryDetails}
+                    onTransfer={handleTransfer}
+                />
+            }
+            {
+                isActiveFeedBackModal &&
+                <FeedBackModal
+                    onClose={toggleActiveFeedBackModal}
+                    icon={<CircleCheck />}
+                    messageCustom={
+                        feedbackNode
+                    }
                 />
             }
         </div>

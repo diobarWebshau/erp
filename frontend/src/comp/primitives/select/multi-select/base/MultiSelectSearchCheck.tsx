@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useDebounce, type StrictStringKeys } from "../types";
+import type { StrictStringKeys } from "../../../../.././interfaces/globalTypes";
+import { useDebounce} from "../../types";
 import style from "./MultiSelectSearchCheck.module.css";
 import { useClickOutside } from "../../../../../hooks/useClickOutside";
 

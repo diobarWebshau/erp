@@ -546,7 +546,7 @@ CREATE TABLE global_settings (
 CREATE TABLE scrap (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reference_type ENUM('Production', 'Inventory', 'Shipping') NOT NULL,
-    reference_id INT NOT NULL,
+    reference_id INT NULL,
     location_id INT,
     location_name VARCHAR(100), -- snapshot
     item_id INT,

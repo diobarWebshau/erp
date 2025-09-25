@@ -7,6 +7,7 @@ interface NumericInputCustomProps {
     min?: number;
     onlyCommitOnBlur?: boolean;
     classNameContainer?: string;
+    classNameInput?: string;
 }
 
 
@@ -16,6 +17,7 @@ const NumericInputCustom = ({
     min,
     onlyCommitOnBlur,
     classNameContainer,
+    classNameInput
 }: NumericInputCustomProps) => {
     return (
         <NumericInput
@@ -24,7 +26,7 @@ const NumericInputCustom = ({
             min={min}
             onlyCommitOnBlur={onlyCommitOnBlur}
             className={`${classNameContainer} ${styleModule.container}`}
-            classNameInput={`nunito-semibold ${styleModule.input}`}
+            classNameInput={`${classNameInput} nunito-semibold ${styleModule.input}`}
         />
     );
 }

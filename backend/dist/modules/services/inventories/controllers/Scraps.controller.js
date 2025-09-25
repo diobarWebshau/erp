@@ -46,17 +46,10 @@ class ScrapController {
         try {
             const { reference_type, reference_id, location_id, location_name, item_id, item_type, item_name, qty, reason, user_id, user_name } = req.body;
             const response = await ScrapModel.create({
-                reference_type,
-                reference_id,
-                location_id,
-                location_name,
-                item_id,
-                item_type,
-                item_name,
-                qty,
-                reason,
-                user_id,
-                user_name
+                location_id, location_name,
+                item_id, item_type, item_name,
+                qty, reference_type, reference_id, reason,
+                user_id, user_name
             });
             const relationship = response.toJSON();
             res.status(200).json(relationship);

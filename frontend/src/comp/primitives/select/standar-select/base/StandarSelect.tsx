@@ -146,6 +146,8 @@ const StandarSelect = <T extends string>({
 }: StandarSelectProps<T>) => {
     const [isOpen, setIsOpen] = useState(false);
 
+    console.log(`value: ${value}`);
+
     // Floating UI setup
     const { refs, floatingStyles, context } = useFloating({
         open: isOpen,
@@ -190,10 +192,16 @@ const StandarSelect = <T extends string>({
         setIsOpen(false);
     };
 
+
+    
     return (
         <div className={`${styles.customSelect} ${classNameContainer ?? ""}`}>
             <div
-                className={`nunito-semibold ${styles.fieldSelectContainer} ${value ? styles.fieldSelectContainerValidate : styles.fieldSelectContainerInvalid} ${classNameFieldContainer}`}
+                className={
+                    `nunito-semibold ${styles.fieldSelectContainer} `+
+                    `${value ? styles.fieldSelectContainerValidate : styles.fieldSelectContainerInvalid} ${classNameFieldContainer} ` +
+                    `${!value && styles.fieldSelectDefault}`
+                }
                 ref={refs.setReference}
                 {...getReferenceProps()}
                 tabIndex={0}

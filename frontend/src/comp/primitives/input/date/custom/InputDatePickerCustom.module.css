@@ -1,0 +1,55 @@
+/* Contenedor de fechas */
+
+.containerMainDayPickerFieldDeliver {
+    /* dimension */
+    width: 100%;
+}
+
+.containerFieldDayPickerFieldDeliver {
+    /* dimension */
+    height: 30px;
+    width: 62%;
+}
+
+.inputDayPickerFieldDeliver {
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    border-radius: 15px;
+    color: var(--color-theme-font-black);
+    font-size: 14px;
+}
+
+.inputDayPickerFieldDeliver:focus {
+    outline: none;
+}
+
+.labelDayPickerFieldDeliver {
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    flex-basis: 38%;
+}
+
+
+.inputDayPickerFieldDeliverVidate {
+    /* estilos */
+    font-size: 14px;
+    border-radius: 15px;
+}
+
+.iconDayPickerField {
+    /* dimension */
+    width: 20px;
+    height: 20px;
+    color: var(--color-theme-primary);
+    cursor: pointer;
+}
+
+.dayPicker {
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.containerPopoverDayPickerField {
+    border-radius: 15px;
+}

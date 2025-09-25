@@ -7,6 +7,8 @@ interface StandardTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaEleme
     classNameTextArea?: string;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    placeholder?: string;
+    maxLength?: number;
 }
 
 
@@ -16,6 +18,8 @@ const StandarTextAreaCustom = ({
     classNameTextArea,
     value,
     onChange,
+    placeholder = "comentarios (Opcional)",
+    maxLength
 }: StandardTextAreaProps) => {
 
     return (
@@ -25,8 +29,8 @@ const StandarTextAreaCustom = ({
             classNameContainer={`${StyleModule.containerTextArea} ${classNameContainer}`}
             classNameTextArea={`nunito-regular ${StyleModule.textArea} ${classNameTextArea}`}
             id="notes"
-            placeholder="comentarios (Opcional)"
-            maxLength={1000}
+            placeholder={placeholder}
+            maxLength={maxLength}
         />
     )
 }

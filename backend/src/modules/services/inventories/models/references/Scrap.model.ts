@@ -18,13 +18,13 @@ enum ItemTypeEnum {
 interface ScrapAttributes {
     id: number;
     reference_type: ReferenceTypeEnum;
-    reference_id: number;
+    reference_id: number | null;
     location_id?: number | null;
     location_name?: string | null;
     item_id: number;
     item_type: ItemTypeEnum;
     item_name: string;
-    qty: string;
+    qty: number;
     reason: string;
     user_id?: number | null;
     user_name?: string | null;
@@ -83,7 +83,7 @@ ScrapModel.init({
         },
         reference_id: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
         location_id: {
             type: DataTypes.INTEGER,

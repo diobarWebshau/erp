@@ -1,5 +1,7 @@
 // interfaces/inventoryTransfer.ts
 
+import type { ILocation } from "./locations";
+
 interface IInventoryTransfer {
     id: number;
     item_type: 'product' | 'input';
@@ -12,6 +14,8 @@ interface IInventoryTransfer {
     status: string;
     created_at: string;
     updated_at: string;
+    destination_location?: ILocation;
+    source_location?: ILocation;
   }
   
   type IPartialInventoryTransfer = Partial<IInventoryTransfer>;
