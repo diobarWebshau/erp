@@ -1,0 +1,46 @@
+
+/* ? container */
+.container {
+    /* posicionamiento */
+    position: relative;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+/* ? input */
+.input {
+    /* dimensiones */
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-basis: 100%;
+    /* distribucion box */
+    padding-left: 1rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+}
+
+.inputWithIcon {
+    /* distribucion box */
+    padding-right: 10%;
+    border: none;
+}
+
+.input:focus{
+    /* estilos */
+    outline: none;
+}
+
+/* ? button */
+.button {
+    /* posicionamiento */
+    position: absolute;
+    /* distribucion box */
+    border: none;
+    /* estilos */
+    background-color: transparent;
+    cursor: pointer;
+}
+

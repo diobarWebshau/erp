@@ -6,7 +6,7 @@ import type {
 } from "../../../../../interfaces/inventories";
 import BubbleTooltip
     from "../../../../../comp/external/mantine/tooltip/bubble-tooltip/BubbleTooltip";
-import StyleModule from "./columns.module.css";
+import StyleModule from "./Columns.module.css";
 import { formatNumber } from "../../../../../helpers/formttersNumeric";
 
 const columnsInventoryDetails: ColumnDef<IInventoryDetails>[] = [

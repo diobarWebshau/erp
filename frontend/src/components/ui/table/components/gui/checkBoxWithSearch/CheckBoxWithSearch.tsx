@@ -43,19 +43,13 @@ const CheckBoxWithSearch = ({
 
     const selectedOptions = Array.isArray(value) ? value : [];
 
-    const [searchQuery, setSearchQuery] =
-        useState("")
+    const [searchQuery, setSearchQuery] = useState("")
 
-    const onChangeSearchInput = (
-        e: ChangeEvent<HTMLInputElement>
-    ) => {
+    const onChangeSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value)
     }
 
-    const handleToggle = (
-        e: ChangeEvent<HTMLInputElement>,
-        option: string
-    ) => {
+    const handleToggle = (e: ChangeEvent<HTMLInputElement>, option: string) => {
         const checked = e.target.checked;
         const updated = checked
             ? [...selectedOptions, option]
@@ -65,11 +59,10 @@ const CheckBoxWithSearch = ({
     };
 
     const filteredOptions = useMemo(() => {
-        return options.filter((option) =>
-            option.toLowerCase()
-                .includes(
-                    searchQuery.toLowerCase()
-                )
+        return options.filter(
+            (option) =>
+                option.toLowerCase()
+                    .includes(searchQuery.toLowerCase())
         )
     }, [options, searchQuery])
 

@@ -3,11 +3,11 @@ import type { AppDispatchRedux } from "../../../../store/store";
 import type { IInventoryDetails, IPartialInventoryDetails } from "../../../../interfaces/inventories";
 import GenericTable from "../../../../components/ui/table/tableContext/GenericTable";
 import { useDispatch } from "react-redux";
-import { columnsInventoryDetails } from "./structure/columns.tsx"
+import { columnsInventoryDetails } from "./structure/Columns.tsx"
 import { fetchInventoriesDetailsFromDB } from "../../../../queries/inventoriesQueries"
 import { createInventoryMovementInDB } from "../../../../queries/inventoryMovementsQueries"
 import type { RowAction } from "../../../../components/ui/table/types";
-import { Plus, Search, Eraser, Download, Pencil, Check, CircleCheck } from "lucide-react";
+import { Plus, Search, Eraser, Download, Pencil, CircleCheck } from "lucide-react";
 import type { IPartialInventoryMovement } from "../../../../interfaces/inventoyMovements";
 import type { IPartialInventoryTransfer } from "../../../../interfaces/inventoryTransfer";
 import { createInventoryTransferInDB } from "../../../../queries/inventoryTransferQueries";

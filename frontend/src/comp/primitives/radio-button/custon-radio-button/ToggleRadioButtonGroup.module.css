@@ -1,0 +1,66 @@
+.container {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+
+    /* distribucion box */
+    border-radius: 15px;
+}
+
+.button {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    /* distribucion box */
+    padding-left: 0.5rem;
+    border: none;
+
+    /* interactividad */
+    cursor: pointer;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    color: var(--color-theme-primary);
+    user-select: none;
+}
+
+.label {
+    font-size: 14px;
+}
+
+.selected {
+    /* estilos */
+    background-color: var(--color-theme-neutral-background);
+}
+
+.button:not(.selected):hover {
+    /* estilos */
+    background-color: var(--color-theme-background);
+}
+
+.container>*:first-child {
+    /* distribucion box */
+    border-radius: 15px 15px 0 0;
+}
+
+.container>*:last-child {
+    /* distribucion box */
+    border-radius: 0 0 15px 15px;
+}
+
+.icon{
+    width: 15px;
+    height: 15px;
+    color: var(--color-theme-primary)
+}
+

@@ -82,16 +82,16 @@ export const FiltersPopoverList = <T,>({
                                             return <span>{`${min ?? "—"} - ${max ?? "—"}`}</span>;
                                         }
                                         if (meta?.type === "date") {
-                                            const { start, end } = item.value as ObjectDateFilter;
-                                            return <span>{`${start ?? "—"} - ${end ?? "—"}`}</span>;
+                                            const { from, to } = item.value as ObjectDateFilter;
+                                            return <span>{`${from?.toLocaleDateString() ?? "—"} - ${to?.toLocaleDateString() ?? "—"}`}</span>;
                                         }
                                     } else {
                                         if (meta?.type === "number") {
                                             const { min } = item.value as ObjectNumericFilter;
                                             return <span>{min}</span>;
                                         } else if (meta?.type === "date") {
-                                            const { start } = item.value as ObjectDateFilter;
-                                            return <span>{start}</span>;
+                                            const { from } = item.value as ObjectDateFilter;
+                                            return <span>{from?.toLocaleDateString()}</span>;
                                         }
                                     }
                                     return <span>{String(item.value)}</span>;

@@ -1,0 +1,46 @@
+/* row-options-toggler.module.css */
+
+.options {
+    position: absolute;
+    top: 100%;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 120px;
+    padding: 0.25rem 0;
+  }
+  
+  .options button {
+    background: transparent;
+    border: none;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .options button:hover:not(:disabled) {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .options button:disabled {
+    color: #aaa;
+    cursor: not-allowed;
+  }
+  
+  .options button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+  }
+  

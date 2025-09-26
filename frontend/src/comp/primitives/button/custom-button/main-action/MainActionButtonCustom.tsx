@@ -7,17 +7,19 @@ interface IMainActionButtonCustomProps {
     label: string;
     icon: JSX.Element;
     classNameButton?: string;
+    disabled?: boolean;
 }
 
 const MainActionButtonCustom = ({
     onClick,
     label,
     icon,
-    classNameButton
+    classNameButton,
+    disabled
 }: IMainActionButtonCustomProps) => {
     
     // Clonamos el icono y le agregamos la clase deseada
-    const iconWithClass = cloneElement(icon, {
+    const iconWithClass = icon && cloneElement(icon, {
         className: [StyleModule.mainActionButtonCustomIcon, icon.props.className].filter(Boolean).join(" ")
     });
 
@@ -30,7 +32,8 @@ const MainActionButtonCustom = ({
             classNameButton={`${classNameButton} ${StyleModule.mainActionButtonCustom}`}
             classNameLabel={StyleModule.mainActionButtonCustomLabel}
             classNameSpan={StyleModule.mainActionButtonCustomSpan}
-            icon={iconWithClass}
+            {...icon && {icon: iconWithClass}}
+            disabled={disabled}
         />
     );
 };

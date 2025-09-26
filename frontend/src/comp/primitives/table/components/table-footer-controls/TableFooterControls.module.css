@@ -1,0 +1,71 @@
+.container {
+    /* dimension */
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    /* estilos */
+    font-size: 14px;
+}
+
+.selectRowsSection {
+    /* dimension */
+    height: 100%;
+    width: 20%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+
+.deleteButton {
+    /* dimension */
+    width: 40%;
+    height: 70%;
+}
+
+
+.paginationControls {
+    /* dimension */
+    width: auto;
+}
+
+.deleteButton { 
+    /* dimension */
+    width: 40%;
+    height: 70%;
+
+    /* estilos */
+    border-radius: 15px;
+    background-color: var(--color-theme-primary);
+    color: var(--color-theme-font-white);
+
+    /* eventos */
+    &:hover {
+        background-color: var(--color-theme-secondary);
+    }
+}
+
+.deleteButtonLabel {
+    /* estilos */
+    color: var(--color-theme-font-white);
+}
+
+.deleteButtonSpan {
+    /* distribucion flex */
+    justify-content: center;
+}
+
+

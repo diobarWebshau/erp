@@ -1,0 +1,81 @@
+/* * ************* Container ************* */
+
+.levelsGroup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-theme-font-white);
+
+}
+
+
+/* * ************* Header ************* */
+
+
+.calendarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* separa extremos */
+}
+
+/* ? Cabecera o Nivel del Header */
+
+/* Label donde se muestra el mes y año */
+.calendarHeaderLevel {
+    color: var(--color-theme-primary) !important;
+    font-size: 16px !important;
+}
+
+.calendarHeaderLevel {
+    text-transform: capitalize;
+    /* primera letra en mayúscula */
+}
+
+/* ? Controls */
+
+/* Botones */
+
+.calendarHeaderControl {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.calendarHeaderControl[data-direction="previous"] {
+    /* Este empuja este botón y el siguiente al extremo derecho */
+    margin-left: auto;
+}
+
+.iconControl {
+    color: var(--color-theme-primary);
+}
+
+/* * ************* Tabla del mes  ************* */
+
+
+/* ? Columnas de la semana */
+
+.monthThead {
+    color: var(--color-theme-primary);
+    background-color: var(--color-theme-primary);
+}
+.weekday {
+    /* color: var(--color-theme-primary); */
+    /* background-color: red; */
+}
+
+.weekdaysRow{
+    /* color: var(--color-theme-primary); */
+}
+
+.weekNumber{
+    color: var(--color-theme-primary);
+}
+
+.monthTbody {
+    background-color: var(--color-theme-primary);
+}

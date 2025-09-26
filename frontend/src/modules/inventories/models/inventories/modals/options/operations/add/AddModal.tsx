@@ -8,8 +8,6 @@ import MainActionButtonCustom from "../../../../../../../../comp/primitives/butt
 import { Plus } from "lucide-react";
 import type { IPartialInventoryMovement } from "../../../../../../../../interfaces/inventoyMovements";
 import Separator from "../../../../../../../../comp/primitives/separator/Separator";
-import { on } from "events";
-
 interface AddModalProps {
     onClose: () => void;
     inventory: IInventoryDetails;
@@ -87,7 +85,7 @@ const AddModal = ({ onClose, inventory, onAdd }: AddModalProps) => {
                     classNameInput={stylesModule.input}
                 />
             </div>
-                        
+
             <MainActionButtonCustom
                 label="Agregar"
                 onClick={handleOnClickButtonAdd}

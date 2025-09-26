@@ -1,6 +1,5 @@
 import type { Column, ColumnSort } from "@tanstack/react-table";
 import stylesModules from "./CheckBoxButtonOptions.module.css";
-import type { BaseRow } from "../../../types";
 import { useTableDispatch, useTableState } from "../../../tableContext/tableHooks";
 import { add_sorting, remove_sorting } from "../../../tableContext/tableActions";
 

@@ -2,7 +2,6 @@ import React, {
     useState,
     useEffect,
     useRef,
-    useCallback,
     type MouseEvent,
     type RefObject,
 } from "react";
@@ -293,7 +292,6 @@ function HeaderPopoverOptions<T>({
                                 iconSearch={<Search className={stylesModules.ListCheckIconSearch} />}
                             />
                         )}
-
                         {meta?.type === "number" && (
                             <NumberSlicerReactRange
                                 min={0}

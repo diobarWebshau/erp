@@ -1,0 +1,21 @@
+.iconButton{
+    width: 15px;
+    height: 15px;
+    color: var(--color-theme-primary);
+}
+
+.inputTextCustom {
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 15px;
+    font-size: 14px;
+    height: 44px;
+}
+
+.inputTextCustom::placeholder{
+    color: var(--color-theme-neutral-primary);
+}
+
+.inputTextButton{
+    top: 30%;
+    right: 0.7rem;
+}

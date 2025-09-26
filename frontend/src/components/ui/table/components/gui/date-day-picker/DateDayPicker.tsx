@@ -14,7 +14,6 @@ type Props = {
     numberOfMonths?: number;
     className?: string;
     type?: "range" | "single";
-    showFooter?: boolean;
     required?: boolean;
 };
 
@@ -25,7 +24,6 @@ const DateRangePicker: React.FC<Props> = ({
     numberOfMonths = 2,
     className,
     type = "range",
-    showFooter = false,
     required = false,
     setInitialValue
 }) => {
@@ -88,28 +86,6 @@ const DateRangePicker: React.FC<Props> = ({
                     required={required}
                 />
             )}
-            {/* {showFooter && (
-                <div className={styles.footer}>
-                    {type === "range" ? (
-                        range?.from ? (
-                            range.to ? (
-                                <span>
-                                    Rango: {format(range.from, "yyyy-MM-dd")} →{" "}
-                                    {format(range.to, "yyyy-MM-dd")}
-                                </span>
-                            ) : (
-                                <span>Desde: {format(range.from, "yyyy-MM-dd")}</span>
-                            )
-                        ) : (
-                            <span>Selecciona un rango de fechas</span>
-                        )
-                    ) : date ? (
-                        <span>Fecha seleccionada: {format(date, "yyyy-MM-dd")}</span>
-                    ) : (
-                        <span>Selecciona una fecha</span>
-                    )}
-                </div>
-            )} */}
         </div>
     );
 };

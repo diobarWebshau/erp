@@ -6,12 +6,14 @@ interface ITertiaryActionButtonCustomProps {
     onClick: () => void;
     label: string;
     icon?: JSX.Element;
+    disabled?: boolean;
 }
 
 const TertiaryActionButtonCustom = ({
     onClick,
     label,
-    icon
+    icon,
+    disabled
 }: ITertiaryActionButtonCustomProps) => {
 
     const iconWithClass = icon ? cloneElement(icon, {
@@ -28,6 +30,7 @@ const TertiaryActionButtonCustom = ({
             classNameLabel={StyleModule.tertiaryActionButtonCustomLabel}
             classNameSpan={StyleModule.tertiaryActionButtonCustomSpan}
             {...(icon && { icon: iconWithClass })}
+            disabled={disabled}
         />
     );
 };
