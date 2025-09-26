@@ -542,7 +542,7 @@ CREATE TABLE global_settings (
     description TEXT
 );
 
-
+DROP TABLE IF EXISTS scrap;
 CREATE TABLE scrap (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reference_type ENUM('Production', 'Inventory', 'Shipping') NOT NULL,

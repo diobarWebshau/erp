@@ -109,7 +109,7 @@ const TransferModal = ({
                 <ObjectSelectCustom
                     options={locations.filter((location) => location.id !== inventory.location_id)}
                     labelKey="name"
-                    defaultLabel="Selecciona un motivo"
+                    defaultLabel="Selecciona una ubicacion"
                     autoOpen={false}
                     onChange={handleOnChangeLocation}
                     value={location}

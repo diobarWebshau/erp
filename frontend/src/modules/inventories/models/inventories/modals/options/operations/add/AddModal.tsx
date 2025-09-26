@@ -6,17 +6,42 @@ import { useState } from "react";
 import NumericInputCustom from "../../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import { Plus } from "lucide-react";
+import type { IPartialInventoryMovement } from "../../../../../../../../interfaces/inventoyMovements";
+import Separator from "../../../../../../../../comp/primitives/separator/Separator";
+import { on } from "events";
 
 interface AddModalProps {
     onClose: () => void;
     inventory: IInventoryDetails;
+    onAdd: (inventory: IPartialInventoryMovement) => void;
 }
-const AddModal = ({ onClose, inventory }: AddModalProps) => {
+const AddModal = ({ onClose, inventory, onAdd }: AddModalProps) => {
 
     const [qty, setQty] = useState<number>(1);
 
     const handleOnChangeQty = (value: number) => {
         setQty(value);
+    }
+
+    const handleOnClickButtonAdd = () => {
+        if (qty <= 0) return;
+        const newMovements: IPartialInventoryMovement = {
+            item_name: inventory.item_name,
+            item_id: inventory.item_id,
+            item_type: inventory.item_type,
+            
+            location_name: inventory.location_name,
+            location_id: inventory.location_id,
+            
+            qty: qty,
+            movement_type: "in",
+            reference_type: "Purchased",
+            reference_id: null,
+            production_id: null,
+            description: null,
+            is_locked: 0,
+        }
+        onAdd(newMovements);
     }
 
     return (
@@ -27,6 +52,11 @@ const AddModal = ({ onClose, inventory }: AddModalProps) => {
             classNameCustomContainer={stylesModule.customContainerHeaderModal}
         >
             <h2>{`${inventory.item_id} ${inventory.item_name}`}</h2>
+
+            <Separator />
+
+        
+
             <div className={`nunito-bold ${stylesModule.containerInfo}`}>
                 <dl>
                     <dt>Movimiento:</dt>
@@ -46,6 +76,8 @@ const AddModal = ({ onClose, inventory }: AddModalProps) => {
                 </dl>
             </div>
 
+            <Separator />
+
             <div className={stylesModule.containerInputField}>
                 <label>Cantidad:</label>
                 <NumericInputCustom
@@ -55,10 +87,10 @@ const AddModal = ({ onClose, inventory }: AddModalProps) => {
                     classNameInput={stylesModule.input}
                 />
             </div>
-            
+                        
             <MainActionButtonCustom
                 label="Agregar"
-                onClick={onClose}
+                onClick={handleOnClickButtonAdd}
                 icon={<Plus />}
                 classNameButton={stylesModule.mainActionButton}
             />

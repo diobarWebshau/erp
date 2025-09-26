@@ -7,19 +7,19 @@ interface Auth {
     username: string | null,
     isAuthenticated: boolean | null,
     retryCount: number | null;
-    userId: number | null;
+    id: number | null;
 }
 
 interface PayloadSlice {
     username: string,
-    userId: number
+    id: number
 }
 
 const defaultAuth: Auth = {
     username: null,
     isAuthenticated: null,
     retryCount: null,
-    userId: null
+    id: null
 }
 
 const authSlice = createSlice({
@@ -30,12 +30,12 @@ const authSlice = createSlice({
             state.username = null;
             state.isAuthenticated = false
             state.retryCount = 0;
-            state.userId = null;
+            state.id = null;
         },
         clearAuth: (state) => {
             state.isAuthenticated = null;
             state.retryCount = null;
-            state.userId = null;
+            state.id = null;
         },
         incrementCount: (state) => {
             if (typeof state.retryCount === 'number') state.retryCount = state.retryCount + 1;
@@ -44,7 +44,7 @@ const authSlice = createSlice({
             state.username =
                 action.payload.username;
             state.isAuthenticated = true;
-            state.userId = action.payload.userId;
+            state.id = action.payload.id;
             state.retryCount = null;
         }
     }

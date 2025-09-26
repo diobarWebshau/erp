@@ -109,8 +109,21 @@ const InventoriesModel = () => {
             if (!response) {
                 return;
             }
+            const messageStockIn = (
+                <h2 className={`nunito-bold ${StyleModule.feedBackMessage}`}>
+                        Se han agregado a tu inventario{" "}
+                        <span>{inventory.qty}</span>{" "}
+                        unidades de{" "}
+                        <span>{inventory.item_name}</span>{" "}
+                        a{" "}
+                        <span>{inventory.location_name}</span>{" "}
+                </h2>
+            );
             setServerError(null);
             fetchs();
+            setIsActiveAddModal(false);
+            setFeedbackNode(messageStockIn);
+            toggleActiveFeedBackModal();
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -131,11 +144,11 @@ const InventoriesModel = () => {
             }
             const messageScrap = (
                 <h2 className={`nunito-bold ${StyleModule.feedBackMessage}`}>
-                        Se han dado de baja {" "}
+                        Se han dado de baja{" "}
                         <span>{scrap.qty}</span>{" "}
                         unidades de{" "}
                         <span>{scrap.item_name}</span>{" "}
-                        de{" "}
+                        a la{" "}
                         <span>{scrap.location_name}</span>{" "}
                 </h2>
             );
@@ -370,6 +383,7 @@ const InventoriesModel = () => {
                 <AddModal
                     onClose={toggleActiveAddModal}
                     inventory={inventoriesRecord as IInventoryDetails}
+                    onAdd={handleStockIn}
                 />
             }
             {

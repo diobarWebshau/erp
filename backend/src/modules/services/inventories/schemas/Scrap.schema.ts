@@ -6,7 +6,7 @@ const ScrapSchema = zod.object({
         "Inventory",
         "Shipping"
     ]),
-    reference_id: zod.number().optional(),
+    reference_id: zod.number().optional().nullable(),
     location_id: zod.number(),
     location_name: zod.string(),
     item_id: zod.number(),

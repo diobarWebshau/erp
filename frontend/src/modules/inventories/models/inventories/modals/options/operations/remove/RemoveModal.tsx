@@ -11,6 +11,7 @@ import StandarTextAreaCustom from "../../../../../../../../comp/primitives/text-
 import type { IPartialScrap } from "../../../../../../../../interfaces/scrap";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../../../../../../store/store";
+import Separator from "../../../../../../../../comp/primitives/separator/Separator";
 
 interface RemoveModalProps {
     onClose: () => void;
@@ -31,8 +32,10 @@ const RemoveModal = ({
     onRemove
 }: RemoveModalProps) => {
 
-    const user = useSelector((state: RootState)=> state.auth);
-    
+    const user = useSelector((state: RootState) => state.auth);
+
+    console.log(user);
+
 
     const [qty, setQty] = useState<number>(1);
     const [reason, setReason] = useState<string>("");
@@ -52,6 +55,7 @@ const RemoveModal = ({
     }
 
     const handleOnClickButtonRemove = () => {
+        if (qty <= 0 || reason === "") return;
         const scrap: IPartialScrap = {
             // ITEM
             item_id: inventory.item_id,
@@ -66,7 +70,7 @@ const RemoveModal = ({
             reference_id: null,
             reference_type: "Inventory",
             user_name: user.username,
-            user_id: user.userId,
+            user_id: user.id,
         }
         onRemove(scrap);
     }
@@ -80,6 +84,8 @@ const RemoveModal = ({
         >
 
             <h2>{`${inventory.item_id} ${inventory.item_name}`}</h2>
+
+            <Separator />
 
             <div className={`nunito-bold ${stylesModule.containerInfo}`}>
                 <dl>
@@ -99,6 +105,8 @@ const RemoveModal = ({
                     <dd>{inventory.location_name}</dd>
                 </dl>
             </div>
+
+            <Separator />
 
             <div className={stylesModule.containerInputField}>
                 <label>Cantidad:</label>
@@ -127,6 +135,8 @@ const RemoveModal = ({
                 classNameContainer={stylesModule.containerTextArea}
                 classNameTextArea={`nunito-regular ${stylesModule.textArea}`}
             />
+
+            <Separator />
 
             <MainActionButtonCustom
                 label="Remover"

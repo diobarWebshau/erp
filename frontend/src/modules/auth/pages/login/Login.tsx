@@ -67,6 +67,7 @@ const Login = () => {
                 return;
             }
             const payload: PayloadSlice = res.message;
+            console.log(payload);
             dispatch(saveAuth(payload));
             if (rememberMe && username && password) {
                 localStorage.setItem('rememberedUser', username);

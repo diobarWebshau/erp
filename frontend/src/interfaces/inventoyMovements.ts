@@ -8,10 +8,10 @@ interface IInventoryMovement {
     qty: number;
     movement_type: "in" | "out";
     reference_id: number | null;
-    reference_type: "production" | "order" | "transfer" | "purchased" | null;
+    reference_type: "Production Order" | "Order" | "Transfer" | "Purchased" | "Scrap" | "Internal Production Order";
     production_id: number | null;
     description: string | null;
-    is_locked: boolean;
+    is_locked: 1 | 0;
     created_at: string;
   }
   
@@ -27,10 +27,10 @@ interface IInventoryMovement {
     qty: 0,
     movement_type: "in",
     reference_id: null,
-    reference_type: null,
+    reference_type: "Purchased",
     production_id: null,
     description: '',
-    is_locked: false,
+    is_locked: 0,
     created_at: '',
   };
   
@@ -43,10 +43,10 @@ interface IInventoryMovement {
     qty: 0,
     movement_type: "in",
     reference_id: null,
-    reference_type: null,
+    reference_type: "Purchased",
     production_id: null,
     description: '',
-    is_locked: false,
+    is_locked: 0,
   };
   
   export type {
