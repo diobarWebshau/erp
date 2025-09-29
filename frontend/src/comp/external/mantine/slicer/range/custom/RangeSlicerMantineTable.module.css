@@ -1,0 +1,126 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 1rem;
+    user-select: none;
+}
+
+.label {
+    margin-bottom: 2rem;
+    display: block;
+    color: var(--color-theme-primary);
+    text-align: center;
+}
+
+/* ===== RangeSlider parts (clases Mantine) ===== */
+
+.sliderRoot {}
+
+/* Contenedor del track (posición relativa, ancho total) */
+.trackContainer {}
+
+/* Track completo (zona gris) */
+.track {
+    position: relative;
+    height: 5px;
+    border-radius: 6px;
+    /* “antes/después del rango” usamos un solo color base del track */
+    background: attr(data-beforecolor color, #ddd);
+}
+
+/* Barra del rango seleccionado */
+.bar {
+    background: attr(data-rangecolor color, #0d6efd);
+}
+
+/* Thumb */
+.thumb {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background-color: var(--color-theme-neutral-primary);
+    border: none;
+    box-shadow: none;
+}
+
+/* Label que flota sobre el thumb (value) */
+.thumbLabel {
+    top: -30px;
+    padding: 0 6px;
+    border-radius: 10px;
+    color: var(--color-theme-font-white);
+    background-color: var(--color-theme-neutral-primary);
+    white-space: nowrap;
+    user-select: none;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+/* Marks */
+.markWrapper {
+    /* Mantine posiciona los marks; puedes ajustar si quieres */
+}
+
+.mark {
+    width: 2px;
+    height: 10px;
+    background-color: var(--color-theme-neutral-primary);
+    opacity: 0.5;
+    transform: translateX(-1px);
+    /* centra la línea */
+}
+
+.markLabel {
+    display: none;
+    /* si deseas ver números debajo, elimina esta línea */
+}
+
+/* ===== Inputs (Min/Max) ===== */
+
+.sectionInputContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.inputContainer {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.input {
+    width: 100%;
+    height: 30px;
+    min-width: 0%;
+    max-width: 100%;
+    border-radius: 10px;
+    padding-left: 0.5rem;
+    border: 1px solid var(--color-theme-background);
+    font-size: 14px;
+    background-color: var(--color-theme-border-table);
+    color: var(--color-theme-font-black);
+    outline: none;
+}
+
+.labelMin,
+.labelMax {
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--color-theme-neutral-primary);
+}
+
+.symbolRange {
+    width: 20px;
+    margin-top: 2rem;
+    border: 2px solid var(--color-theme-font-black);
+}

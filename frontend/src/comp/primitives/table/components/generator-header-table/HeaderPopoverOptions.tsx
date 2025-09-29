@@ -15,11 +15,11 @@ import MainActionButtonCustom from "../../../button/custom-button/main-action/Ma
 import TertiaryActionButtonCustom from "../../../button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import CheckBoxWithSearch from "../../../checkbox/list-search/base/checkBoxWithSearch/CheckBoxWithSearch";
 import ToggleRadioButtonGroup from "../../../radio-button/custon-radio-button/ToggleRadioButtonGroup";
-import DateDayPicker from "../../../../primitives/gui/date-day-picker/DateDayPicker";
-import NumberSlicerReactRange from "../../../../primitives/gui/react-slicer/ReactSlicer";
 import CheckBoxListAutoSize from "../../../checkbox/list-checbox-auto-size/base/CheckBoxListAutoSize";
 import TransparentButtonCustom from "../../../button/custom-button/transparent/TransparentButtonCustom";
 import type { Option } from "../../../radio-button/custon-radio-button/ToggleRadioButtonGroup";
+import StandardDayPickedMantineCustomTable from "../../../../external/mantine/date/standar/custom/table/StandardDayPickedMantineCustomTable";
+import RangeSlicerMantineTable from "../../../../external/mantine/slicer/range/table/custom/RangeSlicerMantineTable";
 
 const options: [Option, Option] = [
     { label: "Orden ascendente", icon: <ChevronUp /> },
@@ -303,37 +303,48 @@ function HeaderPopoverOptions<T>({
                         )}
 
                         {meta?.type === "number" && (
-                            <NumberSlicerReactRange
-                                min={0}
-                                max={Math.max(
-                                    ...table
-                                        .getPreFilteredRowModel()
-                                        .rows.map((row) => Number(row.getValue(columnId)))
-                                        .filter((n) => !isNaN(n))
-                                )}
-                                step={1}
-                                initialValue={inputValueLocal as ObjectNumericFilter}
-                                setInitialValue={setInputValueLocal}
-                                label="Value range"
-                                width={"100%"}
-                                className={stylesModules.numberSlicer}
-                                classNameFontContainer={"nunito-semibold"}
-                                classNameSubTitleMinMax={"nunito-bold"}
-                                classNameTrack={stylesModules.track}
-                                afterRangeColor="#DEDDF8"
-                                rangeColor="#423DD9"
-                                beforeRangeColor="#DEDDF8"
+                            // <NumberSlicerReactRange
+                            //     min={0}
+                            //     max={Math.max(
+                            //         ...table
+                            //             .getPreFilteredRowModel()
+                            //             .rows.map((row) => Number(row.getValue(columnId)))
+                            //             .filter((n) => !isNaN(n))
+                            //     )}
+                            //     step={1}
+                            //     initialValue={inputValueLocal as ObjectNumericFilter}
+                            //     setInitialValue={setInputValueLocal}
+                            //     label="Value range"
+                            //     width={"100%"}
+                            //     className={stylesModules.numberSlicer}
+                            //     classNameFontContainer={"nunito-semibold"}
+                            //     classNameSubTitleMinMax={"nunito-bold"}
+                            //     classNameTrack={stylesModules.track}
+                            //     afterRangeColor="#DEDDF8"
+                            //     rangeColor="#423DD9"
+                            //     beforeRangeColor="#DEDDF8"
+                            // />
+                            <RangeSlicerMantineTable
+                                max={1000}
+                                min={100}
+                                value={inputValueLocal as ObjectNumericFilter}
+                                onChange={setInputValueLocal}
                             />
                         )}
 
                         {meta?.type === "date" && (
-                            <DateDayPicker
-                                initialRange={inputValueLocal as ObjectDateFilter}
-                                setInitialValue={setInputValueLocal}
-                                type={meta.mode ?? "single"}
-                                onChange={handleRangeChange}
-                                numberOfMonths={1}
-                                className={stylesModules.smallCalendar}
+                            
+                            // <DateDayPicker
+                            //     initialRange={inputValueLocal as ObjectDateFilter}
+                            //     setInitialValue={setInputValueLocal}
+                            //     type={meta.mode ?? "single"}
+                            //     onChange={handleRangeChange}
+                            //     numberOfMonths={1}
+                            //     className={stylesModules.smallCalendar}
+                            // />
+                            <StandardDayPickedMantineCustomTable
+                                value={inputValueLocal as ObjectDateFilter}
+                                onChange={setInputValueLocal}
                             />
                         )}
 
@@ -347,7 +358,7 @@ function HeaderPopoverOptions<T>({
                             <CheckBoxListAutoSize
                                 options={meta.booleanLabels ?? ["true", "false"]}
                                 value={inputValueLocal as string[]}
-                                onChange={onChangeInput}
+                                onChange={setInputValueLocal}
                             />
                         )}
 
@@ -361,7 +372,7 @@ function HeaderPopoverOptions<T>({
                             <CheckBoxListAutoSize
                                 options={meta.options ?? []}
                                 value={inputValueLocal as string[]}
-                                onChange={onChangeInput}
+                                onChange={setInputValueLocal}
                             />
                         )}
                     </section>

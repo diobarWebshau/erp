@@ -1,0 +1,153 @@
+/* * ************* Container ************* */
+
+.levelsGroup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 15px;
+    padding: 0rem 1rem 1rem 1rem;
+}
+
+
+/* * ************* Header ************* */
+
+
+.calendarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* separa extremos */
+    padding: 1rem 1rem 0.5rem 1rem;
+}
+
+/* ? Cabecera o Nivel del Header */
+
+/* Label donde se muestra el mes y año */
+.calendarHeaderLevel {
+    color: var(--color-theme-primary) !important;
+    font-size: 20px !important;
+}
+
+.calendarHeaderLevel {
+    text-transform: capitalize;
+    /* primera letra en mayúscula */
+}
+
+/* ? Controls */
+
+/* Botones */
+
+.calendarHeaderControl {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.calendarHeaderControl[data-direction="previous"] {
+    /* Este empuja este botón y el siguiente al extremo derecho */
+    margin-left: auto;
+}
+
+.iconControl {
+    color: var(--color-theme-primary);
+}
+
+
+
+/* * ************* TABLA DEL MES  ************* */
+
+
+/* ? Componentes principales de la tabla */
+
+
+
+
+.monthCell[data-with-spacing] {
+    padding: 0.5rem;
+    text-align: center;
+}
+
+
+
+/* ? Columnas de la semana */
+
+/* Redondea solo extremos izquierdo/derecho de la franja */
+.weekdaysRow>*:first-child {
+    border-top-left-radius: 12px;
+    /* border-bottom-left-radius: 12px; */
+}
+
+.weekdaysRow>*:last-child {
+    border-top-right-radius: 12px;
+    /* border-bottom-right-radius: 12px; */
+}
+
+.weekday {
+    background: var(--color-theme-primary) !important;
+    box-shadow: 0 0 0 2px var(--color-theme-primary) !important;
+    color: var(--color-theme-font-white) !important;
+}
+
+
+/* ? Celdas de la tabla de días */
+
+
+/* Días normales (mes actual) */
+.day {
+    font-weight: 500;
+}
+
+/* Días fuera del mes actual */
+.day[data-outside]:not(.day[data-selected]) {
+    color: var(--color-theme-neutral-primary);
+    /* gris más claro */
+    /* menos contraste */
+}
+
+/* Evitar que se vean como seleccionables */
+.day[data-outside]:hover {
+    background: none;
+    /* sin fondo al pasar el mouse */
+    /* cursor: not-allowed; */
+}
+
+.monthCell:has(.day[data-selected]) {
+    background-color: var(--color-theme-primary-light);
+    color: var(--color-theme-font-white);
+    border-radius: 30%;
+}
+
+.monthCell:has(.day[data-selected][data-outside]) {
+    background-color: var(--color-theme-primary-light);
+    opacity: 1;
+    color: var(--color-theme-font-white);
+}
+
+.monthCell:has(.day[data-in-range]:not(.day[data-selected])) {
+    background-color: var(--color-theme-neutral-background);
+    color: var(--color-theme-font-black);
+    border-radius: 30%;
+}
+
+.monthCell:has(.day[data-today]):not(:has(.day[data-selected])) {
+    border-radius: 100%;
+    border: 1px solid var(--color-theme-primary);
+}
+
+/* .monthCell:has(.day[data-today]):not(:has(.day[data-selected], .day[data-in-range])) {
+    border-radius: 50%;
+    border: 1px solid var(--color-theme-primary);
+  } */
+
+/* NotFound.module.css */
+.calendarHeaderLevel {
+    pointer-events: none;
+    /* bloquea clics */
+    cursor: default;
+    /* cursor normal */
+}

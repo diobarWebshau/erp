@@ -38,27 +38,3 @@
     border-radius: 15px !important;
 }
 
-.labelText {
-    color: var(--color-theme-primary) !important;
-}
-
-.labelTextInput {
-    flex: 1;
-    color: var(--color-theme-primary) !important;
-    text-align: center !important;
-
-}
-
-.numericInput {
-    flex: 1;
-}
-
-.divider {
-    flex: 0 0 20px;
-}
-
-
-.inputContainerNumericInput {
-    background-color: var(--color-theme-neutral-background);
-    padding-left: 1rem;
-}
