@@ -2114,6 +2114,38 @@ END //
 DELIMITER ;
 
 
+DROP FUNCTION IF EXISTS funct_get_details_of_shipping_order;
+DELIMITER //
+CREATE FUNCTION funct_get_details_of_shipping_order(
+	IN in_shipping_order_id INT
+);
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+	
+	DECLARE v_shipping_oder_json JSON DEFAULT JSON_OBJECT();
+
+END //
+DELIMITER ;
+
+	
+
+
+
+SELECT
+FROM shipping_orders AS so
+JOIN shipping_orders_purchased_order_products AS sopop 
+	ON sopop.shipping_order_id = so.id
+JOIN purchased_orders_products AS pop
+	ON pop.id = sopop.purchase_order_product_id
+JOIN purchased_orders_products_locations_production_lines AS poplpl
+	
+JOIN purchased_orders AS po
+	ON po.id = pop.purchase_order_id
+JOIN clients AS cl
+	ON cl.id = po.client_id
+WHERE so.id = in_shipping_order_id 
 
 
 

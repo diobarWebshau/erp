@@ -1,0 +1,625 @@
+/* **************** 
+*       GRID      *
+* ****************/
+
+/* ? collapsed logic */
+
+.gridContainerCollapsed {
+  /* dimension */
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  /* distribucion grid */
+  display: grid;
+  grid-template:
+    "aside header" auto
+    "aside main" 1fr / 60px auto;
+}
+
+/* ? expanded logic */
+
+.gridContainer {
+  /* dimension */
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  /* distribucion grid */
+  display: grid;
+  grid-template:
+    "aside header" 50px
+    "aside main" 1fr / 200px auto;
+}
+
+/* ****************  ASIDE SECTION   ****************/
+
+.aside {
+  grid-area: aside;
+
+  /* posicionamiento */
+  position: relative;
+
+  /* dimension */
+  width: 100%;
+
+  /* distribucion flex*/
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 1.7rem;
+
+  /* distribucion box */
+  padding-top: 0.8rem;
+
+  /* estilos */
+  font-size: 16px;
+  background-color: var(--color-theme-primary);
+}
+
+.asideCollapsed > * {
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: 0;
+}
+
+.aside > * {
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: 0;
+}
+
+
+
+/* ? Logica compartida */
+
+.secondaryContent {
+  /* distribucion flex */
+  display: flex;
+}
+
+.contentText {
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+
+  border: 1px solid white;
+}
+
+.contentText>* {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+
+  /* distribucion flex */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid red;
+}
+
+.navList {
+  /* distribucion flex */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* estilos */
+  list-style: none;
+  cursor: pointer;
+}
+
+.navList>* {
+  /* distribucion flex */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.navItem {
+  /* dimension */
+  width: 100%;
+  padding-block: 1rem;
+  padding-left: 0.5rem;
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+
+}
+
+.navItem .navItemLabel,
+.navItem .navItemLabelCollapsed {
+  color: var(--color-theme-font-white);
+}
+
+.navItem:hover {
+  color: var(--color-theme-font-white);
+  background-color: var(--color-theme-primary-light);
+}
+
+/*  Para cuando se hace hover en el nav item */
+
+.navItem:hover .navItemLabel,
+.navItem:hover .navItemLabelCollapsed {
+  color: var(--color-theme-font-white);
+}
+
+
+.navItemIcon {
+  color: var(--color-theme-font-white);
+}
+
+.navItemActive .navItemIconActive {
+  color: var(--color-theme-primary);
+}
+
+.navItemActive:hover .navItemIconActive {
+  color: var(--color-theme-font-white);
+}
+
+.iconExpandButton:hover {
+  background-color: var(--color-theme-primary-light);
+
+}
+
+
+/*  Para cuando el nav item esta activo */
+
+.navItemActive {
+  background-color: var(--color-theme-secondary-light);
+  color: var(--color-theme-primary);
+}
+
+.navItemActive .navItemIcon {
+  color: var(--color-theme-primary);
+}
+
+.navItemActive .navItemLabel,
+.navItemActive .navItemLabelCollapsed {
+  color: var(--color-theme-primary);
+}
+
+.navItemIconActive {
+  color: var(--color-theme-primary);
+}
+
+
+
+
+.navLink {
+  /* dimension */
+  flex: 1;
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+
+  /* estilos */
+  overflow: hidden;
+  text-decoration: none;
+  cursor: pointer;
+
+}
+
+.navItemIcon {
+  /* dimension */
+  width: 20px;
+  height: 20px;
+  /* estilos */
+  cursor: pointer;
+}
+
+.navLogoIcon {
+  /* dimension */
+  width: 35px;
+  height: 35px;
+  color: var(--color-theme-font-white);
+}
+
+.navLogoIconCollapsed {
+  /* dimension */
+  width: 20px;
+  height: 20px;
+  color: var(--color-theme-font-white);
+}
+
+
+.navItemLabel {
+  /* dimension */
+  width: 80%;
+
+  /* distribucion flex */
+  display: flex;
+  align-items: center;
+
+  /* estilos */
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: pointer;
+
+}
+
+.desktopOnly {
+  /* distribucion flex */
+  display: flex;
+
+  /* estilos */
+  cursor: pointer;
+
+}
+
+.secondaryContent {
+  /* distribucion flex */
+  display: flex;
+}
+
+
+/* ? collapsed  logic */
+
+.asideCollapsed {
+  /* posicionamiento */
+  position: relative;
+
+  /* dimension */
+  width: 100%;
+
+  /* distribucion flex*/
+  grid-area: aside;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 1.7rem;
+
+  /* distribucion box */
+  padding-top: 0.8rem;
+
+  /* estilos */
+  background-color: var(--color-theme-primary);
+  font-size: 16px;
+}
+
+.navItemIconCollapsed {
+  /* dimension */
+  min-width: 20px;
+
+  /* distribucion flex */
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow: hidden;
+
+  /* estilos */
+  text-overflow: ellipsis;
+  cursor: pointer;
+
+  color: var(--color-theme-font-white);
+}
+
+.navItemActive:hover .navItemLabelCollapsed {}
+
+.navItemLabelCollapsed {
+  /* distribucion */
+  display: none;
+
+  /* estilos */
+  cursor: pointer;
+}
+
+/* ? expand logic */
+
+
+.expandSectionCollapsed {
+  /* dimension */
+  width: 100%;
+
+  /* distribucion flex */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* distribucion box */
+  margin-top: auto;
+
+}
+
+.expandSection {
+  /* dimension */
+  width: 100%;
+
+  /* distribucion flex */
+  display: flex;
+  align-items: center;
+  justify-content: end;
+
+  /* distribucion box */
+  margin-top: auto;
+}
+
+.iconExpandButton {
+  /* dimension */
+  width: 60px;
+  height: 50px;
+
+  /* distribucion flex */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* distribucion box */
+  border: none;
+
+
+  /* estilos */
+  background-color: transparent;
+  cursor: pointer;
+}
+
+
+
+.iconExpandButtonCollapsed:hover,
+.iconExpandButton:hover {
+  background-color: var(--color-theme-primary-light);
+}
+
+.iconExpandButtonCollapsed {
+  /* dimension */
+  width: 100%;
+  height: 50px;
+
+
+  /* distribucion flex */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* distribucion box */
+  border: none;
+
+
+  /* estilos */
+  background-color: transparent;
+  cursor: pointer;
+}
+
+
+
+/* *************** MAIN *************** */
+
+.main {
+
+  /* dimension */
+  min-height: 0;
+
+  /* distribucion grid */
+  grid-area: main;
+
+  /* distribucion box */
+  padding-top: 2rem;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  padding-bottom: 2rem;
+
+  /* estilos */
+  background-color: var(--color-theme-white);
+}
+
+/*************** HEADER ***************/
+
+/* Features */
+
+.header {
+  grid-area: header;
+
+  /* dimension */
+  width: 100%;
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  /* distribucion box */
+  padding: 1rem;
+  padding-top: 2.2rem;
+
+  /* estilos */
+}
+
+.divider {
+  /* dimension */
+  width: 1px;
+  height: 40px;
+
+  /* estilos */
+  background-color: rgba(204, 201, 221, 1);
+}
+
+.headerFeatures {
+  /* dimension */
+  width: 100%;
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  gap: 1rem;
+  padding-right: 0.5rem;
+
+}
+
+.headerFunctions {
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+}
+
+.headerFunctions button {
+  /* distribucion box */
+  border: none;
+
+  /* estilos */
+  background-color: transparent;
+  cursor: pointer;
+
+}
+
+.notifications {
+  /* dimension */
+  width: 20px;
+  height: 20px;
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+
+  /* distribucion box */
+  border-radius: 50%;
+
+}
+
+.notifications img {
+  /* dimension */
+  width: 100%;
+  height: 100%;
+
+  /* estilos */
+  object-fit: cover;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+/* Info */
+
+.headerInfo {
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.userInfo {
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: column;
+  text-align: end;
+
+}
+
+
+.userEmail {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+
+.userImage {
+  /* dimension */
+  width: 50px;
+  height: 50px;
+
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+
+  /* distribucion box */
+  border-radius: 50%;
+
+}
+
+.userImage img {
+  /* dimension */
+  width: 100%;
+  height: 100%;
+
+  /* estilos */
+  object-fit: cover;
+}
+
+.toggleSidebarBtn {
+  /* distribucion flex */
+  display: flex;
+}
+
+.userImage {
+  /* distribucion flex */
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 699px) {
+
+  .mobileOnly {
+    /* distribucion flex */
+    display: flex;
+  }
+
+  .desktopOnly {
+    /* distribucion */
+    display: none;
+  }
+
+  .gridContainer {
+    /* distribucion grid */
+    grid-template:
+      "header" 50px
+      "main" 1fr / auto;
+  }
+
+  .gridContainerCollapsed {
+    /* distribucion grid */
+    grid-template:
+      "header" 50px
+      "main" 1fr / auto;
+  }
+
+  .navItemLabelCollapsed {
+    /* dimension */
+    width: 80%;
+
+    /* distribucion flex */
+    display: flex;
+    align-items: center;
+
+    /* estilos */
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+
+  .asideCollapsed {
+    /* posicionamiento */
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    z-index: 1000;
+    bottom: 0;
+  }
+
+  .aside {
+    /* posicionamiento */
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(0);
+    z-index: 1000;
+    bottom: 0;
+  }
+}

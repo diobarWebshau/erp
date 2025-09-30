@@ -33,6 +33,7 @@ import {
 import {
     useLocation
 } from "react-router-dom";
+import withClassName from '../../utils/withClassName';
 
 interface MenuItem {
     label: string;
@@ -113,12 +114,8 @@ const MainLayout = memo(() => {
                         {menuItems.map((item, index) => (
                             (() => {
                                 const isActive = location.pathname === item.path;
-                                const styledIcon =
-                                    isValidElement(item.icon) &&
-                                    cloneElement(item.icon as ReactElement<any>, {
-                                        className: `${isActive ? stylesModules.navItemIconActive : ""} ` +
-                                            `${isSidebarCollapsed ? stylesModules.navItemIconCollapsed : stylesModules.navItemIcon}`
-                                    });
+                                const styledIcon = withClassName(item.icon as ReactElement, `${isActive ? stylesModules.navItemIconActive : ""} ` +
+                                    `${isSidebarCollapsed ? stylesModules.navItemIconCollapsed : stylesModules.navItemIcon}`);
                                 return (
                                     <li className={`
                                         ${stylesModules.navItem}

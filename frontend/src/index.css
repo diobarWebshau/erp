@@ -15,6 +15,7 @@
   /* Variables de tema */
   --color-theme-primary: #423DD9;
   --color-theme-primary-light: #7466E1;
+  --color-theme-secondary: rgba(139, 136, 231, 1);
   --color-theme-secondary-light: #BDBBF1;
   --color-theme-background: #F3F4FA;
   --color-theme-neutral-background: #DEDDF8;

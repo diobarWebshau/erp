@@ -1,0 +1,488 @@
+/* ***************      GRID CONTAINER     ***************/
+
+.gridContainerCollapsed {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "aside header"
+        "aside main" 1fr / auto 1fr;
+    min-inline-size: 0;
+    /* permite colapsar el texto */
+}
+
+.gridContainer {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "aside header" auto
+        "aside main" 1fr / 235px 1fr;
+    min-inline-size: 0;
+    /* permite colapsar el texto */
+}
+
+
+/* ***************      ASIDE      ***************/
+
+/* ? *** EXPANDIDO *** */
+
+.aside {
+    grid-area: aside;
+
+    /* distribucion flex*/
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 1.7rem;
+
+    /* distribucion box */
+    padding-top: 0.8rem;
+
+    /* estilos */
+    background-color: var(--color-theme-primary);
+    font-size: 16px;
+
+}
+
+.aside>* {
+    /* distribucion flex desde el padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 0;
+}
+
+.navLogoIcon {
+    /* dimension */
+    width: 35px;
+    height: 35px;
+    color: var(--color-theme-font-white);
+}
+
+
+/* ? *** COLLAPSED *** */
+
+.asideCollapsed {
+    grid-area: aside;
+
+    /* posicionamiento */
+    position: relative;
+
+    /* distribucion flex*/
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 1.7rem;
+
+    /* distribucion box */
+    padding-top: 0.8rem;
+
+    /* estilos */
+    background-color: var(--color-theme-primary);
+    font-size: 16px;
+
+}
+
+.asideCollapsed>* {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 0;
+}
+
+/* ?  *** LOGICA EN COMUN (COMPARTIDA) *** */
+
+
+/* CONTENIDO DEL ASIDE */
+.contentNav {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    /* estilos */
+}
+
+/*2***************      LISTADO DEL NAV     *************** */
+
+.navList {
+    /* distribuccion flex desde el padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    /* estilos */
+    list-style: none;
+}
+
+
+.navList>* {
+    /* distribucion flex desde el padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+
+/*2***************      ITEM DEL NAV     *************** */
+
+.navItem {
+    /* dimension */
+    padding-block: 1rem;
+    padding-inline: 0.8rem;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+
+    /* interactivdad */
+    cursor: pointer;
+}
+
+.navItem:hover {
+    color: var(--color-theme-font-white);
+    background-color: var(--color-theme-primary-light);
+}
+
+.navItemIcon {
+    color: var(--color-theme-font-white);
+    /* interactivdad */
+    cursor: inherit;
+}
+
+.navLink {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: CEN;
+    gap: 0.2rem;
+}
+
+.navItemLabel {
+    color: var(--color-theme-font-white);
+    /* interactivdad */
+    cursor: inherit;
+}
+
+.navItemLabelCollapsed {
+    max-width: 0;
+    /* ocupa 0, pero sigue montado */
+    opacity: 0;
+    /* opcional (solo visual) */
+    pointer-events: none;
+    /* sin interacción cuando está oculto */
+     /* visibility: hidden; */
+    /* overflow: hidden;
+    text-overflow: hidden; */
+    white-space: nowrap;
+}
+
+.iconNavItemDropdownContainerCollapsed {
+    max-width: 0;
+    /* ocupa 0, pero sigue montado */
+    opacity: 0;
+    /* opcional (solo visual) */
+    pointer-events: none;
+    /* sin interacción cuando está oculto */
+}
+
+/*2***************      ITEM DROPDOWN DEL NAV     *************** */
+
+
+.navItemDropdown {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    /* dimension */
+    padding-block: 1rem;
+
+    /* interactivdad */
+    cursor: pointer;
+}
+
+.navItemDropdownIsNotActive:hover {
+    color: var(--color-theme-font-white);
+    background-color: var(--color-theme-primary-light);
+}
+
+.navItemDropdown>* {
+    cursor: inherit;
+}
+
+.wrapperItemDropdown {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 3rem;
+
+    /* interactivdad */
+    cursor: inherit;
+
+    /* dimension */
+}
+
+
+
+.wrapperItemDropdownCollapsed {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+
+    /* interactivdad */
+    cursor: inherit;
+
+}
+
+.navItemContent {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    color: var(--color-theme-font-white);
+    gap: 0.2rem;
+
+    /* interactivdad */
+    cursor: inherit;
+
+}
+
+.navItemContent>* {
+    cursor: inherit;
+}
+
+.iconNavItemDropdownContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconDropdownItem {
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    stroke-width: 3px;
+    color: var(--color-theme-font-white);
+}
+
+
+.navListChildrenDropdown {
+    /* dimension */
+    padding-left: 2rem;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.navListChildrenDropdownCollapsed {
+    /* dimension */
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.navItemDropdownIsExpanded {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/*2***************      FOOTER      *************** */
+
+.footerSection {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.footerSectionCollapsed {
+
+    /* distribucion flex con respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+    gap: 1rem;
+
+}
+
+.iconExpandButtonContainer {
+    /* distribucion flex */
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    /* dimension */
+    padding-right: 1.5rem;
+}
+
+
+.expandButtonCollapsed,
+.expandButton {
+    /* dimension */
+    background: transparent;
+    border: none;
+    /* interactivdad */
+    cursor: pointer;
+}
+
+.iconCoollapsedAside {
+    height: 24px;
+    width: 24px;
+    color: var(--color-theme-font-white);
+}
+
+
+/* ***************      HEADER      ***************/
+
+.header {
+    grid-area: header;
+}
+
+/* ***************      MAIN      ***************/
+
+.main {
+    grid-area: main;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.layoutTest {
+    display: flex;
+    min-inline-size: 0;
+    /* permite colapsar el texto */
+}
+
+.asideTest {
+    flex: 0 0 auto;
+    /* el ancho lo decide el contenido */
+}
+
+.mainTest {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+}
+
+/* Ítem: icono + texto */
+.itemTest {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    min-inline-size: 0;
+    /* permite colapsar el texto */
+    border: 1px solid red;
+}
+
+.iconTest {
+    display: grid;
+    place-items: center;
+}
+
+/* --- CLAVE: label animable sin fijar ancho al aside --- */
+.labelTest {
+    flex: 0 1 auto;
+    /* no “rellena” todo -> deja ver la animación */
+    min-inline-size: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 20ch;
+    /* techo numérico (interpolable) */
+    opacity: 1;
+    transition: max-width 2200ms ease, opacity 1600ms ease;
+}
+
+.asideTest[data-collapsed="true"] .labelTest {
+    max-width: 0;
+    /* ocupa 0, pero sigue montado */
+    opacity: 0;
+    /* opcional (solo visual) */
+    pointer-events: none;
+    /* sin interacción cuando está oculto */
+}

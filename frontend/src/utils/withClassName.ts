@@ -1,12 +1,12 @@
-import { cloneElement, type JSX } from "react";
+import { cloneElement, isValidElement, type JSX } from "react";
 
 const withClassName = <T extends JSX.Element>(
     element: T,
     className: string
 ): T => {
-    return cloneElement(element, {
+    return isValidElement(element) ? cloneElement(element, {
         className: `${className} ${element.props.className || ""}`,
-    }) as T;
+    }) as T : element;
 }
 
 export default withClassName;
