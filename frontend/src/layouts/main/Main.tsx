@@ -43,23 +43,23 @@ const menuItems: MenuItem[] = [
             {
                 label: "Producto",
                 icon: <Package />,
-                path: "/products"
+                path: "/productss"
+            },
+            {
+                label: "Linea de producción",
+                icon: <ProductionLineIcon />,
+                path: "/production_liness"
             },
             {
                 label: "Ubicación",
                 icon: <MapPinned />,
-                path: "/locations"
+                path: "/locationss"
             },
             {
                 label: "Cliente",
                 icon: <UserPen />,
-                path: "/clients"
-            },
-            {
-                label: "Linea de producción",
-                icon: <Package />,
-                path: "/production_lines"
-            },
+                path: "/clientss"
+            }
         ]
     }
 
@@ -97,7 +97,11 @@ const MainLayout = () => {
         iconWithClassParent
     }: NavItemDropdownProps) => {
 
-        const [isExpanded, setIsExpanded] = useState(false);
+        const internalLocation = useLocation();
+
+        const [isExpanded, setIsExpanded] = useState(
+            parent.children?.some((item) => item.path === internalLocation.pathname) ?? false
+        );
 
         const toggleExpand = () => {
             setIsExpanded(!isExpanded);
@@ -342,7 +346,14 @@ const MainLayout = () => {
                             <NavItemExtra key={index} {...item} parent={item} iconWithClassParent={item.icon} />
                         ))
                     }
-                    <div className={stylesModules.iconExpandButtonContainer}>
+                    <div
+                        className={
+                            `${isSidebarCollapsed
+                                ? stylesModules.iconExpandButtonContainerCollapsed
+                                : stylesModules.iconExpandButtonContainer
+                            }`
+                        }
+                    >
                         <button
                             className={`${isSidebarCollapsed
                                 ? stylesModules.expandButtonCollapsed

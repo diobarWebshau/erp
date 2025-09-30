@@ -149,7 +149,7 @@
 
 .navItem {
     /* dimension */
-    padding-block: 1rem;
+    padding-block: 0.5rem;
     padding-inline: 0.8rem;
 
     /* distribucion flex */
@@ -160,14 +160,18 @@
 
     /* interactivdad */
     cursor: pointer;
+    text-decoration: none;
 }
 
-.navItem:hover {
+.navItem:hover:not(.navItemActive) {
     color: var(--color-theme-font-white);
     background-color: var(--color-theme-primary-light);
+    border-bottom: 1px solid white;
 }
 
 .navItemIcon {
+    height: 24px;
+    width: 24px;
     color: var(--color-theme-font-white);
     /* interactivdad */
     cursor: inherit;
@@ -198,7 +202,7 @@
     /* opcional (solo visual) */
     pointer-events: none;
     /* sin interacción cuando está oculto */
-     /* visibility: hidden; */
+    /* visibility: hidden; */
     /* overflow: hidden;
     text-overflow: hidden; */
     white-space: nowrap;
@@ -227,7 +231,7 @@
     justify-content: flex-start;
 
     /* dimension */
-    padding-block: 1rem;
+    padding-block: 0.5rem;
 
     /* interactivdad */
     cursor: pointer;
@@ -236,6 +240,7 @@
 .navItemDropdownIsNotActive:hover {
     color: var(--color-theme-font-white);
     background-color: var(--color-theme-primary-light);
+    border-bottom: 1px solid var(--color-theme-font-white);
 }
 
 .navItemDropdown>* {
@@ -346,10 +351,11 @@
     justify-content: flex-end;
     align-items: stretch;
     gap: 1rem;
+    padding-bottom: 1rem;
 }
 
 .footerSectionCollapsed {
-
+    
     /* distribucion flex con respecto al padre */
     flex-grow: 1;
     flex-shrink: 1;
@@ -361,7 +367,7 @@
     justify-content: flex-end;
     align-items: stretch;
     gap: 1rem;
-
+    padding-bottom: 1rem;
 }
 
 .iconExpandButtonContainer {
@@ -373,6 +379,13 @@
     padding-right: 1.5rem;
 }
 
+.iconExpandButtonContainerCollapsed {
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* dimension */
+}
 
 .expandButtonCollapsed,
 .expandButton {
@@ -390,6 +403,48 @@
 }
 
 
+.navItemCollapsed .navLink {
+    padding-block: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+}
+
+.navItemCollapsed:hover {
+    background-color: var(--color-theme-primary-light);
+    border-bottom: 2px solid var(--color-theme-font-white);
+}
+
+.navItemCollapsed .navLink:hover:not(.navItemActive) {
+    background: var(--color-theme-primary-light);
+    border-bottom: 1px solid var(--color-theme-primary-light);
+}
+
+.navItemIconCollapsed{
+    height: 24px;
+    width: 24px;
+}
+
+.navItemIconCollapsed,
+.navItemLabelCollapsed {
+    color: var(--color-theme-font-white);
+    cursor: pointer;
+}
+
+
+.desktopOnly{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navItemActive{
+    background-color: var(--color-theme-secondary-light);
+    border-bottom: 2px solid var(--color-theme-font-white);
+}
+
+
 /* ***************      HEADER      ***************/
 
 .header {
@@ -402,87 +457,3 @@
     grid-area: main;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.layoutTest {
-    display: flex;
-    min-inline-size: 0;
-    /* permite colapsar el texto */
-}
-
-.asideTest {
-    flex: 0 0 auto;
-    /* el ancho lo decide el contenido */
-}
-
-.mainTest {
-    flex: 1 1 auto;
-    min-inline-size: 0;
-}
-
-/* Ítem: icono + texto */
-.itemTest {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    min-inline-size: 0;
-    /* permite colapsar el texto */
-    border: 1px solid red;
-}
-
-.iconTest {
-    display: grid;
-    place-items: center;
-}
-
-/* --- CLAVE: label animable sin fijar ancho al aside --- */
-.labelTest {
-    flex: 0 1 auto;
-    /* no “rellena” todo -> deja ver la animación */
-    min-inline-size: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    max-width: 20ch;
-    /* techo numérico (interpolable) */
-    opacity: 1;
-    transition: max-width 2200ms ease, opacity 1600ms ease;
-}
-
-.asideTest[data-collapsed="true"] .labelTest {
-    max-width: 0;
-    /* ocupa 0, pero sigue montado */
-    opacity: 0;
-    /* opcional (solo visual) */
-    pointer-events: none;
-    /* sin interacción cuando está oculto */
-}
