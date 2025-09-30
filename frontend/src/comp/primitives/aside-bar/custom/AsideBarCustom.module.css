@@ -1,42 +1,10 @@
-/* ***************      GRID CONTAINER     ***************/
-
-.gridContainerCollapsed {
-    /* dimension */
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-
-    /* distribucion grid */
-    display: grid;
-    grid-template:
-        "aside header"
-        "aside main" 1fr / auto 1fr;
-    min-inline-size: 0;
-    /* permite colapsar el texto */
-}
-
-.gridContainer {
-    /* dimension */
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-
-    /* distribucion grid */
-    display: grid;
-    grid-template:
-        "aside header" auto
-        "aside main" 1fr / 235px 1fr;
-    min-inline-size: 0;
-    /* permite colapsar el texto */
-}
-
 
 /* ***************      ASIDE      ***************/
 
 /* ? *** EXPANDIDO *** */
 
 .aside {
-    grid-area: aside;
+    /* grid-area: aside; */ /* TODO: SE ASIGNA DESDE EL PADRE
 
     /* distribucion flex*/
     display: flex;
@@ -72,7 +40,7 @@
 /* ? *** COLLAPSED *** */
 
 .asideCollapsed {
-    grid-area: aside;
+    /* grid-area: aside; */ /* TODO: SE ASIGNA DESDE EL PADRE */
 
     /* posicionamiento */
     position: relative;
@@ -166,7 +134,7 @@
 .navItem:hover:not(.navItemActive) {
     color: var(--color-theme-font-white);
     background-color: var(--color-theme-primary-light);
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid var(--color-theme-font-white);
 }
 
 .navItemIcon {
@@ -229,6 +197,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    gap: 0.5rem;
 
     /* dimension */
     padding-block: 0.5rem;
@@ -355,7 +324,7 @@
 }
 
 .footerSectionCollapsed {
-    
+
     /* distribucion flex con respecto al padre */
     flex-grow: 1;
     flex-shrink: 1;
@@ -421,7 +390,7 @@
     border-bottom: 1px solid var(--color-theme-primary-light);
 }
 
-.navItemIconCollapsed{
+.navItemIconCollapsed {
     height: 24px;
     width: 24px;
 }
@@ -433,27 +402,13 @@
 }
 
 
-.desktopOnly{
+.desktopOnly {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.navItemActive{
+.navItemActive {
     background-color: var(--color-theme-secondary-light);
     border-bottom: 2px solid var(--color-theme-font-white);
 }
-
-
-/* ***************      HEADER      ***************/
-
-.header {
-    grid-area: header;
-}
-
-/* ***************      MAIN      ***************/
-
-.main {
-    grid-area: main;
-}
-

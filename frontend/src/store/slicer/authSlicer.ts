@@ -29,7 +29,7 @@ const authSlice = createSlice({
         removeAuth: (state) => {
             state.username = null;
             state.isAuthenticated = false
-            state.retryCount = 0;
+            state.retryCount = null;
             state.id = null;
         },
         clearAuth: (state) => {

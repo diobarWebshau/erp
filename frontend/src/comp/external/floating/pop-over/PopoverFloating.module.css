@@ -1,0 +1,14 @@
+.popoverFloatingIUContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.popoverFloatingTrigger {
+    width: 100%;
+    cursor: pointer;
+}
+
+/* .popoverFloatingFloating {
+    border: 1px solid green;
+} */

@@ -4,6 +4,7 @@ const createAuthRouter = () => {
     const authRouter = Router();
     authRouter.post("/", AuthController.auth);
     authRouter.get("/", AuthController.verifyToken);
+    authRouter.post("/logout", AuthController.logout);
     return authRouter;
 };
 export default createAuthRouter;

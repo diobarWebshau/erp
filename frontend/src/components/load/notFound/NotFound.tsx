@@ -10,7 +10,6 @@ import NumericInput from "../../../comp/primitives/input/numeric/base/NumericInp
 import Separator from "../../../comp/primitives/separator/Separator";
 import RangeSlicerMantine from "../../../comp/external/mantine/slicer/range/table/base/RangeSlicerMantine";
 import RangeSlicerMantineTable from "../../../comp/external/mantine/slicer/range/table/custom/RangeSlicerMantineTable";
-import MainLayout from "../../../layouts/main/Main";
 
 const NotFound = () => {
 
@@ -30,7 +29,10 @@ const NotFound = () => {
 
 
     return (
-        <MainLayout/>
+        <div>
+            Not Found
+        </div>
+        // <MainLayout/>
         // <div
         //     style={{
         //         display: "flex",

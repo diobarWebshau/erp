@@ -25,8 +25,11 @@
   --color-theme-font-white: #FFFFFF;
   --color-theme-font-black: #000000;
   --color-theme-border-table: #E1E2FB;
+  --color-theme-gray: rgba(204, 201, 221, 1);
 
   /* Varibles de alertas */
+  --color-ready: rgba(60, 145, 230, 1);
+  --color-ready-light: rgba(191, 223, 255, 1);
   --color-warning: #DFA60B;
   --color-warning-light: #FFF6BA;
   --color-success: #369965;
@@ -44,6 +47,11 @@
 
   --color-gradient-purple:
     linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
+
+  --linear-gradient-primary: linear-gradient(360deg,
+      var(--color-theme-primary) 0%,
+      #5A55DE 50%,
+      #3B34DA 100%);
 
 
   --color-gradient-purple-white: linear-gradient(90deg,

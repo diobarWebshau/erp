@@ -35,6 +35,7 @@ class AuthController {
                 secure: false,
                 sameSite: 'lax',
                 maxAge: 60 * 60 * 1000,
+                path: "/",
             });
             res.status(200).json({ message: payload });
         }
@@ -72,6 +73,29 @@ class AuthController {
             else {
                 console.error(`An unexpected error occurred: ${error}`);
             }
+        }
+    };
+    static logout = async (req, res, next) => {
+        try {
+            // Muy importante: usar los mismos flags que al setear la cookie
+            res.clearCookie("accessToken", {
+                httpOnly: true,
+                secure: false, // ponlo en true en prod bajo HTTPS
+                sameSite: "lax",
+                path: "/", // explícitalo para asegurar borrado
+            });
+            // Alternativa equivalente (setear expirada):
+            // res.cookie("accessToken", "", {
+            //   httpOnly: true,
+            //   secure: false,
+            //   sameSite: "lax",
+            //   path: "/",
+            //   expires: new Date(0),
+            // });
+            res.status(200).json({ ok: true });
+        }
+        catch (error) {
+            return next(error);
         }
     };
 }

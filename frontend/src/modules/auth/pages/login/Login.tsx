@@ -73,7 +73,7 @@ const Login = () => {
                 localStorage.setItem('rememberedUser', username);
                 localStorage.setItem('rememberedPass', password);
             }
-            navigate("/")
+            navigate("/inventories");
         } catch (error: unknown) {
             if (error instanceof Error)
                 console.error(error.message);
