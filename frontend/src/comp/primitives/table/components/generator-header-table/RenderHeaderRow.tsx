@@ -38,11 +38,9 @@ interface renderHeaderRowProps<T> {
     filterPopoverRef: RefObject<
         HTMLDivElement | null>; // referencia del popover de los filtros
     handlerOnClickButtonFilter: (
-        e: MouseEvent<HTMLButtonElement>,
         column: Column<T>
     ) => void, // handler para el click del boton de filtro(cambia el estado del popover)
     handlerOnClickButtonAddFilterColumn: (
-        e: MouseEvent<HTMLButtonElement>,
         column: Column<T>,
         value: ColumnTypeDataFilter
     ) => void, // handler para el click del boton de agregar filtro(columna)

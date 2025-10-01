@@ -4,7 +4,7 @@ import type {
     IPartialPurchasedOrder
 } from "../../../../../../interfaces/purchasedOrder";
 import usePurchasedOrderById
-    from "../../../../../../modelos/purchased_orders/react-hooks/usePurchasedOrderById";
+    from "../../../../../../modelos/purchased_orders/hooks/usePurchasedOrderById";
 import {
     useEffect,
     useRef

@@ -226,36 +226,20 @@
     /* distribucion flex */
     display: flex;
     flex-direction: column;
+
+    position: relative;
 }
 
 .containerTable {
-    /* dimension */
-    height: 90%;
+    width: 100%;
     height: 100%;
-}
-
-.editIconShippingOrderModel {
-    /* dimension */
-    width: 20px;
-    
-    /* estilos */
-    color: var(--color-theme-primary);
-    cursor: pointer;
 }
 
 .trash2IconShippingOrderModel {
     /* dimension */
-    width: 20px;
+    width: 16px;
     
     /* estilos */
     color: var(--color-alert);
     cursor: pointer;
-}
-
-/* *************** Feedback Modal *************** */
-
-.deleteIconFeedbackModal {
-    color: var(--color-theme-primary);
-    width: 30px;
-    height: 30px;
 }

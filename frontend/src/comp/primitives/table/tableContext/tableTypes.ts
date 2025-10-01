@@ -61,8 +61,8 @@ type TableActionType =
 type TableAction =
     // tipado para acciones de seleccion de filas
     | { type: typeof TableActionTypes.SET_ROW_SELECTION; payload: RowSelectionState }
-    | { type: typeof TableActionTypes.ADD_ROW_SELECTION; payload: RowSelectionState }
-    | { type: typeof TableActionTypes.REMOVE_ROW_SELECTION; payload: RowSelectionState }
+    | { type: typeof TableActionTypes.ADD_ROW_SELECTION; payload: string[] }
+    | { type: typeof TableActionTypes.REMOVE_ROW_SELECTION; payload: string[] }
     | { type: typeof TableActionTypes.CLEAR_ROW_SELECTION }
     // tipado para acciones de paginacion
     | { type: typeof TableActionTypes.SET_PAGINATION; payload: PaginationState }

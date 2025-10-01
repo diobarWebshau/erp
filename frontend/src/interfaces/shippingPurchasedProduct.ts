@@ -15,7 +15,7 @@ interface IShippingOrderPurchasedOrderProduct {
 type IPartialShippingOrderPurchasedOrderProduct =
     Partial<IShippingOrderPurchasedOrderProduct>;
 
-interface IShippingOrderPurchasedOrderProductManager{
+interface IShippingOrderPurchasedOrderProductManager {
     added: IPartialShippingOrderPurchasedOrderProduct[],
     deleted: IShippingOrderPurchasedOrderProduct[],
     modified: IPartialShippingOrderPurchasedOrderProduct[],

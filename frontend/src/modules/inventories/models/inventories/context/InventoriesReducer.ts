@@ -1,18 +1,11 @@
+import type { Draft } from "immer";
+import type { InventoriesState, InventoriesAction } from "./InventoriesTypes";
+import { inventoriesActionsTypes } from "./InventoriesTypes";
 import {
     // current, // para poder acceder al valor original del draft
     // isDraft, // para verificar si el draft es un draft para acceder al valor original, y poder imprimirlo
     produce,
 } from "immer";
-import type {
-    Draft,
-} from "immer";
-import type {
-    InventoriesState,
-    InventoriesAction
-} from "./InventoriesTypes";
-import {
-    inventoriesActionsTypes
-} from "./InventoriesTypes";
 
 /* ****************** Reducer  ******************/
 

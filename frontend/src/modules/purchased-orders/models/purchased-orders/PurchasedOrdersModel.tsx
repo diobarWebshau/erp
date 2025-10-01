@@ -17,7 +17,7 @@ import {
     deletePurchasedOrderInDB,
     updatePurchasedOrderInDB,
     createBatchPurchasedOrderInDB,
-} from "./../../../../queries/purchaseOrderQueries";
+} from "./../../../../modelos/purchased_orders/queries/purchaseOrderQueries";
 import GenericTable
     from "../../../../components/ui/table/tableContext/GenericTable";
 import {
@@ -139,6 +139,7 @@ const PurchasedOrderModel = () => {
     const handleCreate = async (
         purchased: IPartialPurchasedOrder
     ) => {
+        console.log(purchased);
         setLoading(true);
         try {
             const response =
@@ -378,13 +379,11 @@ const PurchasedOrderModel = () => {
 
                 rowActions={rowActions}
                 typeRowActions="icon"
+                
+                enableFilters
+                enablePagination
+                enableRowEditClick
 
-                enableFilters={true}
-                enableSorting={false}
-                enableViews={false}
-                enablePagination={true}
-                enableRowSelection={false}
-                enableRowEditClick={true}
                 enableRowEditClickHandler={toggleActiveEditModal}
                 onDeleteSelected={
                     () => console.log("borrado selectivo")}

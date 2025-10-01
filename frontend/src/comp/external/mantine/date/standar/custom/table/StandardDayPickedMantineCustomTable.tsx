@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DatePicker } from "@mantine/dates";
-import styles from "./StandardDayPickedMantine.module.css";
+import styles from "./StandardDayPickedMantineCustomTable.module.css";
 import dayjs from "dayjs";
 import { memo, useEffect, useState } from "react";
 import type { ObjectDateFilter } from "../../../../../../../interfaces/tableTypes";
@@ -8,14 +8,16 @@ import type { ObjectDateFilter } from "../../../../../../../interfaces/tableType
 interface StandardDayPickedMantineProps {
     value: ObjectDateFilter;
     onChange: (date: ObjectDateFilter) => void;
+    className?: string;
 }
 
 const StandardDayPickedMantine = memo(({
     value,
-    onChange
+    onChange,
+    className
 }: StandardDayPickedMantineProps) => {
 
-    const [selectedValue, setSelectedValue] = useState<Date | null>(value.from ?? null);
+    const [selectedValue, setSelectedValue] = useState<Date | null>(value?.from ?? null);
 
     const handleDateChange = (date: string | null) => {
         if (date) {
@@ -35,12 +37,12 @@ const StandardDayPickedMantine = memo(({
     };
 
     useEffect(() => {
-        const parsedDate = value.from ? dayjs(value.from).toDate() : null;
+        const parsedDate = value?.from ? dayjs(value.from).toDate() : null;
         setSelectedValue(parsedDate);
     }, [value]);
 
     return (
-        <div>
+        <div className={className}>
             <DatePicker
                 value={selectedValue}
                 type="default"

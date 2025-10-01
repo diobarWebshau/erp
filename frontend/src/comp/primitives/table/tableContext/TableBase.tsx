@@ -8,8 +8,6 @@ import {
     clear_row_selection,
     add_column_filter,
     set_column_visibility,
-    remove_column_filter,
-    toggle_column_visibility,
     set_column_filters,
     set_pagination,
 } from "./tableActions"
@@ -37,8 +35,6 @@ import type {
 import {
     useEffect,
     useRef, useState,
-    type MouseEvent,
-    type RefObject
 } from "react";
 import {
     useClickOutside
@@ -101,7 +97,7 @@ interface TableBaseProps<T> {
     enableRowEditClick?: boolean;
     enableRowEditClickHandler?: (record: T) => void;
     noResultsMessage?: string;
-    extraComponents?: (table: Table<T>) => React.ReactNode;
+    extraComponents?: (table?: Table<T>) => React.ReactNode;
     footerComponents?: (table: Table<T>) => React.ReactNode;
     classNameGenericTableContainer?: string;
     classNameExtraComponents?: string;
@@ -297,96 +293,10 @@ const TableBase = <T,>({
     );
 
 
-    // todo: LOGICA PARA LA PAGINACION
-
-
-
-    // todo: LOGICA PARA ORDENAR (SORTEAR) COLUMNAS
-
-    const [isVisibleSortsListPopover, setIsVisibleSortsListPopover] =
-        useState<boolean>(false);
-    const filterSortPopoverRef = useRef<HTMLDivElement>(null);
-    const triggerRefSortsList = useRef<HTMLButtonElement>(null);
-
-    const handlerOnClickButtonSortsList = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setIsVisibleSortsListPopover((prev) => !prev);
-    }
-
-    useClickOutside(
-        [
-            filterSortPopoverRef,
-            triggerRefSortsList
-        ],
-        () => setIsVisibleSortsListPopover(false)
-    );
-
-
-    // todo: LOGICA PARA EL FILTRADO
-
-    const [isVisibleFilterPopover, setIsVisibleFilterPopover] = useState<string | null>(null);
-    const [isVisibleFiltersListPopover, setIsVisibleFiltersListPopover] =
-        useState<boolean>(false);
-    const filterListPopoverRef = useRef<HTMLDivElement>(null);
-    const triggerRefFilterList = useRef<HTMLButtonElement>(null);
-    const filterPopoverRef = useRef<HTMLDivElement>(null);
-
-    useClickOutside(
-        [
-            filterListPopoverRef,
-            triggerRefFilterList
-        ],
-        () => setIsVisibleFiltersListPopover(false)
-    );
-
-
-    /*
-        Se creó un objeto con referencias para cada botón de filtro de columna (un Record con refs dinámicos).
-        Al renderizar cada botón, se guarda su referencia en ese objeto. En useClickOutside se pasan todas esas
-        referencias (el popover + todos los botones) como un array para que el hook pueda verificar si el clic 
-        fue fuera de todos esos elementos.Si el clic es fuera, se cierra el popover (se llama a 
-        setIsVisibleFilterPopover(null)).
-    */
-    const filterTriggerRefs =
-        useRef<Record<string, HTMLButtonElement | null>>({});
-
-    const handlerOnClickButtonFiltersList = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setIsVisibleFiltersListPopover((prev) => !prev);
-    }
-
-    const handlerOnClickButtonFilter = (
-        e: MouseEvent<HTMLButtonElement>,
-        column: Column<T>,
-    ) => {
-        e.preventDefault();
-        if (isVisibleFilterPopover === column.id) {
-            setIsVisibleFilterPopover(null);
-        } else {
-            setIsVisibleFilterPopover(column.id);
-        }
-    };
-
-    useClickOutside(
-        [
-            filterPopoverRef,
-            ...(
-                Object.values(filterTriggerRefs.current)
-                    .map(
-                        (el) => ({ current: el })
-                    )
-            )
-        ],
-        () => setIsVisibleFilterPopover(null)
-    );
-
-
-    const handlerOnClickButtonAddFilterColumn = (
-        e: React.MouseEvent<HTMLButtonElement>,
+    const handlerAddColumnFilter = (
         column: Column<T>,
         value: ColumnTypeDataFilter,
     ) => {
-        e.preventDefault();
         let valueInput: ColumnTypeDataFilter;
         switch (column.columnDef.meta?.type) {
             case "string":
@@ -463,17 +373,7 @@ const TableBase = <T,>({
                     }));
                 break;
         }
-        setIsVisibleFilterPopover(null);
     };
-
-
-    const getValueFieldColumnFilter = (columnId: string): any => {
-        const columnFilters = state.columnFiltersState;
-        const column =
-            columnFilters.find((columnFilter) =>
-                columnFilter.id == columnId);
-        return column?.value ?? "";
-    }
 
     const asignFilterFnToColumns = (columns: ColumnDef<T>[]): ColumnDef<T>[] => {
         const appliedFilterTypeToColumn: ColumnDef<T>[] = columns.map((col) => {
@@ -604,87 +504,6 @@ const TableBase = <T,>({
         return visibilityState;
     };
 
-    const handleOnClickButtonDeleteFilter =
-        (e: MouseEvent<HTMLButtonElement>, columnId: string) => {
-            e.preventDefault();
-            dispatch(remove_column_filter(columnId));
-        }
-
-
-    // todo: LOGICA PARA OCULTAR COLUMNAS
-
-    // state de la visibilidad del popover del boton de columnas
-    const [isVisibleHidePopover, setIsVisibleHidePopover] =
-        useState<boolean>(false);
-    const [valueTextFieldColumnHide, setValueTextFieldColumnHide] =
-        useState<string>("");
-    const popoverRef: RefObject<HTMLDivElement | null>
-        = useRef<HTMLDivElement>(null);
-    const triggerRef: RefObject<HTMLButtonElement | null>
-        = useRef<HTMLButtonElement>(null);
-    const handlerClickButtonVisibblePopoverHideColumn =
-        (e: React.MouseEvent<HTMLButtonElement>): void => {
-            e.preventDefault();
-            setValueTextFieldColumnHide("");
-            setIsVisibleHidePopover((prev) => !prev);
-        };
-    const onChangeTextFieldColumnHide =
-        (e: React.ChangeEvent<HTMLInputElement>): void => {
-            setValueTextFieldColumnHide(e.target.value);
-        };
-    const handlerOnClickButtonHideColumn = (e: MouseEvent<HTMLButtonElement>, currentColumn: Column<T>): void => {
-        e.preventDefault();
-        // si es visible
-        if (currentColumn.getIsVisible()) {
-            // quitamos filtros activos
-            if (currentColumn.getIsFiltered()) {
-                dispatch(remove_column_filter(currentColumn.id));
-            }
-        }
-        dispatch(toggle_column_visibility(currentColumn.id));
-    }
-
-    useClickOutside(
-        [popoverRef, triggerRef],
-        () => {
-            setIsVisibleHidePopover(false)
-        }
-    );
-
-
-    /*
-
-        El parámetro updater que React Table te pasa en onRowSelectionChange puede ser dos cosas:
-
-        Un objeto nuevo de selección, por ejemplo:
-
-            {
-                'rowId1': true,
-                'rowId3': true,
-            }
-
-        Una función que recibe el estado anterior y devuelve el nuevo estado, por ejemplo:
-
-            (prevSelection) => {
-                return {
-                    ...prevSelection,
-                    'rowId4': true
-                }
-            }
-
-        Entonces esta línea:
-
-            typeof updater === 'function'
-                ? updater(state.rowSelection)
-                : updater
-
-        Lo que hace es:
-
-            Si updater es una función, la ejecuta pasando el estado actual (state.rowSelection) y usa el resultado como nuevo estado.
-
-            Si updater es un objeto, lo usa directamente.        
-
-    */
 
     const table: Table<T> = useReactTable({
         /*  Base data */
@@ -820,11 +639,6 @@ const TableBase = <T,>({
                                             table={table}
                                             enableSorting={enableSorting}
                                             enableFilters={enableFilters}
-                                            isVisibleFilterPopover={isVisibleFilterPopover}
-                                            setIsVisibleFilterPopover={setIsVisibleFilterPopover}
-                                            filterTriggerRefs={filterTriggerRefs}
-                                            filterPopoverRef={filterPopoverRef}
-                                            handlerOnClickButtonFilter={handlerOnClickButtonFilter}
                                             handlerOnClickButtonAddFilterColumn={handlerOnClickButtonAddFilterColumn}
                                             className={`${stylesModules.tableHeader} ${classNameTableHeader}`}
                                             typeRowActions={typeRowActions}
@@ -860,11 +674,6 @@ const TableBase = <T,>({
                                         table={table}
                                         enableSorting={enableSorting}
                                         enableFilters={enableFilters}
-                                        isVisibleFilterPopover={isVisibleFilterPopover}
-                                        setIsVisibleFilterPopover={setIsVisibleFilterPopover}
-                                        filterTriggerRefs={filterTriggerRefs}
-                                        filterPopoverRef={filterPopoverRef}
-                                        handlerOnClickButtonFilter={handlerOnClickButtonFilter}
                                         handlerOnClickButtonAddFilterColumn={handlerOnClickButtonAddFilterColumn}
                                         className={`${stylesModules.tableHeader} ${classNameTableHeader}`}
                                         typeRowActions={typeRowActions}

@@ -1,126 +1,50 @@
-import {
-    useEffect, useState,
-    type ReactNode
-} from "react";
-import type {
-    IPartialShippingOrder,
-    IShippingOrder,
-    LoadEvidenceItem,
-    LoadEvidenceManager,
-    PartialLoadEvidenceItem
-} from "../../../../interfaces/shippingOrder";
-import type {
-    AppDispatchRedux
-} from "../../../../store/store";
-import {
-    deleteShippingOrderInDB,
-    fetchShippingOrderFromDB,
-    createCompleteShippingOrderInDB,
-    updateCompleteShippingOrderInDB,
-} from "../../../../queries/shippingOrderQueries";
-import GenericTable
-    from "../../../../components/ui/table/tableContext/GenericTable";
-import {
-    useDispatch
-} from "react-redux";
-import {
-    columnsShippingOrders
-} from "./structure/columns"
-import {
-    AddModal,
-} from "./modals";
-import DeleteModal
-    from "../../../../comp/primitives/modal/deleteModal/DeleteModal";
-import type {
-    RowAction,
-} from "../../../../components/ui/table/types";
-import {
-    Edit, Trash2, Download,
-    Plus, Search, Eraser, Check
-} from "lucide-react";
-import useShippingOrderDetailById
-    from "./hooks/useShippingOrderDetailById";
-import EditModal
-    from "./modals/edit/EditModal";
-import {
-    diffObjectArrays,
-    diffObjects
-} from "../../../../utils/validation-on-update/validationOnUpdate"
-import type {
-    IPartialShippingOrderPurchasedOrderProduct,
-    IShippingOrderPurchasedOrderProduct,
-    IShippingOrderPurchasedOrderProductManager
-} from "../../../../interfaces/shippingPurchasedProduct";
-import InvertOnHoverButton
-    from "../../../../components/ui/table/components/gui/button/Invert-on-hover-button/InvertOnHoverButton";
-import type { Table }
-    from "@tanstack/react-table";
-import FadeButton
-    from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
-import InputSearch
-    from "../../../../components/ui/table/components/gui/input/input-text-search/input";
-import StyleModule
-    from "./ShippingOrdersModel.module.css";
-import {
-    useTableDispatch,
-    useTableState
-} from "../../../../components/ui/table/tableContext/tableHooks";
-import {
-    reset_column_filters
-} from "../../../../components/ui/table/tableContext/tableActions";
-import FeedbackModal
-    from "./modals/confirmation/FeedbackModal";
+import { useEffect, useState } from "react";
+import type { IPartialShippingOrder, IShippingOrder, LoadEvidenceItem, LoadEvidenceManager, PartialLoadEvidenceItem } from "../../../../interfaces/shippingOrder";
+import type { AppDispatchRedux } from "../../../../store/store";
+import { deleteShippingOrderInDB, fetchShippingOrderFromDB, createCompleteShippingOrderInDB, updateCompleteShippingOrderInDB } from "../../../../queries/shippingOrderQueries";
+import GenericTable from "../../../../components/ui/table/tableContext/GenericTable";
+import { useDispatch } from "react-redux";
+import { columnsShippingOrders } from "./structure/columns";
+import type { RowAction } from "../../../../components/ui/table/types";
+import { Trash2, Download, Plus, Search, Eraser } from "lucide-react";
+import useShippingOrderDetailById from "./hooks/useShippingOrderDetailById";
+import { diffObjectArrays, diffObjects } from "../../../../utils/validation-on-update/validationOnUpdate"
+import type { IPartialShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProductManager } from "../../../../interfaces/shippingPurchasedProduct";
+import InvertOnHoverButton from "../../../../components/ui/table/components/gui/button/Invert-on-hover-button/InvertOnHoverButton";
+import type { Table } from "@tanstack/react-table";
+import FadeButton from "../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
+import InputSearch from "../../../../components/ui/table/components/gui/input/input-text-search/input";
+import StyleModule from "./ShippingOrdersModel.module.css";
+import { useTableDispatch, useTableState } from "../../../../components/ui/table/tableContext/tableHooks";
+import { reset_column_filters } from "../../../../components/ui/table/tableContext/tableActions";
+import { clearAllErrors } from "../../../../store/slicer/errorSlicer";
+import ShippingOrderModuleProvider from "./context/ShippingOrderModuleProvider";
+import AddWizardShippingOrder from "./wizards/add/AddWirzardShippingOrder";
 
 const ShippingOrderModel = () => {
 
     // * ******************** Estados ******************** 
 
     // ? Estados para acceso a redux
-    const dispatch: AppDispatchRedux =
-        useDispatch();
+    const dispatch: AppDispatchRedux = useDispatch();
 
     // ? Estados de control de errores y loading
 
-    const [serverError, setServerError] =
-        useState<string | null>(null);
-    const [loading, setLoading] =
-        useState<boolean>(false);
+    const [serverError, setServerError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     // ? Estados para los datos del modelo    
 
-    const [
-        ShippingOrderRecord,
-        setShippingOrderRecord
-    ] = useState<IPartialShippingOrder | null>();
-    const [ShippingOrders, setShippingOrders] =
-        useState<IShippingOrder[]>([]);
-
-    // ? Estados para los modales de retroalimentacion
-
-    const [isActiveFeedbackModal, setIsActiveFeedbackModal] =
-        useState<boolean>(false);
-    const [messageFeedbackModal, setMessageFeedbackModal] =
-        useState<string | null>(null);
-    const [titleFeedbackModal, setTitleFeedbackModal] =
-        useState<string | null>(null);
-    const [iconFeedbackModal, setIconFeedbackModal] =
-        useState<ReactNode | null>(null);
-
-    // ? Estados para los modales de eliminacion
-
-    const [messageDeleteModal, setMessageDeleteModal] =
-        useState<string | null>(null);
-    const [titleDeleteModal, setTitleDeleteModal] =
-        useState<string | null>(null);
-
+    const [shippingOrderRecord, setShippingOrderRecord] = useState<IPartialShippingOrder | null>();
+    const [shippingOrders, setShippingOrders] = useState<IShippingOrder[]>([]);
 
     // ? Estados para los modales 
 
     const [isActiveAddModal, setIsActiveAddModal] =
         useState<boolean>(false);
-    const [isActiveDeleteModal, setIsActiveDeleteModal] =
-        useState<boolean>(false);
     const [isActiveEditModal, setIsActiveEditModal] =
+        useState<boolean>(false);
+    const [isActiveDeleteModal, setIsActiveDeleteModal] =
         useState<boolean>(false);
 
     // * ******************** Funciones de operaciones CRUD ******************** 
@@ -147,7 +71,7 @@ const ShippingOrderModel = () => {
     const handleCreate = async (shipping: IPartialShippingOrder) => {
         setLoading(true);
         try {
-
+            /*
             const new_shipping = { ...shipping }
             const evidences =
                 shipping.load_evidence as LoadEvidenceItem[] || [];
@@ -173,6 +97,7 @@ const ShippingOrderModel = () => {
             setServerError(null);
             fetchs();
             setIsActiveAddModal(false);
+            */
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -200,7 +125,6 @@ const ShippingOrderModel = () => {
 
             delete shipping_old.load_evidence;
             delete shipping_old.shipping_order_purchase_order_product;
-
 
             const sopops_new =
                 shipping_new.shipping_order_purchase_order_product || [];
@@ -290,7 +214,7 @@ const ShippingOrderModel = () => {
 
                 const response =
                     await updateCompleteShippingOrderInDB(
-                        ShippingOrderRecord?.id || null,
+                        shippingOrderRecord?.id || null,
                         new_shipping,
                         dispatch
                     );
@@ -315,16 +239,11 @@ const ShippingOrderModel = () => {
         setLoading(true);
         try {
             await deleteShippingOrderInDB(
-                ShippingOrderRecord?.id || null,
+                shippingOrderRecord?.id || null,
                 dispatch
             );
             setServerError(null);
             fetchs();
-            setIsActiveDeleteModal(false);
-            setTitleFeedbackModal("Tu orden se ha eliminado correctamente");
-            setMessageFeedbackModal(null);
-            setIconFeedbackModal(<Check className={StyleModule.deleteIconFeedbackModal} />);
-            setIsActiveFeedbackModal(true);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
@@ -335,32 +254,28 @@ const ShippingOrderModel = () => {
 
     // * ******************** Funciones para control de modales ******************** 
 
-
-    const toggleActiveDeleteModal = () => {
-        setServerError(null);
-        setIsActiveDeleteModal(!isActiveDeleteModal);
-    }
-
-    const toggleActiveAddModal = () => {
-        setServerError(null);
+    const toggleisActiveAddModal = () => {
         setIsActiveAddModal(!isActiveAddModal);
     }
-    const handleOnClickActivEditModal = (record: IShippingOrder) => {
+
+    const toggleisActiveEditModalSetup = (record: IShippingOrder) => {
+        dispatch(clearAllErrors());
         setServerError(null);
         setShippingOrderRecord(record);
-        setIsActiveEditModal(!isActiveEditModal);
-    }
-    const handleOnClickActiveDeleteModal = (record: IShippingOrder) => {
-        setTitleDeleteModal("¿Seguro que desea eliminar esta orden?");
-        setMessageDeleteModal("Este proceso no se puede deshacer.");
-        setServerError(null);
-        setShippingOrderRecord(record);
-        setIsActiveDeleteModal(!isActiveDeleteModal);
     }
 
-    const toggleActiveFeedbackModal = () => {
+    const toggleisActiveEditModal = () => {
+        setIsActiveEditModal(!isActiveEditModal);
+    }
+
+    const toggleisActiveDeleteModalSetup = (record: IShippingOrder) => {
+        dispatch(clearAllErrors());
         setServerError(null);
-        setIsActiveFeedbackModal(!isActiveFeedbackModal);
+        setShippingOrderRecord(record);
+    }
+
+    const toggleisActiveDeleteModal = () => {
+        setIsActiveDeleteModal(!isActiveDeleteModal);
     }
 
     // * ******************** Funciones para control de acciones de la tabla ******************** 
@@ -368,14 +283,9 @@ const ShippingOrderModel = () => {
     const rowActions: RowAction<IShippingOrder>[] = [
         {
             label: "Delete",
-            onClick: handleOnClickActiveDeleteModal,
+            onClick: toggleisActiveDeleteModalSetup,
             icon: <Trash2 className={StyleModule.trash2IconShippingOrderModel} />
-        },
-        {
-            label: "Edit",
-            onClick: handleOnClickActivEditModal,
-            icon: <Edit className={StyleModule.editIconShippingOrderModel} />
-        },
+        }
     ];
 
     // * ******************** Componentes extra para inyectar como props en el GenericTable ******************** 
@@ -392,8 +302,8 @@ const ShippingOrderModel = () => {
                 >
                     <h1 className="nunito-bold">Logistica</h1>
                     <FadeButton
-                        label="Orden de envio"
-                        onClick={toggleActiveAddModal}
+                        label="Orden de envio1"
+                        onClick={toggleisActiveAddModal}
                         icon={<Plus className={StyleModule.plusIconShippingOrderModel} />}
                         typeOrderIcon="first"
                         classNameButton={StyleModule.fadeButtonExtraComponents}
@@ -458,10 +368,9 @@ const ShippingOrderModel = () => {
 
     const {
         shippingOrderDetailById,
-        loadingShippingOrderDetailById,
         refetchShippingOrderDetailById
     } = useShippingOrderDetailById(
-        ShippingOrderRecord?.id || null
+        shippingOrderRecord?.id || null
     );
 
     return (
@@ -469,51 +378,46 @@ const ShippingOrderModel = () => {
             className={StyleModule.containerShippingOrdersModel}
         >
             <GenericTable
-                getRowId={(row) => row.id.toString()}
                 modelName="Ordenes de envio"
+
+                /* distribucion de columnas y rows */
+                getRowId={(row) => row.id.toString()}
                 columns={columnsShippingOrders}
-                data={ShippingOrders}
+                data={shippingOrders}
 
-                rowActions={rowActions}
-                typeRowActions="icon"
-
+                /* funcionalidades habilitadas */
                 enableFilters={true}
                 enableSorting={false}
                 enableViews={false}
                 enablePagination={true}
+                enableRowSelection={false}
+                enableRowEditClick={true}
+                enableRowEditClickHandler={toggleisActiveEditModalSetup}
 
+                /* acciones de la tabla */
+                rowActions={rowActions}
+                typeRowActions="icon"
+                onDeleteSelected={() => console.log("borrado selectivo")}
+
+                /* componentes extra */
                 extraComponents={(table) => ExtraComponents(table)}
 
-                onDeleteSelected={
-                    () => console.log("borrado selectivo")}
-
-                classNameTableContainer={StyleModule.containerTable}
+                /* estilos */
+                classNameGenericTableContainer={StyleModule.containerTable}
             />
-            {isActiveAddModal && <AddModal
-                onClose={setIsActiveAddModal}
-                onCreate={(value) => handleCreate(value)}
-            />}
-            {isActiveDeleteModal && <DeleteModal
-                onClose={toggleActiveDeleteModal}
-                onDelete={handleDelete}
-                title={titleDeleteModal}
-                message={messageDeleteModal}
-            />}
             {
-                isActiveEditModal &&
-                !loadingShippingOrderDetailById &&
-                <EditModal
-                    onClose={setIsActiveEditModal}
-                    onUpdate={handleUpdate}
-                    record={{ ...shippingOrderDetailById }}
-                />
+                isActiveAddModal && (
+                    <ShippingOrderModuleProvider
+                        initialStep={1}
+                        totalSteps={4}
+                    >
+                        <AddWizardShippingOrder
+                            onCreate={handleCreate}
+                            onClose={toggleisActiveAddModal}
+                        />
+                    </ShippingOrderModuleProvider>
+                )
             }
-            {isActiveFeedbackModal && <FeedbackModal
-                onClose={setIsActiveFeedbackModal}
-                title={titleFeedbackModal}
-                message={messageFeedbackModal}
-                icon={iconFeedbackModal}
-            />}
         </div>
     );
 }

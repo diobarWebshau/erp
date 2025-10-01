@@ -1,13 +1,6 @@
-import {
-    createContext
-} from "react";
-import type {
-    InventoriesState,
-    InventoriesAction
-} from "./InventoriesTypes";
-import type {
-    Dispatch
-} from "react";
+import { createContext } from "react";
+import type { InventoriesState, InventoriesAction } from "./InventoriesTypes";
+import type { Dispatch } from "react";
 
 // Contexto para el estado de inventarios
 const InventoriesStateContext =
@@ -19,4 +12,4 @@ const InventoriesDispatchContext =
 export {
     InventoriesStateContext,
     InventoriesDispatchContext
-}
+}   

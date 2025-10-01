@@ -1,28 +1,126 @@
-import collectorUpdateFields
-    from "../../../../scripts/collectorUpdateField.js";
-import {
-    PurchasedOrderModel, ClientModel,
-    ClientAddressesModel,
-    ProductModel,
-    ProductDiscountRangeModel,
-} from "../../../associations.js";
-import { Request, Response, NextFunction }
-    from "express";
+import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
+import { PurchasedOrderModel, ClientModel, ClientAddressesModel, ProductModel, ProductDiscountRangeModel } from "../../../associations.js";
+import { Request, Response, NextFunction } from "express";
 import { Op } from "sequelize";
-import {
-    AppliedProductDiscountClientModel,
-    AppliedProductDiscountRangeModel,
-    ProductDiscountClientModel,
-    PurchaseOrderProductModel
-} from "../associations.js";
+import { AppliedProductDiscountClientModel, AppliedProductDiscountRangeModel, ProductDiscountClientModel, PurchaseOrderProductModel } from "../associations.js";
 import sequelize from "sequelize";
 
 class PurchasedOrderController {
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
+        const { filter } = req.query;
         try {
-            const response = await PurchasedOrderModel.findAll();
+            console.log(filter);
+            console.log(typeof filter);
+
+            const response = await PurchasedOrderModel.findAll(
+                {
+                    ...((filter !== undefined && filter !== "") && {
+                        where: {
+                            [Op.or]: [
+                                { order_code: { [Op.like]: `${filter ?? ''}%` } },
+                                { company_name: { [Op.like]: `${filter ?? ''}%` } },
+                                { email: { [Op.like]: `${filter ?? ''}%` } },
+                                { phone: { [Op.like]: `${filter ?? ''}%` } },
+                            ],
+                        }
+                    }),
+                    attributes: PurchasedOrderModel.getAllFields(),
+                    include: [
+                        {
+                            model: PurchaseOrderProductModel,
+                            as: "purchase_order_products",
+                            attributes: [
+                                ...PurchaseOrderProductModel.getAllFields(),
+                                [
+                                    sequelize.literal("func_get_production_summary_of_pop(`purchase_order_products`.id)"),
+                                    "production_summary"
+                                ],
+                                [
+                                    sequelize.literal("funct_get_stock_available_of_pop_on_location(`purchase_order_products`.id)"),
+                                    "stock_available"
+                                ],
+                                [
+                                    sequelize.literal("func_summary_shipping_on_client_order(`purchase_order_products`.id)"),
+                                    "shipping_summary"
+                                ]
+                            ],
+                            include: [
+                                {
+                                    model: ProductModel,
+                                    as: "product",
+                                    attributes: [
+                                        ...ProductModel.getAllFields(),
+                                        [
+                                            sequelize.literal("funct_get_info_location_stock_product(`purchase_order_products->product`.id)"),
+                                            "summary_location"
+                                        ]
+                                    ],
+                                    include: [
+                                        {
+                                            model: ProductDiscountRangeModel,
+                                            as: "product_discount_ranges",
+                                            attributes:
+                                                ProductDiscountRangeModel.getAllFields()
+                                        }
+                                    ]
+                                },
+                                {
+                                    model: AppliedProductDiscountClientModel,
+                                    as: "applied_product_discount_client",
+                                    attributes:
+                                        AppliedProductDiscountClientModel.getAllFields(),
+                                    include: [
+                                        {
+                                            model: ProductDiscountClientModel,
+                                            as: "product_discount_client",
+                                            attributes:
+                                                ProductDiscountClientModel.getAllFields()
+                                        }
+                                    ]
+                                },
+                                {
+                                    model: AppliedProductDiscountRangeModel,
+                                    as: "applied_product_discount_range",
+                                    attributes:
+                                        AppliedProductDiscountRangeModel.getAllFields(),
+                                    include: [
+                                        {
+                                            model: ProductDiscountRangeModel,
+                                            as: "product_discount_range",
+                                            attributes:
+                                                ProductDiscountRangeModel.getAllFields()
+                                        }
+                                    ]
+                                }
+                            ],
+                        },
+                        {
+                            model: ClientModel,
+                            as: "client",
+                            attributes:
+                                ClientModel.getAllFields(),
+                            include: [{
+                                model: ProductDiscountClientModel,
+                                as: "pruduct_discounts_client",
+                                attributes: ProductDiscountClientModel.getAllFields()
+                            }, {
+                                model: ClientAddressesModel,
+                                as: "addresses",
+                                attributes:
+                                    ClientAddressesModel.getAllFields()
+                            }]
+                        },
+                        {
+                            model: ClientAddressesModel,
+                            as: "client_address",
+                            attributes:
+                                ClientAddressesModel.getAllFields()
+                        }
+                    ]
+                },
+            );
             if (!(response.length > 0)) {
-                res.status(404).json([]);
+                res.status(200).json([]);
                 return;
             }
             const purchasedOrder = response.map(c => c.toJSON());

@@ -12,15 +12,15 @@ import {
     ChevronRight
 } from "lucide-react";
 import Select
-    from "../../gui/select-customized/SelectCustomized";
+    from "../../../select/select-customized/SelectCustomized";
 import {
     useTableDispatch,
     useTableState
-} from "./../../../tableContext/tableHooks"
+} from "./../../tableContext/tableHooks"
 import {
     set_page_index,
     set_page_size
-} from "./../../../tableContext/tableActions"
+} from "./../../tableContext/tableActions"
 
 
 interface IPaginationControlsProps<T> {

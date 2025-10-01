@@ -1,8 +1,6 @@
-import type {
-    IPartialInventoryDetails
-} from "../../../../../interfaces/inventories";
+import type { IPartialInventoryDetails } from "../../../../../interfaces/inventories";
 
-type InventoriesState = {
+interface InventoriesState {
     total_steps: number,
     current_step: number,
     data: IPartialInventoryDetails[],
@@ -21,13 +19,11 @@ const inventoriesActionsTypes = {
 } as const;
 
 type InventoriesActionType =
-    typeof inventoriesActionsTypes[
-    keyof typeof inventoriesActionsTypes
-    ];
+    typeof inventoriesActionsTypes[keyof typeof inventoriesActionsTypes];
 
 type InventoriesAction =
     // Acciones directas al array de inventarios
-    | { type: typeof inventoriesActionsTypes.SET_INVENTORIES, payload: IPartialInventoryDetails[] }
+    { type: typeof inventoriesActionsTypes.SET_INVENTORIES, payload: IPartialInventoryDetails[] }
     | { type: typeof inventoriesActionsTypes.ADD_ITEMS, payload: IPartialInventoryDetails[] }
     | { type: typeof inventoriesActionsTypes.REMOVE_ITEMS, payload: string[] }
 

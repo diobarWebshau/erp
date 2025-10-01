@@ -392,8 +392,6 @@ const ProductionOrderModel = () => {
     }, []);
 
 
-    console.log(productionOrders)
-
     const getColumns = () => {
         return columnsProductionOrders({ onClickContent });
     }
@@ -429,7 +427,7 @@ const ProductionOrderModel = () => {
                     enableOptionsColumn={true}
                     enableRowEditClick={true}
                     enableRowEditClickHandler={toggleActiveEditModal}
-
+                    
                     // acciones de la tabla
                     onDeleteSelected={() => console.log("Delete selected")}
                     typeRowActions="icon"

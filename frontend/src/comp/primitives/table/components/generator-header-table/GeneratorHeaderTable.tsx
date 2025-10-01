@@ -4,42 +4,22 @@ import {
 import {
     type Column,
 } from "@tanstack/react-table"
-import type {
-    Dispatch,
-    MouseEvent,
-    RefObject,
-    SetStateAction
-} from "react";
 import stylesModules
     from "./GeneratorHeaderTable.module.css"
 import renderHeaderRow
     from "./RenderHeaderRow";
 import type {
     ColumnTypeDataFilter,
-    BaseRow
-} from "../../../types";
-import { useTableDispatch, useTableState } from "../../../tableContext/tableHooks";
+} from "../../../../../interfaces/tableTypes";
 
 interface GeneratorHeaderTableProps<T> {
     table: Table<T>;
     enableSorting?: boolean;
     enableFilters?: boolean;
-    isVisibleFilterPopover: string | null;
-    setIsVisibleFilterPopover: Dispatch<
-        SetStateAction<string | null>
-    >,
-    filterTriggerRefs: RefObject<
-        Record<string, HTMLButtonElement | null>
-    >,
-    filterPopoverRef: RefObject<
-        HTMLDivElement | null
-    >,
     handlerOnClickButtonFilter: (
-        e: MouseEvent<HTMLButtonElement>,
         column: Column<T>
     ) => void,
     handlerOnClickButtonAddFilterColumn: (
-        e: MouseEvent<HTMLButtonElement>,
         column: Column<T>,
         value: ColumnTypeDataFilter
     ) => void,
@@ -51,10 +31,6 @@ const GeneratorHeaderTable = <T,>({
     table,
     enableSorting = false,
     enableFilters = false,
-    isVisibleFilterPopover,
-    setIsVisibleFilterPopover,
-    filterTriggerRefs,
-    filterPopoverRef,
     handlerOnClickButtonFilter,
     handlerOnClickButtonAddFilterColumn,
     typeRowActions,
@@ -70,10 +46,6 @@ const GeneratorHeaderTable = <T,>({
                     table,
                     enableSorting,
                     enableFilters,
-                    isVisibleFilterPopover,
-                    setIsVisibleFilterPopover,
-                    filterTriggerRefs,
-                    filterPopoverRef,
                     handlerOnClickButtonFilter,
                     handlerOnClickButtonAddFilterColumn,
                     typeRowActions,

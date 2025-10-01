@@ -14,10 +14,16 @@ const API_URL =
     "http://localhost:3003/production/purchased-orders";
 
 const fetchPurchasedOrdersFromDB = async (
-    dispatch: AppDispatchRedux
+    dispatch: AppDispatchRedux,
+    like?: string | undefined
 ): Promise<IPurchasedOrder[]> => {
     try {
-        const response = await fetch(API_URL, {
+
+        const params = new URLSearchParams();
+
+        if (like) params.set("filter", like);
+
+        const response = await fetch(`${API_URL}?${params.toString()}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });
@@ -208,7 +214,7 @@ const createBatchPurchasedOrderInDB = async (
 };
 
 const updatePurchasedOrderInDB = async (
-    id: number,
+    id: number | undefined,
     data: IPartialPurchasedOrder,
     dispatch: AppDispatchRedux
 ): Promise<any> => {
@@ -247,7 +253,7 @@ const updatePurchasedOrderInDB = async (
 };
 
 const deletePurchasedOrderInDB = async (
-    id: number,
+    id: number | undefined,
     dispatch: AppDispatchRedux
 ): Promise<any> => {
     try {

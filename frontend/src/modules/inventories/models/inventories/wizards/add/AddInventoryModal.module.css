@@ -1,7 +1,9 @@
 .containerAddInventoryModal {
+    /* dimensiones */
     width: 100%;
     height: 100%;
     
+    /* distribucion grid */
     display: grid;
     grid-template: 
      "header" auto
@@ -10,10 +12,12 @@
 }
 
 .headerSection {
+    /* distribucion grid respecto al padre */
     grid-area: header;
 }
 
 .mainContent {
+    /* distribucion grid respecto al padre */
     grid-area: main;
 }
 
@@ -21,6 +25,7 @@
 /* *************** Header *************** */
 
 .headerSection {
+    /* distribucion flex */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -28,6 +33,7 @@
 }
 
 .headerSection > h1 {
+    /* estilos */
     font-size: 36px;
     color: var(--color-theme-primary);
     

@@ -1,10 +1,10 @@
 import InputText from "../base/inputText"
 import type { JSX} from "react";
-import { cloneElement } from "react";
 import StyleModule from "./InputTextCustom.module.css";
+import withClassName from "../../../../../utils/withClassName";
 
 interface InputTextProps {
-    value: string;
+    value: string | undefined;
     onChange: (value: string) => void;
     onClick?: () => void;
     id?: string;
@@ -35,11 +35,7 @@ const InputTextCustom = ({
 }: InputTextProps) => {
 
     // Clonamos el icono y le agregamos la clase deseada
-    const iconWithClass = icon && cloneElement(icon, {
-        className: [
-            StyleModule.iconButton, icon?.props.className
-        ].filter(Boolean).join(" ")
-    });
+    const iconWithClass = icon && withClassName(icon, StyleModule.iconButton)
 
     return (
         <InputText

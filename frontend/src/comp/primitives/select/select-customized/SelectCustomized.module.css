@@ -1,0 +1,76 @@
+.selectWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    position: relative;
+}
+
+.selectWrapper select {
+    height: 100%;
+    padding: 8px 32px 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    /* solo un border-radius para evitar redundancia */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    background-color: #F3F4FA;
+}
+
+.containerIcon {
+    position: absolute;
+    height: 100%;
+    right: 0;
+    border: none;
+    /* background-color: transparent; */
+    pointer-events: none;
+    /* <- Esto permite "pasar clics" al de abajo */
+    cursor: pointer;
+    z-index: 1;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.selectWrapper select:focus {
+    outline: none;
+    /* box-shadow: 0 0 0 2px #423DD9; */
+    /* para un foco visible sin romper el layout */
+}
+
+.icon {
+    /* un poco de espacio desde el borde derecho */
+    /* top: 50%; */
+    padding: 0.2rem;
+    background-color: #ffffff;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    height: 100%;
+    /* evita que sea 100% para que no tape el select */
+    width: 24px;
+    /* tamaño fijo para icono */
+    /* transform: translateY(-50%); */
+    color: #423DD9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achicanada {
+    position: absolute;
+    left: 38px;
+    height: 100%;
+    width: 10px;
+    pointer-events: none;
+
+    border: none;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+
+    background-color: #F3F4FA;
+    z-index: 1;
+}

@@ -2,7 +2,7 @@ import type { ChangeEvent, JSX} from "react";
 import StyleModule from "./InputText.module.css";
 
 interface InputTextProps {
-    value: string;
+    value: string | undefined;
     onChange: (value: string) => void;
     onClick?: () => void;
     id?: string;

@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import type { RefObject } from "react";
-import ReactDOM from "react-dom";
-import { MoreVertical, ChevronDown, ChevronUp, XCircle, Search, ChevronLeft, Plus, } from "lucide-react";
+import { MoreVertical, ChevronDown, ChevronUp, XCircle, ChevronLeft, Plus, } from "lucide-react";
 import type { Column, ColumnSort, Header, Table } from "@tanstack/react-table";
 import stylesModules from "./HeaderPopoverOptions.module.css";
 import type { DateRange } from "react-day-picker";
@@ -20,6 +19,7 @@ import TransparentButtonCustom from "../../../button/custom-button/transparent/T
 import type { Option } from "../../../radio-button/custon-radio-button/ToggleRadioButtonGroup";
 import StandardDayPickedMantineCustomTable from "../../../../external/mantine/date/standar/custom/table/StandardDayPickedMantineCustomTable";
 import RangeSlicerMantineTable from "../../../../external/mantine/slicer/range/table/custom/RangeSlicerMantineTable";
+import PopoverFloating from "../../../../external/floating/pop-over/PopoverFloating";
 
 const options: [Option, Option] = [
     { label: "Orden ascendente", icon: <ChevronUp /> },
@@ -240,7 +240,7 @@ function HeaderPopoverOptions<T>({
         return desc ? optionLabel === options[1].label : optionLabel === options[0].label;
     };
 
-    const popoverContent = (
+    const FilterPopover = memo(()=>(
         <div
             ref={setFloating}
             className={stylesModules.popoverOptions}
@@ -266,17 +266,6 @@ function HeaderPopoverOptions<T>({
                             isOptionSelectedFunction={isOptionSelectedFunction}
                             typeOrderIcon="first"
                         />
-                        {/* <RadioButtonsWithIcons
-                            options={[
-                                { label: "Ascending Order", icon: <ChevronUp /> },
-                                { label: "Descending Order", icon: <ChevronDown /> },
-                            ]}
-                            typeOrderIcon="first"
-                            classNameContainer={stylesModules.groupButtons}
-                            classNameButton={stylesModules.labelButton}
-                            classNameSelected={stylesModules.selected}
-                            column={column}
-                        /> */}
                     </section>
 
                     <div className={stylesModules.separator}></div>
@@ -291,39 +280,10 @@ function HeaderPopoverOptions<T>({
                                     .filter((v, i, arr) => arr.indexOf(v) === i)}
                                 value={inputValueLocal}
                                 onChange={onChangeInput}
-                                classNameContainer={stylesModules.ListCheckboxContainer}
-                                classNameGroupOptions={stylesModules.ListCheckboxGroupOptions}
-                                classNameOption={stylesModules.ListCheckboxOption}
-                                classNameSelectedOption={stylesModules.ListCheckboxOptionSelected}
-                                classNameInputOption={stylesModules.ListCheckboxInputOption}
-                                classNameContainerSearch={stylesModules.ListCheckboxContainerSearch}
-                                classNameInputSearch={stylesModules.ListCheckboxInputSearch}
-                                classNameButtonSearch={stylesModules.ListCheckboxButtonSearch}
                             />
                         )}
 
                         {meta?.type === "number" && (
-                            // <NumberSlicerReactRange
-                            //     min={0}
-                            //     max={Math.max(
-                            //         ...table
-                            //             .getPreFilteredRowModel()
-                            //             .rows.map((row) => Number(row.getValue(columnId)))
-                            //             .filter((n) => !isNaN(n))
-                            //     )}
-                            //     step={1}
-                            //     initialValue={inputValueLocal as ObjectNumericFilter}
-                            //     setInitialValue={setInputValueLocal}
-                            //     label="Value range"
-                            //     width={"100%"}
-                            //     className={stylesModules.numberSlicer}
-                            //     classNameFontContainer={"nunito-semibold"}
-                            //     classNameSubTitleMinMax={"nunito-bold"}
-                            //     classNameTrack={stylesModules.track}
-                            //     afterRangeColor="#DEDDF8"
-                            //     rangeColor="#423DD9"
-                            //     beforeRangeColor="#DEDDF8"
-                            // />
                             <RangeSlicerMantineTable
                                 max={1000}
                                 min={100}
@@ -333,28 +293,14 @@ function HeaderPopoverOptions<T>({
                         )}
 
                         {meta?.type === "date" && (
-                            
-                            // <DateDayPicker
-                            //     initialRange={inputValueLocal as ObjectDateFilter}
-                            //     setInitialValue={setInputValueLocal}
-                            //     type={meta.mode ?? "single"}
-                            //     onChange={handleRangeChange}
-                            //     numberOfMonths={1}
-                            //     className={stylesModules.smallCalendar}
-                            // />
                             <StandardDayPickedMantineCustomTable
                                 value={inputValueLocal as ObjectDateFilter}
                                 onChange={setInputValueLocal}
+                                className={stylesModules.smallCalendar}
                             />
                         )}
 
                         {meta?.type === "boolean" && (
-                            // <BooleanInput
-                            //     value={inputValueLocal as BooleanFilter}
-                            //     options={meta.booleanLabels ?? ["false", "true"]}
-                            //     onChange={onChangeInput}
-                            //     label={columnId}
-                            // />
                             <CheckBoxListAutoSize
                                 options={meta.booleanLabels ?? ["true", "false"]}
                                 value={inputValueLocal as string[]}
@@ -363,12 +309,6 @@ function HeaderPopoverOptions<T>({
                         )}
 
                         {meta?.type === "enum" && (
-                            // <EnumSelectInput
-                            //     options={meta.options ?? []}
-                            //     value={inputValueLocal as string}
-                            //     onChange={onChangeInput}
-                            //     label={columnId}
-                            // />
                             <CheckBoxListAutoSize
                                 options={meta.options ?? []}
                                 value={inputValueLocal as string[]}
@@ -397,36 +337,28 @@ function HeaderPopoverOptions<T>({
                             label="Reiniciar cambios"
                             icon={<ChevronLeft />}
                         />
-                        {/* <FadeButton
-                            onClick={handleResetChanges}
-                            label="Reiniciar cambios"
-                            typeOrderIcon="first"
-                            classNameButton={stylesModules.resetButton}
-                            classNameSpan={stylesModules.resetSpan}
-                            classNameLabel={stylesModules.resetLabel}
-                            icon={< className={stylesModules.IconActionSection} />}
-                        /> */}
                     </div>
                 </>
             )}
         </div>
-    );
+    ));
 
     return (
-        <div className={stylesModules.container}>
-            <button
-                className={stylesModules.optionIconButton}
-                disabled={!isFilterable}
-                ref={setReference}
-                onClick={() => onClickFilter(column)}
-                aria-label={`Toggle filter options for column ${columnId}`}
-                type="button"
-            >
-                <MoreVertical className={stylesModules.optionIcon} />
-            </button>
-
-            {open && portalRoot.current && ReactDOM.createPortal(popoverContent, portalRoot.current)}
-        </div>
+        <PopoverFloating
+            childrenFloating={
+                <FilterPopover />
+            }
+            childrenTrigger={
+                <button
+                    className={stylesModules.optionIconButton}
+                    disabled={!isFilterable}
+                    onClick={() => onClickFilter(column)}
+                    type="button"
+                >
+                    <MoreVertical className={stylesModules.optionIcon} />
+                </button>
+            }
+        />
     );
 }
 

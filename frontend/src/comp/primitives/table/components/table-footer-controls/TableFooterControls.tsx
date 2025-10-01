@@ -6,11 +6,11 @@ import PaginationControls
 import StyleModule
     from "./TableFooterControls.module.css";
 import FadeButton
-    from "../../gui/button/fade-button/FadeButton";
+    from "../../../button/fade-button/FadeButton";
 import {
     useTableDispatch,
     useTableState
-} from "../../../tableContext/tableHooks";
+} from "../../tableContext/tableHooks";
 
 interface TableFooterControlsProps<T> {
     deleteRowsSelected: () => void;

@@ -61,8 +61,6 @@ const usePurchasedOrderById = (id: number | undefined | null) => {
     };
 
     useEffect(() => {
-        console.log("id");
-        console.log(id);
         fetchPurchasedOrderByIdFunction();
     }, [id]);
 

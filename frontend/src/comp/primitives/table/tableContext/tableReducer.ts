@@ -1,27 +1,13 @@
-import type {
-    Draft
-} from "immer";
-import {
-    produce
-} from "immer";
-import type {
-    TableAction,
-    TableState,
-} from "./tableTypes";
-import {
-    TableActionTypes
-} from "./tableTypes";
-import type {
-    ColumnFiltersState,
-    PaginationState,
-    RowSelectionState,
-    SortingState,
-    VisibilityState
-} from "@tanstack/react-table";
+import type { ColumnFiltersState, PaginationState, RowSelectionState, SortingState, VisibilityState } from "@tanstack/react-table";
+import type { Draft } from "immer";
+import { produce } from "immer";
+import type { TableAction, TableState } from "./tableTypes";
+import { TableActionTypes } from "./tableTypes";
 
 /******************
 *  Initial State  *
 ******************/
+// *  ******  ******
 
 const initialState: TableState = {
     rowSelectionState: {},
@@ -34,38 +20,63 @@ const initialState: TableState = {
     columnVisibilityState: {}
 };
 
-/*************
-*  Slicers   *
-*************/
+// *  ****** REDUCERS ******
 
 const rowSelectionReducer = (
-    draft: Draft<TableState['rowSelectionState']>,
+    draft: Draft<RowSelectionState>,
     action: TableAction
 ): RowSelectionState | void => {
     switch (action.type) {
-        case TableActionTypes.SET_ROW_SELECTION:
-            return action.payload;
-        case TableActionTypes.ADD_ROW_SELECTION:
-            draft[action.payload.id.toString()] = action.payload.value;
-            break;
-        case TableActionTypes.REMOVE_ROW_SELECTION:
-            delete draft[action.payload.id.toString()];
-            break;
-        case TableActionTypes.CLEAR_ROW_SELECTION: {
-            const keys = Object.keys(draft);
-            for (const key of keys) {
-                delete draft[key];
-            }
+        case TableActionTypes.SET_ROW_SELECTION: {
+            draft = action.payload;
             break;
         }
+
+        case TableActionTypes.ADD_ROW_SELECTION: {
+            let changed = false;
+            for (const id of action.payload) {
+                const key = id.toString();
+                if (!draft[key]) {
+                    draft[key] = true;
+                    changed = true;
+                }
+            }
+            // si no cambió nada, no hacemos nada (Immer devolverá misma ref)
+            return;
+        }
+
+        case TableActionTypes.REMOVE_ROW_SELECTION: {
+            let changed = false;
+            for (const id of action.payload) {
+                const key = id.toString();
+                if (draft[key]) {
+                    delete draft[key];
+                    changed = true;
+                }
+            }
+            return;
+        }
+
+        case TableActionTypes.CLEAR_ROW_SELECTION: {
+            // Más barato: si ya está vacío, no toques nada.
+            if (Object.keys(draft).length === 0) return;
+
+            // Opción A (rápida): reemplazo inmutable
+            return {};
+
+            // Opción B (mutable): limpiar claves (peor que A)
+            // for (const key of Object.keys(draft)) delete draft[key];
+            // return;
+        }
+
         default:
-            break;
+            return;
     }
-}
+};
 
 
 const paginationReducer = (
-    draft: Draft<TableState['paginationState']>,
+    draft: Draft<PaginationState>,
     action: TableAction
 ): PaginationState | void => {
     switch (action.type) {
@@ -89,7 +100,7 @@ const paginationReducer = (
 
 
 const sortingReducer = (
-    draft: Draft<TableState['sortingState']>,
+    draft: Draft<SortingState>,
     action: TableAction
 ): SortingState | void => {
     switch (action.type) {
@@ -128,7 +139,7 @@ const sortingReducer = (
 }
 
 const columnFiltersReducer = (
-    draft: Draft<TableState['columnFiltersState']>,
+    draft: Draft<ColumnFiltersState>,
     action: TableAction
 ): ColumnFiltersState | void => {
     switch (action.type) {
@@ -170,7 +181,7 @@ const columnFiltersReducer = (
 
 
 const columnVisibilityReducer = (
-    draft: Draft<TableState['columnVisibilityState']>,
+    draft: Draft<VisibilityState>,
     action: TableAction
 ): VisibilityState | void => {
     switch (action.type) {
@@ -221,7 +232,6 @@ const TableReducer = produce((
         draft.columnFiltersState = columnFiltersState;
     if (columnVisibilityState !== undefined)
         draft.columnVisibilityState = columnVisibilityState;
-
 
     switch (action.type) {
         case TableActionTypes.SET_PARTIAL_TABLE_STATE: {

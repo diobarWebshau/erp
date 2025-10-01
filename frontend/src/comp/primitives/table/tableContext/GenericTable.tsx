@@ -26,7 +26,7 @@ type GenericTableProps<T> = {
     enableRowSelection?: boolean;
     enableOptionsColumn?: boolean;
     noResultsMessage?: string;
-    extraComponents?: (table: Table<T>) => React.ReactNode;
+    extraComponents?: (table?: Table<T>) => React.ReactNode;
     footerComponents?: (table: Table<T>) => React.ReactNode;
     classNameGenericTableContainer?: string;
     classNameTableContainer?: string;
@@ -51,12 +51,12 @@ const GenericTable = <T,>({
     rowActions,
     extraButtons,
     typeRowActions = "ellipsis",
-    enableFilters = true,
-    enableSorting = true,
-    enableViews = true,
-    enablePagination = true,
-    enableRowSelection = true,
-    enableOptionsColumn = true,
+    enableFilters = false,
+    enableSorting = false,
+    enableViews = false,
+    enablePagination = false,
+    enableRowSelection = false,
+    enableOptionsColumn = false,
     noResultsMessage = "No results.",
     classNameGenericTableContainer,
     classNameTableContainer,
