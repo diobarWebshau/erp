@@ -24,12 +24,12 @@ const set_row_selection = (payload: RowSelectionState): TableAction => ({
     payload
 });
 
-const add_row_selection = (payload: RowSelectionState): TableAction => ({
+const add_row_selection = (payload: string[]): TableAction => ({
     type: TableActionTypes.ADD_ROW_SELECTION,
     payload
 });
 
-const remove_row_selection = (payload: RowSelectionState): TableAction => ({
+const remove_row_selection = (payload: string[]): TableAction => ({
     type: TableActionTypes.REMOVE_ROW_SELECTION,
     payload
 });

@@ -8,6 +8,7 @@ interface IMainActionButtonCustomProps {
     icon: JSX.Element;
     classNameButton?: string;
     disabled?: boolean;
+    classNameSpan?: string;
 }
 
 const MainActionButtonCustom = ({
@@ -15,7 +16,8 @@ const MainActionButtonCustom = ({
     label,
     icon,
     classNameButton,
-    disabled
+    disabled,
+    classNameSpan
 }: IMainActionButtonCustomProps) => {
     
     // Clonamos el icono y le agregamos la clase deseada
@@ -30,8 +32,8 @@ const MainActionButtonCustom = ({
             type="button"
             typeOrderIcon="first"
             classNameButton={`${classNameButton} ${StyleModule.mainActionButtonCustom}`}
-            classNameLabel={StyleModule.mainActionButtonCustomLabel}
-            classNameSpan={StyleModule.mainActionButtonCustomSpan}
+            classNameLabel={`nunito-medium ${StyleModule.mainActionButtonCustomLabel}`}
+            classNameSpan={`${classNameSpan} ${StyleModule.mainActionButtonCustomSpan}`}
             {...icon && {icon: iconWithClass}}
             disabled={disabled}
         />

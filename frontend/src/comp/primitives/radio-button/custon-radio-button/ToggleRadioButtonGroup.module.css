@@ -12,7 +12,7 @@
 .button {
     flex-grow: 1;
     flex-shrink: 1;
-    flex-basis: 0;
+    flex-basis: 1;
 
     /* distribucion flex */
     display: flex;
@@ -35,6 +35,7 @@
 }
 
 .label {
+    /* estilos */
     font-size: 14px;
 }
 
@@ -59,8 +60,10 @@
 }
 
 .icon{
+    /* dimensiones */
     width: 15px;
     height: 15px;
+    /* estilos */
     color: var(--color-theme-primary)
 }
 

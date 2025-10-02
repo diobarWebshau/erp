@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DatePicker } from "@mantine/dates";
 import styles from "./StandardDayPickedMantineCustomTable.module.css";
 import dayjs from "dayjs";
+import "dayjs/locale/es";
 import { memo, useEffect, useState } from "react";
 import type { ObjectDateFilter } from "../../../../../../../interfaces/tableTypes";
 

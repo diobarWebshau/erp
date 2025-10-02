@@ -13,6 +13,7 @@ import {
   useInteractions,      // Hook: combina varios comportamientos de interacción (click, dismiss, role, etc.).
   FloatingPortal,       // Componente: renderiza el floating en un portal (fuera del DOM normal).
   FloatingFocusManager, // Componente: gestiona el foco al abrir (muy útil en menús y selects).
+  autoPlacement // 
 } from "@floating-ui/react";
 
 
@@ -24,7 +25,7 @@ type Placement =
 
 interface PopoverFloatingProps {
   childrenTrigger: ReactNode;
-  childrenFloating: ReactNode;
+  childrenFloating: ReactNode | ((args: { onClose: () => void }) => ReactNode);
   placement?: Placement;
   matchWidth?: boolean; // 👈 nueva bandera
   classNameContainerPopover?: string;
@@ -39,11 +40,16 @@ const PopoverFloating = ({
 
   const [isOpenFloating, setIsOpenFloating] = useState(false);
 
+  const toggleIsOpenFloating = () => {
+    console.log("Ejecucion del cierre");
+    setIsOpenFloating(!isOpenFloating);
+  };
+
   // * Configuración de Floating UI
   const { refs, floatingStyles, context } = useFloating({
     // ? Estado controlado: el floating se abre/cierra según isOpen
     open: isOpenFloating,                       // Booleano: si está abierto o cerrado
-    onOpenChange: setIsOpenFloating,            // Función que actualiza ese estado
+    onOpenChange: toggleIsOpenFloating,            // Función que actualiza ese estado
 
     // ? Posición preferida del floating
     placement: placement,          // Abajo y alineado al inicio (izquierda)
@@ -143,7 +149,11 @@ const PopoverFloating = ({
                 }}
                 className={StyleModule.popoverFloatingFloating}
               >
-                {childrenFloating}
+                {
+                  typeof childrenFloating === "function"
+                    ? childrenFloating({ onClose: toggleIsOpenFloating })
+                    : childrenFloating
+                }
               </div>
             </FloatingFocusManager>
           </FloatingPortal>

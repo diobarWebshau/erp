@@ -7,12 +7,16 @@ interface ITransparentButtonCustomProps {
     onClick: () => void;
     label: string;
     icon: JSX.Element;
+    classNameButton?: string;
+    classNameSpan?: string;
 }
 
 const TransparentButtonCustom = ({
     onClick,
     label,
-    icon
+    icon,
+    classNameButton,
+    classNameSpan
 }: ITransparentButtonCustomProps) => {
 
     // Clonamos el icono y le agregamos la clase deseada
@@ -26,9 +30,9 @@ const TransparentButtonCustom = ({
             onClick={onClick}
             type="button"
             typeOrderIcon="first"
-            classNameButton={StyleModule.transparentButtonCustom}
-            classNameLabel={StyleModule.transparentButtonCustomLabel}
-            classNameSpan={StyleModule.transparentButtonCustomSpan}
+            classNameButton={`${classNameButton} ${StyleModule.transparentButtonCustom}`}
+            classNameLabel={`nunito-medium ${StyleModule.transparentButtonCustomLabel}`}
+            classNameSpan={`${classNameSpan} ${StyleModule.transparentButtonCustomSpan}`}
             {...(icon && { icon: iconWithClass })}
             
         />

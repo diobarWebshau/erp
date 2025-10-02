@@ -25,6 +25,7 @@
 }
 
 .tertiaryActionButtonCustomLabel {
+    font-size: 14px;
     color: var(--color-theme-primary-light);
 }
 

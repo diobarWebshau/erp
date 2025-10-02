@@ -1,22 +1,24 @@
 import { DatePicker } from "@mantine/dates";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { memo, useEffect, useState } from "react";
-import styles from "./RangeDayPickerMantine.module.css";
+import styles from "./RangeDayPickerMantineCustomTable.module.css";
 import dayjs from "dayjs";
 import type { ObjectDateFilter } from "../../../../../../../interfaces/tableTypes";
 
 interface RangeDayPickerMantineProps {
     value: ObjectDateFilter;
     onChange: (value: ObjectDateFilter) => void;
+    className?: string;
 }
 
 const RangeDayPickerMantine = memo(({
     value,
-    onChange
+    onChange,
+    className
 }: RangeDayPickerMantineProps) => {
 
 
-    const [range, setRange] = useState<[Date | null, Date | null]>(value.from && value.to ? [value.from, value.to] : [null, null]);
+    const [range, setRange] = useState<[Date | null, Date | null]>(value?.from && value?.to ? [value.from, value.to] : [null, null]);
 
     const handleDateChangeRange = (date: [string | null, string | null] | null) => {
         if (!date) return;
@@ -43,6 +45,7 @@ const RangeDayPickerMantine = memo(({
     };
 
     useEffect(() => {
+        if (!value) return;
         const { from, to } = value;
         const parsedDate = [from, to].filter((d) => d !== undefined);
         setRange([parsedDate[0], parsedDate[1]]);
@@ -59,7 +62,7 @@ const RangeDayPickerMantine = memo(({
             withCellSpacing={true}
             classNames={{
                 // ROOT 
-                levelsGroup: styles.levelsGroup, // Contenedor principal de los niveles 
+                levelsGroup: `${styles.levelsGroup} ${className}`, // Contenedor principal de los niveles 
                 // ENCAEZADO
                 calendarHeader: styles.calendarHeader, // Contenedor del encabezado
                 calendarHeaderLevel: `nunito-bold ${styles.calendarHeaderLevel}`, // Label donde se muestra el mes y año
@@ -67,11 +70,11 @@ const RangeDayPickerMantine = memo(({
                 // calendarHeaderControlIcon: styles.calendarHeaderControlIcon // Iconos de los controles por defecto
                 datePickerRoot: styles.datePickerRoot,
                 // TABLE -->  CONTENIDO DEL MES
-                monthThead: styles.monthThead,
+                monthThead: `nunito-regular ${styles.monthThead}`,
                 monthTbody: styles.monthTbody,
                 weekdaysRow: styles.weekdaysRow,
                 weekNumber: styles.weekNumber,
-                weekday: styles.weekday,
+                weekday: `nunito-regular ${styles.weekday}`,
                 monthCell: styles.monthCell,
                 day: `nunito-regular ${styles.day}`,
 

@@ -11,24 +11,22 @@ const inventoriesReducer = produce((
 
         // ? Acciones directas al objeto de shipping order
         case shippingOrderActionsTypes.SET_SHIPPING_ORDER:
-            draft.data = action.payload;
-            break;
+            return action.payload;
         case shippingOrderActionsTypes.UPDATE_SHIPPING_ORDER:
             Object.assign(draft.data, action.payload);
             break;
-
         // ? Acciones directas al array de shipping order purchased order products
         case shippingOrderActionsTypes.ADD_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS:
             for (const item of action.payload) {
                 const isDuplicate = draft.data?.shipping_order_purchase_order_product?.some(
                     it => it.purchase_order_product_id === item.purchase_order_product_id
                 );
-                if (isDuplicate) continue;
+                if (isDuplicate) return;
                 draft.data.shipping_order_purchase_order_product?.push(item);
             }
             break;
         case shippingOrderActionsTypes.REMOVE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS: {
-            if (!draft.data?.shipping_order_purchase_order_product) break;
+            if (!draft.data?.shipping_order_purchase_order_product) return;
             const idsToRemove = new Set(action.payload); // Convertir payload a Set para mejor rendimiento y no se repitan los ids
             draft.data.shipping_order_purchase_order_product =
                 draft.data.shipping_order_purchase_order_product.filter(it => {

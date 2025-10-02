@@ -25,6 +25,7 @@
 }
 
 .mainActionButtonCustomLabel {
+    font-size: 14px;
     color: var(--color-theme-font-white);
 }
 

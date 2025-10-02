@@ -79,6 +79,7 @@ const CheckBoxWithSearch = ({
                             htmlFor={option}
                             key={option}
                             className={
+                                `nunito-semibold ` +
                                 `${styles.option} ${classNameOption} ` +
                                 `${isSelected ? styles.selected : ""} ` +
                                 `${isSelected ? classNameSelectedOption : ""}`

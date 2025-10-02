@@ -249,7 +249,6 @@ const PurchasedOrderModel = () => {
         }
     }
 
-
     // * ******************** Funciones para control de modales ******************** 
 
     const toggleActiveAddModal = () => {
@@ -281,7 +280,6 @@ const PurchasedOrderModel = () => {
         setIsActiveDeleteModal(false);
     }
 
-
     // * ******************** Funciones para control de acciones de la tabla ******************** 
 
     const rowActions: RowAction<IPurchasedOrder>[] = [
@@ -291,7 +289,6 @@ const PurchasedOrderModel = () => {
             icon: <Trash2 className={StyleModule.trash2IconShippingOrderModel} />
         }
     ];
-
 
     // * ******************** Componentes extra para inyectar como props en el GenericTable ******************** 
 
@@ -361,9 +358,7 @@ const PurchasedOrderModel = () => {
         );
     }
 
-
     /* ******************** Efectos ******************** */
-
 
     useEffect(() => {
         fetchs();

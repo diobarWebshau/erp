@@ -17,7 +17,7 @@ const CriticalActionButton = ({ onClick, label, icon, classNameButton }: ICritic
             type="button"
             typeOrderIcon="first"
             classNameButton={`${StyleModule.criticalActionButton} ${classNameButton}`}
-            classNameLabel={StyleModule.criticalActionButtonLabel}
+            classNameLabel={`nunito-medium ${StyleModule.criticalActionButtonLabel}`}
             classNameSpan={StyleModule.criticalActionButtonSpan}
             icon={icon ?? <CircleX className={StyleModule.criticalActionButtonIcon} />}
         />

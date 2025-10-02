@@ -91,6 +91,8 @@
     background: var(--color-theme-primary) !important;
     box-shadow: 0 0 0 2px var(--color-theme-primary) !important;
     color: var(--color-theme-font-white) !important;
+    font-size: 14px !important;
+
 }
 
 
@@ -99,7 +101,7 @@
 
 /* Días normales (mes actual) */
 .day {
-    font-weight: 500;
+    font-size: 14px !important;
 }
 
 /* Días fuera del mes actual */

@@ -1,17 +1,12 @@
-import type {
-    ColumnDef,
-    Row,
-    Table,
-} from "@tanstack/react-table";
-import type {
-    RowAction,
-    TopButtonAction,
-} from "../types";
-import ProviderTableContext
-    from "./ProviderTableContext";
+import type { ColumnDef, Table } from "@tanstack/react-table";
+import type { RowAction, TopButtonAction } from "../types";
+import ProviderTableContext from "./ProviderTableContext";
 import TableBase from "./TableBase";
+import type { TableState, TableStatePartial } from "./tableTypes";
+import { DEFAULT_TABLE_STATE } from "./tableTypes";
+import { useMemo } from "react";
 
-type GenericTableProps<T> = {
+interface GenericTableProps<T> {
     modelName: string;
     columns: ColumnDef<T>[];
     data: T[];
@@ -41,6 +36,7 @@ type GenericTableProps<T> = {
     enableRowEditClickHandler?: (record: T) => void;
     expandedComponent?: React.ReactNode;
     isExpanded?: boolean;
+    initialState?: TableStatePartial;
 };
 
 const GenericTable = <T,>({
@@ -73,11 +69,22 @@ const GenericTable = <T,>({
     enableRowEditClickHandler,
     expandedComponent,
     isExpanded,
+    initialState,
 }: GenericTableProps<T>) => {
-    // Aquí va tu lógica y contexto
+
+    /*
+        Calculamos el estado final unicamente si, se establece initialState
+        Evita recrear objeto en cada render si initialState no cambia
+    */
+    const finalState = useMemo<TableState>(() => ({
+        ...DEFAULT_TABLE_STATE,
+        ...(initialState || {}),
+    }), [initialState]);
 
     return (
-        <ProviderTableContext>
+        <ProviderTableContext
+            initialState={finalState}
+        >
             <TableBase
                 modelName={modelName}
                 columns={columns}
@@ -109,8 +116,54 @@ const GenericTable = <T,>({
                 expandedComponent={expandedComponent}
                 isExpanded={isExpanded}
             />
-        </ProviderTableContext>
+        </ProviderTableContext >
     );
 }
 
 export default GenericTable;
+
+
+// ! ¿Como manejar el initialState en el padre ?
+
+/* 
+    --- ¿Solo quieres inicializar una vez?
+        
+        Pasamos initialState como objeto memorizado (useMemo en el padre). No se volverá a resetear. 
+        
+        @Ejemplo: 
+            const initialState = useMemo(() => ({ ...  }), []);
+            <GenericTable initialState={initialState} />
+
+
+    --- ¿Quieres poder “resetear” la tabla desde el padre?
+
+        Haz que initialState sea estado (o uses una versión).
+
+
+        @ Como estado:
+            const [initialState, setInitialState] = useState<TableState>(...estadoBase);
+            const reset = () => setInitialState(...estadoBase);
+            <GenericTable initialState={initialState} />
+
+        @ Con versión (más ligero si el objeto es grande):
+            const [version, setVersion] = useState(0);
+            const initialState = useMemo(() => ({ ...estadoBase }), [version]);
+            const reset = () => setVersion(v => v + 1);
+            <GenericTable initialState={initialState} />
+
+    ¿Por qué funciona?
+        Tu Provider solo re-aplica el estado cuando cambia la referencia de initialState después del montaje. Por eso:
+
+        Si no quieres resets → mantén la misma referencia (memo vacío).
+
+        Si quieres resets → cambia la referencia (con estado o versión).
+
+    Reglas rápidas:
+
+        No pases {} inline en cada render.
+
+        Si no necesitas overrides, puedes omitir la prop initialState.
+
+        Para resets controlados, usa estado o versión en el padre.
+
+*/

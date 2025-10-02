@@ -9,7 +9,7 @@
     /* dimension */
     width: 100%;
     height: 100%;
-
+    
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -19,6 +19,7 @@
 
 .transparentButtonCustomLabel {
     color: var(--color-theme-primary-light);
+    font-size: 14px;
 }
 
 .transparentButtonCustomIcon {
