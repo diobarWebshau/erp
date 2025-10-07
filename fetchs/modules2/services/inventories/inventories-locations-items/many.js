@@ -94,7 +94,6 @@ const sendInventoryLocationItem = async (data) => {
                 console.log(responseData);
             } else {
                 const text = await response.text();
-                console.warn(text);
             }
         } else {
             if (contentType && contentType.includes('application/json')) {
@@ -106,6 +105,7 @@ const sendInventoryLocationItem = async (data) => {
             }
         }
     } catch (error) {
+
         console.error('Error al registrar el elemento de ubicación de inventario:', error.message);
     }
 };

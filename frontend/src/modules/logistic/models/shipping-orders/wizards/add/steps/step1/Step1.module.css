@@ -17,12 +17,21 @@
 
 /* ******** HEADER ******** */
 
-.title {
+.headerSection {
     /* distribucion grid respecto al padre*/
     grid-area: header;
+
+    /* distibucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+
     /* estilos */
     font-size: 24px;
     color: var(--color-theme-primary);
+
 }
 
 
@@ -59,7 +68,7 @@
 /* ? ******** INPUT ******** */
 
 .inputTextCustomContainer{
-    width: 100%;
+    flex: 1;
 }
 
 /* ? ************ TAG ************ */
@@ -70,12 +79,6 @@
     color: var(--color-warning);
     border: 1px solid var(--color-warning);
 }
-
-/* .shipping {
-    background-color: var(--color-partial-liht);
-    color: var(--color-partial);
-    border: 1px solid var(--color-partial);
-} */
 
 .delivered {
     background-color: var(--color-alert-light);

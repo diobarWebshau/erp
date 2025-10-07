@@ -15,42 +15,50 @@ const API_URL =
 
 const fetchPurchasedOrdersFromDB = async (
     dispatch: AppDispatchRedux,
-    like?: string | undefined
+    like?: string,
+    signal?: AbortSignal
 ): Promise<IPurchasedOrder[]> => {
     try {
-
         const params = new URLSearchParams();
-
         if (like) params.set("filter", like);
-
+        
         const response = await fetch(`${API_URL}?${params.toString()}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
+            signal, // <-- pasamos la señal para poder abortar
         });
+        
         if (!response.ok) {
             const errorText = await response.json();
             if (response.status >= 500) {
-                throw new Error(
-                    `${errorText}`
-                );
+                throw new Error(`${errorText}`);
             }
             dispatch(
                 setError({
                     key: "purchasedOrders",
-                    message: errorText
+                    message: errorText,
                 })
             );
             return [];
         }
-        dispatch(
-            clearError("purchasedOrders")
-        );
+
+        dispatch(clearError("purchasedOrders"));
+
         const data: IPurchasedOrder[] = await response.json();
+
+        console.log(data);
         return data;
     } catch (error: unknown) {
+        console.log(error);
+        // Ignoramos abortError, solo lanzamos otros errores
+        if (error instanceof DOMException && error.name === "AbortError") {
+            console.log("abort");
+            return []; // fetch cancelado, retornamos vacío
+        }
         throw error;
     }
 };
+
 
 const getPurchasedOrderByIdInDB = async (
     dispatch: AppDispatchRedux,

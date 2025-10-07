@@ -16,7 +16,6 @@ import { add_shipping_order_purchased_order_products, next_step, remove_shipping
 import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
 import type { IPurchasedOrderProduct } from "interfaces/purchasedOrdersProducts";
 import { getEnumoSingleLabel, type TableStatePartial } from "../../../../../../../../comp/primitives/table/tableContext/tableTypes";
-import { Loader } from "@mantine/core"
 import Tag from "../../../../../../../../comp/primitives/tag/Tag";
 
 interface IStep1 {
@@ -30,30 +29,29 @@ const Step1 = ({
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
 
-    const purchase_orders: IPartialPurchasedOrder[] =
-        (state.data?.shipping_order_purchase_order_product ?? [])
-            .map(p => p.purchase_order_products?.purchase_order)
-            .filter((p): p is IPartialPurchasedOrder => p !== undefined);
+    const [purchase_orders, client, initialState]: [IPartialPurchasedOrder[], string, TableStatePartial] = useMemo(() => {
 
-    const generatorRowSelectionState = (purchase_orders: IPurchasedOrder[]) => {
+        const map = new Map<number | string, IPartialPurchasedOrder>();
+        for (const item of state.data?.shipping_order_purchase_order_product ?? []) {
+            const po = item.purchase_order_products?.purchase_order as IPartialPurchasedOrder | undefined;
+            if (po?.id != null) map.set(po.id, po);
+        }
+        const purchase_orders = [...map.values()];
+
+        const client = [...purchase_orders].shift()?.client?.company_name || "";
+
         const rowSelectionState: RowSelectionState = {}
         purchase_orders.forEach(p => {
-            rowSelectionState[p.id.toString()] = true;
+            rowSelectionState[p?.id?.toString() || ""] = true;
         });
-        return rowSelectionState;
-    };
 
-    const initialRowSelection = useMemo(
-        () => generatorRowSelectionState(purchase_orders as IPurchasedOrder[]),
-        []
-    );
+        const initialState: TableStatePartial = {
+            rowSelectionState
+        }
 
-    const initialState: TableStatePartial = useMemo(
-        () => ({ rowSelectionState: initialRowSelection }),
-        [initialRowSelection]
-    );
+        return [purchase_orders, client, initialState];
+    }, [state.data?.shipping_order_purchase_order_product]);
 
-    const client = [...purchase_orders].shift()?.client?.company_name || "";
 
     const [search, setSearch] = useState<string>(client);
     const [selectedPurchasedOrder, setSelectedPurchasedOrder] =
@@ -62,20 +60,8 @@ const Step1 = ({
     const {
         purchasedOrders,
         loadingPurchasedOrders
-    } = usePurchasedOrders(search);
+    } = usePurchasedOrders(search, 0);
 
-    const ExtraComponent = () => {
-        return (
-            <InputTextCustom
-                value={search}
-                onChange={setSearch}
-                placeholder="Buscar"
-                icon={<Search />}
-
-                classNameContainer={StyleModule.inputTextCustomContainer}
-            />
-        )
-    }
 
     const columns: ColumnDef<IPurchasedOrder>[] = useMemo(() => [
         {
@@ -142,9 +128,12 @@ const Step1 = ({
                 );
             }
         }
-    ], [purchasedOrders]);
+    ], []);
+
 
     const handleRowSelectionChange = (selected: IPurchasedOrder[]) => {
+        console.log(`selected:`, selected);
+        console.log(`selectedPurchasedOrder:`, selectedPurchasedOrder);
         const diffObject: {
             added: IPurchasedOrder[],
             deleted: IPurchasedOrder[]
@@ -175,7 +164,7 @@ const Step1 = ({
     };
 
     const conditionalRowSelection = (updater: RowSelectionState, rows: Row<IPurchasedOrder>[]): boolean => {
-        const keys: String[] = Object.keys(updater);
+        const keys: string[] = Object.keys(updater);
         const rowsRecords = rows.filter(row => keys.includes(row.id));
         const records = rowsRecords.map(row => row.original);
         return records.every((p: IPurchasedOrder, _, arr) => p.client?.company_name === arr[0].client?.company_name);
@@ -189,39 +178,41 @@ const Step1 = ({
 
     return (
         <div className={StyleModule.container}>
-            <span className={`nunito - bold ${StyleModule.title} `}>Selecciona una orden</span>
-            {loadingPurchasedOrders ?
-                <Loader
-                    size={24}
-                    className="nunito-bold"
+
+            <div className={StyleModule.headerSection}>
+                <span className={`nunito - bold ${StyleModule.title} `}>Selecciona una orden</span>
+                <InputTextCustom
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Buscar"
+                    icon={<Search />}
+
+                    classNameContainer={StyleModule.inputTextCustomContainer}
                 />
-                :
-                <GenericTable
-                    modelName="purchased_orders"
+            </div>
+            <GenericTable
+                modelName="purchased_orders"
 
-                    /* distribuccion de columnas y rows */
-                    columns={columns}
-                    data={purchasedOrders ? purchasedOrders : []}
+                /* distribuccion de columnas y rows */
+                columns={columns}
+                data={purchasedOrders ? purchasedOrders : []}
+                isLoadingData={loadingPurchasedOrders}
 
-                    /* funcionalidades */
-                    enablePagination
-                    enableFilters
-                    enableSorting
-                    enableRowSelection
-
-                    /* componentes extra */
-                    extraComponents={ExtraComponent}
-
-                    /* acciones */
-                    onDeleteSelected={() => { }}
-                    getRowId={(row, _) => row.id.toString()}
-                    onRowSelectionChange={handleRowSelectionChange}
-                    conditionalRowSelection={conditionalRowSelection}
-                    initialState={initialState}
-                    classNameGenericTableContainer={StyleModule.genericTableContainer}
-                />
-
-            }
+                /* funcionalidades */
+                enablePagination
+                enableFilters
+                enableSorting
+                enableRowSelection
+                isExpanded
+                expandedComponent={<div>Hola</div>}
+                /* acciones */
+                onDeleteSelected={() => { }}
+                getRowId={(row, _) => row.id.toString()}
+                onRowSelectionChangeExternal={handleRowSelectionChange}
+                conditionalRowSelection={conditionalRowSelection}
+                initialState={initialState}
+                classNameGenericTableContainer={StyleModule.genericTableContainer}
+            />
             <div className={StyleModule.footerSection}>
                 <CriticalActionButton
                     onClick={onClose}

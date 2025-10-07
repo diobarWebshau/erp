@@ -13,6 +13,12 @@
         var(--color-theme-neutral);
 }
 
+.trTableBody{
+    /* estilos */
+    cursor: pointer;
+}
+
+
 .rowSelected {
     /* estilos */
     background-color:

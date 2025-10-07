@@ -1,10 +1,10 @@
 import type { ColumnDef, Row, RowSelectionState, Table } from "@tanstack/react-table";
-import type { RowAction, TopButtonAction } from "../types";
+import type { RowAction} from "../types";
 import ProviderTableContext from "./ProviderTableContext";
 import TableBase from "./TableBase";
 import type { TableState, TableStatePartial } from "./tableTypes";
 import { DEFAULT_TABLE_STATE } from "./tableTypes";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 interface GenericTableProps<T> {
     modelName: string;
@@ -12,16 +12,15 @@ interface GenericTableProps<T> {
     data: T[];
     onDeleteSelected: (datas: T[]) => void;
     rowActions?: RowAction<T>[];
-    extraButtons?: TopButtonAction<T>[];
     typeRowActions?: "ellipsis" | "icon";
+    isLoadingData?: boolean;
     enableFilters?: boolean;
     enableSorting?: boolean;
-    enableViews?: boolean;
     enablePagination?: boolean;
     enableRowSelection?: boolean;
     enableOptionsColumn?: boolean;
     noResultsMessage?: string;
-    onRowSelectionChange?: (selected: T[], table?: Table<T>) => void;
+    onRowSelectionChangeExternal?: (selected: T[], table?: Table<T>) => void;
     conditionalRowSelection?: (updater: RowSelectionState, rows: Row<T>[]) => boolean;
     extraComponents?: (table?: Table<T>) => React.ReactNode;
     footerComponents?: (table: Table<T>) => React.ReactNode;
@@ -47,18 +46,17 @@ const GenericTable = <T,>({
     data,
     onDeleteSelected,
     rowActions,
-    extraButtons,
     typeRowActions = "ellipsis",
+    isLoadingData,
     enableFilters = false,
     enableSorting = false,
-    enableViews = false,
     enablePagination = false,
     enableRowSelection = false,
     enableOptionsColumn = false,
     noResultsMessage = "No results.",
     classNameGenericTableContainer,
     classNameTableContainer,
-    onRowSelectionChange,
+    onRowSelectionChangeExternal,
     conditionalRowSelection,
     classNameTable,
     classNameTableBody,
@@ -85,7 +83,6 @@ const GenericTable = <T,>({
         ...(initialState || {}),
     }), [initialState]);
 
-
     return (
         <ProviderTableContext
             initialState={finalState}
@@ -96,13 +93,12 @@ const GenericTable = <T,>({
                 data={data}
                 onDeleteSelected={onDeleteSelected}
                 rowActions={rowActions}
-                extraButtons={extraButtons}
                 typeRowActions={typeRowActions}
+                isLoadingData={isLoadingData}
                 enableFilters={enableFilters}
                 enableSorting={enableSorting}
-                enableViews={enableViews}
                 enablePagination={enablePagination}
-                onRowSelectionChange={onRowSelectionChange}
+                onRowSelectionChangeExternal={onRowSelectionChangeExternal}
                 enableRowSelection={enableRowSelection}
                 conditionalRowSelection={conditionalRowSelection}
                 enableOptionsColumn={enableOptionsColumn}
@@ -127,8 +123,9 @@ const GenericTable = <T,>({
     );
 }
 
-export default GenericTable;
+const GenericTableMemo = memo(GenericTable) as typeof GenericTable;
 
+export default GenericTableMemo;
 
 // ! ¿Como manejar el initialState en el padre ?
 

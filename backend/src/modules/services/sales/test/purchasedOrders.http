@@ -5,11 +5,11 @@ GET http://localhost:3003/sales/purchased-orders HTTP/1.1
 GET http://localhost:3003/sales/purchased-orders/id/1 HTTP/1.1
 
 ### Obtener orden de compra por filtro
-GET http://localhost:3003/sales/purchased-orders?filter=PO-2
+GET http://localhost:3003/sales/purchased-orders?filter=
 Accept: application/json
 
 ### Obtener orden de compra por ID
-GET http://localhost:3003/sales/purchased-orders/like/+52 HTTP/1.1
+GET http://localhost:3003/sales/purchased-orders/like/ HTTP/1.1
 
 ### Obtener orden de compra por código de orden
 GET http://localhost:3003/sales/purchased-orders/code/ORD123 HTTP/1.1

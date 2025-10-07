@@ -13,7 +13,7 @@ interface InventoryMovementAttributes {
     qty: number,
     movement_type: 'in' | 'out',
     reference_id: number,
-    reference_type: 'production' | 'order' | 'transfer' | "purchased",
+    reference_type: 'Production Order' | 'Order' | 'Transfer' | "Purchased" | "Scrap" | "Internal Production Order",
     production_id: number,
     description: string,
     is_locked: number,
