@@ -1,5 +1,5 @@
 import type { Draft } from "immer";
-import { produce } from "immer";
+import { current, produce } from "immer";
 import type { ShippingOrderState, ShippingOrderAction } from "./shippingOrderTypes";
 import { shippingOrderActionsTypes } from "./shippingOrderTypes";
 
@@ -18,10 +18,12 @@ const inventoriesReducer = produce((
         // ? Acciones directas al array de shipping order purchased order products
         case shippingOrderActionsTypes.ADD_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS:
             for (const item of action.payload) {
-                const isDuplicate = draft.data?.shipping_order_purchase_order_product?.some(
-                    it => it.purchase_order_product_id === item.purchase_order_product_id
-                );
-                if (isDuplicate) return;
+                if (draft.data?.shipping_order_purchase_order_product?.length === 0) {
+                    const isDuplicate = draft.data?.shipping_order_purchase_order_product?.some(
+                        it => it.purchase_order_product_id === item.purchase_order_product_id
+                    );
+                    if (isDuplicate) return;
+                }
                 draft.data.shipping_order_purchase_order_product?.push(item);
             }
             break;

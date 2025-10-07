@@ -1,0 +1,33 @@
+2025-10-02 21:08:07 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-10-02 21:10:30 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-10-02 21:11:15 [[31MERROR[39M]: uncaughtException: listen EADDRINUSE: address already in use :::3003
+Error: listen EADDRINUSE: address already in use :::3003
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\express\lib\application.js:635:24)
+    at createServer (file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/server.js:5:24)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/index.js:3:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)

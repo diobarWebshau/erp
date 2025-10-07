@@ -92,7 +92,6 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./ObjectSelect.module.css";
-import type { BaseRow } from "../../../../../interfaces/globalTypes";
 
 import {
     useFloating,
@@ -109,7 +108,7 @@ import {
     FloatingFocusManager,
 } from "@floating-ui/react";
 
-interface ObjectSelectProps<T extends BaseRow> {
+interface ObjectSelectProps<T> {
     value?: T | null | undefined; // valor seleccionado desde el padre
     options: T[];
     labelKey: keyof T;
@@ -125,7 +124,7 @@ interface ObjectSelectProps<T extends BaseRow> {
     classNameOptionValidate?: string;
 }
 
-const ObjectSelect = <T extends BaseRow>({
+const ObjectSelect = <T,>({
     options,
     labelKey,
     defaultLabel = "Selecciona una opción",
@@ -226,10 +225,10 @@ const ObjectSelect = <T extends BaseRow>({
                         >
                             {options.map((opt) => {
                                 const label = String(opt[labelKey]);
-                                const isSelected = value?.id === opt.id;
+                                const isSelected = value?.[labelKey] === opt[labelKey];
                                 return (
                                     <div
-                                        key={opt.id}
+                                        key={String(opt[labelKey])}
                                         className={`${styles.option} ${isSelected ? `${styles.selected} ${classNameOptionSelected}` : ""} ${classNameOption}`}
                                         role="option"
                                         aria-selected={isSelected}

@@ -9,6 +9,22 @@ import {
     InventoryLocationItemCreationAttributes
 } from "../../../../../modules/types.js";
 
+
+interface IInventory {
+    stock: number;
+    item_id: number;
+    available: number;
+    item_name: string;
+    item_type: string;
+    location_id: number;
+    inventory_id: number;
+    maximum_stock: number;
+    minimum_stock: number;
+    committed_qty: number;
+    location_name: string;
+    pending_production_qty: number;
+}
+
 interface LocationAttributes {
     id: number,
     name: string,
@@ -18,6 +34,7 @@ interface LocationAttributes {
     updated_at: Date,
     inventory_location_item?: InventoryLocationItemCreationAttributes[]
     types?: LocationTypeCreateAttributes[]
+    inventory?: IInventory
 }
 
 interface LocationCreateAttributes extends

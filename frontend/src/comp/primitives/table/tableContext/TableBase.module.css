@@ -1,90 +1,137 @@
+/* ******** CONTAINER ******** */
+
 .container {
     /* dimension */
     width: 100%;
     min-height: 0;
+    min-width: 0;
+}
 
-    /* distribucion  grif */
+.containerWithExtraComponents{
+    /* distribucion  grid */
     display: grid;
     grid-template:
         "header" auto
         "main" 1fr
-        / auto;
-
+        / 100%;
+    gap: 1rem;
 }
 
-.FeaturesContainer {
-    /* dimension */
-    width: 100%;
+.containerWithoutExtraComponents{
+    /* distribucion  grid */
+    display: grid;
+    grid-template:
+        "main" 1fr
+        / 100%;
+}
 
-    /* distribucion  grid*/
+.headerContainer {
+    /* distribucion  grid respecto al padre */
     grid-area: header;
+}
 
+.containerMain {
+    /* distribucion  grid respecto al padre */
+    grid-area: main;
+}
+
+/* ******** HEADER ******** */
+
+.headerContainer {
     /* distribucion flex */
     display: flex;
-    flex-direction: row;
-    justify-content: start;
+}
+
+.extraComponentsContainer{
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
     gap: 0.5rem;
 }
 
 
-/*************
-*   table    *
-**************/
+/* ********  MAIN ******** */
 
-.table {
-    /* dimension */
-    width: 100%;
-    height: 100%;
-
-    /* distribucion box */
-    border-collapse: separate;
-    border-spacing: 0.2px;
-}
-
-
-
-.containerTableMain {
-    grid-area: main;
-
-    /* dimension */
-    width: 100%;
-    height: 100%;
-    min-height: 0;
+.containerMain {
     /* distribucion grid */
     display: grid;
 
+    /* distribucion box */
     border-top-right-radius: 15px;
     border-top-left-radius: 15px;
 
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+
 }
 
-.containerTableMainWithFooterOrPagination {
+.containerMainWithFooterOrPagination {
+    /* distribucion grid */
     grid-template:
-    "main2" 1fr
-    "option" auto
-    / auto;
+        "table" 1fr
+        "option" auto
+        / 100%;
 }
 
-.containerTableMainWithoutFooterOrPagination {
-    display: grid;
+.containerMainWithoutFooterOrPagination {
+    /* distribucion grid */
     grid-template:
-        "main2" 1fr
-        / auto;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+        "table" 1fr
+        / 100%;
 }
 
-.containerTableBorderRadius {
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+.containerMainOnlyFooter {
+    /* distribucion flex */
+    gap: 1.5rem;
 }
 
 .containerTable {
+    /* distribucion grid respecto al padre */
+    grid-area: table;
+}
+
+.containerOption {
+    /* distribucion grid respecto al padre */
+    grid-area: option;
+}
+
+
+/* ******** CONTAINER OPTION ******** */
+
+.containerOption {
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+}
+
+
+.containerPagination {
+    /* distribucion grid */
+    grid-area: option;
     /* dimension */
-    grid-area: main2;
-    width: 100%;
+    /* distribucion box */
+    border: 1px solid var(--color-theme-neutral-background);
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+
+
+/* ******** CONTAINER TABLE ******** */
+
+.containerTable {
     /* dimension */
     min-height: 0;
+    min-width: 0;
     /* distribucion grid */
 
     /* distribucion box */
@@ -92,22 +139,31 @@
     border-top-right-radius: 15px;
     border-top-left-radius: 15px;
 
-    /* estilos */
-    overflow-x: auto;
-    overflow-y: auto;
-
-}
-
-
-.containerOption {
-    
-    grid-area: option;
-    
     /* distribucion flex */
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+
+    /* desbordamiento */
+    overflow-x: auto;
+    overflow-y: auto;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
 }
 
+.wrapperTable {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+    min-height: 0;   /* asegura que pueda encogerse dentro de flex */
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+}
 
 /*
 Selecciona el scrollbar en sí (el carril que aparece al hacer overflow). 
@@ -154,28 +210,28 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
     /* Firefox */
 }
 
-.tableHeader {
-    /* dimension */
-    width: 100%;
-}
-
-.extraComponentsContainer {
-    /* dimension */
-    width: 100%;
-}
-
-.containerPagination {
-    /* distribucion grid */
-    grid-area: option;
-    /* dimension */
+.containerTableBorderRadius {
     /* distribucion box */
-    border: 1px solid var(--color-theme-neutral-background);
-    border-bottom-right-radius: 15px;
     border-bottom-left-radius: 15px;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    border-bottom-right-radius: 15px;
 }
 
+/* ? ******** TABLE ******** */
+
+.table {
+    /* distribucion box */
+    border-collapse: separate;
+    border-spacing: 0.2px;
+}
+
+.tableWithoutRow {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 0;
+}
+
+/* ? ******** TABLE HEADER ******** */
 
 
 /******************************************
@@ -187,17 +243,17 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
     /* dimension */
     width: 16px;
     height: 16px;
-    
+
     /* posicionamiento */
     position: relative;
 
     /* distribucion */
 
     display: inline-block;
-    
+
     /* distribucion box */
     border: 2px solid var(--color-theme-primary-light);
-    border-radius: 15px;
+    /* border-radius: 15px; */
 
     /* estilos */
     -moz-appearance: none;
@@ -205,7 +261,7 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
     background-color: var(--color-theme-font-white);
     cursor: pointer;
     appearance: none;
-    
+
     /* animaciones */
     transition: all 0.2s ease;
 }
@@ -242,17 +298,17 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
     /* dimension */
     width: 16px;
     height: 16px;
-    
+
     /* posicionamiento */
     position: relative;
 
     /* distribucion */
 
     display: inline-block;
-    
+
     /* distribucion box */
     border: 2px solid var(--color-theme-font-white);
-    border-radius: 15px;
+    /* border-radius: 15px; */
 
     /* estilos */
     -moz-appearance: none;
@@ -260,7 +316,7 @@ Estas propiedades sólo afectan Firefox, mientras que las anteriores (-webkit-) 
     background-color: var(--color-theme-font-white);
     cursor: pointer;
     appearance: none;
-    
+
     /* animaciones */
     transition: all 0.2s ease;
 }

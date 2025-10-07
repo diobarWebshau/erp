@@ -3,6 +3,21 @@ import type {
   ILocationType
 } from "./locationTypes";
 
+interface IInventoryRecord {
+  stock: number;
+  minimum_stock: number,
+  maximum_stock: number,
+  item_id: number;
+  available: number;
+  item_name: string;
+  item_type: string;
+  location_id: number;
+  inventory_id: number;
+  committed_qty: number;
+  location_name: string;
+  pending_production_qty: number;
+}
+
 interface ILocation {
   id: number,
   name: string,
@@ -12,6 +27,7 @@ interface ILocation {
   created_at: string,
   updated_at: string
   location_production_line?: ILocationProductionLine[]
+  inventory?: IInventoryRecord
 }
 
 type IPartialLocation = Partial<ILocation>;

@@ -15,6 +15,7 @@ import { Core, Services, Features }
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import compression from 'compression';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +28,16 @@ const createApp = (): Express => {
     app.use(morganUtil);
     app.use(helmetUtil);
     app.use(cookieParser());
+
+    app.use(compression({
+        threshold: 1024,          // no comprime respuestas pequeñas
+        // filter: (req: Request, res: Response) => {
+        //     // Puedes desactivar compresión para ciertos endpoints si quieres
+        //     if (req.headers['x-no-compress']) return false;
+        //     return compression.filter(req, res);
+        // }
+    }));
+
 
     // SOLO uno de estos, con límite aumentado
     app.use(express.json({ limit: '10mb' }));
@@ -148,7 +159,7 @@ const createApp = (): Express => {
         Services.Sales
             .createAppliedProductDiscountsClientRouter());
 
-    
+
 
 
     app.use("/production/products",

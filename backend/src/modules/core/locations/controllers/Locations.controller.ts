@@ -483,14 +483,14 @@ class LocationController {
             type ProductionLocation = { production_locations: LocationAttributes[] };
 
             const response: ProductionLocation[] = await sequelize.query(
-                "SELECT func_get_product_production_locations(:product_id) AS production_locations",
+                "SELECT func_get_product_production_locations_with_inventory(:product_id) AS production_locations",
                 {
                     replacements: { product_id: product_id },
                     type: QueryTypes.SELECT,
                 }
             );
             const locations: LocationAttributes[] = response[0].production_locations;
-            res.status(200).json(locations);
+            res.status(200).send(locations);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 next(error);

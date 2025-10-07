@@ -1,3 +1,4 @@
+import type { IPartialLocation } from "./locations";
 import type {
     IPartialPurchasedOrderProduct
 } from "./purchasedOrdersProducts";
@@ -8,8 +9,8 @@ interface IShippingOrderPurchasedOrderProduct {
     shipping_order_id: number | null;
     purchase_order_product_id: number;
     qty: number;
-    purchase_order_products?:
-    IPartialPurchasedOrderProduct;
+    purchase_order_products?: IPartialPurchasedOrderProduct;
+    location?: IPartialLocation;
 }
 
 type IPartialShippingOrderPurchasedOrderProduct =

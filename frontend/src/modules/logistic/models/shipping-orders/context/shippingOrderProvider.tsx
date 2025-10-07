@@ -23,8 +23,10 @@ const ShippingOrderProvider = ({
 
     const baseData: IPartialShippingOrder = {
         ...data,
-        ...(data?.shipping_order_purchase_order_product && {
+        ...(data?.shipping_order_purchase_order_product ? {
             shipping_order_purchase_order_product: data.shipping_order_purchase_order_product
+        } : {
+            shipping_order_purchase_order_product: []
         })
     };
 

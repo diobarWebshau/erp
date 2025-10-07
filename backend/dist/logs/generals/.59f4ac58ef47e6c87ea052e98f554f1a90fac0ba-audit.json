@@ -6,26 +6,6 @@
     "auditLog": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\.59f4ac58ef47e6c87ea052e98f554f1a90fac0ba-audit.json",
     "files": [
         {
-            "date": 1758293232042,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-19.log",
-            "hash": "78a2043511949e2fcb0e91372e389ce1d6ce9bbf83b1d10ae434c751a7209712"
-        },
-        {
-            "date": 1758352596275,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-20.log",
-            "hash": "3c302e8ccc60394d6db9eb15d905d3a2f9f7ba1e2fb496c5d8d0a2cebe2cea73"
-        },
-        {
-            "date": 1758454836618,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-21.log",
-            "hash": "fa2d7e4ab21fb073d981eaba8265e73d49b1d8b7602cbd5629efcdf636dc25da"
-        },
-        {
-            "date": 1758552516607,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-22.log",
-            "hash": "d2169fe258b7035340b0d5eaf989569709822ef85733dd3e58a63691a56d81fb"
-        },
-        {
             "date": 1758635846757,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-23.log",
             "hash": "a82910a2a53a533a54e8714820167b01a15ca23128c04d36e5110749fe120270"
@@ -64,6 +44,36 @@
             "date": 1759218675268,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-30.log",
             "hash": "f69a6e6f8b6b7c7caf9ed0234dcbdcfe944915e3d825a6de61ac931f1582c0e2"
+        },
+        {
+            "date": 1759371904609,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-01.log",
+            "hash": "d5338428d020feed4e5a92950e570fc5b213f79ee8c3c2efb0041767e4bc2d6c"
+        },
+        {
+            "date": 1759458989511,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-02.log",
+            "hash": "c2c1b8aa8c7e0606341d5dde9609109a4dfcad78a71926f44e565f8e3ca3cb28"
+        },
+        {
+            "date": 1759503749018,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-03.log",
+            "hash": "3e0e3e4dc73d95681175ce0d2bd1253d075aa3c5bf2ef2c417d81ce5d422b215"
+        },
+        {
+            "date": 1759594593584,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-04.log",
+            "hash": "efa65c5d77248ee38150e9e2b4db8ff014d995fe3c9a3d01a1974f5f13c5bd9b"
+        },
+        {
+            "date": 1759687201995,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-05.log",
+            "hash": "acfdb78596612aabfc77e08950c3a5e0a7af7d5d5e065c65c4d68265542cdfd0"
+        },
+        {
+            "date": 1759762246677,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-06.log",
+            "hash": "830d6bf599337c8589f9a44aa0ba05806d8634b40f45ce72615684004f26f6b0"
         }
     ],
     "hashType": "sha256"

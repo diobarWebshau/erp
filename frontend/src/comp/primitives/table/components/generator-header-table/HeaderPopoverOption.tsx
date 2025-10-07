@@ -8,13 +8,14 @@ import MainActionButtonCustom from "../../../button/custom-button/main-action/Ma
 import TertiaryActionButtonCustom from "../../../button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import TransparentButtonCustom from "../../../button/custom-button/transparent/TransparentButtonCustom";
 import PopoverFloating from "../../../../external/floating/pop-over/PopoverFloating"
-import { getDefaultResetValue, type BooleanFilter, type ColumnTypeDataFilter, type EnumFilter, type ObjectDateFilter, type ObjectNumericFilter } from "./../../tableContext/tableTypes";
+import { getDefaultResetValue, getEnumLabel, getEnumValue } from "../../tableContext/tableTypes";
+import type { BooleanFilter, ColumnTypeDataFilter, EnumFilter, ObjectDateFilter, ObjectNumericFilter } from "../../tableContext/tableTypes";
 import { ChevronLeft, MoreVertical, Plus, XCircle, ChevronDown, ChevronUp } from "lucide-react"
 import { useEffect, useState } from "react";
 import type { Column, ColumnSort, Table } from "@tanstack/react-table";
-import { useTableDispatch, useTableState } from "./../../tableContext/tableHooks";
+import { useTableDispatch, useTableState } from "../../tableContext/tableHooks";
 import stylesModules from "./HeaderPopoverOptions.module.css"
-import { add_column_filter, add_sorting, remove_column_filter, remove_sorting } from "./../../tableContext/tableActions";
+import { add_column_filter, add_sorting, remove_column_filter, remove_sorting } from "../../tableContext/tableActions";
 import { Divider } from "@mantine/core";
 
 const options: [Option, Option] = [
@@ -157,17 +158,40 @@ const PopoverComponentHeader = <T,>({
                 break;
             case "enum":
                 valueInput = filteredValueLocal as EnumFilter;
-                if (valueInput !== undefined)
-                    dispatch(add_column_filter({
-                        id: column.id,
-                        value: valueInput
-                    }));
+                dispatch(add_column_filter({
+                    id: column.id,
+                    value: valueInput
+                }));
                 break;
             default:
                 break;
         }
         onClose();
     };
+
+    // const convertEnumToArray = () => {
+
+    //     let array: string[] = [];
+
+    //     if (filteredValueLocal as EnumFilter){
+    //         const enumValue = getEnumLabel(column.columnDef, filteredValueLocal as EnumFilter);
+    //         if (enumValue !== undefined)
+    //             array.push(enumValue);
+    //     }
+    //     return array;
+    // }
+
+    const convertEnumToArray = () => {
+        const enumValue = getEnumLabel(column.columnDef, filteredValueLocal as EnumFilter);
+        return [...enumValue];
+    }
+
+    const onChangeEnum = (value: string[]) => {
+        console.log(value);
+        const enumValue = getEnumValue(column.columnDef, value);
+        console.log(enumValue);
+        setFilteredValueLocal(enumValue);
+    }
 
     // ************** EFECTOS **************
 
@@ -249,9 +273,9 @@ const PopoverComponentHeader = <T,>({
 
                 {meta?.type === "enum" && (
                     <CheckBoxListAutoSize
-                        options={meta.options ?? []}
-                        value={filteredValueLocal as string[]}
-                        onChange={setFilteredValueLocal}
+                        options={meta.enumOptions?.map((option) => option.label) ?? []}
+                        value={convertEnumToArray()}
+                        onChange={onChangeEnum}
                     />
                 )}
             </div>

@@ -74,6 +74,7 @@ interface NumericInputProps {
     value: number | undefined;
     onChange: (value: number) => void;
     min?: number;
+    max?: number;
     className?: string;
     classNameInput?: string;
     /**
@@ -88,6 +89,7 @@ const NumericInput = ({
     value,
     onChange,
     min = 1,
+    max = 100000000000,
     className,
     classNameInput,
     onlyCommitOnBlur = false,
@@ -100,6 +102,7 @@ const NumericInput = ({
         const num = Number(val);
         if (val === "" || Number.isNaN(num)) return false;
         if (num < min) return false;
+        if (num > max) return false;
         return true;
     };
 

@@ -1,8 +1,15 @@
 // utils/formatters.ts
 
 /**
+ * Detecta si un número tiene parte decimal.
+ */
+const hasDecimals = (value: number): boolean => {
+    return value % 1 !== 0;
+};
+
+/**
  * Formatea un número normal con separadores de miles y decimales.
- * Ej: 1000 => "1,000.000"
+ * Ej: 1000 => "1,000" | 1000.5 => "1,000.5"
  */
 export const formatNumber = (
     value: number,
@@ -13,7 +20,7 @@ export const formatNumber = (
     }
 ): string => {
     const {
-        minimumFractionDigits = 2,
+        minimumFractionDigits = hasDecimals(value) ? 2 : 0,
         maximumFractionDigits = 6,
         locale = 'es-MX',
     } = options || {};
@@ -26,7 +33,7 @@ export const formatNumber = (
 
 /**
  * Formatea un número como moneda.
- * Ej: 1000 => "$1,000.00"
+ * Ej: 1000 => "$1,000" | 1000.5 => "$1,000.50"
  */
 export const formatCurrency = (
     value: number,
@@ -38,7 +45,7 @@ export const formatCurrency = (
     }
 ): string => {
     const {
-        minimumFractionDigits = 2,
+        minimumFractionDigits = hasDecimals(value) ? 2 : 0,
         maximumFractionDigits = 6,
         locale = 'es-MX',
     } = options || {};
@@ -53,7 +60,7 @@ export const formatCurrency = (
 
 /**
  * Formatea un número como porcentaje.
- * Ej: 0.25 => "25%"
+ * Ej: 0.25 => "25%" | 0.253 => "25.3%"
  */
 export const formatPercentage = (
     value: number,
@@ -64,7 +71,7 @@ export const formatPercentage = (
     }
 ): string => {
     const {
-        minimumFractionDigits = 2,
+        minimumFractionDigits = hasDecimals(value) ? 2 : 0,
         maximumFractionDigits = 6,
         locale = 'es-MX',
     } = options || {};
@@ -78,7 +85,7 @@ export const formatPercentage = (
 
 /**
  * Formatea un número de forma compacta.
- * Ej: 1500 => "1.5K"
+ * Ej: 1500 => "1.5 K" | 1000 => "1 K"
  */
 export const formatCompact = (
     value: number,
@@ -90,7 +97,7 @@ export const formatCompact = (
 ): string => {
     const {
         locale = 'es-MX',
-        minimumFractionDigits = 2,
+        minimumFractionDigits = hasDecimals(value) ? 2 : 0,
         maximumFractionDigits = 6,
     } = options || {};
 

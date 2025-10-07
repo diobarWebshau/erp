@@ -36,7 +36,7 @@ const remove_shipping_order_purchased_order_products = (
 });
 
 const update_shipping_order_purchased_order_products = (
-    payload: { id: number; attributes: IPartialShippingOrderPurchasedOrderProduct[] }
+    payload: { id: number; attributes: IPartialShippingOrderPurchasedOrderProduct }
 ): ShippingOrderAction => ({
     type: shippingOrderActionsTypes.UPDATE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS,
     payload

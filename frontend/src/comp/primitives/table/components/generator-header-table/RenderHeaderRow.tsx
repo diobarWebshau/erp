@@ -1,6 +1,6 @@
 import { flexRender } from "@tanstack/react-table";
 import type { Header, HeaderGroup, Table } from "@tanstack/react-table";
-import HeaderPopoverOptions from "./../../comp/generator-header-table/HeaderPopoverOption2";
+import HeaderPopoverOption from "./HeaderPopoverOption";
 import stylesModules from "./RenderHeaderRow.module.css"
 
 interface HeaderRowProps<T> {
@@ -22,7 +22,8 @@ const HeaderRow = <T,>({
     const rowCount = table?.getRowModel()?.rows?.length ?? 0;
 
     return (
-        <th key={header.id}
+        <th
+            key={header.id}
             className={`  ${stylesModules.thTableHeader}`}
             style={{
                 backgroundColor: rowCount > 0
@@ -37,7 +38,7 @@ const HeaderRow = <T,>({
 
                     >
                         <div>
-                            <label>
+                            <label className={`nunito-bold ${stylesModules.labelTableHeader}`}>
                                 {
                                     flexRender(
                                         header.column.columnDef.header,
@@ -54,7 +55,7 @@ const HeaderRow = <T,>({
                         {
                             typeRowActions === "icon" ? (
                                 <div>
-                                    <label>
+                                    <label className={`nunito-bold ${stylesModules.labelTableHeader}`}>
                                         {
                                             flexRender(
                                                 header.column.columnDef.header,
@@ -77,7 +78,7 @@ const HeaderRow = <T,>({
                         }
                     >
                         <div>
-                            <label>
+                            <label className={`nunito-bold ${stylesModules.labelTableHeader}`}>
                                 {
                                     flexRender(
                                         header.column.columnDef.header,
@@ -86,7 +87,7 @@ const HeaderRow = <T,>({
                                 }
                             </label>
                             {enableFilters && (
-                                <HeaderPopoverOptions
+                                <HeaderPopoverOption
                                     column={header.column}
                                     table={table}
                                     enableSorting={enableSorting || true}
@@ -124,6 +125,7 @@ const RenderHeaderRow = <T,>({
             {group.headers.map((header) => {
                 return (
                     <HeaderRow
+                        key={header.id}
                         header={header}
                         table={table}
                         enableSorting={enableSorting}

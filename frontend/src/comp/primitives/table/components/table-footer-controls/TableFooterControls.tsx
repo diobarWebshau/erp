@@ -33,10 +33,11 @@ const TableFooterControls = <T,>({
         <div
             className={`nunito-regular ${StyleModule.container} ${className}`}
             style={{
-                justifyContent: enableRowSelection ? "space-between" : "flex-end",
+                // justifyContent: enableRowSelection ? "end" : "flex-end",
+                justifyContent: "flex-end",
             }}
         >
-            {enableRowSelection && (
+            {/* {enableRowSelection && (
                 <div
                     className={StyleModule.selectRowsSection}
                 >
@@ -52,7 +53,7 @@ const TableFooterControls = <T,>({
                         />
                     )}
                 </div>
-            )}
+            )} */}
             <PaginationControls
                 table={table}
                 className={StyleModule.paginationControls}

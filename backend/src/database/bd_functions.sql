@@ -1105,6 +1105,192 @@ END //
 DELIMITER ;
 
 
+DROP FUNCTION IF EXISTS func_get_product_production_locations_with_inventory;
+DELIMITER //
+CREATE FUNCTION func_get_product_production_locations_with_inventory(
+  in_product_id INT
+)
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+  DECLARE json_agg JSON DEFAULT JSON_ARRAY();
+
+  /* Envolvemos la selección por location en un subquery (q)
+     y desde afuera hacemos JSON_ARRAYAGG para obtener una sola fila */
+  SELECT COALESCE(JSON_ARRAYAGG(q.loc_json), JSON_ARRAY())
+  INTO json_agg
+  FROM (
+    SELECT
+      JSON_OBJECT(
+        'id',          l.id,
+        'name',        l.name,
+        'description', l.description,
+        'is_active',   l.is_active,
+        'created_at',  l.created_at,
+        'updated_at',  l.updated_at,
+        'inventory',
+        (
+          SELECT
+			COALESCE(
+				JSON_OBJECT(
+				'location_id',   l2.id,
+				'location_name', l2.name,
+				'item_type',     idt.item_type,
+				'item_id',       idt.item_id,
+				'inventory_id',  idt.inventory_id,
+				'item_name',
+					CASE
+					WHEN idt.item_type = 'product' THEN p.name
+					WHEN idt.item_type = 'input'   THEN inp.name
+					ELSE NULL
+					END,
+				'stock',                  IFNULL(idt.stock, 0),
+				'minimum_stock',          IFNULL(idt.minimum_stock, 0),
+				'maximum_stock',          IFNULL(idt.maximum_stock, 0),
+				'committed_qty',          IFNULL(idt.committed, 0),
+				'pending_production_qty', IFNULL(iip.qty, 0),
+				'available',              IFNULL(IFNULL(idt.stock,0) - IFNULL(idt.committed,0), 0)
+				-- ,'produced_qty',       IFNULL(ipr.produced, 0)
+				),
+				JSON_OBJECT()
+			)
+          FROM locations AS l2
+          /* --- inventory_data (idt): stock + committed bloqueado --- */
+          LEFT JOIN (
+            SELECT
+              ili.item_type,
+              ili.item_id,
+              ili.location_id,
+              inv.stock AS stock,
+			  inv.minimum_stock AS minimum_stock,
+			  inv.maximum_stock AS maximum_stock,
+              inv.id    AS inventory_id,
+              IFNULL(SUM(
+                CASE
+                  WHEN im.movement_type  = 'out'
+                   AND im.reference_type IN ('Transfer','Scrap')
+                   AND im.is_locked      = 1
+                  THEN im.qty ELSE 0
+                END
+              ),0) AS committed
+            FROM inventories_locations_items AS ili
+            JOIN inventories AS inv
+              ON inv.id = ili.inventory_id
+            LEFT JOIN inventory_movements AS im
+              ON im.item_type   = ili.item_type
+             AND im.item_id     = ili.item_id
+             AND im.location_id = ili.location_id
+            WHERE ili.item_type = 'product'
+              AND ili.item_id   = in_product_id
+            GROUP BY
+              ili.item_type, ili.item_id, ili.location_id, inv.stock, inv.id
+          ) AS idt
+            ON idt.location_id = l2.id
+
+          /* Nombres por tipo */
+          LEFT JOIN products p
+            ON idt.item_type = 'product' AND p.id   = idt.item_id
+          LEFT JOIN inputs   inp
+            ON idt.item_type = 'input'   AND inp.id = idt.item_id
+
+          /* --- inventory_inProduction (iip): pendiente por producir --- */
+          LEFT JOIN (
+            SELECT item_type, item_id, location_id, SUM(qty) AS qty
+            FROM (
+              SELECT
+                'product' AS item_type,
+                po.product_id AS item_id,
+                l3.id AS location_id,
+                po.qty
+              FROM production_orders po
+              LEFT JOIN purchased_orders_products pop
+                ON po.order_type = 'client'  AND pop.id  = po.order_id
+              LEFT JOIN internal_product_production_orders ippo
+                ON po.order_type = 'internal' AND ippo.id = po.order_id
+              LEFT JOIN internal_production_orders_lines_products ipolp
+                ON ippo.id = ipolp.internal_product_production_order_id
+              LEFT JOIN purchased_orders_products_locations_production_lines poplpl
+                ON poplpl.purchase_order_product_id = pop.id
+              JOIN locations_production_lines lpl
+                ON (
+                     (po.order_type = 'client'  AND lpl.production_line_id = poplpl.production_line_id)
+                  OR (po.order_type = 'internal' AND lpl.production_line_id = ipolp.production_line_id)
+                )
+              LEFT JOIN locations l3 ON l3.id = lpl.location_id
+              WHERE po.order_type IN ('client','internal')
+                AND (po.product_id = pop.product_id OR po.product_id = ippo.product_id)
+                AND po.status <> 'completed'
+                AND po.product_id = in_product_id
+            ) z
+            GROUP BY item_type, item_id, location_id
+          ) AS iip
+            ON iip.location_id = l2.id
+           AND iip.item_id     = idt.item_id
+           AND iip.item_type   = idt.item_type
+
+          /* --- inventory_produced (ipr): producido (entradas no bloqueadas) --- */
+          LEFT JOIN (
+            SELECT
+              ili.item_type,
+              ili.item_id,
+              ili.location_id,
+              IFNULL(SUM(
+                CASE
+                  WHEN im.movement_type = 'in'
+                   AND im.reference_type IN ('Production')
+                   AND im.is_locked = 0
+                   AND po.status = 'pending'
+                  THEN im.qty ELSE 0
+                END
+              ),0) AS produced
+            FROM inventories_locations_items AS ili
+            JOIN inventories AS inv2
+              ON inv2.id = ili.inventory_id
+            LEFT JOIN inventory_movements AS im
+              ON im.item_type   = ili.item_type
+             AND im.item_id     = ili.item_id
+             AND im.location_id = ili.location_id
+            LEFT JOIN production_orders AS po
+              ON po.id = im.reference_id
+            WHERE ili.item_type = 'product'
+              AND ili.item_id   = in_product_id
+            GROUP BY ili.item_type, ili.item_id, ili.location_id
+          ) AS ipr
+            ON ipr.location_id = l2.id
+           AND ipr.item_id     = idt.item_id
+           AND ipr.item_type   = idt.item_type
+
+          /* Misma correlación y restricción de tipo de ubicación */
+          JOIN locations_location_types AS llt2
+            ON llt2.location_id = l2.id
+          JOIN location_types AS lt2
+            ON lt2.id = llt2.location_type_id
+          WHERE lt2.name = 'Store'
+            AND l2.id = l.id
+        )
+      ) AS loc_json
+    FROM locations AS l
+    JOIN locations_location_types AS llt 
+      ON llt.location_id = l.id
+    JOIN location_types AS lt 
+      ON lt.id = llt.location_type_id
+    JOIN inventories_locations_items AS ili 
+      ON ili.location_id = l.id
+    JOIN inventories AS inv 
+      ON inv.id = ili.inventory_id
+    WHERE lt.name = 'Store'
+      AND ili.item_type = 'product'
+      AND ili.item_id = in_product_id
+    GROUP BY l.id, l.name, l.description, l.is_active, l.created_at, l.updated_at
+  ) AS q;
+
+  RETURN json_agg;
+END //
+DELIMITER ;
+
+
+
 DROP FUNCTION IF EXISTS func_get_extra_data_production_order;
 DELIMITER //
 CREATE FUNCTION func_get_extra_data_production_order(

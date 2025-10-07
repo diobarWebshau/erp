@@ -1,9 +1,9 @@
+import { memo } from "react";
 import { ChevronDown } from "lucide-react";
-import type { BaseRow } from "../../../../../interfaces/globalTypes";
 import ObjectSelect from "../base/ObjectSelect";
 import StyleModule from "./ObjectSelectCustom.module.css";
 
-interface ObjectSelectCustomProps<T extends BaseRow> {
+interface ObjectSelectCustomProps<T> {
     value?: T | null | undefined; // valor seleccionado desde el padre
     options: T[];
     labelKey: keyof T;
@@ -15,19 +15,17 @@ interface ObjectSelectCustomProps<T extends BaseRow> {
     classNameOption?: string;
 }
 
-
-const ObjectSelectCustom = <T extends BaseRow>({
+const ObjectSelectCustom = <T,>({
     options,
     labelKey,
     defaultLabel = "Selecciona una opción",
-    autoOpen = true,
+    autoOpen = false,
     onChange,
     value,
     classNameFieldContainer,
     classNameToggleContainer,
     classNameOption
 }: ObjectSelectCustomProps<T>) => {
-
 
     return (
         <ObjectSelect
@@ -41,9 +39,10 @@ const ObjectSelectCustom = <T extends BaseRow>({
             classNameFieldContainer={`${StyleModule.customSelectFieldContainer} ${classNameFieldContainer}`}
             classNameToggleContainer={`${StyleModule.customSelectToggleContainer} ${classNameToggleContainer}`}
             classNameOption={`${StyleModule.customSelectOption} ${classNameOption}`}
-
         />
     )
 }
 
-export default ObjectSelectCustom
+// Memoizamos el componente para optimizar renders dentro de tablas u otros escenarios donde se re-renderiza mucho
+// Usamos `as typeof ObjectSelectCustom` para mantener el tipado genérico <T> que TypeScript pierde al usar memo()
+export default memo(ObjectSelectCustom) as typeof ObjectSelectCustom;

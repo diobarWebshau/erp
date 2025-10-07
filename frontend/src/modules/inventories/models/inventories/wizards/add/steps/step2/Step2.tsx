@@ -14,7 +14,7 @@ import ObjectSelectCustom from "../../../../../../../../comp/primitives/select/o
 import NumericInputCustom from "../../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import type { RowAction } from "../../../../../../../../components/ui/table/types";
 import { useState } from "react";
-import SelectObjectsModal from "../../../../../../../../comp/features/modal-objects/SelectProductsModal";
+import SelectObjectsModal from "../../../../../../../../comp/features/modal-product/SelectProductsModal";
 import useAllLocations from "../../../../../../../../modelos/locations/hooks/useAllLocations";
 
 

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import NumericInput from "../base/NumericInput";
 import styleModule from "./NumericInputCustom.module.css";
 
@@ -8,8 +9,8 @@ interface NumericInputCustomProps {
     onlyCommitOnBlur?: boolean;
     classNameContainer?: string;
     classNameInput?: string;
+    max?: number;
 }
-
 
 const NumericInputCustom = ({
     value,
@@ -17,13 +18,15 @@ const NumericInputCustom = ({
     min,
     onlyCommitOnBlur,
     classNameContainer,
-    classNameInput
+    classNameInput,
+    max
 }: NumericInputCustomProps) => {
     return (
         <NumericInput
             value={value}
             onChange={onChange}
             min={min}
+            max={max}
             onlyCommitOnBlur={onlyCommitOnBlur}
             className={`${classNameContainer} ${styleModule.container}`}
             classNameInput={`${classNameInput} nunito-semibold ${styleModule.input}`}
@@ -31,4 +34,6 @@ const NumericInputCustom = ({
     );
 }
 
-export default NumericInputCustom;
+// Memoizamos
+// Usamos `as typeof NumericInputCustom` para mantener el tipado intacto, especialmente si este componente es genérico o se usa en celdas de tablas
+export default memo(NumericInputCustom) as typeof NumericInputCustom;

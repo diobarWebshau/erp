@@ -1,5 +1,5 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
-import { PurchasedOrderModel, ClientModel, ClientAddressesModel, ProductModel, ProductDiscountRangeModel } from "../../../associations.js";
+import { PurchasedOrderModel, ClientModel, ClientAddressesModel, ProductModel, ProductDiscountRangeModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, LocationsProductionLinesModel, LocationModel } from "../../../associations.js";
 import { Request, Response, NextFunction } from "express";
 import { Op } from "sequelize";
 import { AppliedProductDiscountClientModel, AppliedProductDiscountRangeModel, ProductDiscountClientModel, PurchaseOrderProductModel } from "../associations.js";
@@ -89,6 +89,42 @@ class PurchasedOrderController {
                                             as: "product_discount_range",
                                             attributes:
                                                 ProductDiscountRangeModel.getAllFields()
+                                        }
+                                    ]
+                                }, {
+                                    model: PurchasedOrderModel,
+                                    as: "purchase_order",
+                                    attributes: PurchasedOrderModel.getAllFields(),
+                                    include: [
+                                        {
+                                            all: true, // esto trae TODO el árbol de relaciones de PurchasedOrderModel
+                                            // nested: true // esto trae todas relaciones de PurchasedOrderModel y a la vez todas las relaciones de las relaciones
+                                        }
+                                    ]
+                                }, 
+                                {
+                                    model: PurchasedOrdersProductsLocationsProductionLinesModel,
+                                    as: "purchase_order_product_location_production_line",
+                                    attributes: PurchasedOrdersProductsLocationsProductionLinesModel.getAllFields(),
+                                    include: [
+                                        {
+                                            model: ProductionLineModel,
+                                            as: "production_line",
+                                            attributes: ProductionLineModel.getAllFields(),
+                                            include: [
+                                                {
+                                                    model: LocationsProductionLinesModel,
+                                                    as: "location_production_line",
+                                                    attributes: LocationsProductionLinesModel.getAllFields(),
+                                                    include: [
+                                                        {
+                                                            model: LocationModel,
+                                                            as: "location",
+                                                            attributes: LocationModel.getAllFields()
+                                                        }
+                                                    ]
+                                                }
+                                            ]
                                         }
                                     ]
                                 }

@@ -15,15 +15,16 @@
     /* estilos */
     color: var(--color-theme-font-white);
     border: 1px solid var(--color-theme-border-table);
+    height: 50px;
 }
 
 .thTableHeader > * {
     color: inherit;
 }
 
-.rowTableHeader label {
+.labelTableHeader {
+    font-size: 14px;
     /* estilos */
-    font-weight: lighter;
 }
 
 .thTableHeader:first-child {

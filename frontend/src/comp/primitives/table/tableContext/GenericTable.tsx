@@ -1,4 +1,4 @@
-import type { ColumnDef, Table } from "@tanstack/react-table";
+import type { ColumnDef, Row, RowSelectionState, Table } from "@tanstack/react-table";
 import type { RowAction, TopButtonAction } from "../types";
 import ProviderTableContext from "./ProviderTableContext";
 import TableBase from "./TableBase";
@@ -21,6 +21,8 @@ interface GenericTableProps<T> {
     enableRowSelection?: boolean;
     enableOptionsColumn?: boolean;
     noResultsMessage?: string;
+    onRowSelectionChange?: (selected: T[], table?: Table<T>) => void;
+    conditionalRowSelection?: (updater: RowSelectionState, rows: Row<T>[]) => boolean;
     extraComponents?: (table?: Table<T>) => React.ReactNode;
     footerComponents?: (table: Table<T>) => React.ReactNode;
     classNameGenericTableContainer?: string;
@@ -56,6 +58,8 @@ const GenericTable = <T,>({
     noResultsMessage = "No results.",
     classNameGenericTableContainer,
     classNameTableContainer,
+    onRowSelectionChange,
+    conditionalRowSelection,
     classNameTable,
     classNameTableBody,
     classNameTableHeader,
@@ -81,6 +85,7 @@ const GenericTable = <T,>({
         ...(initialState || {}),
     }), [initialState]);
 
+
     return (
         <ProviderTableContext
             initialState={finalState}
@@ -97,7 +102,9 @@ const GenericTable = <T,>({
                 enableSorting={enableSorting}
                 enableViews={enableViews}
                 enablePagination={enablePagination}
+                onRowSelectionChange={onRowSelectionChange}
                 enableRowSelection={enableRowSelection}
+                conditionalRowSelection={conditionalRowSelection}
                 enableOptionsColumn={enableOptionsColumn}
                 noResultsMessage={noResultsMessage}
                 extraComponents={extraComponents}

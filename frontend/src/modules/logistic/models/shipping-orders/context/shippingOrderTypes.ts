@@ -29,7 +29,7 @@ type ShippingOrderAction =
     // Acciones directas al array de shipping order purchased order products
     | { type: typeof shippingOrderActionsTypes.ADD_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS, payload: IPartialShippingOrderPurchasedOrderProduct[] }
     | { type: typeof shippingOrderActionsTypes.REMOVE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS, payload: number[] }
-    | { type: typeof shippingOrderActionsTypes.UPDATE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS, payload: { id: number, attributes: IPartialShippingOrderPurchasedOrderProduct[] } }
+    | { type: typeof shippingOrderActionsTypes.UPDATE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS, payload: { id: number, attributes: IPartialShippingOrderPurchasedOrderProduct } }
     // Acciones de los steps
     | { type: typeof shippingOrderActionsTypes.SET_STEP, payload: number }
     | { type: typeof shippingOrderActionsTypes.BACK_STEP }
