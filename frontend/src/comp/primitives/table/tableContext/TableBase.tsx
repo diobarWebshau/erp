@@ -1,29 +1,28 @@
-import { useTableDispatch, useTableState } from "./tableHooks"
-import { set_row_selection, set_sorting, clear_row_selection, set_column_visibility, set_column_filters, set_pagination } from "./tableActions"
+import type { ColumnDef, ColumnFiltersState, PaginationState, Row, RowModel, RowSelectionState, SortingState, Table, Updater, VisibilityState } from "@tanstack/react-table";
 import { getCoreRowModel, getExpandedRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
-import type { ColumnDef, ColumnFiltersState, PaginationState, Row, RowSelectionState, SortingState, Table, Updater, VisibilityState } from "@tanstack/react-table";
-import type { RowAction } from "./tableTypes";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
-import { Ellipsis } from "lucide-react";
-import formatDateToDMY from "../utils/formatDateToDMY";
-import startsWithFilter from "../filters/string/startsWithFilter";
+import { set_row_selection, set_sorting, set_column_visibility, set_column_filters, set_pagination } from "./tableActions"
+import PopoverFloating from "../../../external/floating/pop-over/PopoverFloating";
+import equalsBooleanFilter from "../filters/boolean/equalsBooleanFilter";
 import betweenNumberFilter from "../filters/number/betweenNumberFilter";
 import equalsNumberFilter from "../filters/number/equalsNumberFilter";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import startsWithFilter from "../filters/string/startsWithFilter";
 import betweenDateFilter from "../filters/date/betweenDateFilter";
 import equalsDateFilter from "../filters/date/equalsDateFilter";
-import equalsBooleanFilter from "../filters/boolean/equalsBooleanFilter";
-import GeneratorBodyTable from "../components/generator_body-table/GeneratorBodyTable";
-import TableFooterControls from "../components/table-footer-controls/TableFooterControls";
-import GeneratorHeaderTable from "../components/generator-header-table/GeneratorHeaderTable";
+import { useTableDispatch, useTableState } from "./tableHooks"
+import formatDateToDMY from "../utils/formatDateToDMY";
+import type { RowAction } from "./tableTypes";
+import { Ellipsis } from "lucide-react";
 import stylesModules from "./TableBase.module.css"
-import PopoverFloating from "../../../external/floating/pop-over/PopoverFloating";
+import GeneratorHeaderTable from "../components/generator-header-table/GeneratorHeaderTable";
+import TableFooterControlsMemo from "../components/table-footer-controls/TableFooterControls";
+import GeneratorBodyTableMemo from "../components/generator_body-table/GeneratorBodyTable";
 
 interface TableBaseProps<T> {
     modelName: string;
     columns: ColumnDef<T>[];
     isLoadingData?: boolean;
     data: T[];
-    onDeleteSelected: (datas: T[]) => void;
     typeRowActions?: "ellipsis" | "icon";
     rowActions?: RowAction<T>[];
     enableFilters?: boolean;
@@ -55,7 +54,6 @@ const TableBase = <T,>({
     columns,
     isLoadingData,
     data,
-    onDeleteSelected,
     rowActions,
     typeRowActions = "ellipsis",
     enableFilters = false,
@@ -85,26 +83,26 @@ const TableBase = <T,>({
 
     const dispatch = useTableDispatch();
     const state = useTableState();
-    const memoData = useMemo(() => data, [data]);
-    const memoGetRowId = useCallback(getRowId, [getRowId]);
-    const baseColumns = useMemo(() => columns, [columns]);
     const firstRenderRef = useRef(true);
+    const memoData = useMemo(() => data, [data]);
+    const baseColumns = useMemo(() => columns, [columns]);
+    const memoGetRowId = useCallback(getRowId, [getRowId]);
 
     // todo: LOGICA PARA OPCIONES DE ROWS
 
-    const deleteRowsSelected = () => {
-        const selectedIds = Object.keys(state.rowSelectionState).filter(
-            (rowId) => state.rowSelectionState[rowId] === true
-        );
+    // const deleteRowsSelected = () => {
+    //     const selectedIds = Object.keys(state.rowSelectionState).filter(
+    //         (rowId) => state.rowSelectionState[rowId] === true
+    //     );
 
-        const selectedRows = data.filter((row, index) => {
-            const rowId = getRowId(row, index);
-            return selectedIds.includes(rowId);
-        });
+    //     const selectedRows = data.filter((row, index) => {
+    //         const rowId = getRowId(row, index);
+    //         return selectedIds.includes(rowId);
+    //     });
 
-        onDeleteSelected(selectedRows);
-        dispatch(clear_row_selection());
-    };
+    //     onDeleteSelected(selectedRows);
+    //     dispatch(clear_row_selection());
+    // };
 
     // * ********* Preprocesamiento de las columnas ********* */
 
@@ -145,7 +143,7 @@ const TableBase = <T,>({
             parts.push({
                 id: "select",
                 header: ({ table }) => (
-                    <input
+                    <CheckBoxTableMemo
                         className={stylesModules.checkboxHeader}
                         type="checkbox"
                         checked={table.getIsAllPageRowsSelected()}
@@ -153,7 +151,7 @@ const TableBase = <T,>({
                     />
                 ),
                 cell: ({ row }) => (
-                    <input
+                    <CheckBoxTableMemo
                         className={stylesModules.checkbox}
                         type="checkbox"
                         checked={row.getIsSelected()}
@@ -227,7 +225,6 @@ const TableBase = <T,>({
 
     const onRowSelectionChange = useCallback((updater: Updater<RowSelectionState>) => {
         const next = typeof updater === "function" ? updater(state.rowSelectionState) : updater;
-
         const ok = conditionalRowSelection ? conditionalRowSelection(next, table.getRowModel().rows) : true;
         if (ok) dispatch(set_row_selection(next));
     }, [dispatch, state.rowSelectionState, conditionalRowSelection /* no pongas table aquí */]);
@@ -254,7 +251,6 @@ const TableBase = <T,>({
 
     // ****** Inicializacion de la tabla ******
 
-
     const table: Table<T> = useReactTable({
 
         // ? props base de la tabla
@@ -262,7 +258,6 @@ const TableBase = <T,>({
         columns: memoProcessedColumns,
         getRowId: memoGetRowId,
         getCoreRowModel: getCoreRowModel(),
-
 
         // ? Modelos de la tabla segun se requieran
         ...(enablePagination ? { getPaginationRowModel: getPaginationRowModel() } : {}),
@@ -272,16 +267,15 @@ const TableBase = <T,>({
 
         // ? Hanlder onChange de la tabla(Visibilidad, filtros, sorts, paginacion y seleccion de filas)
         ...(enableRowSelection && { onRowSelectionChange: onRowSelectionChange }),
-    onColumnVisibilityChange: onColumnVisibilityChange,
+        onColumnVisibilityChange: onColumnVisibilityChange,
         ...(enableSorting && { onSortingChange: onSortingChange }),
         ...(enableFilters && { onColumnFiltersChange: onColumnFiltersChange }),
         ...(enablePagination && { onPaginationChange: onPaginationChange }),
 
-
-    // ? Estado inicial de la tabla establecida por el estado global(Context Provider)
-    state: {
+        // ? Estado inicial de la tabla establecida por el estado global(Context Provider)
+        state: {
             ...(enableRowSelection ? { rowSelection: state.rowSelectionState } : {}),
-        columnVisibility: mergedVisibilityColumns,
+            columnVisibility: mergedVisibilityColumns,
             ...(enableFilters ? { columnFilters: state.columnFiltersState } : {}),
             ...(enablePagination ? { pagination: state.paginationState } : {}),
             ...(enableSorting ? { sorting: state.sortingState } : {}),
@@ -289,175 +283,155 @@ const TableBase = <T,>({
         },
     });
 
-// * ********* Efectos ********* */
+    // * ********* Efectos ********* */
 
-// ? Efecto que permite retroalimentar al padre sobre cuando ocurrio una seleccion, y ejecutar una funcion enviada desde el padre(Este efecto no debe realizarse en el primer render)
-useEffect(() => {
-    if (firstRenderRef.current) { // Si es el primer render, no efectuar el metodo del onSelected del padre
-        console.log(`firstRenderRef.current:`, firstRenderRef.current);
-        firstRenderRef.current = false;
-        return;
-    }
-    const selected = table.getPreFilteredRowModel()
-        .rows.filter(r => r.getIsSelected()).map(r => r.original);
-    onRowSelectionChangeExternal?.(selected);
-}, [state.rowSelectionState, onRowSelectionChangeExternal, memoData.length]);
-// useEffect(() => {
-//     if (firstRenderRef.current) { // Si es el primer render, no efectuar el metodo del onSelected del padre
-//         firstRenderRef.current = false;
-//         return;
-//     }
-//     if (!memoData.length) return;            // espera a que haya data
-//     const selected = table.getPreFilteredRowModel().rows
-//         .filter(r => r.getIsSelected())
-//         .map(r => r.original);
-//     onRowSelectionChangeExternal?.(selected);
-// }, [state.rowSelectionState, memoData.length]);
-
-
-// useEffect(() => {
-//     const next = { ...initialStateVisibilityColumns };
-//     dispatch(set_column_visibility(next));
-// }, [initialStateVisibilityColumns])
-
-
-return (
-    < div
-        className={
-            `${stylesModules.container} ${classNameGenericTableContainer} ` +
-            `${extraComponents ? stylesModules.containerWithExtraComponents : stylesModules.containerWithoutExtraComponents}`
+    /*  
+        Efecto que permite retroalimentar al padre sobre cuando
+        ocurrio una seleccion, y ejecutar una funcion enviada
+        desde el padre(Este efecto no debe realizarse en el
+        primer render)
+    */
+    useEffect(() => {
+        if (firstRenderRef.current) {
+            firstRenderRef.current = false;
+            return;
         }
-    >
-        {
-            extraComponents &&
-            <div
-                className={`${stylesModules.headerContainer} ${classNameExtraComponents}`}
-            >
-                {(
-                    <div
-                        className={`${stylesModules.extraComponentsContainer} `}
-                    >
+
+        // 1) IDs marcados como true en tu estado global
+        const selectedIds = Object.entries(state.rowSelectionState)
+            .filter(([, v]) => v)
+            .map(([k]) => k);
+
+        // 2) Mapa rápido id->row presente en la data actual
+        const present = new Map<string, T>();
+        for (let i = 0; i < memoData.length; i++) {
+            present.set(memoGetRowId(memoData[i], i), memoData[i]);
+        }
+
+        // 3) Si la data actual NO contiene todos los seleccionados, NO notifiques.
+        //    Esto evita "des-seleccionar" por el hecho de filtrar/paginar.
+        const allVisible = selectedIds.every((id) => present.has(id));
+        if (!allVisible) {
+            return;
+        }
+
+        // 4) Arma el array de seleccionados y notifica
+        const selected = selectedIds
+            .map((id) => present.get(id))
+            .filter((r): r is T => Boolean(r));
+
+        onRowSelectionChangeExternal?.(selected);
+
+        // 👇 deps: SOLO cambia cuando cambia la selección o la data
+    }, [state.rowSelectionState, onRowSelectionChangeExternal, memoData, memoGetRowId]);
+
+
+    // **** Declaracion de los classNames **** */
+
+    const [
+        containerClassNames, headerClassNames, containerMainClassNames,
+        containerTableClassNames, tableClassNames, headerTableClassNames,
+        bodyTableClassNames, footerclassNames
+    ] = useMemo(() => {
+        const containerClassNames =
+            `${stylesModules.container} ${classNameGenericTableContainer} ` +
+            `${extraComponents ? stylesModules.containerWithExtraComponents : stylesModules.containerWithoutExtraComponents} `;
+
+        const headerClassNames = `${stylesModules.headerContainer} ${classNameExtraComponents} `;
+
+        const containerMainClassNames = `${stylesModules.containerMain} ` +
+            `${enablePagination || footerComponents ? stylesModules.containerMainWithFooterOrPagination : stylesModules.containerMainWithoutFooterOrPagination} ` +
+            `${footerComponents && !enablePagination ? stylesModules.containerMainOnlyFooter : ""} `;
+
+        const containerTableClassNames = `${stylesModules.containerTable} ${classNameTableContainer} ` +
+            `${((footerComponents && !enablePagination) || (!enablePagination && !footerComponents)) ? stylesModules.containerTableBorderRadius : ""}`;
+
+        const tableClassNames = `${stylesModules.table} ${classNameTable} ` +
+            `${footerComponents ? stylesModules.tableWithoutFooter : ""}`;
+
+        const headerTableClassNames = `${stylesModules.tableHeader} ${classNameTableHeader}`;
+
+        const bodyTableClassNames = `${stylesModules.tableBody} ${classNameTableBody}`;
+
+        const footerclassNames = `${stylesModules.footerComponentsContainer} ${classNameFooter}`;
+
+        return [
+            containerClassNames, headerClassNames, containerMainClassNames,
+            containerTableClassNames, tableClassNames, headerTableClassNames,
+            bodyTableClassNames, footerclassNames
+        ];
+    }, [
+        extraComponents, enablePagination, footerComponents,
+        classNameGenericTableContainer, classNameExtraComponents,
+        classNameTableContainer, classNameTable,
+        classNameTableHeader, classNameTableBody
+    ]);
+
+    const wrapperTableClassNames = useMemo(() => {
+        const wrapperTableClassNames = `${(!(table?.getRowModel()?.rows?.length > 0) || isLoadingData) ? stylesModules.wrapperTableEmpty : stylesModules.wrapperTable}`;
+        return wrapperTableClassNames;
+    }, [table?.getRowModel()?.rows?.length, isLoadingData]);
+
+    const rowModel = table.getRowModel();
+
+    return (
+        <div className={containerClassNames}>
+            {extraComponents &&
+                <div className={headerClassNames}>
+                    <div className={`${stylesModules.extraComponentsContainer} `}>
                         {extraComponents(table)}
                     </div>
-                )}
-            </div>
-        }
-        <div
-            className={
-                ` ${stylesModules.containerMain} ` +
-                `${enablePagination || footerComponents
-                    ? stylesModules.containerMainWithFooterOrPagination
-                    : stylesModules.containerMainWithoutFooterOrPagination} ` +
-                `${footerComponents && stylesModules.containerMainOnlyFooter}`
+                </div>
             }
-        >
-            <div
-                className={
-                    `${stylesModules.containerTable} ${classNameTableContainer} ` +
-                    `${((footerComponents && !enablePagination) || (!enablePagination && !footerComponents)) ? stylesModules.containerTableBorderRadius : ""}`
-                }
-            >
-                {table?.getRowModel()?.rows?.length > 0 ? (
-                    <div className={stylesModules.wrapperTable}>
-                        <table
-                            className={
-                                `${stylesModules.table} ${classNameTable} ` +
-                                `${footerComponents ? stylesModules.tableWithoutFooter : ""}`
-                            }
-                        >
-                            {
-                                table?.getRowModel()?.rows?.length >= 0 && (
-                                    <GeneratorHeaderTable
-                                        table={table}
-                                        enableSorting={enableSorting}
-                                        enableFilters={enableFilters}
-                                        className={`${stylesModules.tableHeader} ${classNameTableHeader}`}
-                                        typeRowActions={typeRowActions}
-                                    />
-                                )}
-                            {
-                                table?.getRowModel()?.rows?.length >= 0 && (
-                                    <GeneratorBodyTable
-                                        table={table}
-                                        noResultsMessage={noResultsMessage}
-                                        enableRowEditClick={enableRowEditClick}
-                                        enableRowEditClickHandler={enableRowEditClickHandler}
-                                        className={`${stylesModules.tableBody} ${classNameTableBody}`}
-                                        expandedComponent={expandedComponent}
-                                        isExpanded={isExpanded}
-                                        isHasFooter={footerComponents ? true : false}
-                                        isHasPagination={enablePagination}
-                                        isLoadingData={isLoadingData}
-                                    />
-                                )
-                            }
+            <div className={containerMainClassNames}>
+                <div className={containerTableClassNames}>
+                    <div className={wrapperTableClassNames}>
+                        <table className={tableClassNames}>
+                            <GeneratorHeaderTable
+                                table={table}
+                                enableSorting={enableSorting}
+                                enableFilters={enableFilters}
+                                className={headerTableClassNames}
+                                typeRowActions={typeRowActions}
+                            />
+                            <GeneratorBodyTableMemo
+                                rowModel={rowModel}
+                                table={table}
+                                noResultsMessage={noResultsMessage}
+                                enableRowEditClick={enableRowEditClick}
+                                enableRowEditClickHandler={enableRowEditClickHandler}
+                                className={bodyTableClassNames}
+                                expandedComponent={expandedComponent}
+                                isExpanded={isExpanded}
+                                isHasFooter={footerComponents ? true : false}
+                                isHasPagination={enablePagination}
+                                isLoadingData={isLoadingData}
+                            />
                         </table>
                     </div>
-
-                ) : (
-                    <table
-                        className={
-                            `${stylesModules.table}  ${classNameTable} ` +
-                            `${footerComponents ? stylesModules.tableWithoutFooter : ""}`
+                </div>
+                {(enablePagination || footerComponents) &&
+                    <div className={stylesModules.containerOption}>
+                        {
+                            footerComponents &&
+                            <div className={footerclassNames}>
+                                {footerComponents(table)}
+                            </div>
                         }
-                    >
                         {
-                            table?.getRowModel()?.rows?.length >= 0 && (
-                                <GeneratorHeaderTable
+                            (table?.getRowModel()?.rows?.length >= 0 && enablePagination) && (
+                                <TableFooterControlsMemo<T>
                                     table={table}
-                                    enableSorting={enableSorting}
-                                    enableFilters={enableFilters}
-                                    className={`${stylesModules.tableHeader} ${classNameTableHeader}`}
-                                    typeRowActions={typeRowActions}
-                                />
-                            )}
-                        {
-                            table?.getRowModel()?.rows?.length >= 0 && (
-                                <GeneratorBodyTable
-                                    table={table}
-                                    noResultsMessage={noResultsMessage}
-                                    enableRowEditClick={enableRowEditClick}
-                                    enableRowEditClickHandler={enableRowEditClickHandler}
-                                    className={`${stylesModules.tableBody} ${classNameTableBody}`}
-                                    expandedComponent={expandedComponent}
-                                    isExpanded={isExpanded}
-                                    isHasPagination={footerComponents ? true : false}
-                                    isHasFooter={enablePagination}
-                                    isLoadingData={isLoadingData}
+                                    className={`${stylesModules.containerPagination} ${classNamePagination}`}
+                                    enableRowSelection={enableRowSelection}
                                 />
                             )
                         }
-                    </table>
-                )}
+                    </div>
+                }
             </div>
-            {(enablePagination || footerComponents) &&
-                <div className={`${stylesModules.containerOption}`}
-                >
-                    {
-                        footerComponents && (
-                            <div
-                                className={`${stylesModules.footerComponentsContainer} ${classNameFooter}`}
-                            >
-                                {footerComponents(table)}
-                            </div>
-                        )
-                    }
-                    {
-                        table?.getRowModel()?.rows?.length >= 0 &&
-                        enablePagination && (
-                            <TableFooterControls<T>
-                                deleteRowsSelected={deleteRowsSelected}
-                                table={table}
-                                className={`${stylesModules.containerPagination} ${classNamePagination}`}
-                                enableRowSelection={enableRowSelection}
-                            />
-                        )
-                    }
-                </div>
-            }
-        </div>
-    </div >
-)
+        </div >
+    )
 }
 
 const TableBaseMemo = memo(TableBase) as typeof TableBase;
@@ -483,12 +457,8 @@ const OptionsRow = <T,>({
             {typeRowActions === "ellipsis" ? (
                 <PopoverFloating
                     placement="bottom"
-                    childrenTrigger={
-                        <TriggerButtonOptionsRow />
-                    }
-                    childrenFloating={
-                        <PopoverContentOptionMemo rowActions={rowActions} row={row} />
-                    }
+                    childrenTrigger={<TriggerButtonOptionsRow />}
+                    childrenFloating={<PopoverContentOptionMemo rowActions={rowActions} row={row} />}
                 />
             ) : (
                 <div className={stylesModules.optionsColumn}>
@@ -516,9 +486,7 @@ const OptionsRowMemo = memo(OptionsRow) as typeof OptionsRow;
 
 const TriggerButtonOptionsRow = () => {
     return (
-        <button
-            className={stylesModules.optionsColumnButton}
-        >
+        <button className={stylesModules.optionsColumnButton}>
             <Ellipsis size={15} />
         </button>
     );
@@ -552,3 +520,31 @@ const PopoverContentOption = <T,>({
 
 const PopoverContentOptionMemo = memo(PopoverContentOption) as typeof PopoverContentOption;
 
+
+// * ********* Check Box table ********* */
+
+interface CheckBoxTableProps {
+    className?: string;
+    type?: string;
+    checked?: boolean;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const CheckBoxTable = ({ className, type, checked, onChange }: CheckBoxTableProps) => {
+
+    const handlerOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation();
+        onChange?.(e);
+    }
+
+    return (
+        <input
+            className={className}
+            type={type}
+            checked={checked}
+            onChange={handlerOnChange}
+        />
+    );
+};
+
+const CheckBoxTableMemo = memo(CheckBoxTable) as typeof CheckBoxTable;

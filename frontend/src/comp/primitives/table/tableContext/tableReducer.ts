@@ -61,8 +61,7 @@ const rowSelectionSliceReducer = (initialState: RowSelectionState) => (
             break; // si mutaste algo, Immer devolverá el nuevo estado
         }
         case TableActionTypes.CLEAR_ROW_SELECTION: {
-            if (Object.keys(draft).length === 0) return; // no mutaste nada, Immer devolverá el mismo estado
-            return {}; // si mutaste algo, Immer devolverá el nuevo estado
+            return initialState;
         }
         default:
             return;

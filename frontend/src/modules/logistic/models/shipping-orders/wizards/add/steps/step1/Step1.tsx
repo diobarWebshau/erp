@@ -54,8 +54,7 @@ const Step1 = ({
 
 
     const [search, setSearch] = useState<string>(client);
-    const [selectedPurchasedOrder, setSelectedPurchasedOrder] =
-        useState<IPartialPurchasedOrder[]>(purchase_orders);
+    const [selectedPurchasedOrder, setSelectedPurchasedOrder] = useState<IPartialPurchasedOrder[]>(purchase_orders);
 
     const {
         purchasedOrders,
@@ -132,8 +131,6 @@ const Step1 = ({
 
 
     const handleRowSelectionChange = (selected: IPurchasedOrder[]) => {
-        console.log(`selected:`, selected);
-        console.log(`selectedPurchasedOrder:`, selectedPurchasedOrder);
         const diffObject: {
             added: IPurchasedOrder[],
             deleted: IPurchasedOrder[]
@@ -178,7 +175,6 @@ const Step1 = ({
 
     return (
         <div className={StyleModule.container}>
-
             <div className={StyleModule.headerSection}>
                 <span className={`nunito - bold ${StyleModule.title} `}>Selecciona una orden</span>
                 <InputTextCustom
@@ -203,10 +199,7 @@ const Step1 = ({
                 enableFilters
                 enableSorting
                 enableRowSelection
-                isExpanded
-                expandedComponent={<div>Hola</div>}
                 /* acciones */
-                onDeleteSelected={() => { }}
                 getRowId={(row, _) => row.id.toString()}
                 onRowSelectionChangeExternal={handleRowSelectionChange}
                 conditionalRowSelection={conditionalRowSelection}

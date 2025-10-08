@@ -39,14 +39,11 @@ const usePurchasedOrderById = (id: number | undefined | null) => {
                         dispatch,
                         id
                     );
-                console.log("dasdsds")
-                console.log(data);
                 setPurchasedOrderById(data);
             } else {
                 setPurchasedOrderById(null);
             }
         } catch (err: unknown) {
-            console.log(err);
             const msg = err instanceof Error
                 ? { validation: err.message }
                 : { validation: "Unknown error" };

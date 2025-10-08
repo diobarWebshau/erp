@@ -1,5 +1,5 @@
 import type { Draft } from "immer";
-import { current, produce } from "immer";
+import { produce } from "immer";
 import type { ShippingOrderState, ShippingOrderAction } from "./shippingOrderTypes";
 import { shippingOrderActionsTypes } from "./shippingOrderTypes";
 
@@ -48,7 +48,6 @@ const inventoriesReducer = produce((
             }
             break;
         }
-
         // ? Acciones de los steps
         case shippingOrderActionsTypes.SET_STEP:
             draft.current_step = action.payload;

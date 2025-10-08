@@ -10,7 +10,6 @@ interface GenericTableProps<T> {
     modelName: string;
     columns: ColumnDef<T>[];
     data: T[];
-    onDeleteSelected: (datas: T[]) => void;
     rowActions?: RowAction<T>[];
     typeRowActions?: "ellipsis" | "icon";
     isLoadingData?: boolean;
@@ -44,7 +43,6 @@ const GenericTable = <T,>({
     modelName,
     columns,
     data,
-    onDeleteSelected,
     rowActions,
     typeRowActions = "ellipsis",
     isLoadingData,
@@ -91,7 +89,6 @@ const GenericTable = <T,>({
                 modelName={modelName}
                 columns={columns}
                 data={data}
-                onDeleteSelected={onDeleteSelected}
                 rowActions={rowActions}
                 typeRowActions={typeRowActions}
                 isLoadingData={isLoadingData}

@@ -1,11 +1,11 @@
 import CriticalActionButton from "../../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import StyleModule from "./Step2.module.css";
 import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
 import { back_step, next_step, update_shipping_order_purchased_order_products } from "../../../../context/shippingOrderActions";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
 import DateInputMantine from "./../../../../../../../../comp/external/mantine/date/input/base/DateInputMantine"
 import type { ColumnDef } from "@tanstack/react-table";
 import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
@@ -19,6 +19,8 @@ import Tag from "./../../../../../../../../comp/primitives/tag/Tag";
 import usePurchasedOrders from "../../../../../../../../modelos/purchased_orders/hooks/usePurchasedOrders";
 import type { IPartialPurchasedOrder, IPurchasedOrder } from "interfaces/purchasedOrder";
 import SelectPurchasedModal from "../../../../../../../../comp/features/modal-purchase/SelectPurchasedModal";
+import type { ShippingOrderAction } from "../../../../context/shippingOrderTypes";
+
 
 interface IStep2 {
     onClose: () => void;
@@ -43,10 +45,7 @@ const Step2 = ({
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
 
-    const {
-        purchasedOrders,
-        loadingPurchasedOrders
-    } = usePurchasedOrders(client_name);
+    const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders(client_name, 0);
 
     const handleOnClickPrevious = () => {
         dispatch(back_step());
@@ -131,31 +130,22 @@ const Step2 = ({
             accessorKey: "qty",
             header: "Cantidad a enviar",
             cell: ({ row }) => (
-                <QuantityCell record={row.original} dispatch={dispatch} />
+                <QuantityCell
+                    record={row.original}
+                    dispatch={dispatch}
+                />
             )
         },
         {
             id: "disponibilidad ",
             header: "Disponibilidad",
             cell: (row) => {
-                const inventory = row.row.original.location?.inventory;
-                const qty = row.row.original.qty ?? 0;
-                const available = inventory?.available || 0;
-                const minimumStock = inventory?.minimum_stock || 0;
-                let className: string;
-
-                if (available < qty) {
-                    className = StyleModule.tagError;
-                } else if (available >= qty && (available + qty) > minimumStock) {
-                    className = StyleModule.tagSuccess;
-                } else {
-                    className = StyleModule.tagWarning;
-                }
-
+                const record = row.row.original;
                 return (
-                    <Tag
-                        label={formatNumber(available)}
-                        className={className}
+                    <TagTable
+                        qty={record.qty || 0}
+                        available={record.location?.inventory?.available || 0}
+                        minimumStock={record.location?.inventory?.minimum_stock || 0}
                     />
                 );
             }
@@ -206,10 +196,8 @@ const Step2 = ({
                     modelName="shipping_order_purchase_order_product"
                     columns={columns}
                     data={state.data?.shipping_order_purchase_order_product as IPartialShippingOrderPurchasedOrderProduct[]}
-                    onDeleteSelected={() => { }}
                     enableRowSelection
                     classNameGenericTableContainer={StyleModule.genericTableContainer}
-
                     getRowId={(row) => `${row.purchase_order_product_id?.toString()}-${row.purchase_order_products?.purchase_order_id?.toString() || ""}`}
                 />
             </div>
@@ -246,64 +234,63 @@ export default Step2;
 
 // *********** QuantityCell ***********
 
-const QuantityCell = memo(
-    ({
-        record,
-        dispatch,
-    }: {
-        record: IPartialShippingOrderPurchasedOrderProduct;
-        dispatch: any;
-    }) => {
+interface QuantityCellProps {
+    record: IPartialShippingOrderPurchasedOrderProduct;
+    dispatch: Dispatch<ShippingOrderAction>;
+}
+
+const QuantityCell = ({
+    record,
+    dispatch,
+}: QuantityCellProps) => {
+
+    const [valueQty, limitQty] = (() => {
         const valueQty = record.qty || 0;
+        const limitQty = (Number(record.purchase_order_products?.qty ?? 0) -
+            Number(record.purchase_order_products?.shipping_summary?.shipping_qty ?? 0));
+        return [valueQty, limitQty];
+    })();
 
-        const handleChange = useCallback(
-            (value: number) => {
-                dispatch(
-                    update_shipping_order_purchased_order_products({
-                        id: record.purchase_order_product_id ?? 0,
-                        attributes: { qty: value },
-                    })
-                );
-            },
-            [dispatch, record.purchase_order_product_id]
+    const handleChange = (value: number) => {
+        dispatch(
+            update_shipping_order_purchased_order_products({
+                id: record.purchase_order_product_id ?? 0,
+                attributes: { qty: value },
+            })
         );
+    };
 
-        const limitQty =
-            Number(record.purchase_order_products?.qty ?? 0) -
-            Number(record.purchase_order_products?.shipping_summary?.shipping_qty ?? 0);
-
-        return (
-            <NumericInputCustom
-                value={valueQty}
-                onChange={handleChange}
-                onlyCommitOnBlur
-                max={limitQty}
-            />
-        );
-    }
-);
+    return (
+        <NumericInputCustom
+            value={valueQty}
+            onChange={handleChange}
+            onlyCommitOnBlur
+            max={limitQty}
+        />
+    );
+};
 
 // *********** LocationCell ***********
 
 interface LocationCellProps {
     record: IPartialShippingOrderPurchasedOrderProduct;
-    dispatch: any;
+    dispatch: Dispatch<ShippingOrderAction>;
 }
 
-const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
+const LocationCell = ({ record, dispatch }: LocationCellProps) => {
 
-    const { loadingLocationsProducedProduct, locationsProducedProduct } =
-        useLocationsProducedOneProduct(record.purchase_order_products?.product?.id);
+    const product = record.purchase_order_products?.product;
 
-    const handleOnChangeLocation = useCallback(
-        (location: ILocation | null | undefined) => {
-            dispatch(update_shipping_order_purchased_order_products({
-                id: record.purchase_order_product_id ?? 0,
-                attributes: { location: location ?? undefined }
-            }));
-        },
-        [dispatch, record.purchase_order_product_id]
-    );
+    const { loadingLocationsProducedProduct, locationsProducedProduct } = useLocationsProducedOneProduct(product?.id ?? 0);
+
+    const handleOnChangeLocation = (
+        location: ILocation | null | undefined) => {
+        console.log(record?.qty);
+        dispatch(update_shipping_order_purchased_order_products({
+            id: record.purchase_order_product_id ?? 0,
+            attributes: { location: location ?? undefined }
+        }));
+    };
 
     useEffect(() => {
         if (!record.location && locationsProducedProduct.length > 0) {
@@ -328,4 +315,33 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
             )}
         </div>
     );
-});
+};
+
+
+/* ********** Tag ********** */
+
+interface TagTableProps {
+    qty: number;
+    available: number;
+    minimumStock: number;
+}
+
+const TagTable = ({ qty, available, minimumStock }: TagTableProps) => {
+    // OJO: lo correcto normalmente es comparar el remanente (available - qty)
+    const { className } = useMemo(() => {
+        let className: string;
+        const remaining = available - qty;
+
+        if (available < qty) {
+            className = StyleModule.tagError;
+        } else if (remaining > minimumStock) {
+            className = StyleModule.tagSuccess;
+        } else {
+            className = StyleModule.tagWarning;
+        }
+        return { className };
+    }, [qty, available, minimumStock]);
+
+    return <Tag label={formatNumber(available)} className={className} />;
+};
+

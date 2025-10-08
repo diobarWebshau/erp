@@ -170,4 +170,3 @@ const NumericInput = ({
 };
 
 export default NumericInput;
-

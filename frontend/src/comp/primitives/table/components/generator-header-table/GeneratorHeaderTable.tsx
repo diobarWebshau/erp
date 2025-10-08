@@ -31,4 +31,6 @@ const GeneratorHeaderTable = <T,>({
     );
 }
 
+// const GeneratorHeaderTableMemo = memo(GeneratorHeaderTable) as typeof GeneratorHeaderTable;
+
 export default GeneratorHeaderTable;

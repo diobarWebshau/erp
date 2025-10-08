@@ -1,11 +1,13 @@
-import type { Row, Table } from "@tanstack/react-table";
+import { useTableState } from "../../tableContext/tableHooks";
+import type { Row, RowModel, Table } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
-import stylesModules from "./GeneratorBodyTable.module.css"
 import { memo, useCallback, useMemo, useState } from "react";
 import { useViewTransition } from "./useHookds";
 import { Loader } from "@mantine/core";
+import stylesModules from "./GeneratorBodyTable.module.css"
 
 interface GeneratorBodyTableProps<T> {
+    rowModel: RowModel<T>;
     table: Table<T>;
     noResultsMessage?: string;
     enableRowEditClick?: boolean;
@@ -19,6 +21,7 @@ interface GeneratorBodyTableProps<T> {
 }
 
 const GeneratorBodyTable = <T,>({
+    rowModel,
     table,
     noResultsMessage = "No results found",
     enableRowEditClick = false,
@@ -30,26 +33,26 @@ const GeneratorBodyTable = <T,>({
     isLoadingData = false,
 }: GeneratorBodyTableProps<T>) => {
 
+    const state = useTableState();
     const tbodyClassName = useMemo(() => {
         const tbodyClassName: string = `${stylesModules.tableBody} ` +
             `${(isHasFooter || isHasPagination) ? stylesModules.tableBodyWithFooter : ""} `;
         return tbodyClassName;
-    }, [isHasFooter, isHasPagination])
+    }, [isHasFooter, isHasPagination, state.columnFiltersState, state.sortingState, state.paginationState])
 
     return (
         <tbody className={tbodyClassName}>
             {
                 isLoadingData ? (
                     <tr className={stylesModules.trTableEmpty}>
-                        <td colSpan={table?.getAllColumns().length} className={stylesModules.sd}>
-                            <Loader
-                                size={24}
-                                className="nunito-bold"
-                            />
+                        <td colSpan={table?.getAllColumns().length}>
+                            <div className={stylesModules.containerLoading}>
+                                <Loader size="lg" type="oval" color="var(--color-theme-primary)" />
+                            </div>
                         </td>
                     </tr>
-                ) : table?.getRowModel().rows.length > 0 ? (
-                    table?.getRowModel().rows.map((row) => (
+                ) : rowModel.rows.length > 0 ? (
+                    rowModel.rows.map((row) => (
                         <RowComponentMemo
                             key={row.id}
                             row={row}
@@ -60,12 +63,8 @@ const GeneratorBodyTable = <T,>({
                         />
                     ))
                 ) : (
-                    <tr
-                        className={stylesModules.trTableEmpty}
-                    >
-                        <td
-                            className="nunito-regular"
-                            colSpan={table?.getAllColumns().length}>
+                    <tr className={stylesModules.trTableEmpty}>
+                        <td className="nunito-regular" colSpan={table?.getAllColumns().length}>
                             {noResultsMessage}
                         </td>
                     </tr>
@@ -100,15 +99,17 @@ const RowComponent = <T,>({
     isExpanded,
 }: IRowComponent<T>) => {
 
-    const [isExpandedRow, setIsExpandedRow] = useState<string>("");
+    const state = useTableState();
 
+
+    const [isExpandedRow, setIsExpandedRow] = useState<string>("");
     const { startViewTransition } = useViewTransition();
 
     const [classNameRow] = useMemo(() => {
         const classNameRow = `${stylesModules.trTableBody} ` +
             `${row.getIsSelected() ? stylesModules.rowSelected : ""} `;
         return [classNameRow];
-    }, [row])
+    }, [row, state.rowSelectionState])
 
     const handlerOnClickRow = useCallback((row: Row<T>) => {
         if (isExpandedRow === row.id) {
@@ -131,29 +132,18 @@ const RowComponent = <T,>({
 
     return (
         <>
-            <tr
-                key={row.id}
-                className={classNameRow}
-                onClick={createHandlerOnClickRow(row)}
-            >
+            <tr key={row.id} className={classNameRow} onClick={createHandlerOnClickRow(row)}>
                 {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}
-                        className={stylesModules.tdTableBody}
-                    >
+                    <td key={cell.id} className={stylesModules.tdTableBody}>
                         <div>
-                            {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                            )}
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </div>
                     </td>
                 ))}
             </tr>
             {(enableRowEditClick === undefined || !enableRowEditClick)
                 && (isExpanded && isExpandedRow === row.id) && (
-                    <tr key={row.id + "-expanded"}
-                        className={classNameRow}
-                    >
+                    <tr key={row.id + "-expanded"} className={classNameRow}>
                         <td colSpan={row.getVisibleCells().length}>
                             {expandedComponent}
                         </td>
@@ -163,4 +153,6 @@ const RowComponent = <T,>({
     )
 }
 
-const RowComponentMemo = memo(RowComponent) as typeof RowComponent;
+const RowComponentMemo = memo(RowComponent,) as typeof RowComponent;
+
+

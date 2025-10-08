@@ -40,7 +40,6 @@ const useDebouncedFetch = <T,>(
                 // Ejecuta la función fetch pasada por el usuario, con señal de cancelación
                 const result = await fetchFn(searchTerm, controller.signal);
 
-                console.log("result en useDebouncedFetch:", result);
                 // Almacena los datos obtenidos
                 setData(result);
             } finally {

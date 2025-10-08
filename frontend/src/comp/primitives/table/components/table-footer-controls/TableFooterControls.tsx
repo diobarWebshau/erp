@@ -1,65 +1,45 @@
-import type {
-    Table
-} from "@tanstack/react-table";
-import PaginationControls
-    from "../pagination-controls/PaginationControls";
-import StyleModule
-    from "./TableFooterControls.module.css";
-import FadeButton
-    from "../../../button/fade-button/FadeButton";
-import {
-    useTableDispatch,
-    useTableState
-} from "../../tableContext/tableHooks";
+import type { Table } from "@tanstack/react-table";
+import PaginationControls from "../pagination-controls/PaginationControls";
+import { useTableState } from "../../tableContext/tableHooks";
+import StyleModule from "./TableFooterControls.module.css";
+import { memo, useMemo } from "react";
 
 interface TableFooterControlsProps<T> {
-    deleteRowsSelected: () => void;
     table: Table<T>;
     className?: string;
     enableRowSelection?: boolean;
 }
 
 const TableFooterControls = <T,>({
-    deleteRowsSelected,
     table,
     className = "",
     enableRowSelection = false,
 }: TableFooterControlsProps<T>) => {
 
     const state = useTableState();
-    const dispatch = useTableDispatch();
+
+    const containerClassName = useMemo(() => {
+        return `${StyleModule.container} ` +
+            `${(enableRowSelection && Object.keys(state.rowSelectionState).length > 0)
+                ? StyleModule.containerWithSelection
+                : StyleModule.containerWithoutSelection} ` +
+            `${className}`;
+    }, [enableRowSelection, state.rowSelectionState, className]);
 
     return (
-        <div
-            className={`nunito-regular ${StyleModule.container} ${className}`}
-            style={{
-                // justifyContent: enableRowSelection ? "end" : "flex-end",
-                justifyContent: "flex-end",
-            }}
-        >
-            {/* {enableRowSelection && (
-                <div
-                    className={StyleModule.selectRowsSection}
-                >
-                    <span>{`${Object.keys(state.rowSelectionState).length} rows selected`}</span>
-                    {Object.keys(state.rowSelectionState).length > 0 && (
-                        <FadeButton
-                            onClick={deleteRowsSelected}
-                            label="Delete"
-                            type="button"
-                            classNameButton={StyleModule.deleteButton}
-                            classNameLabel={StyleModule.deleteButtonLabel}
-                            classNameSpan={StyleModule.deleteButtonSpan}
-                        />
-                    )}
+        <div className={containerClassName}>
+            {enableRowSelection && Object.keys(state.rowSelectionState).length > 0 && (
+                <div className={`nunito-regular ${StyleModule.infoContainer}`}>
+                    <span>{`${Object.keys(state.rowSelectionState).length} registro(s) seleccionado(s)`}</span>
                 </div>
-            )} */}
-            <PaginationControls
-                table={table}
-                className={StyleModule.paginationControls}
-            />
+            )}
+            <div className={StyleModule.paginationContainer}>
+                <PaginationControls table={table} className={StyleModule.paginationControls} />
+            </div>
         </div>
     );
 };
 
-export default TableFooterControls;
+const TableFooterControlsMemo = memo(TableFooterControls) as typeof TableFooterControls;
+
+export default TableFooterControlsMemo;

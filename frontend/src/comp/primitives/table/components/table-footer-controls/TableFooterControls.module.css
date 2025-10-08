@@ -1,71 +1,51 @@
+/* ******** Container ******** */
+
 .container {
     /* dimension */
-    height: 100%;
+    height: 50px;
+    width: 100%;
 
     /* distribucion flex */
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    justify-content: space-between;
     align-items: center;
-
-    /* estilos */
-    font-size: 14px;
 }
 
-.selectRowsSection {
+.containerWithoutSelection {
     /* dimension */
-    height: 100%;
-    width: 20%;
+    justify-content: flex-end;
+}
 
-    /* distribucion flex */
+.containerWithSelection {
+    /* dimension */
+    justify-content: space-between;
+}
+
+/* ******** Pagination ******** */
+
+.paginationContainer {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
-    align-content: center;
-    align-items: center;
-    gap: 1rem;
-
-    /* estilos */
-    color: var(--color-theme-primary);
+    align-items: flex-end;
 }
-
-
-.deleteButton {
-    /* dimension */
-    width: 40%;
-    height: 70%;
-}
-
 
 .paginationControls {
     /* dimension */
     width: auto;
 }
 
-.deleteButton { 
-    /* dimension */
-    width: 40%;
-    height: 70%;
+/* ******** Info ******** */
 
-    /* estilos */
-    border-radius: 15px;
-    background-color: var(--color-theme-primary);
-    color: var(--color-theme-font-white);
-
-    /* eventos */
-    &:hover {
-        background-color: var(--color-theme-secondary);
-    }
+.infoContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
 }
 
-.deleteButtonLabel {
-    /* estilos */
-    color: var(--color-theme-font-white);
+.infoContainer {
+    color: var(--color-theme-primary);
+    font-size: 14px;
+
 }
-
-.deleteButtonSpan {
-    /* distribucion flex */
-    justify-content: center;
-}
-
-

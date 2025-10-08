@@ -34,6 +34,6 @@ const NumericInputCustom = ({
     );
 }
 
-// Memoizamos
-// Usamos `as typeof NumericInputCustom` para mantener el tipado intacto, especialmente si este componente es genérico o se usa en celdas de tablas
-export default memo(NumericInputCustom) as typeof NumericInputCustom;
+const NumericInputCustomMemo = memo(NumericInputCustom) as typeof NumericInputCustom;
+
+export default NumericInputCustomMemo;

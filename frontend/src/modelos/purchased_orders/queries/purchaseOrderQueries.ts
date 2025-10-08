@@ -46,7 +46,6 @@ const fetchPurchasedOrdersFromDB = async (
 
         const data: IPurchasedOrder[] = await response.json();
 
-        console.log(data);
         return data;
     } catch (error: unknown) {
         console.log(error);

@@ -7,7 +7,7 @@
     min-width: 0;
 }
 
-.containerWithExtraComponents{
+.containerWithExtraComponents {
     /* distribucion  grid */
     display: grid;
     grid-template:
@@ -17,7 +17,7 @@
     gap: 1rem;
 }
 
-.containerWithoutExtraComponents{
+.containerWithoutExtraComponents {
     /* distribucion  grid */
     display: grid;
     grid-template:
@@ -42,7 +42,7 @@
     display: flex;
 }
 
-.extraComponentsContainer{
+.extraComponentsContainer {
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
@@ -156,13 +156,44 @@
 .wrapperTable {
     /* distribucion flex respecto al padre */
     flex: 1;
-    min-height: 0;   /* asegura que pueda encogerse dentro de flex */
+
+    /* dimension */
+    min-height: 0;
 
     /* distribucion flex */
     display: flex;
     flex-direction: column;
     justify-content: start;
     align-items: stretch;
+}
+
+.wrapperTableEmpty {
+    /* distribucion flex con respecto al padre */
+    flex: 1;
+
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+}
+
+.wrapperTableEmpty>*:first-child {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+}
+
+.wrapperTableEmpty>*:last-child {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
 }
 
 /*

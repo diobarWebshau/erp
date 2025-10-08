@@ -1,7 +1,9 @@
+/* ********* Container ******** */
+
 .container {
-    /* dimension */
-    height: 100%;
-    
+    /* distribucion flex con respecto al padre */
+    flex: 1;
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -11,7 +13,16 @@
     gap: 2rem;
 }
 
-.selectRowPerPage {
+.container > * {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+
+/* * ********* selectRowPerPageContainer  ******** */
+
+.selectRowPerPageContainer {
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -19,9 +30,16 @@
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+}
+
+.select {
+    /* dimension */
+    width: 70px;
     /* estilos */
     color: var(--color-theme-primary);
 }
+
+/* * ********* pageInfoContainer ******** */
 
 .pageInfo {
     /* distribucion flex */
@@ -33,17 +51,7 @@
     gap: 0.5rem;
 }
 
-.pageInfo label {
-    /* estilos */
-    color: var(--color-theme-primary);
-}
-
-.select {
-    /* dimension */
-    width: 70px;
-    /* estilos */
-    color: var(--color-theme-primary);
-}
+/* * ********* paginationButtonSection ******** */
 
 .paginationButtonSection {
     /* distribucion flex */
@@ -55,18 +63,26 @@
     gap: 0.5rem;
 }
 
-.arrowLeftButton,
-.arrowRightButton {
+.arrowLeftButton, .arrowRightButton {
     /* distribucion box */
     border: none;
     /* estilos */
     background-color: transparent;
+    /* interactividad */
     cursor: pointer;
 }
 
-.arrowRight,
-.arrowLeft {
+.arrowRight, .arrowLeft {
     /* estilos */
     color: var(--color-theme-primary);
     stroke: var(--color-theme-primary);
 }
+
+/* * ********* generals ******** */
+
+.selectRowPerPageContainer > span,
+.pageInfoContainer > span {
+    color: var(--color-theme-primary);
+    font-size: 14px;
+}
+    
