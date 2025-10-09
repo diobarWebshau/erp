@@ -1,73 +1,4 @@
-// import { useEffect, useState, type ChangeEvent } from "react";
-// import styleModule from "./InputToggle.module.css";
-
-// interface InputToggleProps {
-//     value: number | undefined;
-//     onChange: (value: number) => void;
-//     min?: number;
-//     className?: string;
-//     classNameInput?: string;
-// }
-
-// const InputToggle = ({ value, onChange, min = 1, className, classNameInput }: InputToggleProps) => {
-//     const [inputValue, setInputValue] = useState(value?.toString() ?? "");
-
-//     // Sync externo
-//     useEffect(() => {
-//         if (value?.toString() !== inputValue) {
-//             setInputValue(value?.toString() ?? "");
-//         }
-//     }, [value]);
-
-//     // Manejador de cambios en el input
-//     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-//         const val = e.target.value;
-//         setInputValue(val);
-
-//         const num = Number(val);
-
-//         // Solo actualizamos si es válido
-//         // Validamos que el valor sea un número, que no esté vacío y que sea mayor o igual al valor mínimo
-//         if (!Number.isNaN(num) && val !== "" && num >= min) {
-//             onChange(num);
-//         }
-//     };
-
-//     const handleBlur = () => {
-//         const num = Number(inputValue);
-
-//         // Si el valor es inválido, lo forzamos al mínimo
-//         if (Number.isNaN(num) || inputValue === "" || num < min) {
-//             onChange(min);
-//             setInputValue(min.toString());
-//         }
-//     };
-
-//     const isValid = () => {
-//         const num = Number(inputValue);
-//         return !Number.isNaN(num) && inputValue !== "" && num >= min;
-//     };
-
-//     return (
-//         <div className={`${styleModule.container} ${className}`}>
-//             <input
-//                 className={`${styleModule.input} ${!isValid() && styleModule.inputValidation} ${classNameInput}`}
-//                 type="number"
-//                 value={inputValue}
-//                 onChange={handleChange}
-//                 onBlur={handleBlur}
-//                 inputMode="numeric"
-//                 pattern="[0-9]*"
-//                 min={min}
-//             />
-//         </div>
-//     );
-// };
-
-// export default InputToggle;
-
-
-import { useEffect, useState, type ChangeEvent, type KeyboardEvent } from "react";
+import { memo, useCallback, useEffect, useMemo, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import styleModule from "./NumericInput.module.css";
 
 interface NumericInputProps {
@@ -77,15 +8,16 @@ interface NumericInputProps {
     max?: number;
     className?: string;
     classNameInput?: string;
-    /**
-     * Si true: Solo llama onChange al perder foco o Enter.
-     * Si false: Llama onChange en cada tecleo.
-     * Default: false.
-     */
     onlyCommitOnBlur?: boolean;
 }
 
-const NumericInput = ({
+/** onlyCommitOnBlur
+ * Si true: Solo llama onChange al perder foco o Enter.
+ * Si false: Llama onChange en cada tecleo.
+ * Default: false.
+ */
+
+const NumericInput = memo(({
     value,
     onChange,
     min = 1,
@@ -94,40 +26,38 @@ const NumericInput = ({
     classNameInput,
     onlyCommitOnBlur = false,
 }: NumericInputProps) => {
+
     const [inputValue, setInputValue] = useState(value?.toString() ?? "");
     const [isValid, setIsValid] = useState<boolean>(true);
 
-    // ✔️ función pura que NO setea estado
-    const computeIsValid = (val: string) => {
+    // ? Funcion que valida que el valor ingresado sea valido
+    const computeIsValid = useCallback((val: string) => {
         const num = Number(val);
         if (val === "" || Number.isNaN(num)) return false;
         if (num < min) return false;
         if (num > max) return false;
         return true;
-    };
+    }, [min, max]);
 
-    // Sincroniza cuando cambia value externo
-    useEffect(() => {
-        const synced = value?.toString() ?? "";
-        setInputValue(synced);
-        setIsValid(computeIsValid(synced));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value, min]);
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // ? Funcion que maneja el cambio del input
+    const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setInputValue(val);
         const ok = computeIsValid(val);
         setIsValid(ok);
 
+        // ? Si no se debe commitear al perder el foco y el valor es valido, se llama a onChange
         if (!onlyCommitOnBlur && ok) {
             onChange(Number(val));
         }
-    };
+    }, [computeIsValid, onlyCommitOnBlur, onChange, setInputValue, setIsValid]);
 
-    const commitChange = () => {
+    // ? Funcion que maneja el commit del input
+    const commitChange = useCallback(() => {
         const ok = computeIsValid(inputValue);
         setIsValid(ok);
+
+        // ? Si el valor es valido, se llama a onChange
         if (ok) {
             onChange(Number(inputValue));
         } else {
@@ -136,26 +66,41 @@ const NumericInput = ({
             setInputValue(fallback);
             setIsValid(true);
         }
-    };
+    }, [computeIsValid, inputValue, onChange, min]);
 
-    const handleBlur = () => {
+    // ? Funcion que maneja el blur del input
+    const handleBlur = useCallback(() => {
         if (onlyCommitOnBlur) commitChange();
-    };
+    }, [onlyCommitOnBlur, commitChange]);
 
-    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    // ? Funcion que maneja el keydown del input
+    const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+        // ? Si se debe commitear al perder el foco y se presiona Enter, se llama a commitChange
         if (onlyCommitOnBlur && e.key === "Enter") {
             (e.target as HTMLInputElement).blur();
         }
-    };
+    }, [onlyCommitOnBlur]);
+
+    // ? useMemo que genera las clases del input y el container
+    const [classNamesContainer, classNamesInput] = useMemo(() => {
+        const containerClassNames = `${className} ` +
+            `${styleModule.container} `;
+        const inputClassNames = `${styleModule.input} ` +
+            `${isValid ? classNameInput : styleModule.inputValidation} `;
+        return [containerClassNames, inputClassNames];
+    }, [classNameInput, className, isValid]);
+
+    // ? useEffect que sincroniza el valor del input con el valor del prop value
+    useEffect(() => {
+        const synced = value?.toString() ?? "";
+        setInputValue(synced);
+        setIsValid(computeIsValid(synced));
+    }, [value, min, max]);
 
     return (
-        <div className={[styleModule.container, className].filter(Boolean).join(" ")}>
+        <div className={classNamesContainer}>
             <input
-                className={[
-                    styleModule.input,
-                    classNameInput,
-                    !isValid ? styleModule.inputValidation : "",
-                ].filter(Boolean).join(" ")}
+                className={classNamesInput}
                 type="number"
                 value={inputValue}
                 onChange={handleChange}
@@ -167,6 +112,6 @@ const NumericInput = ({
             />
         </div>
     );
-};
+});
 
 export default NumericInput;

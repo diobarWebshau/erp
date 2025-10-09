@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import StyleModule from "./FadeButton.module.css"
 
 interface FadeButtonProps {
@@ -13,7 +14,7 @@ interface FadeButtonProps {
     typeOrderIcon?: "first" | "last";
 }
 
-const FadeButton = ({
+const FadeButton = memo(({
     label,
     icon,
     onClick,
@@ -24,26 +25,28 @@ const FadeButton = ({
     type = "button",
     typeOrderIcon = "last",
 }: FadeButtonProps) => {
-    // Aseguramos que si el icono es un ReactElement válido, le pasamos className
-    // const styledIcon =
-    //     isValidElement(icon) && cloneElement(icon as ReactElement<any>, {
-    //         className: `${StyleModule.icon} ${classNameIcon}`,
-    //     });
+
+    const [classNamesButton, classNamesSpan, classNamesLabel] = useMemo(() => {
+        const classNamesButton = `${StyleModule.fadeButton} ` + `${classNameButton} `;
+        const classNamesSpan = `${StyleModule.fadeButtonSpan} ` + `${classNameSpan} `;
+        const classNamesLabel = `${StyleModule.fadeButtonLabel} ` + `${classNameLabel} `;
+        return [classNamesButton, classNamesSpan, classNamesLabel];
+    }, [classNameButton, classNameLabel, classNameSpan]);
 
     return (
         <button
-            className={`${StyleModule.fadeButton} ${classNameButton}`}
+            className={classNamesButton}
             onClick={onClick}
             disabled={disabled}
             type={type}
         >
-            <span className={`nunito-medium ${StyleModule.fadeButtonSpan} ${classNameSpan}`}>
+            <span className={classNamesSpan}>
                 {typeOrderIcon === "first" && icon}
-                {label && <span className={classNameLabel}>{label}</span>}
+                {label && <span className={classNamesLabel}>{label}</span>}
                 {typeOrderIcon === "last" && icon}
             </span>
         </button>
     )
-}
+});
 
 export default FadeButton

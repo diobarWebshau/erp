@@ -372,7 +372,7 @@ const TableBase = <T,>({
         return wrapperTableClassNames;
     }, [table?.getRowModel()?.rows?.length, isLoadingData]);
 
-    const rowModel = table.getRowModel();
+    const rowModel: RowModel<T> = table.getRowModel();
 
     return (
         <div className={containerClassNames}>

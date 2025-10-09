@@ -6,21 +6,6 @@
     "auditLog": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\.59f4ac58ef47e6c87ea052e98f554f1a90fac0ba-audit.json",
     "files": [
         {
-            "date": 1758635846757,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-23.log",
-            "hash": "a82910a2a53a533a54e8714820167b01a15ca23128c04d36e5110749fe120270"
-        },
-        {
-            "date": 1758770915781,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-24.log",
-            "hash": "17ff26fdb5c27a39b566ee6ab1f973f4bc51f8d68b919cc5e7abadb335304b87"
-        },
-        {
-            "date": 1758783711290,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-25.log",
-            "hash": "db5ba4ab1f1a02ef7221a2bfb691c3839d356170b53f7f0906c034395a38f2f7"
-        },
-        {
             "date": 1758877849679,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-09-26.log",
             "hash": "b2001c900fde17b4f0d43f4b45bafe5341b6608a72c8c2de089461e2a0a95706"
@@ -74,6 +59,16 @@
             "date": 1759762246677,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-06.log",
             "hash": "830d6bf599337c8589f9a44aa0ba05806d8634b40f45ce72615684004f26f6b0"
+        },
+        {
+            "date": 1759980154019,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-08.log",
+            "hash": "d87afe0957ee82fa3878c50b365ec3716f29f57571692d83619138b16f82775c"
+        },
+        {
+            "date": 1760019236987,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-09.log",
+            "hash": "0ea3bd20b72dcf596ed626e72a8f4ee5c0e8121716649a9312086e3342c1b344"
         }
     ],
     "hashType": "sha256"

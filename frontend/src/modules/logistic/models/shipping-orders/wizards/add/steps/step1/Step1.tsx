@@ -5,7 +5,7 @@ import type { IPurchasedOrder } from "../../../../../../../../interfaces/purchas
 import CriticalActionButton from "../../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import { ChevronRight, Search } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import InputTextCustom from "../../../../../../../../comp/primitives/input/text/custom/InputTextCustom";
 import usePurchasedOrders from "../../../../../../../../modelos/purchased_orders/hooks/usePurchasedOrders";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
@@ -46,12 +46,11 @@ const Step1 = ({
         });
 
         const initialState: TableStatePartial = {
-            rowSelectionState
+            ...(Object.keys(rowSelectionState).length > 0 ? { rowSelectionState } : {})
         }
 
         return [purchase_orders, client, initialState];
     }, [state.data?.shipping_order_purchase_order_product]);
-
 
     const [search, setSearch] = useState<string>(client);
     const [selectedPurchasedOrder, setSelectedPurchasedOrder] = useState<IPartialPurchasedOrder[]>(purchase_orders);
@@ -60,7 +59,6 @@ const Step1 = ({
         purchasedOrders,
         loadingPurchasedOrders
     } = usePurchasedOrders(search, 0);
-
 
     const columns: ColumnDef<IPurchasedOrder>[] = useMemo(() => [
         {
@@ -130,7 +128,7 @@ const Step1 = ({
     ], []);
 
 
-    const handleRowSelectionChange = (selected: IPurchasedOrder[]) => {
+    const handleRowSelectionChange = useCallback((selected: IPurchasedOrder[]) => {
         const diffObject: {
             added: IPurchasedOrder[],
             deleted: IPurchasedOrder[]
@@ -158,20 +156,26 @@ const Step1 = ({
                 dispatch(remove_shipping_order_purchased_order_products(sopopsIds));
             }
         }
-    };
+    }, [
+        selectedPurchasedOrder, state.data?.shipping_order_purchase_order_product,
+        dispatch, remove_shipping_order_purchased_order_products, diffObjectArrays,
+        setSelectedPurchasedOrder, add_shipping_order_purchased_order_products
+    ]);
 
-    const conditionalRowSelection = (updater: RowSelectionState, rows: Row<IPurchasedOrder>[]): boolean => {
+    const conditionalRowSelection = useCallback((updater: RowSelectionState, rows: Row<IPurchasedOrder>[]): boolean => {
+        if (purchase_orders.length === 0) return true;
         const keys: string[] = Object.keys(updater);
         const rowsRecords = rows.filter(row => keys.includes(row.id));
         const records = rowsRecords.map(row => row.original);
-        return records.every((p: IPurchasedOrder, _, arr) => p.client?.company_name === arr[0].client?.company_name);
-    };
+        const condition = records.every((p: IPurchasedOrder) => p.client?.company_name === client);
+        return condition;
+    }, [client, purchase_orders]);
 
-    const handleOnClickNext = () => {
+    const handleOnClickNext = useCallback(() => {
         if (selectedPurchasedOrder.length > 0) {
             dispatch(next_step());
         }
-    };
+    }, [selectedPurchasedOrder, dispatch, next_step]);
 
     return (
         <div className={StyleModule.container}>

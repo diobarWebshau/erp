@@ -1,10 +1,14 @@
-.mainActionButtonCustom {
+/* ******** base ******** */
+
+.mainActionButton {
     /* dimension */
     width: 200px;
-    height: 45px;
+    height: 44px;
 
     /* distribucion box */
     border-radius: 15px;
+
+    /* interactividad */
     cursor: pointer;
 }
 
@@ -20,21 +24,55 @@
     align-items: center;
 }
 
+.mainActionLabel {
+    font-size: 14px;
+}
+
+.mainActionIcon {
+    width: 15px;
+    height: 15px;
+}
+
+.mainActionButton:focus {
+    outline: none;
+}
+
+/* ******** disabled ******** */
+
+.mainActionButtonCustomDisabled {
+    /* estilos */
+    background: var(--color-theme-background);
+    border: 2px solid var(--color-theme-neutral-primary);
+    /* interactividad */
+    cursor: not-allowed;
+}
+
+.mainActionButtonCustomLabelDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+.mainActionButtonCustomIconDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+/* ******** enabled ******** */
+
 .mainActionButtonCustom {
+    border: none;
     background: var(--color-gradient-purple);
 }
 
-.mainActionButtonCustomLabel {
+.mainActionButtonCustom .mainActionButtonCustomLabel {
     font-size: 14px;
     color: var(--color-theme-font-white);
 }
 
 .mainActionButtonCustomIcon {
     color: var(--color-theme-font-white);
-    width: 15px;
-    height: 15px;
 }
 
-.mainActionButtonCustom:hover {
+.mainActionButtonCustom:hover:not(:disabled) {
     background: var(--color-theme-primary-light);
 }
