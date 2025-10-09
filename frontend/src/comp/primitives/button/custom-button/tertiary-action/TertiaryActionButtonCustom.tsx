@@ -1,6 +1,7 @@
+import withClassName from "../../../../../utils/withClassName";
 import FadeButton from "../../fade-button/FadeButton";
 import StyleModule from "./TertiaryActionButtonCustom.module.css";
-import { cloneElement, type JSX } from "react";
+import { useMemo, type JSX } from "react";
 
 interface ITertiaryActionButtonCustomProps {
     onClick: () => void;
@@ -8,6 +9,8 @@ interface ITertiaryActionButtonCustomProps {
     icon?: JSX.Element;
     disabled?: boolean;
     classNameButton?: string;
+    classNameSpan?: string;
+    classNameLabel?: string;
 }
 
 const TertiaryActionButtonCustom = ({
@@ -15,12 +18,18 @@ const TertiaryActionButtonCustom = ({
     label,
     icon,
     disabled,
-    classNameButton
+    classNameButton,
+    classNameSpan,
+    classNameLabel
 }: ITertiaryActionButtonCustomProps) => {
 
-    const iconWithClass = icon ? cloneElement(icon, {
-        className: [StyleModule.tertiaryActionButtonCustomIcon, icon.props.className].filter(Boolean).join(" ")
-    }) : null;
+    const [iconWithClass, buttonClassNames, spanClassNames, labelClassNames] = useMemo(() => {
+        const buttonClassNames = `${StyleModule.tertiaryActionButtonCustom} ` + `${disabled ? StyleModule.tertiaryActionButtonCustomDisabled : StyleModule.tertiaryActionButtonCustomEnabled} ${classNameButton} `;
+        const iconWithClass = icon ? withClassName(icon, `${StyleModule.tertiaryActionButtonCustomIcon} ${disabled ? StyleModule.tertiaryActionButtonCustomIconDisabled : StyleModule.tertiaryActionButtonCustomIconEnabled} `) : null;
+        const spanClassNames = `${classNameSpan} ${StyleModule.tertiaryActionButtonCustomSpan}`;
+        const labelClassNames = `nunito-medium ${StyleModule.tertiaryActionButtonCustomLabel} ${disabled ? StyleModule.tertiaryActionButtonCustomLabelDisabled : StyleModule.tertiaryActionButtonCustomLabelEnabled} ${classNameLabel} `;
+        return [iconWithClass, buttonClassNames, spanClassNames, labelClassNames];
+    }, [icon, disabled, classNameButton, classNameSpan, classNameLabel, classNameSpan])
 
     return (
         <FadeButton
@@ -28,9 +37,9 @@ const TertiaryActionButtonCustom = ({
             onClick={onClick}
             type="button"
             typeOrderIcon="first"
-            classNameButton={`${classNameButton} ${StyleModule.tertiaryActionButtonCustom}`}
-            classNameLabel={`nunito-medium ${StyleModule.tertiaryActionButtonCustomLabel}`}
-            classNameSpan={StyleModule.tertiaryActionButtonCustomSpan}
+            classNameButton={buttonClassNames}
+            classNameLabel={labelClassNames}
+            classNameSpan={spanClassNames}
             {...(icon && { icon: iconWithClass })}
             disabled={disabled}
         />

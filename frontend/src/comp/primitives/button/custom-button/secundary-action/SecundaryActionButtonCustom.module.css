@@ -1,13 +1,15 @@
+/* ******** base ******** */
+
 .secundaryActionButtonCustom {
     /* dimension */
     width: 200px;
-    height: 45px;
+    height: 44px;
 
     /* distribucion box */
     border-radius: 15px;
+
+    /* interactividad */
     cursor: pointer;
-    background-color: var(--color-theme-neutral-background);
-    border: 1px solid var(--color-theme-border-table);
 }
 
 .secundaryActionButtonCustomSpan {
@@ -23,20 +25,62 @@
 }
 
 .secundaryActionButtonCustomLabel {
-    color: var(--color-theme-primary);
+    font-size: 14px;
 }
 
 .secundaryActionButtonCustomIcon {
-    color: var(--color-theme-primary);
     width: 15px;
     height: 15px;
 }
 
-.secundaryActionButtonCustom:hover {
+.secundaryActionButtonCustom:focus {
+    outline: none;
+}
+
+/* ******** disabled ******** */
+
+.secundaryActionButtonCustomDisabled {
+    /* estilos */
+    background: var(--color-theme-background);
+    border: 2px solid var(--color-theme-neutral-primary);
+    /* interactividad */
+    cursor: not-allowed;
+}
+
+.secundaryActionButtonCustomLabelDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+.secundaryActionButtonCustomIconDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+/* ******** enabled ******** */
+
+.secundaryActionButtonCustomEnabled {
+    border: none;
+    background: var(--color-theme-neutral-background);
+}
+
+.secundaryActionButtonCustomEnabled .secundaryActionButtonCustomLabelEnabled {
+    font-size: 14px;
+    color: var(--color-theme-primary);
+}
+
+.secundaryActionButtonCustomIconEnabled {
+    color: var(--color-theme-primary);
+}
+
+.secundaryActionButtonCustomEnabled:hover:not(:disabled) .secundaryActionButtonCustomLabelEnabled {
+    color: var(--color-theme-font-white);
+}
+
+.secundaryActionButtonCustomEnabled:hover:not(:disabled){
     background-color: var(--color-theme-primary-light);
 }
 
-.secundaryActionButtonCustom:hover .secundaryActionButtonCustomLabel,
-.secundaryActionButtonCustom:hover .secundaryActionButtonCustomIcon {
+.secundaryActionButtonCustomEnabled:hover:not(:disabled) .secundaryActionButtonCustomIconEnabled {
     color: var(--color-theme-font-white);
 }

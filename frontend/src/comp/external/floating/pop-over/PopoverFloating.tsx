@@ -1,4 +1,133 @@
-import { useState, type ReactNode } from "react";
+// import { useState, type ReactNode } from "react";
+// import StyleModule from "./PopoverFloating.module.css";
+// import {
+//   useFloating,          // Hook principal: calcula posición del elemento flotante (dropdown, tooltip, etc.)
+//   offset,               // Middleware: agrega espacio entre el botón (reference) y el menú (floating).
+//   flip,                 // Middleware: invierte el lado si no cabe (ej. de abajo a arriba).
+//   shift,                // Middleware: ajusta la posición para que no se salga de la pantalla.
+//   size,                 // Middleware: controla ancho/alto del floating (ej. mismo ancho que el botón).
+//   autoUpdate,           // Función: recalcula posición automáticamente al cambiar tamaño/scroll/resize.
+//   useRole,              // Hook: añade atributos ARIA (ej. role="listbox") para accesibilidad.
+//   useClick,             // Hook: abre/cierra el floating al hacer click en el reference.
+//   useDismiss,           // Hook: permite cerrar al hacer click fuera o con la tecla Esc.
+//   useInteractions,      // Hook: combina varios comportamientos de interacción (click, dismiss, role, etc.).
+//   FloatingPortal,       // Componente: renderiza el floating en un portal (fuera del DOM normal).
+//   FloatingFocusManager, // Componente: gestiona el foco al abrir (muy útil en menús y selects).
+//   autoPlacement,  //
+//   hide, 
+// } from "@floating-ui/react";
+
+
+// type Placement =
+//   "bottom-start" | "bottom-end" | "bottom" |
+//   "top-start" | "top-end" | "top" |
+//   "left-start" | "left-end" | "left" |
+//   "right-start" | "right-end" | "right";
+
+// interface PopoverFloatingProps {
+//   childrenTrigger: ReactNode;
+//   childrenFloating: ReactNode | ((args: { onClose: () => void }) => ReactNode);
+//   placement?: Placement;
+//   matchWidth?: boolean; // 👈 nueva bandera
+//   classNameContainerPopover?: string;
+// }
+
+// const PopoverFloating = ({
+//   childrenTrigger,
+//   childrenFloating,
+//   placement = "bottom-start",
+//   matchWidth = false,
+// }: PopoverFloatingProps) => {
+
+//   const [isOpenFloating, setIsOpenFloating] = useState(false);
+
+//   const toggleIsOpenFloating = () => {
+//     setIsOpenFloating(!isOpenFloating);
+//   };
+
+//   // * Configuración de Floating UI
+//   const { refs, floatingStyles, context } = useFloating({
+//     // ? Estado controlado: el floating se abre/cierra según isOpen
+//     open: isOpenFloating,                       // Booleano: si está abierto o cerrado
+//     onOpenChange: setIsOpenFloating,            // Función que actualiza ese estado
+
+//     // ? Posición preferida del floating
+//     placement: placement,          // Abajo y alineado al inicio (izquierda)
+
+//     // ? Hace que la posición se recalcule automáticamente
+//     // cuando hay scroll, resize, cambios de layout, etc.
+//     whileElementsMounted: autoUpdate,
+
+//     // NEW: Estrategia fija para evitar problemas con contenedores con transform/overflow
+//     strategy: "fixed", // NEW
+
+//     // ? Lista de middlewares que ajustan la posición y el tamaño
+//     middleware: [
+//       offset(4),                      // Deja 4px de separación entre el botón y el menú
+//       flip({ padding: 8 }),           // Si no cabe abajo, lo voltea (arriba, derecha, etc.)
+//       // con un margen de seguridad de 8px
+//       // NEW: evita correcciones horizontales cuando anclas en "bottom-end"
+//       shift({ padding: 8, crossAxis: false }),  // NEW
+//       // Ajusta el menú para que no se salga de la pantalla, corrigiendo bordes con 8px de padding
+
+//       size({
+//         // ? size → controla el ancho/alto del floating
+//         apply({ rects, elements }) {
+//           // Object.assign(elements.floating.style, {
+//           //     // Igualar el ancho del floating con el ancho del botón de referencia
+//           //     width: `${rects.reference.width}px`,
+//           //     // Asegura que nunca sea más angosto que el reference
+//           //     minWidth: `${rects.reference.width}px`,
+//           //     // Forzar que quede siempre encima de otros elementos
+//           //     zIndex: 9999,
+//           // });
+//           if (matchWidth) {
+//             Object.assign(elements.floating.style, {
+//               width: `${rects.reference.width}px`,
+//               minWidth: `${rects.reference.width}px`,
+//             });
+//           } else {
+//             Object.assign(elements.floating.style, {
+//               minWidth: `${rects.reference.width}px`,
+//             });
+//           }
+//           elements.floating.style.zIndex = "9999";
+//         }
+//       }),
+//       // Oculta/cierra cuando el trigger queda fuera de vista por el contenedor con scroll
+//       hide({ strategy: "referenceHidden" }),
+//     ],
+//   });
+
+
+//   // * Interacciones Floating UI
+//   const role = useRole(context, { role: "dialog" });
+//   // ? Añade atributos de accesibilidad (ARIA) al floating.
+//   //    En este caso le dice a lectores de pantalla que el floating
+//   //    es una "listbox" (como un menú de opciones).
+
+//   const click = useClick(context, { event: "mousedown" });
+//   // ? Controla la apertura/cierre del floating con click (mousedown).
+//   //    - Si haces click en el "reference" (ej. el botón), abre o cierra.
+//   //    - Usa "mousedown" en vez de "click" para que responda más rápido.
+
+//   const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true, ancestorScroll: true });
+//   // ? Permite cerrar el floating de forma natural:
+//   //    - outsidePress: true → si haces click fuera, se cierra.
+//   //    - escapeKey: true → si presionas Escape, se cierra.
+
+//   const { getReferenceProps, getFloatingProps } = useInteractions([
+//     role,
+//     click,
+//     dismiss,
+//   ]);
+//   // ? Combina todas las interacciones anteriores en un solo lugar.
+//   //    - getReferenceProps → props que debes pasar al elemento de referencia (botón o trigger).
+//   //    - getFloatingProps → props que debes pasar al floating (menú o dropdown).
+//   // Así se aplican automáticamente los eventos, atributos ARIA, etc.
+
+
+import { useState, type ReactNode, useEffect } from "react"; // Se importa useEffect para reaccionar a cambios de visibilidad del trigger y cerrar el popover cuando deje de ser visible.
 import StyleModule from "./PopoverFloating.module.css";
 import {
   useFloating,          // Hook principal: calcula posición del elemento flotante (dropdown, tooltip, etc.)
@@ -13,7 +142,8 @@ import {
   useInteractions,      // Hook: combina varios comportamientos de interacción (click, dismiss, role, etc.).
   FloatingPortal,       // Componente: renderiza el floating en un portal (fuera del DOM normal).
   FloatingFocusManager, // Componente: gestiona el foco al abrir (muy útil en menús y selects).
-  autoPlacement // 
+  autoPlacement,        // (Reservado) Middleware alternativo para elegir placement automáticamente si lo necesitas en el futuro.
+  hide,                 // Middleware: detecta cuando el elemento de referencia queda oculto (por scroll/clip) para poder actuar en consecuencia.
 } from "@floating-ui/react";
 
 
@@ -41,25 +171,40 @@ const PopoverFloating = ({
   const [isOpenFloating, setIsOpenFloating] = useState(false);
 
   const toggleIsOpenFloating = () => {
-    console.log("Ejecucion del cierre");
     setIsOpenFloating(!isOpenFloating);
   };
 
   // * Configuración de Floating UI
-  const { refs, floatingStyles, context } = useFloating({
+  const { 
+    refs, 
+    floatingStyles, 
+    context,
+    middlewareData, // Se extrae middlewareData para poder leer datos de middlewares (ej. hide → referenceHidden) y reaccionar a ello.
+  } = useFloating({
     // ? Estado controlado: el floating se abre/cierra según isOpen
     open: isOpenFloating,                       // Booleano: si está abierto o cerrado
-    onOpenChange: toggleIsOpenFloating,            // Función que actualiza ese estado
+    onOpenChange: setIsOpenFloating,            // Función que actualiza ese estado
 
     // ? Posición preferida del floating
     placement: placement,          // Abajo y alineado al inicio (izquierda)
 
     // ? Hace que la posición se recalcule automáticamente
     // cuando hay scroll, resize, cambios de layout, etc.
-    whileElementsMounted: autoUpdate,
+    // whileElementsMounted: autoUpdate,
+    whileElementsMounted(reference, floating, update) {
+      // Versión extendida de autoUpdate:
+      // - ancestorScroll: escucha scroll de todos los ancestros (p. ej. el body scrolleable de una tabla dentro de un modal).
+      // - ancestorResize: reacciona a cambios de tamaño de ancestros (layouts responsivos).
+      // - elementResize: reacciona a cambios del propio floating/reference (contenido dinámico).
+      return autoUpdate(reference, floating, update, {
+        ancestorScroll: true,
+        ancestorResize: true,
+        elementResize: true,
+      });
+    },
 
     // NEW: Estrategia fija para evitar problemas con contenedores con transform/overflow
-    strategy: "fixed", // NEW
+    strategy: "fixed", // Se usa 'fixed' para evitar “saltos” cuando el modal o ancestros tienen transform/filters/position que crean stacking contexts.
 
     // ? Lista de middlewares que ajustan la posición y el tamaño
     middleware: [
@@ -68,20 +213,13 @@ const PopoverFloating = ({
       // con un margen de seguridad de 8px
 
       // NEW: evita correcciones horizontales cuando anclas en "bottom-end"
-      shift({ padding: 8, crossAxis: false }),  // NEW
-      // Ajusta el menú para que no se salga de la pantalla, corrigiendo bordes con 8px de padding
+      shift({ padding: 8, crossAxis: false }),  // Mantiene el ajuste contra bordes, pero sin desplazar en el eje cruzado innecesariamente.
 
       size({
         // ? size → controla el ancho/alto del floating
-        apply({ rects, elements }) {
-          // Object.assign(elements.floating.style, {
-          //     // Igualar el ancho del floating con el ancho del botón de referencia
-          //     width: `${rects.reference.width}px`,
-          //     // Asegura que nunca sea más angosto que el reference
-          //     minWidth: `${rects.reference.width}px`,
-          //     // Forzar que quede siempre encima de otros elementos
-          //     zIndex: 9999,
-          // });
+        // Además de ajustar el ancho relativo al reference, aquí podemos limitar el tamaño según el espacio visible disponible.
+        apply({ rects, elements, availableWidth, availableHeight }) {
+          // Igualar (o al menos no ser menor que) el ancho del reference
           if (matchWidth) {
             Object.assign(elements.floating.style, {
               width: `${rects.reference.width}px`,
@@ -92,9 +230,20 @@ const PopoverFloating = ({
               minWidth: `${rects.reference.width}px`,
             });
           }
-          elements.floating.style.zIndex = "9999";
+
+          // Limitar por el área disponible (evita que el popover se salga del viewport o del contenedor scrolleable)
+          Object.assign(elements.floating.style, {
+            maxWidth: `${availableWidth}px`,
+            maxHeight: `${availableHeight}px`,
+            overflow: "auto", // Si el contenido es mayor que el espacio disponible, habilita scroll interno en el popover.
+            zIndex: "9999",   // Asegura que quede por encima de otros elementos (especialmente dentro de modales).
+          });
         }
       }),
+
+      // Oculta/cierra cuando el trigger queda fuera de vista por el contenedor con scroll
+      // hide expone en middlewareData.hide.referenceHidden un booleano indicando que la referencia ya no es visible (por clipping/scroll).
+      hide({ strategy: "referenceHidden" }),
     ],
   });
 
@@ -110,10 +259,11 @@ const PopoverFloating = ({
   //    - Si haces click en el "reference" (ej. el botón), abre o cierra.
   //    - Usa "mousedown" en vez de "click" para que responda más rápido.
 
-  const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true });
+  const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true, ancestorScroll: true });
   // ? Permite cerrar el floating de forma natural:
   //    - outsidePress: true → si haces click fuera, se cierra.
   //    - escapeKey: true → si presionas Escape, se cierra.
+  //    - ancestorScroll: true → si hay scrolls de ancestros relevantes (p. ej. desplazamiento fuerte), ayuda a mantener un cierre coherente.
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     role,
@@ -124,6 +274,18 @@ const PopoverFloating = ({
   //    - getReferenceProps → props que debes pasar al elemento de referencia (botón o trigger).
   //    - getFloatingProps → props que debes pasar al floating (menú o dropdown).
   // Así se aplican automáticamente los eventos, atributos ARIA, etc.
+
+  // Cierre reactivo cuando la referencia (trigger) queda oculta por scroll/clip:
+  // - Gracias al middleware hide(), podemos leer middlewareData.hide.referenceHidden.
+  // - Si es true mientras está abierto, cerramos el popover para evitar que “quede flotando” fuera de contexto.
+  useEffect(() => {
+    if (!isOpenFloating) return;
+    if (middlewareData?.hide?.referenceHidden) {
+      setIsOpenFloating(false);
+    }
+  }, [isOpenFloating, middlewareData?.hide?.referenceHidden]);
+
+
   return (
     <div className={StyleModule.popoverFloatingIUContainer}>
       <div
@@ -165,6 +327,51 @@ const PopoverFloating = ({
 
 
 export default PopoverFloating;
+
+
+
+  
+//   return (
+//     <div className={StyleModule.popoverFloatingIUContainer}>
+//       <div
+//         className={StyleModule.popoverFloatingTrigger}
+//         ref={refs.setReference}
+//         {...getReferenceProps()}
+//       >
+//         {childrenTrigger}
+//       </div>
+//       {
+//         isOpenFloating && (
+//           <FloatingPortal>
+//             <FloatingFocusManager
+//               context={context}
+//               modal={false}
+//               initialFocus={-1}
+//             >
+//               <div
+//                 ref={refs.setFloating}
+//                 {...getFloatingProps()}
+//                 style={{
+//                   ...floatingStyles,
+//                 }}
+//                 className={StyleModule.popoverFloatingFloating}
+//               >
+//                 {
+//                   typeof childrenFloating === "function"
+//                     ? childrenFloating({ onClose: toggleIsOpenFloating })
+//                     : childrenFloating
+//                 }
+//               </div>
+//             </FloatingFocusManager>
+//           </FloatingPortal>
+//         )
+//       }
+//     </div>
+//   );
+// };
+
+
+// export default PopoverFloating;
 
 
 /*

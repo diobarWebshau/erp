@@ -24,7 +24,7 @@ const ObjectSelectCustom = <T,>({
     value,
     classNameFieldContainer,
     classNameToggleContainer,
-    classNameOption
+    classNameOption,
 }: ObjectSelectCustomProps<T>) => {
 
     return (

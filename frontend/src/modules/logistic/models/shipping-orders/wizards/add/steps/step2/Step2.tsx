@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import StyleModule from "./Step2.module.css";
 import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
-import { back_step, next_step, update_shipping_order_purchased_order_products } from "../../../../context/shippingOrderActions";
+import { add_shipping_order_purchased_order_products_aux, back_step, next_step, update_shipping_order_purchased_order_products, update_shipping_order_purchased_order_products_aux } from "../../../../context/shippingOrderActions";
 import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
 import DateInputMantine from "./../../../../../../../../comp/external/mantine/date/input/base/DateInputMantine"
 import type { ColumnDef } from "@tanstack/react-table";
@@ -20,6 +20,7 @@ import usePurchasedOrders from "../../../../../../../../modelos/purchased_orders
 import type { IPartialPurchasedOrder, IPurchasedOrder } from "interfaces/purchasedOrder";
 import SelectPurchasedModal from "../../../../../../../../comp/features/modal-purchase/SelectPurchasedModal";
 import type { ShippingOrderAction } from "../../../../context/shippingOrderTypes";
+import { diffObjectArrays } from "../../../../../../../../utils/validation-on-update/validationOnUpdate";
 
 interface IStep2 {
     onClose: () => void;
@@ -32,31 +33,70 @@ const Step2 = ({
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
 
+
+    const getRowId = useCallback(
+        (row: IPartialShippingOrderPurchasedOrderProduct) =>
+            `${row.purchase_order_product_id?.toString()}-${row.purchase_order_products?.purchase_order_id?.toString() || ""}`,
+        []
+    );
+
     const [purchase_orders, client_name, purchaseOrder]: [IPartialPurchasedOrder[], string, IPurchasedOrder] = useMemo(() => {
-        const purchase_orders = (state.data?.shipping_order_purchase_order_product ?? [])
+        const purchase_orders = (state.data?.shipping_order_purchase_order_product_aux ?? [])
             .map(p => p.purchase_order_products?.purchase_order)
             .filter((p): p is IPartialPurchasedOrder => p !== undefined);
         const purchaseOrder = [...purchase_orders].shift() as IPurchasedOrder;
-        const client_name = purchaseOrder.client?.company_name || "";
+        const client_name = purchaseOrder?.client?.company_name || "";
         return [purchase_orders, client_name, purchaseOrder];
-    }, [state.data?.shipping_order_purchase_order_product]);
+    }, [state.data?.shipping_order_purchase_order_product_aux]);
+
 
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
     const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders(client_name, 0);
+    const [sopops, setSopops] = useState<IPartialShippingOrderPurchasedOrderProduct[]>([]);
+
 
     const filterPurchasedOrderAlreadySelected = useMemo(() => {
         return purchasedOrders.filter(p => !purchase_orders.some(sp => sp.id === p.id));
     }, [purchase_orders, purchasedOrders]);
 
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch, back_step]);
-    const handleOnClickNext = useCallback(() => dispatch(next_step()), [dispatch, next_step]);
+
     const toggleAddNewOrderModal = useCallback(() => {
         setIsActiveAddNewOrderModal(!isActiveAddNewOrderModal);
     }, [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal]);
 
-    const handleAddPurchasedOrder = useCallback((purchasedOrders: IPurchasedOrder[]) => {
-    }, []);
+    const handleRowSelectionChange = (selected: IPartialShippingOrderPurchasedOrderProduct[]) => {
+        const diffObject = diffObjectArrays(sopops, selected);
+        const { added, deleted } = diffObject;
+        if (added.length > 0) {
+            setSopops(prev => [...prev, ...added]);
+        }
+        if (deleted.length > 0) {
+            const del = new Set(deleted.map(d => d.id));
+            setSopops(prev => prev.filter(p => !del.has(p.id)));
+        }
+    };
+
+    const handleAddPurchasedOrder = useCallback((sopops: IPartialShippingOrderPurchasedOrderProduct[]) => {
+        dispatch(add_shipping_order_purchased_order_products_aux(sopops));
+    }, [dispatch]);
+
+    const handleOnClickNextStep = useCallback(() => {
+        const updateValues = state.data?.shipping_order_purchase_order_product_aux?.filter(p => sopops.some(sopop => sopop.id === p.id)) || [];
+        const locationBase = [...updateValues].shift()?.location;
+        const isSameLocation = updateValues?.every((p) => p.location?.id === locationBase?.id);
+        const isValid = updateValues?.every((p) => {
+            const qtyValid = ((p.purchase_order_products?.shipping_summary?.order_qty ?? 0) - (p.purchase_order_products?.shipping_summary?.shipping_qty ?? 0));
+            const isExceedQtyOrder = (p.qty ?? 0) <= qtyValid;
+            const isExceedQtyLocation = (p.qty ?? 0) < (locationBase?.inventory?.available ?? 0);
+            if (!isExceedQtyOrder || !isExceedQtyLocation) return false;
+            return true;
+        });
+        if (!isSameLocation || !isValid) return;
+        dispatch(update_shipping_order_purchased_order_products(updateValues));
+    }, [sopops, state.data?.shipping_order_purchase_order_product_aux]);
+
 
     const columns: ColumnDef<IPartialShippingOrderPurchasedOrderProduct>[] = useMemo(() => [
         {
@@ -100,7 +140,7 @@ const Step2 = ({
             },
             cell: (row) => {
                 const record = row.row.original;
-                const valueQty: number = record.qty || 0;
+                const valueQty: number = record.purchase_order_products?.qty || 0;
                 return <div> {formatNumber(valueQty)}</div>;
             }
         },
@@ -204,10 +244,12 @@ const Step2 = ({
                 <GeneralTable
                     modelName="shipping_order_purchase_order_product"
                     columns={columns}
-                    data={state.data?.shipping_order_purchase_order_product as IPartialShippingOrderPurchasedOrderProduct[]}
+                    data={state.data?.shipping_order_purchase_order_product_aux as IPartialShippingOrderPurchasedOrderProduct[]}
                     enableRowSelection
                     classNameGenericTableContainer={StyleModule.genericTableContainer}
-                    getRowId={(row) => `${row.purchase_order_product_id?.toString()}-${row.purchase_order_products?.purchase_order_id?.toString() || ""}`}
+                    classNameTableBody={StyleModule.tableBody}
+                    onRowSelectionChangeExternal={handleRowSelectionChange}
+                    getRowId={getRowId}
                 />
             </div>
             <div className={StyleModule.footerSection}>
@@ -221,9 +263,10 @@ const Step2 = ({
                     icon={<ChevronLeft />}
                 />
                 <MainActionButtonCustom
-                    onClick={handleOnClickNext}
+                    onClick={handleOnClickNextStep}
                     label="Siguiente"
                     icon={<ChevronRight />}
+                    disabled={sopops.length === 0}
                 />
             </div>
             {
@@ -262,7 +305,7 @@ const QuantityCell = memo(({
 
     const handleChange = useCallback((value: number) => {
         dispatch(
-            update_shipping_order_purchased_order_products({
+            update_shipping_order_purchased_order_products_aux({
                 id: record.purchase_order_product_id ?? 0,
                 attributes: { qty: value },
             })
@@ -295,7 +338,7 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
 
     const handleOnChangeLocation = (
         location: ILocation | null | undefined) => {
-        dispatch(update_shipping_order_purchased_order_products({
+        dispatch(update_shipping_order_purchased_order_products_aux({
             id: record.purchase_order_product_id ?? 0,
             attributes: { location: location ?? undefined }
         }));

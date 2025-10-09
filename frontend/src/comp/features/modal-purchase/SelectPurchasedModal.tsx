@@ -2,23 +2,22 @@
 import MainActionButtonCustom from "../../primitives/button/custom-button/main-action/MainActionButtonCustom";
 import DialogModal from "../../primitives/modal2/dialog-modal/base/DialogModal";
 import styleModule from "./SelectPurchasedModal.module.css"
-import { Plus } from "lucide-react";
+import { CircleX, Plus } from "lucide-react";
 import type { IPurchasedOrder } from "interfaces/purchasedOrder";
 import TertiaryActionButtonCustom from "../../primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import { getEnumoSingleLabel } from "../../primitives/table/tableContext/tableTypes";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Tag from "../../primitives/tag/Tag";
 import GenericTable from "../../primitives/table/tableContext/GenericTable";
-// import GenericTable from "../../primitives/table/tableContext/GenericTable";
+import type { IPurchasedOrderProduct } from "interfaces/purchasedOrdersProducts";
+import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
 
 interface ISelectPurchasedModal {
     onClose: () => void;
     purchasedOrders: IPurchasedOrder[];
-    onAdd: (IPurchaseOrder: IPurchasedOrder[]) => void;
+    onAdd: (sopops: IPartialShippingOrderPurchasedOrderProduct[]) => void;
 }
-
-
 
 const SelectPurchasedModal = ({
     onClose,
@@ -26,6 +25,20 @@ const SelectPurchasedModal = ({
     onAdd
 }: ISelectPurchasedModal) => {
 
+    const [selectedPurchasedOrders, setSelectedPurchasedOrders] = useState<IPurchasedOrder[]>([]);
+
+    const handleAddPurchasedOrder = useCallback(() => {
+        if (selectedPurchasedOrders.length === 0) return;
+        const popsArray: IPurchasedOrderProduct[][] = selectedPurchasedOrders.map(p => p.purchase_order_products as IPurchasedOrderProduct[] ?? []);
+        const popsFlat: IPurchasedOrderProduct[] = popsArray.flat();
+        const sopops: IPartialShippingOrderPurchasedOrderProduct[] = popsFlat.map(p => ({
+            purchase_order_products: p,
+            purchase_order_product_id: p.id,
+            qty: 1,
+        }));
+        onAdd(sopops);
+        onClose();
+    }, [selectedPurchasedOrders, onAdd, onClose]);
 
     const columns: ColumnDef<IPurchasedOrder>[] = useMemo(() => [
         {
@@ -94,28 +107,32 @@ const SelectPurchasedModal = ({
         }
     ], []);
 
+    const handleRowSelectionChange = useCallback((selectedRows: IPurchasedOrder[]) => {
+        setSelectedPurchasedOrders(selectedRows);
+    }, []);
+
 
     return (
         <DialogModal
-            classNameCustomContainer={styleModule.containerDialogModal}
+            className={styleModule.containerDialogModal}
             onClose={onClose}
         >
             <div className={styleModule.containerContent}>
-                <div className={styleModule.containerHeader}></div>
+
                 <div className={styleModule.containerBody}>
                     <GenericTable
                         modelName="purchased_orders"
 
-                        /* distribuccion de columnas y rows */
+                        // distribuccion de columnas y rows
                         columns={columns}
                         data={purchasedOrders ? purchasedOrders : []}
 
-                        /* funcionalidades */
+                        // funcionalidades 
                         enablePagination
                         enableRowSelection
+                        onRowSelectionChangeExternal={handleRowSelectionChange}
 
-                        /* acciones */
-                        onDeleteSelected={() => { }}
+                        // acciones 
                         getRowId={(row, _) => row.id.toString()}
                         classNameGenericTableContainer={styleModule.genericTableContainer}
                     />
@@ -124,11 +141,13 @@ const SelectPurchasedModal = ({
                     <TertiaryActionButtonCustom
                         label="Cancelar"
                         onClick={onClose}
+                        icon={<CircleX />}
                     />
                     <MainActionButtonCustom
                         label="Agregar orden"
                         icon={<Plus />}
-                        onClick={() => { }}
+                        onClick={handleAddPurchasedOrder}
+                        disabled={selectedPurchasedOrders.length === 0}
                     />
                 </div>
             </div>
@@ -138,3 +157,5 @@ const SelectPurchasedModal = ({
 
 
 export default SelectPurchasedModal;
+
+

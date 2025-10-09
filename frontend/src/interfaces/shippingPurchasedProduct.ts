@@ -5,7 +5,7 @@ import type {
 
 
 interface IShippingOrderPurchasedOrderProduct {
-    id: number;
+    id: number | string;
     shipping_order_id: number | null;
     purchase_order_product_id: number;
     qty: number;

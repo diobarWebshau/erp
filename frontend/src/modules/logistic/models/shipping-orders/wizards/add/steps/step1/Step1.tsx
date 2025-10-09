@@ -12,11 +12,12 @@ import { useShippingOrderDispatch, useShippingOrderState } from "../../../../con
 import { useMemo } from "react";
 import type { IPartialPurchasedOrder } from "../../../../../../../../interfaces/purchasedOrder";
 import { diffObjectArrays } from "./../../../../../../../../utils/validation-on-update/validationOnUpdate";
-import { add_shipping_order_purchased_order_products, next_step, remove_shipping_order_purchased_order_products } from "../../../../context/shippingOrderActions";
+import { add_shipping_order_purchased_order_products_aux, next_step, remove_shipping_order_purchased_order_products_aux } from "../../../../context/shippingOrderActions";
 import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
 import type { IPurchasedOrderProduct } from "interfaces/purchasedOrdersProducts";
 import { getEnumoSingleLabel, type TableStatePartial } from "../../../../../../../../comp/primitives/table/tableContext/tableTypes";
 import Tag from "../../../../../../../../comp/primitives/tag/Tag";
+import { generateRandomIds } from "../../../../../../../../helpers/nanoId";
 
 interface IStep1 {
     onClose: () => void;
@@ -32,7 +33,7 @@ const Step1 = ({
     const [purchase_orders, client, initialState]: [IPartialPurchasedOrder[], string, TableStatePartial] = useMemo(() => {
 
         const map = new Map<number | string, IPartialPurchasedOrder>();
-        for (const item of state.data?.shipping_order_purchase_order_product ?? []) {
+        for (const item of state.data?.shipping_order_purchase_order_product_aux ?? []) {
             const po = item.purchase_order_products?.purchase_order as IPartialPurchasedOrder | undefined;
             if (po?.id != null) map.set(po.id, po);
         }
@@ -50,15 +51,11 @@ const Step1 = ({
         }
 
         return [purchase_orders, client, initialState];
-    }, [state.data?.shipping_order_purchase_order_product]);
+    }, [state.data?.shipping_order_purchase_order_product_aux]);
 
     const [search, setSearch] = useState<string>(client);
     const [selectedPurchasedOrder, setSelectedPurchasedOrder] = useState<IPartialPurchasedOrder[]>(purchase_orders);
-
-    const {
-        purchasedOrders,
-        loadingPurchasedOrders
-    } = usePurchasedOrders(search, 0);
+    const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders(search, 0);
 
     const columns: ColumnDef<IPurchasedOrder>[] = useMemo(() => [
         {
@@ -127,7 +124,6 @@ const Step1 = ({
         }
     ], []);
 
-
     const handleRowSelectionChange = useCallback((selected: IPurchasedOrder[]) => {
         const diffObject: {
             added: IPurchasedOrder[],
@@ -139,27 +135,26 @@ const Step1 = ({
             const popsArray: IPurchasedOrderProduct[][] = added.map(p => p.purchase_order_products as IPurchasedOrderProduct[] ?? []);
             const popsFlat: IPurchasedOrderProduct[] = popsArray.flat();
             const sopops: IPartialShippingOrderPurchasedOrderProduct[] = popsFlat.map(p => ({
+                id: generateRandomIds(),
                 purchase_order_products: p,
                 purchase_order_product_id: p.id,
                 qty: 1,
             }));
             if (sopops.length > 0) {
-                dispatch(add_shipping_order_purchased_order_products(sopops));
+                dispatch(add_shipping_order_purchased_order_products_aux(sopops));
             }
         }
         if (deleted.length > 0) {
             const poIds = deleted.map(p => p.id);
             setSelectedPurchasedOrder(prev => prev.filter(p => !poIds.includes(p.id || 0)));
-            const pops = state.data?.shipping_order_purchase_order_product?.filter(p => poIds.includes(p.purchase_order_products?.purchase_order_id || 0));
+            const pops = state.data?.shipping_order_purchase_order_product_aux?.filter(p => poIds.includes(p.purchase_order_products?.purchase_order_id || 0));
             const sopopsIds = (pops?.map(p => p.purchase_order_product_id) ?? []).filter((p): p is number => p !== undefined);
             if (sopopsIds.length > 0) {
-                dispatch(remove_shipping_order_purchased_order_products(sopopsIds));
+                dispatch(remove_shipping_order_purchased_order_products_aux(sopopsIds));
             }
         }
     }, [
-        selectedPurchasedOrder, state.data?.shipping_order_purchase_order_product,
-        dispatch, remove_shipping_order_purchased_order_products, diffObjectArrays,
-        setSelectedPurchasedOrder, add_shipping_order_purchased_order_products
+        state.data?.shipping_order_purchase_order_product_aux, dispatch
     ]);
 
     const conditionalRowSelection = useCallback((updater: RowSelectionState, rows: Row<IPurchasedOrder>[]): boolean => {
@@ -175,7 +170,7 @@ const Step1 = ({
         if (selectedPurchasedOrder.length > 0) {
             dispatch(next_step());
         }
-    }, [selectedPurchasedOrder, dispatch, next_step]);
+    }, [selectedPurchasedOrder, dispatch]);
 
     return (
         <div className={StyleModule.container}>

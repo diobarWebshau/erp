@@ -4,13 +4,14 @@ import { useReducer } from "react";
 import type { Dispatch, ReactNode } from "react";
 import { ShippingOrderStateContext, ShippingOrderDispatchContext } from "./shippingOrderContext";
 import ShippingOrderReducer from "./shippingOrderReducer"
+import { initialShippingOrderState } from "./shippingOrderTypes";
 
 
 interface IProviderShippingOrder {
     currentStep: number;
     totalSteps: number;
     children: ReactNode;
-    data?: IPartialShippingOrder;
+    data: IPartialShippingOrder;
 }
 
 
@@ -22,18 +23,15 @@ const ShippingOrderProvider = ({
 }: IProviderShippingOrder) => {
 
     const baseData: IPartialShippingOrder = {
-        ...data,
-        ...(data?.shipping_order_purchase_order_product ? {
-            shipping_order_purchase_order_product: data.shipping_order_purchase_order_product
-        } : {
-            shipping_order_purchase_order_product: []
-        })
+        ...initialShippingOrderState.data,
+        ...data
     };
 
     const initialState: ShippingOrderState = {
+        ...initialShippingOrderState,
         current_step: currentStep,
         total_steps: totalSteps,
-        data: baseData || {}
+        data: baseData
     };
 
     const [state, dispatch]: [ShippingOrderState, Dispatch<ShippingOrderAction>] =

@@ -1,95 +1,3 @@
-// import React, {
-//     useEffect,
-//     useRef,
-//     useState,
-//     type Dispatch,
-//     type SetStateAction,
-// } from "react";
-// import styles from "./CustomSelect.module.css";
-// import type { BaseRow } from "../../../types";
-
-// interface CustomSelectProps<T extends BaseRow> {
-//     value?: T | null | undefined; // valor seleccionado desde el padre
-//     options: T[];
-//     labelKey: keyof T;
-//     defaultLabel?: string;
-//     autoOpen?: boolean;
-//     onChange?: ((value: T | null | undefined) => void); // actualización al padre
-//     icon?: React.ReactNode;
-// }
-
-// const CustomSelectObject = <T extends BaseRow>({
-//     options,
-//     labelKey,
-//     defaultLabel = "Selecciona una opción",
-//     autoOpen = true,
-//     onChange,
-//     value,
-//     icon,
-// }: CustomSelectProps<T>) => {
-//     const [isOpen, setIsOpen] = useState(false);
-//     const selectRef = useRef<HTMLDivElement>(null);
-
-//     // Label mostrado, derivado de `value`
-//     const selectedLabel = value ? String(value[labelKey]) : defaultLabel;
-
-//     // Abrir automáticamente al montar (opcional)
-//     useEffect(() => {
-//         if (autoOpen) {
-//             setIsOpen(true);
-//         }
-//     }, [autoOpen]);
-
-//     // Cerrar al hacer clic fuera del componente
-//     useEffect(() => {
-//         const handleClickOutside = (event: MouseEvent) => {
-//             if (
-//                 selectRef.current &&
-//                 !selectRef.current.contains(event.target as Node)
-//             ) {
-//                 setIsOpen(false);
-//             }
-//         };
-//         document.addEventListener("mousedown", handleClickOutside);
-//         return () => document.removeEventListener("mousedown", handleClickOutside);
-//     }, []);
-
-//     return (
-//         <div className={styles.customSelect} ref={selectRef}>
-//             <div className={`nunito-semibold ${styles.fieldSelectContainer}`}
-//                 onClick={() => setIsOpen((prev) => !prev)}
-//             >
-//                 {selectedLabel}
-//                 <button className={styles.iconButton}>
-//                     {icon}
-//                 </button>
-//             </div>
-//             {isOpen && (
-//                 <div className={`nunito-semibold ${styles.toggle}`}>
-//                     {options.map((opt) => {
-//                         const label = String(opt[labelKey]);
-//                         const isSelected = value?.id === opt.id;
-//                         return (
-//                             <div
-//                                 key={opt.id}
-//                                 className={`${styles.option} ${isSelected ? styles.selected : ""}`}
-//                                 onClick={() => {
-//                                     onChange?.(opt);
-//                                     setIsOpen(false);
-//                                 }}
-//                             >
-//                                 {label}
-//                             </div>
-//                         );
-//                     })}
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
-
-// export default CustomSelectObject;
-
 import React, { useEffect, useState } from "react";
 import styles from "./ObjectSelect.module.css";
 
@@ -99,6 +7,7 @@ import {
     flip,
     shift,
     size,
+    hide,
     autoUpdate,
     useRole,
     useClick,
@@ -144,31 +53,55 @@ const ObjectSelect = <T,>({
     const selectedLabel = value ? String(value[labelKey]) : defaultLabel;
 
     // Floating UI setup
-    const { refs, floatingStyles, context } = useFloating({
+    const { refs, floatingStyles, context, middlewareData } = useFloating({
         open: isOpen,
         onOpenChange: setIsOpen,
         placement: "bottom-start",
-        whileElementsMounted: autoUpdate,
+        strategy: "fixed", // evita saltos bajo modales/transform
+        whileElementsMounted(reference, floating, update) {
+            return autoUpdate(reference, floating, update, {
+                ancestorScroll: true,
+                ancestorResize: true,
+                elementResize: true,
+            });
+        },
         middleware: [
             offset(4),
             flip({ padding: 8 }),
-            shift({ padding: 8 }),
+            // evita corrección lateral innecesaria en bottom-start/end
+            shift({ padding: 8, crossAxis: false }),
             size({
-                apply({ rects, elements }) {
+                padding: 8,
+                apply({ rects, availableWidth, availableHeight, elements }) {
                     Object.assign(elements.floating.style, {
                         width: `${rects.reference.width}px`,
                         minWidth: `${rects.reference.width}px`,
+                        maxWidth: `${availableWidth}px`,
+                        maxHeight: `${availableHeight}px`,
+                        overflow: "auto",
                         zIndex: 9999,
                     });
                 }
             }),
+            // oculta cuando la referencia queda fuera de vista por el scroll/clip
+            hide({ strategy: "referenceHidden" }),
         ],
     });
+
+    // Cierra automáticamente si el trigger quedó oculto por el scroll
+    useEffect(() => {
+        if (!isOpen) return;
+        if (middlewareData.hide?.referenceHidden) setIsOpen(false);
+    }, [isOpen, middlewareData.hide?.referenceHidden]);
 
     // Interacciones Floating UI
     const role = useRole(context, { role: "listbox" });
     const click = useClick(context, { event: "mousedown" });
-    const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true });
+    const dismiss = useDismiss(context, {
+        outsidePress: true,
+        escapeKey: true,
+        ancestorScroll: true, // cerrar en scroll si corresponde
+    });
     const { getReferenceProps, getFloatingProps } = useInteractions([
         role,
         click,
@@ -234,7 +167,7 @@ const ObjectSelect = <T,>({
                                         aria-selected={isSelected}
                                         tabIndex={0}
                                         onMouseDown={e => {
-                                            e.preventDefault(); // Evita perder el focus antes de seleccionar
+                                            e.preventDefault(); // evita perder foco antes de seleccionar
                                             onChange?.(opt);
                                             setIsOpen(false);
                                         }}

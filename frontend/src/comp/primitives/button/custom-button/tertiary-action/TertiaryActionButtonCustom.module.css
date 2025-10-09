@@ -1,10 +1,14 @@
+/* ******** base ******** */
+
 .tertiaryActionButtonCustom {
     /* dimension */
     width: 200px;
-    height: 45px;
+    height: 44px;
 
     /* distribucion box */
     border-radius: 15px;
+
+    /* interactividad */
     cursor: pointer;
 }
 
@@ -20,26 +24,63 @@
     align-items: center;
 }
 
-.tertiaryActionButtonCustom {
-    background-color: var(--color-theme-font-white);
-}
-
 .tertiaryActionButtonCustomLabel {
     font-size: 14px;
-    color: var(--color-theme-primary-light);
 }
 
 .tertiaryActionButtonCustomIcon {
-    color: var(--color-theme-primary-light);
     width: 15px;
     height: 15px;
 }
 
-.tertiaryActionButtonCustom:hover .tertiaryActionButtonCustomLabel,
-.tertiaryActionButtonCustom:hover .tertiaryActionButtonCustomIcon {
+.tertiaryActionButtonCustom:focus {
+    outline: none;
+}
+
+/* ******** disabled ******** */
+
+.tertiaryActionButtonCustomDisabled {
+    /* estilos */
+    background: var(--color-theme-background);
+    border: 2px solid var(--color-theme-neutral-primary);
+    /* interactividad */
+    cursor: not-allowed;
+}
+
+.tertiaryActionButtonCustomLabelDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+.tertiaryActionButtonCustomIconDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+/* ******** enabled ******** */
+
+.tertiaryActionButtonCustomEnabled {
+    border: none;
+    background: var(--color-theme-font-white);
+}
+
+.tertiaryActionButtonCustomEnabled .tertiaryActionButtonCustomLabelEnabled {
+    font-size: 14px;
+    color: var(--color-theme-primary-light);
+}
+
+.tertiaryActionButtonCustomIconEnabled {
+    color: var(--color-theme-primary-light);
+}
+
+.tertiaryActionButtonCustomEnabled:hover:not(:disabled) .tertiaryActionButtonCustomLabelEnabled {
     color: var(--color-theme-primary);
 }
 
-.tertiaryActionButtonCustom:hover {
+.tertiaryActionButtonCustomEnabled:hover:not(:disabled) {
     border: 1px solid var(--color-theme-border-table);
+}
+
+.tertiaryActionButtonCustomEnabled:hover:not(:disabled) .tertiaryActionButtonCustomIconEnabled {
+    color: var(--color-theme-primary);
 }

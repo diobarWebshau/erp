@@ -1,6 +1,85 @@
-.containerDialogModal{
-    width: 670px;
-    height: 250px;
+/* ******* DialogModalContainer ******** */
+
+.containerDialogModal {
+    width: 1000px;
     min-height: 0;
+    /* dimension */
 }
 
+/* ******* ContainerContent ******** */
+
+.containerContent {
+    /* min dimension */
+    min-height: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    gap: 2rem;
+
+    /* distribucion box */
+    padding: 2rem;
+}
+
+/* ********* ContainerBody ********** */
+
+.containerBody {
+    /* min dimension */
+    min-height: 0;
+
+    /* distribucion flex */
+    display: flex;
+
+}
+
+.genericTableContainer{
+    min-height: 0;
+    max-height: 400px;
+}
+
+/* ******** FOOTER ******** */
+
+.containerFooter {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+.pending {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+}
+
+.delivered {
+    background-color: var(--color-alert-light);
+    color: var(--color-alert);
+    border: 1px solid var(--color-alert);
+}
+
+.cancelled {
+    background-color: var(--color-partial-liht);
+    color: var(--color-partial);
+    border: 1px solid var(--color-partial);
+}
+
+.completed {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}

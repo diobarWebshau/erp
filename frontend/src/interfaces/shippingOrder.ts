@@ -33,6 +33,8 @@ interface IShippingOrder {
     updated_at: string;
     shipping_order_purchase_order_product?:
     IPartialShippingOrderPurchasedOrderProduct[],
+    shipping_order_purchase_order_product_aux?:
+    IPartialShippingOrderPurchasedOrderProduct[],
     shipping_order_purchase_order_product_manager?:
     IShippingOrderPurchasedOrderProductManager,
     carrier?: IPartialCarrier,

@@ -1,15 +1,18 @@
-.transparentButtonCustom {
+
+.transparentActionButtonCustom {
+
     /* distribucion box */
-    background-color: transparent;
-    border: none;
+    border-radius: 15px;
+
+    /* interactividad */
     cursor: pointer;
 }
 
-.transparentButtonCustomSpan {
+.transparentActionButtonCustomSpan {
     /* dimension */
     width: 100%;
     height: 100%;
-    
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -17,18 +20,59 @@
     align-items: center;
 }
 
-.transparentButtonCustomLabel {
-    color: var(--color-theme-primary-light);
+.transparentActionButtonCustomLabel {
     font-size: 14px;
 }
 
-.transparentButtonCustomIcon {
-    color: var(--color-theme-primary-light);
+.transparentActionButtonCustomIcon {
     width: 15px;
     height: 15px;
 }
 
-.transparentButtonCustom:hover .transparentButtonCustomLabel,
-.transparentButtonCustom:hover .transparentButtonCustomIcon {
+.transparentActionButtonCustom:focus {
+    outline: none;
+}
+
+/* ******** disabled ******** */
+
+.transparentActionButtonCustomDisabled {
+    /* estilos */
+    background: var(--color-theme-background);
+    border: 2px solid var(--color-theme-neutral-primary);
+    /* interactividad */
+    cursor: not-allowed;
+}
+
+.transparentActionButtonCustomLabelDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+.transparentActionButtonCustomIconDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+/* ******** enabled ******** */
+
+.transparentActionButtonCustomEnabled {
+    border: none;
+    background: transparent;
+}
+
+.transparentActionButtonCustomEnabled .transparentActionButtonCustomLabelEnabled {
+    font-size: 14px;
+    color: var(--color-theme-primary-light);
+}
+
+.transparentActionButtonCustomIconEnabled {
+    color: var(--color-theme-primary-light);
+}
+
+.transparentActionButtonCustomEnabled:hover:not(:disabled) .transparentActionButtonCustomLabelEnabled {
+    color: var(--color-theme-primary);
+}
+
+.transparentActionButtonCustomEnabled:hover:not(:disabled) .transparentActionButtonCustomIconEnabled {
     color: var(--color-theme-primary);
 }

@@ -9,6 +9,7 @@
     /* estilos */
     text-align: center;
     font-size: 14px;
+    z-index: 2000000000000000;
 }
 
 .tableBodyWithFooter>*:last-child {

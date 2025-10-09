@@ -321,9 +321,8 @@ const TableBase = <T,>({
             .filter((r): r is T => Boolean(r));
 
         onRowSelectionChangeExternal?.(selected);
-
         // 👇 deps: SOLO cambia cuando cambia la selección o la data
-    }, [state.rowSelectionState, onRowSelectionChangeExternal, memoData, memoGetRowId]);
+    }, [state.rowSelectionState, memoData, memoGetRowId, onRowSelectionChangeExternal]);
 
 
     // **** Declaracion de los classNames **** */

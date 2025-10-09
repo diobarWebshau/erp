@@ -102,6 +102,10 @@
     min-width: 0;
 }
 
+.tableBody{
+    z-index: 20000000;
+}
+
 .objectSelectContainer{
     /* dimension */
     width: 100%;
@@ -111,18 +115,21 @@
     /* estilo */
     background-color: var(--color-success-light);
     color: var(--color-success);
+    border: 1px solid var(--color-success);
 }
 
 .tagError{
     /* estilo */
     background-color: var(--color-alert-light);
     color: var(--color-alert);
+    border: 1px solid var(--color-alert);
 }
 
 .tagWarning{
     /* estilo */
     background-color: var(--color-warning-light);
     color: var(--color-warning);
+    border: 1px solid var(--color-warning);
 }
 
 /* ******** FOOTER ******** */

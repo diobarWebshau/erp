@@ -1,6 +1,7 @@
-import { cloneElement, useMemo, type JSX } from "react";
+import { useMemo, type JSX } from "react";
 import FadeButton from "../../fade-button/FadeButton";
 import StyleModule from "./MainActionButtonCustom.module.css";
+import withClassName from "../../../../../utils/withClassName";
 
 interface IMainActionButtonCustomProps {
     onClick: () => void;
@@ -23,12 +24,10 @@ const MainActionButtonCustom = ({
 }: IMainActionButtonCustomProps) => {
 
     const [iconWithClass, buttonClassNames, spanClassNames, labelClassNames] = useMemo(() => {
-        const buttonClassNames = `${StyleModule.mainActionButton} `+`${disabled ? StyleModule.mainActionButtonCustomDisabled : StyleModule.mainActionButtonCustom} ${classNameButton} `;
-        const iconWithClass = icon && cloneElement(icon, {
-            className: `${StyleModule.mainActionIcon} ${ disabled? StyleModule.mainActionButtonCustomIconDisabled : StyleModule.mainActionButtonCustomIcon } `
-        });
+        const buttonClassNames = `${StyleModule.mainActionButton} `+`${disabled ? StyleModule.mainActionButtonCustomDisabled : StyleModule.mainActionButtonCustomEnabled} ${classNameButton} `;
+        const iconWithClass = icon ? withClassName(icon, `${StyleModule.mainActionIcon} ${ disabled? StyleModule.mainActionButtonCustomIconDisabled : StyleModule.mainActionButtonCustomIconEnabled } `) : null;
         const spanClassNames = `${ classNameSpan } ${ StyleModule.mainActionButtonCustomSpan }`;
-        const labelClassNames = `nunito-medium ${StyleModule.mainActionLabel} ${disabled ? StyleModule.mainActionButtonCustomLabelDisabled : StyleModule.mainActionButtonCustomLabel} ${classNameLabel} `;
+        const labelClassNames = `nunito-medium ${StyleModule.mainActionLabel} ${disabled ? StyleModule.mainActionButtonCustomLabelDisabled : StyleModule.mainActionButtonCustomLabelEnabled} ${classNameLabel} `;
         return [iconWithClass, buttonClassNames, spanClassNames, labelClassNames];
     }, [icon, disabled, classNameButton, classNameSpan, classNameLabel, classNameSpan])
 

@@ -1,14 +1,15 @@
+/* ******** base ******** */
 
-.criticalActionButton{
+.criticalActionButton {
     /* dimension */
     width: 200px;
-    height: 45px;
+    height: 44px;
 
     /* distribucion box */
     border-radius: 15px;
+
+    /* interactividad */
     cursor: pointer;
-    background-color: var(--color-theme-font-white);
-    border: 1px solid var(--color-theme-border-table);
 }
 
 .criticalActionButtonSpan {
@@ -25,16 +26,61 @@
 
 .criticalActionButtonLabel {
     font-size: 14px;
-    color: var(--color-theme-neutral-primary);
 }
 
 .criticalActionButtonIcon {
-    color: var(--color-theme-neutral-primary);
     width: 15px;
     height: 15px;
 }
 
-.criticalActionButton:hover .criticalActionButtonLabel,
-.criticalActionButton:hover .criticalActionButtonIcon {
+.criticalActionButton:focus {
+    outline: none;
+}
+
+/* ******** disabled ******** */
+
+.criticalActionButtonDisabled {
+    /* estilos */
+    background: var(--color-theme-background);
+    border: 2px solid var(--color-theme-neutral-primary);
+    /* interactividad */
+    cursor: not-allowed;
+}
+
+.criticalActionButtonCustomLabelDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+.criticalActionButtonCustomIconDisabled {
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+}
+
+/* ******** enabled ******** */
+
+.criticalActionButtonCustomEnabled {
+    border: none;
+    background: var(--color-theme-font-white);
+}
+
+.criticalActionButtonCustomEnabled .criticalActionButtonCustomLabelEnabled {
+    font-size: 14px;
+    color: var(--color-theme-neutral-primary);
+}
+
+.criticalActionButtonIconEnabled {
+    color: var(--color-theme-neutral-primary);
+}
+
+.criticalActionButtonCustomEnabled:hover:not(:disabled) .criticalActionButtonCustomLabelEnabled {
+    color: var(--color-alert);
+}
+
+.criticalActionButtonCustomEnabled:hover:not(:disabled){
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.criticalActionButtonCustomEnabled:hover:not(:disabled) .criticalActionButtonIconEnabled {
     color: var(--color-alert);
 }

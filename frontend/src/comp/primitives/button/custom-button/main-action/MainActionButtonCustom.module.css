@@ -59,20 +59,20 @@
 
 /* ******** enabled ******** */
 
-.mainActionButtonCustom {
+.mainActionButtonCustomEnabled {
     border: none;
     background: var(--color-gradient-purple);
 }
 
-.mainActionButtonCustom .mainActionButtonCustomLabel {
+.mainActionButtonCustomEnabled .mainActionButtonCustomLabelEnabled {
     font-size: 14px;
     color: var(--color-theme-font-white);
 }
 
-.mainActionButtonCustomIcon {
+.mainActionButtonCustomIconEnabled {
     color: var(--color-theme-font-white);
 }
 
-.mainActionButtonCustom:hover:not(:disabled) {
+.mainActionButtonCustomEnabled:hover:not(:disabled) {
     background: var(--color-theme-primary-light);
 }
