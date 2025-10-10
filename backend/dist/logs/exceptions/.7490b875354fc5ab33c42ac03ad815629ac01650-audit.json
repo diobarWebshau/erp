@@ -6,16 +6,6 @@
     "auditLog": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\.7490b875354fc5ab33c42ac03ad815629ac01650-audit.json",
     "files": [
         {
-            "date": 1758770915924,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-24.log",
-            "hash": "be5b2b9abffe68389f476e552b5917e9036b71ec5a93a8064ec63f1d0b8982f3"
-        },
-        {
-            "date": 1758855641841,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-25.log",
-            "hash": "56d8f70c64f623be44f65546f88ed79ee72edfc40a8ec4d02c553dc3aed01588"
-        },
-        {
             "date": 1758877962780,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-09-26.log",
             "hash": "f11f4ec2a0084977ddb42ec4926b89a3e8a82c4d9261971e3023f6b038d1b4ed"
@@ -59,6 +49,16 @@
             "date": 1759980154191,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-08.log",
             "hash": "7e938c493e094cf20be6bca22e80e420f5a536b2a1f1f2c06eff95b0d4c87f05"
+        },
+        {
+            "date": 1760069511481,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-09.log",
+            "hash": "1cd00dc11177b6ce1f1812314d467d69aea6e15f0081e8409c9f8278e11afca1"
+        },
+        {
+            "date": 1760084505721,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-10.log",
+            "hash": "7e850cbc3fbfc71f685752ba22172042d837e71def4d59e17181e37aedefff22"
         }
     ],
     "hashType": "sha256"

@@ -10,10 +10,7 @@
     /* posicionamiento */
     position: relative;
 
-    /* distribucion dentro del padre */
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 100%;
+    min-width: max-content;
 
     /* distribucion flex */
     display: flex;
@@ -25,31 +22,6 @@
     padding-right: 1%;
     border-radius: 15px;
     border: 1px solid var(--color-theme-border-table);
-
-    /* estilos */
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.fieldSelectContainer {
-
-    /* posicionamiento */
-    position: relative;
-
-    /* distribucion dentro del padre */
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 100%;
-
-    /* distribucion flex */
-    display: flex;
-    align-items: center;
-    justify-content: start;
-
-    /* distribucion box */
-    padding-left: 1rem;
-    padding-right: 1%;
-    border-radius: 15px;
 
     /* estilos */
     cursor: pointer;
@@ -129,9 +101,16 @@
 }
 
 .selected {
-    /* estilos */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
     background: var(--color-theme-neutral-background);
+    white-space: nowrap;
+    width: auto;
+    /* o 100%, dependiendo del layout */
 }
+
 
 .fieldSelectDefault {
     /* estilos */

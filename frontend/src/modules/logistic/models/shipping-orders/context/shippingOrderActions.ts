@@ -29,14 +29,14 @@ const add_shipping_order_purchased_order_products = (
 });
 
 const remove_shipping_order_purchased_order_products = (
-    payload: number[]
+    payload: (number | string)[]
 ): ShippingOrderAction => ({
     type: shippingOrderActionsTypes.REMOVE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS,
     payload
 });
 
 const update_shipping_order_purchased_order_products = (
-    payload: { id: number; attributes: IPartialShippingOrderPurchasedOrderProduct }
+    payload: { id: number | string; attributes: IPartialShippingOrderPurchasedOrderProduct }
 ): ShippingOrderAction => ({
     type: shippingOrderActionsTypes.UPDATE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS,
     payload
@@ -51,14 +51,14 @@ const add_shipping_order_purchased_order_products_aux = (
 });
 
 const remove_shipping_order_purchased_order_products_aux = (
-    payload: number[]
+    payload: (number | string)[]
 ): ShippingOrderAction => ({
     type: shippingOrderActionsTypes.REMOVE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS_AUX,
     payload
 });
 
 const update_shipping_order_purchased_order_products_aux = (
-    payload: { id: number; attributes: IPartialShippingOrderPurchasedOrderProduct }
+    payload: { id: number | string; attributes: IPartialShippingOrderPurchasedOrderProduct }
 ): ShippingOrderAction => ({
     type: shippingOrderActionsTypes.UPDATE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS_AUX,
     payload

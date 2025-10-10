@@ -4,10 +4,10 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import StyleModule from "./Step2.module.css";
 import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
-import { add_shipping_order_purchased_order_products_aux, back_step, next_step, update_shipping_order_purchased_order_products, update_shipping_order_purchased_order_products_aux } from "../../../../context/shippingOrderActions";
+import { add_shipping_order_purchased_order_products, add_shipping_order_purchased_order_products_aux, back_step, next_step, remove_shipping_order_purchased_order_products, update_shipping_order, update_shipping_order_purchased_order_products, update_shipping_order_purchased_order_products_aux } from "../../../../context/shippingOrderActions";
 import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
 import DateInputMantine from "./../../../../../../../../comp/external/mantine/date/input/base/DateInputMantine"
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
 import useLocationsProducedOneProduct from "./../../../../../../../../modelos/locations/hooks/useLocationsProducedOneProduct"
 import ObjectSelectCustom from "./../../../../../../../../comp/primitives/select/object-select/custom/ObjectSelectCustom"
@@ -21,6 +21,9 @@ import type { IPartialPurchasedOrder, IPurchasedOrder } from "interfaces/purchas
 import SelectPurchasedModal from "../../../../../../../../comp/features/modal-purchase/SelectPurchasedModal";
 import type { ShippingOrderAction } from "../../../../context/shippingOrderTypes";
 import { diffObjectArrays } from "../../../../../../../../utils/validation-on-update/validationOnUpdate";
+import { DateUtils } from "../../../../../../../../utils/dayJsUtils";
+import type { TableStatePartial } from "../../../../../../../../comp/primitives/table/tableContext/tableTypes";
+import { generateRandomIds } from "../../../../../../../../helpers/nanoId";
 
 interface IStep2 {
     onClose: () => void;
@@ -33,12 +36,22 @@ const Step2 = ({
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
 
+    const getRowId = useCallback((row: IPartialShippingOrderPurchasedOrderProduct) => row.id?.toString() || "", []);
 
-    const getRowId = useCallback(
-        (row: IPartialShippingOrderPurchasedOrderProduct) =>
-            `${row.purchase_order_product_id?.toString()}-${row.purchase_order_products?.purchase_order_id?.toString() || ""}`,
-        []
-    );
+    const date = useMemo(() => state.data?.delivery_date || null, [state.data?.delivery_date]);
+
+    const [selectedSopops, initialTableState] = useMemo(() => {
+        const selectedSopops = state.data?.shipping_order_purchase_order_product || [];
+        const rowSelectionState: RowSelectionState = {}
+        selectedSopops.forEach(p => {
+            rowSelectionState[p?.id?.toString() || ""] = true;
+        });
+        const initialTableState: TableStatePartial = {
+            ...(Object.keys(rowSelectionState).length > 0 ? { rowSelectionState } : {})
+        }
+        console.log(initialTableState);
+        return [selectedSopops, initialTableState];
+    }, [state.data?.shipping_order_purchase_order_product]);
 
     const [purchase_orders, client_name, purchaseOrder]: [IPartialPurchasedOrder[], string, IPurchasedOrder] = useMemo(() => {
         const purchase_orders = (state.data?.shipping_order_purchase_order_product_aux ?? [])
@@ -49,12 +62,10 @@ const Step2 = ({
         return [purchase_orders, client_name, purchaseOrder];
     }, [state.data?.shipping_order_purchase_order_product_aux]);
 
-
-    const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
+    const [deliveryDate, setDeliveryDate] = useState<Date | null>(date);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
     const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders(client_name, 0);
-    const [sopops, setSopops] = useState<IPartialShippingOrderPurchasedOrderProduct[]>([]);
-
+    const [sopops, setSopops] = useState<IPartialShippingOrderPurchasedOrderProduct[]>(selectedSopops);
 
     const filterPurchasedOrderAlreadySelected = useMemo(() => {
         return purchasedOrders.filter(p => !purchase_orders.some(sp => sp.id === p.id));
@@ -79,7 +90,8 @@ const Step2 = ({
     };
 
     const handleAddPurchasedOrder = useCallback((sopops: IPartialShippingOrderPurchasedOrderProduct[]) => {
-        dispatch(add_shipping_order_purchased_order_products_aux(sopops));
+        const sopposWithId = sopops.map(sopop => ({ ...sopop, id: generateRandomIds() }));
+        dispatch(add_shipping_order_purchased_order_products_aux(sopposWithId));
     }, [dispatch]);
 
     const handleOnClickNextStep = useCallback(() => {
@@ -93,10 +105,28 @@ const Step2 = ({
             if (!isExceedQtyOrder || !isExceedQtyLocation) return false;
             return true;
         });
+        if (updateValues.length === 0) return;
         if (!isSameLocation || !isValid) return;
-        dispatch(update_shipping_order_purchased_order_products(updateValues));
-    }, [sopops, state.data?.shipping_order_purchase_order_product_aux]);
-
+        if (!DateUtils.isValid(deliveryDate)) return;
+        const diffObject = diffObjectArrays(state.data?.shipping_order_purchase_order_product ?? [], updateValues);
+        if (diffObject.added.length > 0) {
+            const added = diffObject.added;
+            dispatch(add_shipping_order_purchased_order_products(added));
+        }
+        if (diffObject.deleted.length > 0) {
+            const ids = new Set(diffObject.deleted.map(d => d.id));
+            dispatch(remove_shipping_order_purchased_order_products([...ids]));
+        }
+        if (diffObject.modified.length > 0) {
+            const modified = diffObject.modified;
+            const updateValues = modified.map(m => ({ id: m.id, attributes: m }));
+            updateValues.forEach(u => {
+                dispatch(update_shipping_order_purchased_order_products({ id: u.id, attributes: u.attributes }))
+            });
+        }
+        dispatch(update_shipping_order({ delivery_date: deliveryDate }));
+        dispatch(next_step());
+    }, [sopops, state.data?.shipping_order_purchase_order_product, state.data?.shipping_order_purchase_order_product_aux, deliveryDate, date]);
 
     const columns: ColumnDef<IPartialShippingOrderPurchasedOrderProduct>[] = useMemo(() => [
         {
@@ -250,6 +280,7 @@ const Step2 = ({
                     classNameTableBody={StyleModule.tableBody}
                     onRowSelectionChangeExternal={handleRowSelectionChange}
                     getRowId={getRowId}
+                    initialState={initialTableState}
                 />
             </div>
             <div className={StyleModule.footerSection}>
@@ -266,7 +297,7 @@ const Step2 = ({
                     onClick={handleOnClickNextStep}
                     label="Siguiente"
                     icon={<ChevronRight />}
-                    disabled={sopops.length === 0}
+                // disabled={sopops.length === 0}
                 />
             </div>
             {
@@ -336,13 +367,13 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
 
     const { loadingLocationsProducedProduct, locationsProducedProduct } = useLocationsProducedOneProduct(product?.id ?? 0);
 
-    const handleOnChangeLocation = (
-        location: ILocation | null | undefined) => {
-        dispatch(update_shipping_order_purchased_order_products_aux({
-            id: record.purchase_order_product_id ?? 0,
-            attributes: { location: location ?? undefined }
-        }));
-    };
+    const handleOnChangeLocation = useCallback(
+        (location: ILocation | null | undefined) => {
+            dispatch(update_shipping_order_purchased_order_products_aux({
+                id: record.purchase_order_product_id ?? 0,
+                attributes: { location: location ?? undefined }
+            }));
+        }, [dispatch, record]);
 
     useEffect(() => {
         if (!record.location && locationsProducedProduct.length > 0) {
@@ -352,7 +383,7 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
             );
             if (initialLocation) handleOnChangeLocation(initialLocation);
         }
-    }, [locationsProducedProduct, handleOnChangeLocation, record.location]);
+    }, [locationsProducedProduct, handleOnChangeLocation, record]);
 
     return (
         <div className={StyleModule.objectSelectContainer}>

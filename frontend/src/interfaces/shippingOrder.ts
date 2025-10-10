@@ -29,6 +29,7 @@ interface IShippingOrder {
     carrier_id: number | null;
     load_evidence: LoadEvidenceItem[] | File[] | null;
     delivery_cost: number;
+    delivery_date: Date | null;
     created_at: string;
     updated_at: string;
     shipping_order_purchase_order_product?:
@@ -40,7 +41,7 @@ interface IShippingOrder {
     carrier?: IPartialCarrier,
     load_evidence_old?: PartialLoadEvidenceItem[],
     load_evidence_deleted?: PartialLoadEvidenceItem[],
-}
+};
 
 type IPartialShippingOrder =
     Partial<IShippingOrder>;
@@ -53,6 +54,7 @@ const defaultValueShippingOrder:
     carrier_id: null,
     load_evidence: null,
     delivery_cost: 0,
+    delivery_date: null,
     created_at: '',
     updated_at: '',
 };
@@ -64,6 +66,7 @@ const defaultValuePartialShippingOrder:
     carrier_id: null,
     load_evidence: null,
     delivery_cost: 0,
+    delivery_date: null,
 };
 
 export type {

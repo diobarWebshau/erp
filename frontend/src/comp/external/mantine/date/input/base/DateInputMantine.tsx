@@ -1,14 +1,13 @@
 import { DateInput } from '@mantine/dates';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import dayjs from "dayjs";
 import styles from "./DateInputMantine.module.css";
-import "dayjs/locale/es"; // para cambiar el idioma
-
+import { useState } from "react";
+import { DateUtils } from "../../../../../../utils/dayJsUtils";
 
 interface IDateInputMantine {
-  value: Date | null;
-  onChange: (value: Date | null) => void;
-  className?: string;
+  value: Date | null; // Fecha actual seleccionada, puede ser null
+  onChange: (value: Date | null) => void; // Callback al cambiar la fecha
+  className?: string; // Clase opcional para personalizar el contenedor principal
 }
 
 function DateInputMantine({
@@ -17,60 +16,97 @@ function DateInputMantine({
   className
 }: IDateInputMantine) {
 
+  const [isValidDate, setIsValidDate] = useState(DateUtils.isValid(value));
+
+  // ---------------------------------------------------------------------------
+  // Función que se llama al cambiar el valor del input
+  // Recibe un string o null (de Mantine DateInput)
+  // Convierte el string a un objeto Date usando dayjs y lo pasa a onChange
+  // ---------------------------------------------------------------------------
   const onChangeDate = (value: string | null) => {
-    onChange(dayjs(value).toDate());
+    if (DateUtils.isValid(value)) {
+      if (!isValidDate) {
+        setIsValidDate(true);
+      }
+      onChange(DateUtils.toDate(value)); // parsea y convierte a Date
+    } else {
+      if (isValidDate) {
+        setIsValidDate(false);
+      }
+    }
   };
+
+  // ---------------------------------------------------------------------------
+  // Función para mostrar abreviatura de los días de la semana
+  // Ejemplo: lunes -> "L", martes -> "M"
+  // ---------------------------------------------------------------------------
   const weekdayFormat = (date: string) => {
-    const abbr = dayjs(date).locale("es").format("dd");
-    return abbr.charAt(0).toUpperCase();
+    const abbr = DateUtils.parse(date).locale("es").format("dd"); // abreviatura de dos letras
+    return abbr.charAt(0).toUpperCase(); // tomamos la primera letra y la ponemos en mayúscula
   };
 
   return (
     <DateInput
-      value={value}
-      onChange={onChangeDate}
-      headerControlsOrder={['level', 'previous', 'next']}
-      weekdayFormat={weekdayFormat}
-      locale="es"
+      value={value} // Fecha actual seleccionada
+      onChange={onChangeDate} // Callback al cambiar la fecha
+      valueFormat="MM/DD/YYYY" // Formato de visualización en el input
+      headerControlsOrder={['level', 'previous', 'next']} // Orden de los controles del header
+      weekdayFormat={weekdayFormat} // Función para mostrar los días de la semana
+      locale="es" // Idioma español
 
-      placeholder="Selecciona una fecha"
-      rightSection={<Calendar size={18} color="blue" />}
-      rightSectionPointerEvents="none" // evita que tape el input
+      placeholder="Selecciona una fecha" // Texto cuando no hay valor
+      rightSection={<Calendar size={18} color="blue" />} // Icono del calendario dentro del input
+      rightSectionPointerEvents="none" // Evita que el icono bloquee la interacción con el input
+
+      // -----------------------------------------------------------------------
+      // Clases CSS personalizadas usando CSS Modules y clases globales
+      // -----------------------------------------------------------------------
       classNames={{
-        // Wrapper del input
-        root: `${className} ${styles.root}`, // contenedor que contiene tanto el label como el input
-        wrapper: styles.wrapper, // contenedor que contiene el input
-        label: `nunito-regular ${styles.label}`, // label
-        input: `nunito-regular ${styles.input}`, // input
-        description: `nunito-regular ${styles.description}`, // description
-        error: `nunito-regular ${styles.error}`, // error
-        required: styles.required, // required
-        section: styles.section, // section donde se encuentra el icono del input
-        // ROOT 
-        // ROOT 
-        levelsGroup: `${styles.levelsGroup} ${className}`, // Contenedor principal de los niveles 
-        // ENCAEZADO
-        calendarHeader: styles.calendarHeader, // Contenedor del encabezado
-        calendarHeaderLevel: `nunito-bold ${styles.calendarHeaderLevel}`, // Label donde se muestra el mes y año
-        calendarHeaderControl: styles.calendarHeaderControl, // Botones de control
-        // calendarHeaderControlIcon: styles.calendarHeaderControlIcon // Iconos de los controles por defecto
-        // datePickerRoot: styles.datePickerRoot,
-        // TABLE -->  CONTENIDO DEL MES
-        monthThead: `nunito-regular ${styles.monthThead}`,
-        monthTbody: styles.monthTbody,
-        weekdaysRow: styles.weekdaysRow,
-        weekNumber: styles.weekNumber,
-        weekday: `nunito-regular ${styles.weekday}`,
-        monthCell: styles.monthCell,
-        day: `nunito-regular ${styles.day}`,
+        root: `${className} ${styles.root}`, // Contenedor principal que envuelve label + input
+        wrapper: styles.wrapper, // Contenedor que envuelve solo el input
+        label: `nunito-regular ${styles.label}`, // Estilo del label
+        input: `nunito-regular ${isValidDate ? styles.input : styles.inputInvalid}`, // Estilo del input
+        description: `nunito-regular ${styles.description}`, // Estilo del texto de ayuda
+        error: `nunito-regular ${styles.error}`, // Estilo del mensaje de error
+        required: styles.required, // Estilo del indicador de campo requerido
+        section: styles.section, // Contenedor del rightSection (icono del calendario)
+
+        // -------------------------------------------------------------------
+        // Contenedor del calendario
+        // -------------------------------------------------------------------
+        levelsGroup: `${styles.levelsGroup} ${className}`, // Contenedor principal de los niveles del calendario (mes/año)
+        calendarHeader: styles.calendarHeader, // Contenedor del encabezado del calendario
+        calendarHeaderLevel: `nunito-bold ${styles.calendarHeaderLevel}`, // Mes y año en el encabezado
+        calendarHeaderControl: styles.calendarHeaderControl, // Botones prev/next
+
+        // -------------------------------------------------------------------
+        // Contenido del mes
+        // -------------------------------------------------------------------
+        monthThead: `nunito-regular ${styles.monthThead}`, // Encabezado de los días de la semana
+        monthTbody: styles.monthTbody, // Cuerpo del calendario
+        weekdaysRow: styles.weekdaysRow, // Fila de días de la semana
+        weekNumber: styles.weekNumber, // Número de la semana (si aplica)
+        weekday: `nunito-regular ${styles.weekday}`, // Celda de cada día de la semana
+        monthCell: styles.monthCell, // Celda de cada día del mes
+        day: `nunito-regular ${styles.day}`, // Estilo del día individual
       }}
-      withCellSpacing={true}
-      nextIcon={<ChevronRight className={styles.iconControl} />}
-      previousIcon={<ChevronLeft className={styles.iconControl} />}
+
+      withCellSpacing={true} // Espacio entre las celdas del calendario
+
+      // -----------------------------------------------------------------------
+      // Iconos de navegación del calendario
+      // -----------------------------------------------------------------------
+      nextIcon={<ChevronRight className={styles.iconControl} />} // Botón siguiente
+      previousIcon={<ChevronLeft className={styles.iconControl} />} // Botón anterior
+
+      // -----------------------------------------------------------------------
+      // Props para personalizar el popover del calendario
+      // -----------------------------------------------------------------------
       popoverProps={{
         classNames: {
-          dropdown: styles.dropdown,
+          dropdown: styles.dropdown, // Estilo del popover
         },
+        // Si quieres personalizar el estilo directamente:
         // styles: {
         //   dropdown: {
         //     padding: "0rem",
