@@ -24,13 +24,14 @@ import CancelModalCustom from "../../../../../../comp/primitives/modal/custom-mo
 
 interface IAddModalProps {
     onClose: () => void;
-    onCreate: (data: IPartialProductionOrder) => void
-
+    onCreate: (data: IPartialProductionOrder) => void;
+    onEdit: () => void;
 }
 
 const AddModal = ({
     onClose,
     onCreate,
+    onEdit,
 }: IAddModalProps) => {
 
     // ? ************ Hooks de contexto ************/
@@ -146,6 +147,7 @@ const AddModal = ({
                             onCancel={toggleCancelProcessModal}
                             onBack={onClose}
                             onCreate={onCreate}
+                            onEdit={onEdit}
                         />
                     )
                 }

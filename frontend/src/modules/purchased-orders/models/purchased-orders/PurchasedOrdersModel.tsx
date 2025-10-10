@@ -139,7 +139,6 @@ const PurchasedOrderModel = () => {
     const handleCreate = async (
         purchased: IPartialPurchasedOrder
     ) => {
-        console.log(purchased);
         setLoading(true);
         try {
             const response =

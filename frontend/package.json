@@ -21,6 +21,7 @@
     "@mantine/hooks": "^8.2.1",
     "@reduxjs/toolkit": "2.8.1",
     "@tanstack/react-table": "^8.21.3",
+    "clx": "^1.0.0",
     "country-state-city": "3.2.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",

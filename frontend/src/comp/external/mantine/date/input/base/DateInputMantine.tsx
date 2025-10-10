@@ -57,7 +57,6 @@ function DateInputMantine({
       placeholder="Selecciona una fecha" // Texto cuando no hay valor
       rightSection={<Calendar size={18} color="blue" />} // Icono del calendario dentro del input
       rightSectionPointerEvents="none" // Evita que el icono bloquee la interacción con el input
-
       // -----------------------------------------------------------------------
       // Clases CSS personalizadas usando CSS Modules y clases globales
       // -----------------------------------------------------------------------
@@ -103,6 +102,7 @@ function DateInputMantine({
       // Props para personalizar el popover del calendario
       // -----------------------------------------------------------------------
       popoverProps={{
+        
         classNames: {
           dropdown: styles.dropdown, // Estilo del popover
         },

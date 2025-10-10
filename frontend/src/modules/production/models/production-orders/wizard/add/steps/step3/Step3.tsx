@@ -28,12 +28,14 @@ interface IStep3Props {
     onCancel: () => void;
     onBack: () => void;
     onCreate: (data: IPartialProductionOrder) => void;
+    onEdit: () => void;
 }
 
 const Step3 = ({
     onCancel,
     onBack,
     onCreate,
+    onEdit,
 }: IStep3Props) => {
 
     const validationError =
@@ -60,6 +62,12 @@ const Step3 = ({
             }))
         }
     }
+
+    const handlerOnClickGoToOrderView = () => {
+        onEdit();
+        setShowModalConfirm(false);
+    }
+
     const handlerOnChangeSelectedLocation = (
         location: ILocation | null | undefined) => {
         if (location) {
@@ -461,7 +469,7 @@ const Step3 = ({
             </section>
             {showModalConfirm &&
                 <CustomModal
-                    onClose={handleToggleModalConfirm}
+                    onClose={onBack}
                     title="Tu orden de producción ha sido creada exitosamente"
                     icon={<CircleCheck className={StyleModule.customModalConfirmIcon} />}
                     children={() =>
@@ -472,8 +480,8 @@ const Step3 = ({
                                 icon={<FileCheck2 />}
                             />
                             <MainActionButtonCustom
-                                onClick={onBack}
-                                label="Ver orden de producción"
+                                onClick={handlerOnClickGoToOrderView}
+                                label="Ver orden"
                                 icon={<FileCheck2 />}
                             />
                         </div>

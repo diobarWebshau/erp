@@ -145,7 +145,13 @@ import {
   autoPlacement,        // (Reservado) Middleware alternativo para elegir placement automáticamente si lo necesitas en el futuro.
   hide,                 // Middleware: detecta cuando el elemento de referencia queda oculto (por scroll/clip) para poder actuar en consecuencia.
 } from "@floating-ui/react";
+import { type UseRoleProps } from '@floating-ui/react';
 
+type roleOptions =
+  "dialog" | "combobox" | "listbox" | "menu" |
+  "tooltip" | "alert" | "alertdialog" | "grid" | "label" | "select" | "tooltip" | "tree"; // Nota: listado ilustrativo; en práctica usamos RoleOption de UseRoleProps.
+
+type RoleOption = NonNullable<UseRoleProps['role']>;
 
 type Placement =
   "bottom-start" | "bottom-end" | "bottom" |
@@ -156,37 +162,63 @@ type Placement =
 interface PopoverFloatingProps {
   childrenTrigger: ReactNode;
   childrenFloating: ReactNode | ((args: { onClose: () => void }) => ReactNode);
+  typeRole?: RoleOption;                // Rol ARIA del contenedor flotante (ej. "listbox", "menu", "dialog")
   placement?: Placement;
-  matchWidth?: boolean; // 👈 nueva bandera
+  matchWidth?: boolean;                 // 👈 nueva bandera
   classNameContainerPopover?: string;
+  initialOpen?: boolean;                // Estado inicial si lo usas de forma NO controlada
+  open?: boolean;                       // Si se provee, el componente entra en MODO CONTROLADO (sin importar si es true/false)
+  setOpen?: (value: boolean) => void;   // Setter externo para MODO CONTROLADO
+  minHeight?: number | string;          // Altura mínima visual opcional (p.ej. 100 o "8rem")
+  maxHeight?: number | string;          // Altura máxima antes de scroll (p.ej. 250 o "20rem")
 }
 
 const PopoverFloating = ({
   childrenTrigger,
   childrenFloating,
+  typeRole = "dialog",
   placement = "bottom-start",
   matchWidth = false,
+  initialOpen = false,
+  open,                 // 🔴 IMPORTANTE: la presencia de esta prop define modo controlado (no su valor)
+  setOpen,              // 🔴 Setter externo si es controlado
+  minHeight,
+  maxHeight,            // 🔴 NUEVO: controla el punto a partir del cual aparece scroll
 }: PopoverFloatingProps) => {
 
-  const [isOpenFloating, setIsOpenFloating] = useState(false);
+  // ─────────────────────────────────────────────────────────────────────────────
+  // CONTROL: modo controlado por PRESENCIA de props (open/setOpen), no por su valor
+  // Si 'open' está definido y hay 'setOpen', usamos esas referencias (CONTROLADO).
+  // Si no, usamos estado interno (NO controlado), inicializado con initialOpen.
+  // ─────────────────────────────────────────────────────────────────────────────
+  const isControlled = typeof open !== 'undefined' && typeof setOpen === 'function';
 
-  const toggleIsOpenFloating = () => {
-    setIsOpenFloating(!isOpenFloating);
-  };
+  const [internalOpen, setInternalOpen] = useState<boolean>(initialOpen); // Estado interno para modo NO controlado
+  const actualOpen = isControlled ? (open as boolean) : internalOpen;     // Estado efectivo abierto/cerrado
+  const setActualOpen = isControlled ? (setOpen as (v: boolean) => void) : setInternalOpen; // Setter efectivo
+
+  // Sincroniza el estado interno si estás en modo controlado (permite reflejar false)
+  useEffect(() => {
+    // Se mantiene para debugging/consistencia: cuando te controlan, copiamos el valor
+    if (isControlled) setInternalOpen(open as boolean);
+  }, [isControlled, open]);
+
+  // Helpers para normalizar valores numéricos/string a CSS
+  const toCss = (v?: number | string) => (typeof v === 'number' ? `${v}px` : v);
 
   // * Configuración de Floating UI
-  const { 
-    refs, 
-    floatingStyles, 
+  const {
+    refs,
+    floatingStyles,
     context,
     middlewareData, // Se extrae middlewareData para poder leer datos de middlewares (ej. hide → referenceHidden) y reaccionar a ello.
   } = useFloating({
-    // ? Estado controlado: el floating se abre/cierra según isOpen
-    open: isOpenFloating,                       // Booleano: si está abierto o cerrado
-    onOpenChange: setIsOpenFloating,            // Función que actualiza ese estado
+    // ? Estado controlado: el floating se abre/cierra según actualOpen
+    open: actualOpen,                // Booleano: si está abierto o cerrado
+    onOpenChange: setActualOpen,     // Función que actualiza ese estado (respeta controlado/no controlado)
 
     // ? Posición preferida del floating
-    placement: placement,          // Abajo y alineado al inicio (izquierda)
+    placement: placement,            // Abajo y alineado al inicio (izquierda)
 
     // ? Hace que la posición se recalcule automáticamente
     // cuando hay scroll, resize, cambios de layout, etc.
@@ -231,12 +263,35 @@ const PopoverFloating = ({
             });
           }
 
-          // Limitar por el área disponible (evita que el popover se salga del viewport o del contenedor scrolleable)
+          // ─────────────────────────────────────────────────────────────
+          // 🔹 Control de alturas y scroll interno
+          // - maxHeight: límite superior antes de que aparezca scroll interno.
+          //   Si se provee número → se expresa en px y se recorta por el espacio disponible (availableHeight).
+          //   Si se provee string (ej. "20rem") → se usa literal (no se recorta con availableHeight).
+          // - minHeight: altura mínima visual opcional (número→px o string CSS).
+          // - overflowY: auto para mostrar scrollbar solo cuando sea necesario.
+          // ─────────────────────────────────────────────────────────────
+          let computedMaxHeight: string | undefined;
+
+          if (typeof maxHeight === 'number') {
+            // Combina tu tope con el espacio realmente disponible
+            computedMaxHeight = `${Math.min(availableHeight, maxHeight)}px`;
+          } else if (typeof maxHeight === 'string') {
+            // Si das una unidad CSS, se respeta tal cual
+            computedMaxHeight = maxHeight;
+          } else {
+            // Valor por defecto si no das maxHeight: usa todo el espacio disponible
+            computedMaxHeight = `${availableHeight}px`;
+          }
+          
+
           Object.assign(elements.floating.style, {
             maxWidth: `${availableWidth}px`,
-            maxHeight: `${availableHeight}px`,
-            overflow: "auto", // Si el contenido es mayor que el espacio disponible, habilita scroll interno en el popover.
-            zIndex: "9999",   // Asegura que quede por encima de otros elementos (especialmente dentro de modales).
+            maxHeight: maxHeight || computedMaxHeight,
+            minHeight: toCss(minHeight), // puede ser undefined → no se aplica
+            overflowY: "auto",           // 👈 activa scroll vertical interno cuando se supera maxHeight
+            // overflowX: "hidden",
+            zIndex: "9999",
           });
         }
       }),
@@ -247,21 +302,19 @@ const PopoverFloating = ({
     ],
   });
 
-
   // * Interacciones Floating UI
-  const role = useRole(context, { role: "dialog" });
+  const role = useRole(context, { role: typeRole });
   // ? Añade atributos de accesibilidad (ARIA) al floating.
-  //    En este caso le dice a lectores de pantalla que el floating
-  //    es una "listbox" (como un menú de opciones).
+  //    En este caso le dice a lectores de pantalla qué tipo de patrón es (listbox, menu, dialog, etc.).
 
-  const click = useClick(context, { event: "mousedown" });
-  // ? Controla la apertura/cierre del floating con click (mousedown).
-  //    - Si haces click en el "reference" (ej. el botón), abre o cierra.
-  //    - Usa "mousedown" en vez de "click" para que responda más rápido.
+  const click = useClick(context, { event: "click" });
+  // ? Controla la apertura/cierre del floating con click (click).
+  //    - Usar "click" (en vez de "mousedown") evita carreras con outsidePress que también dispara en mousedown.
 
-  const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true, ancestorScroll: true });
+  const dismiss = useDismiss(context, { outsidePress: true, outsidePressEvent: "click", escapeKey: true, ancestorScroll: true });
   // ? Permite cerrar el floating de forma natural:
-  //    - outsidePress: true → si haces click fuera, se cierra.
+  //    - outsidePress: true → si haces click fuera, se cierra (configurado en "click" para evitar colisiones con onMouseDown).
+  //    - outsidePressEvent: "click" → hace el cierre consistente con el hook useClick.
   //    - escapeKey: true → si presionas Escape, se cierra.
   //    - ancestorScroll: true → si hay scrolls de ancestros relevantes (p. ej. desplazamiento fuerte), ayuda a mantener un cierre coherente.
 
@@ -279,12 +332,14 @@ const PopoverFloating = ({
   // - Gracias al middleware hide(), podemos leer middlewareData.hide.referenceHidden.
   // - Si es true mientras está abierto, cerramos el popover para evitar que “quede flotando” fuera de contexto.
   useEffect(() => {
-    if (!isOpenFloating) return;
+    if (!actualOpen) return;
     if (middlewareData?.hide?.referenceHidden) {
-      setIsOpenFloating(false);
+      setActualOpen(false);
     }
-  }, [isOpenFloating, middlewareData?.hide?.referenceHidden]);
+  }, [actualOpen, middlewareData?.hide?.referenceHidden, setActualOpen]);
 
+  // Helper para onClose desde children como función
+  const handleCloseFromChildren = () => setActualOpen(false);
 
   return (
     <div className={StyleModule.popoverFloatingIUContainer}>
@@ -296,7 +351,7 @@ const PopoverFloating = ({
         {childrenTrigger}
       </div>
       {
-        isOpenFloating && (
+        actualOpen && (
           <FloatingPortal>
             <FloatingFocusManager
               context={context}
@@ -313,7 +368,7 @@ const PopoverFloating = ({
               >
                 {
                   typeof childrenFloating === "function"
-                    ? childrenFloating({ onClose: toggleIsOpenFloating })
+                    ? childrenFloating({ onClose: handleCloseFromChildren }) // Actualizado: onClose respeta modo controlado/no controlado
                     : childrenFloating
                 }
               </div>
@@ -325,12 +380,11 @@ const PopoverFloating = ({
   );
 };
 
-
 export default PopoverFloating;
 
 
 
-  
+
 //   return (
 //     <div className={StyleModule.popoverFloatingIUContainer}>
 //       <div

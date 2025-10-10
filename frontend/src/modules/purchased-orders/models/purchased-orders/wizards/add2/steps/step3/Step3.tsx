@@ -488,13 +488,7 @@ const Step3 = ({
     const goToViewPurchasedOrder = () => {
         onCloseAddModal();
         onEdit();
-        console.log("go to view purchased order");
     }
-
-    const sendByEmail = () => {
-        console.log("send by email");
-    }
-
 
     // * ************ Componentes extra para inyectar como props en el GenericTable ************/
 

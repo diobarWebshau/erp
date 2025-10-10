@@ -1,0 +1,52 @@
+
+
+.fieldSelectContainer {
+    /* dimension */
+    width: 100%;
+    /* posicionamiento */
+    position: relative;
+    /* distribucion flex*/
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    /* distribucion box */
+    padding-left: 0.7rem;
+    /* estilos */
+    font-size: 14px;
+}
+
+.fieldSelectContainerValidate {
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.fieldSelectContainerInvalid {
+    border: 1px solid var(--color-alert);
+}
+
+.iconButton {
+    /* posicionamiento */
+    position: absolute;
+
+    right: 0.2rem;
+
+    background: transparent;
+    border: none;
+}
+
+
+.toggle{
+
+    /* distribucion flex*/
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+
+    padding-left: 0.7rem;
+    /* estilos */
+    font-size: 14px;
+
+    border: 1px solid red;
+
+}

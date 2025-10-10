@@ -237,7 +237,7 @@ const Step2 = ({
     return (
         <div className={StyleModule.container}>
             <div className={StyleModule.header}>
-                <h2 className="nunito-bold">Step 2</h2>
+                <h2 className="nunito-bold">Orden #V-51236</h2>
                 <MainActionButtonCustom
                     onClick={toggleAddNewOrderModal}
                     label="Agregar orden"

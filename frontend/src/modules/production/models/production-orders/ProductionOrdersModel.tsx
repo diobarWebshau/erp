@@ -129,7 +129,7 @@ const ProductionOrderModel = () => {
         productionOrder: IPartialProductionOrder
     ) => {
         try {
-            const result =
+            const result: IProductionOrder | null =
                 await createProductionOrderInDB(
                     productionOrder,
                     dispatch
@@ -138,6 +138,7 @@ const ProductionOrderModel = () => {
                 return;
             }
             setServerError(null);
+            setProductionOrderRecord(result);
             await fetchs();
         } catch (error) {
             if (error instanceof Error)
@@ -163,7 +164,6 @@ const ProductionOrderModel = () => {
                 return;
             }
             setServerError(null);
-            console.log("hago el refetch");
             await refetchProductionOrderById();
             await fetchs();
         } catch (error) {
@@ -211,6 +211,10 @@ const ProductionOrderModel = () => {
         setServerError(null);
         setProductionOrderRecord({ ...record, qty: Number(record.qty) });
         setIsActiveEditModal(!isActiveEditModal);
+    }
+    
+    const handlerGotoViewOrder = () => {
+        setIsActiveEditModal(true);
     }
     const toggleActiveDeleteModal = (record: IProductionOrder) => {
         dispatch(clearAllErrors());
@@ -459,6 +463,7 @@ const ProductionOrderModel = () => {
                             <AddModal
                                 onClose={() => setIsActiveAddModal(false)}
                                 onCreate={handleCreate}
+                                onEdit={handlerGotoViewOrder}
                             />
                         </AddModalProductionOrderGeneric>
                     )
