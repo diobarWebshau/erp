@@ -143,19 +143,18 @@ const TableBase = <T,>({
             parts.push({
                 id: "select",
                 header: ({ table }) => (
-                    <CheckBoxTableMemo
+                    <CheckBoxHeaderTableMemo
                         className={stylesModules.checkboxHeader}
-                        type="checkbox"
-                        checked={table.getIsAllPageRowsSelected()}
-                        onChange={table.getToggleAllPageRowsSelectedHandler()}
+                        table={table}
+                        condition={conditionalRowSelection ?? null}
+                        state={table.getState().rowSelection}
                     />
                 ),
                 cell: ({ row }) => (
-                    <CheckBoxTableMemo
+                    <CheckBoxBodyTableMemo
                         className={stylesModules.checkbox}
-                        type="checkbox"
-                        checked={row.getIsSelected()}
-                        onChange={row.getToggleSelectedHandler()}
+                        row={row}
+                        state={table.getState().rowSelection}
                     />
                 ),
                 enableSorting: false,
@@ -226,8 +225,11 @@ const TableBase = <T,>({
     const onRowSelectionChange = useCallback((updater: Updater<RowSelectionState>) => {
         const next = typeof updater === "function" ? updater(state.rowSelectionState) : updater;
         const ok = conditionalRowSelection ? conditionalRowSelection(next, table.getRowModel().rows) : true;
-        if (ok) dispatch(set_row_selection(next));
-    }, [dispatch, state.rowSelectionState, conditionalRowSelection /* no pongas table aquí */]);
+        if (ok) {
+            dispatch(set_row_selection(next));
+            // confirmChangesExternal();
+        }
+    }, [dispatch, state.rowSelectionState, conditionalRowSelection]);
 
     const onColumnVisibilityChange = useCallback((updater: Updater<VisibilityState>) => {
         const next = typeof updater === "function" ? updater(state.columnVisibilityState) : updater;
@@ -248,6 +250,7 @@ const TableBase = <T,>({
         const next = typeof updater === "function" ? updater(state.paginationState) : updater;
         dispatch(set_pagination(next));
     }, [dispatch, state.paginationState]);
+
 
     // ****** Inicializacion de la tabla ******
 
@@ -325,6 +328,7 @@ const TableBase = <T,>({
     }, [state.rowSelectionState, memoData, memoGetRowId, onRowSelectionChangeExternal]);
 
 
+
     // **** Declaracion de los classNames **** */
 
     const [
@@ -360,10 +364,7 @@ const TableBase = <T,>({
             bodyTableClassNames, footerclassNames
         ];
     }, [
-        extraComponents, enablePagination, footerComponents,
-        classNameGenericTableContainer, classNameExtraComponents,
-        classNameTableContainer, classNameTable,
-        classNameTableHeader, classNameTableBody
+        extraComponents, footerComponents,
     ]);
 
     const wrapperTableClassNames = useMemo(() => {
@@ -520,30 +521,155 @@ const PopoverContentOption = <T,>({
 const PopoverContentOptionMemo = memo(PopoverContentOption) as typeof PopoverContentOption;
 
 
-// * ********* Check Box table ********* */
+// -----------------------------------------------------------
+//  Checkbox del encabezado de la tabla (seleccionar/deseleccionar todos)
+//  Incluye soporte para "estado indeterminado" (cuando solo algunas filas
+//  están seleccionadas) y valida con la condición `conditionalRowSelection`.
+// -----------------------------------------------------------
 
-interface CheckBoxTableProps {
+interface CheckBoxHeaderTableProps<T> {
     className?: string;
-    type?: string;
-    checked?: boolean;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    table: Table<T>;
+    /** Si regresa false, se cancela la selección masiva */
+    condition: ((updater: RowSelectionState, rows: Row<T>[]) => boolean) | null;
+    state?: RowSelectionState;
 }
 
-const CheckBoxTable = ({ className, type, checked, onChange }: CheckBoxTableProps) => {
+const CheckBoxHeaderTable = <T,>({
+    className,
+    table,
+    condition,
+    state,
+}: CheckBoxHeaderTableProps<T>) => {
+    // Referencia al input checkbox del header, para controlar
+    // manualmente su estado "indeterminate".
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    const handlerOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.stopPropagation();
-        onChange?.(e);
-    }
+    //  Este efecto actualiza el estado visual del checkbox
+    // cuando algunas filas están seleccionadas (indeterminate).
+    useEffect(() => {
+        if (!inputRef.current) return;
+        const some = table.getIsSomePageRowsSelected(); // hay algunas seleccionadas
+        const all = table.getIsAllPageRowsSelected();   // todas seleccionadas
+        inputRef.current.indeterminate = some && !all;  // estado visual intermedio
+    }, [table, state]);
+
+    //  Evento que se ejecuta al hacer clic en el checkbox del header.
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation(); // evita que el clic burbujee a la fila
+
+        // Obtiene todas las filas visibles (página actual)
+        const pageRows = table.getRowModel().rows;
+
+        // Determina si el clic actual intenta seleccionar o deseleccionar todo.
+        const willSelectAll = !table.getIsAllPageRowsSelected();
+
+        // Simula el "estado siguiente" de selección para validarlo
+        const next: RowSelectionState = { ...table.getState().rowSelection };
+        if (willSelectAll) {
+            // Si se intenta seleccionar todo, marcamos todas las filas visibles
+            for (const r of pageRows) next[r.id] = true;
+        } else {
+            // Si se intenta deseleccionar todo, las removemos
+            for (const r of pageRows) delete next[r.id];
+        }
+
+        // Si existe una condición personalizada, la evaluamos
+        if (condition && !condition(next, pageRows)) {
+            //  No se cumple la condición → revertimos el cambio visual
+            e.preventDefault();
+
+            // Re-sincronizamos el estado visual (checked e indeterminate)
+            if (inputRef.current) {
+                const some = table.getIsSomePageRowsSelected();
+                const all = table.getIsAllPageRowsSelected();
+                inputRef.current.checked = all;
+                inputRef.current.indeterminate = some && !all;
+            }
+            return; // no aplicar selección
+        }
+
+        //  Si la condición se cumple, aplicamos el cambio en TanStack
+        table.toggleAllPageRowsSelected(willSelectAll);
+    };
 
     return (
         <input
+            ref={inputRef}
             className={className}
-            type={type}
-            checked={checked}
-            onChange={handlerOnChange}
+            type="checkbox"
+            checked={table.getIsAllPageRowsSelected()}
+            onChange={onChange}
         />
     );
 };
 
-const CheckBoxTableMemo = memo(CheckBoxTable) as typeof CheckBoxTable;
+// Memoriza el componente para evitar renders innecesarios
+const CheckBoxHeaderTableMemo = memo(CheckBoxHeaderTable) as typeof CheckBoxHeaderTable;
+
+
+// -----------------------------------------------------------
+//  Checkbox individual de cada fila de la tabla.
+//  Aplica validación condicional antes de alternar la selección.
+// -----------------------------------------------------------
+
+interface CheckBoxBodyTableProps<T> {
+    className?: string;
+    row: Row<T>;
+    table?: Table<T>; // Se usa para acceder a todas las filas visibles
+    /** Si regresa false, se cancela el toggle de esta fila */
+    condition?: (updater: RowSelectionState, rows: Row<T>[]) => boolean;
+    state?: RowSelectionState;
+}
+
+const CheckBoxBodyTable = <T,>({
+    className,
+    row,
+    table,
+    condition,
+    state
+}: CheckBoxBodyTableProps<T>) => {
+    // 👇 Evento al cambiar el estado del checkbox
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation(); // evita afectar otros clics de la fila
+
+        // Si hay condición definida y tenemos acceso a la tabla
+        if (table && condition) {
+            const rows = table.getRowModel().rows;
+
+            // Simula el estado de selección si esta fila cambiara
+            const next: RowSelectionState = { ...table.getState().rowSelection };
+            const willSelect = !row.getIsSelected();
+            if (willSelect) next[row.id] = true;
+            else delete next[row.id];
+
+            // Si la condición no se cumple, cancelamos el cambio
+            if (!condition(next, rows)) {
+                e.preventDefault();
+                return;
+            }
+        }
+
+        // ✅ Si la condición se cumple, aplicamos el cambio a TanStack
+        row.getToggleSelectedHandler()(e);
+    };
+
+    useEffect(() => {
+        if (state) {
+            row.toggleSelected(state[row.id] ?? false);
+        }
+    }, [state]);
+
+    return (
+        <input
+            className={className}
+            type="checkbox"
+            checked={row.getIsSelected()}     // estado real de la fila
+            onChange={onChange}               // handler personalizado con validación
+            onClick={(e) => e.stopPropagation()} // evita abrir detalles de la fila
+        />
+    );
+};
+
+// Memoriza el componente para evitar renders innecesarios
+const CheckBoxBodyTableMemo = memo(CheckBoxBodyTable) as typeof CheckBoxBodyTable;

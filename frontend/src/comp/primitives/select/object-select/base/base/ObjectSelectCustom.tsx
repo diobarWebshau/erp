@@ -25,7 +25,6 @@ const ObjectSelectCustom = <T,>({
     classNameInput,
     classNameOption,
 }: IObjectSelectCustom<T>) => {
-    console.log(maxHeightToggle);
     return (
         <ObjectSelect
             defaultLabel={defaultLabel || "Seleccione una opción"}

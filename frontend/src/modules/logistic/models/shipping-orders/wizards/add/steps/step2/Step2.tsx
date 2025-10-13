@@ -1,7 +1,6 @@
 import CriticalActionButton from "../../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import StyleModule from "./Step2.module.css";
 import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
 import { add_shipping_order_purchased_order_products, add_shipping_order_purchased_order_products_aux, back_step, next_step, remove_shipping_order_purchased_order_products, update_shipping_order, update_shipping_order_purchased_order_products, update_shipping_order_purchased_order_products_aux } from "../../../../context/shippingOrderActions";
@@ -24,6 +23,7 @@ import type { TableStatePartial } from "../../../../../../../../comp/primitives/
 import { generateRandomIds } from "../../../../../../../../helpers/nanoId";
 import ObjectSelectCustomMemo from "../../../../../../../../comp/primitives/select/object-select/base/base/ObjectSelectCustom";
 import toastMantine from "../../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import StyleModule from "./Step2.module.css";
 
 interface IStep2 {
     onClose: () => void;
@@ -37,7 +37,6 @@ const Step2 = ({
     const dispatch = useShippingOrderDispatch();
 
     const getRowId = useCallback((row: IPartialShippingOrderPurchasedOrderProduct) => row.id?.toString() || "", []);
-
     const date = useMemo(() => state.data?.delivery_date || null, [state.data?.delivery_date]);
 
     const [selectedSopops, initialTableState] = useMemo(() => {
@@ -95,41 +94,51 @@ const Step2 = ({
 
     const handleOnClickNextStep = useCallback(() => {
         const updateValues = state.data?.shipping_order_purchase_order_product_aux?.filter(p => sopops.some(sopop => sopop.id === p.id)) || [];
-        console.log(updateValues)
         const locationBase = [...updateValues].shift()?.location;
         const isSameLocation = updateValues?.every((p) => p.location?.id === locationBase?.id);
-        const [isExceedQtyOrder, isExceedQtyLocation] = (
-            (locationBase: ILocation | undefined) => {
-                const isExceedQtyOrder = updateValues?.every((p) => {
-                    const qtyValid = ((p.purchase_order_products?.shipping_summary?.order_qty ?? 0) - (p.purchase_order_products?.shipping_summary?.shipping_qty ?? 0));
-                    return (updateValues.find(p => p.purchase_order_product_id === p.purchase_order_product_id)?.qty ?? 0) <= qtyValid;
-                })
-                const someIsExceedQtyLocation = updateValues?.some((p) => (p.qty ?? 0) > (locationBase?.inventory?.available ?? 0));
-                return [isExceedQtyOrder, someIsExceedQtyLocation];
+        const [isAnyExceeds, isExceedQtyLocation] = (
+            () => {
+                const anyExceeds = updateValues?.some((item) => {
+                    const orderQty = Number(item.purchase_order_products?.shipping_summary?.order_qty ?? 0);
+                    const shippedQty = Number(item.purchase_order_products?.shipping_summary?.shipping_qty ?? 0);
+                    const remaining = orderQty - shippedQty;
+                    const requested = Number(item.qty ?? 0);
+
+                    return requested > remaining;
+                }) ?? false;
+
+                const someIsExceedQtyLocation = updateValues?.some((p) => (p.qty ?? 0) > (p?.location?.inventory?.available ?? 0));
+                return [anyExceeds, someIsExceedQtyLocation];
             }
-        )(locationBase as ILocation);
+        )();
         if (updateValues.length === 0) {
-            toastMantine.feedBackForm({ message: "Debe seleccionar al menos un producto para generar la orden de envio", });
+            toastMantine.feedBackForm({
+                message: "Debe seleccionar al menos un producto para generar la orden de envio."
+            });
             return;
         }
         if (!isSameLocation) {
-            toastMantine.feedBackForm({ message: "Todos los productos a enviar deben pertenecer a la misma ubicación" });
+            toastMantine.feedBackForm({
+                message: "Todos los productos a enviar deben pertenecer a la misma ubicación."
+            });
             return;
         }
         if (isExceedQtyLocation) {
             toastMantine.feedBackForm({
-                message: 'Verifica que todas las cantidades de los productos puedan ser abastecidos por la ubicación asignada antes de continuar.',
+                message: "Verifica que todas las cantidades de los productos puedan ser abastecidos por la ubicación asignada antes de continuar."
             });
             return;
         }
-        if (!isExceedQtyOrder) {
+        if (isAnyExceeds) {
             toastMantine.feedBackForm({
-                message: 'Solo puede procesarse la cantidad que aún no ha sido enviada de la orden.',
+                message: "Solo puede procesarse la cantidad que aún no ha sido enviada de la orden."
             });
             return;
         }
         if (!deliveryDate) {
-            toastMantine.feedBackForm({ message: "Debe seleccionar una fecha de envio valida" });
+            toastMantine.feedBackForm({
+                message: "Debe seleccionar una fecha de envio valida."
+            });
             return;
         }
         const diffObject = diffObjectArrays(state.data?.shipping_order_purchase_order_product ?? [], updateValues);
@@ -246,7 +255,8 @@ const Step2 = ({
                 autoGenerated: true,
                 type: "number",
             },
-        }, {
+        },
+        {
             id: "location",
             header: "Ubicación",
             cell: ({ row }) => <LocationCell record={row.original} dispatch={dispatch} />,

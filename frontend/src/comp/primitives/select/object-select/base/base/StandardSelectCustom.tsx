@@ -19,7 +19,6 @@ const ObjectSelectCustom = ({
     defaultLabel,
     maxHeightToggle,
 }: IObjectSelectCustom) => {
-    console.log(maxHeightToggle);
     return (
         <StandardSelect
             defaultLabel={defaultLabel || "Seleccione una opción"}

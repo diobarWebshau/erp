@@ -74,8 +74,10 @@ const fetchInventoriesDetailsFromDB = async (
             clearError("Inventorys")
         );
         const data: IInventoryDetails[] = await response.json();
+        console.log(data)
         return data;
     } catch (error: unknown) {
+        console.log(error);
         throw error;
     }
 };

@@ -482,7 +482,7 @@ class LocationController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, description } = req.body;
+        const { name, description, address, mail, phone, city, state, country, is_active } = req.body;
         try {
             const validateName = await LocationModel.findOne({ where: { name: name } });
             if (validateName) {
@@ -494,6 +494,13 @@ class LocationController {
             const response = await LocationModel.create({
                 name,
                 description,
+                address,
+                mail,
+                phone,
+                city,
+                state,
+                country,
+                is_active,
             });
             if (!response) {
                 res.status(200).json({ message: "The location could not be created" });
@@ -610,7 +617,7 @@ class LocationController {
         const transaction = await sequelize.transaction({
             isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
         });
-        const { name, description, types } = req.body;
+        const { name, description, types, address, mail, phone, city, state, country, is_active } = req.body;
         try {
             // Validar nombre único de ubicación
             const validateName = await LocationModel.findOne({
@@ -628,7 +635,14 @@ class LocationController {
             // Crear ubicación
             const response = await LocationModel.create({
                 name,
-                description
+                description,
+                address,
+                mail,
+                phone,
+                city,
+                state,
+                country,
+                is_active: is_active ? 1 : 0
             }, { transaction });
             if (!response) {
                 await transaction.rollback();

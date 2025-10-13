@@ -3,29 +3,85 @@ import CriticalActionButton from "../../../../../../../../comp/primitives/button
 import StyleModule from "./Step4.module.css";
 import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
 import { back_step, next_step } from "../../../../context/shippingOrderActions";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { DateUtils } from "../../../../../../../../utils/dayJsUtils";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
+import GenericTableMemo from "../../../../../../../../comp/primitives/table/tableContext/GenericTable";
+import FeedBackModal from "../../../../../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal";
+import { useSelector } from "react-redux";
+import type { RootState } from "store/store";
 import toastMantine from "../../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import type { IPartialShippingOrder } from "interfaces/shippingOrder";
 
-interface IStep4 { onClose: () => void }
+interface IStep4 { onClose: () => void, onLeave: () => void, onCreate: (shippingOrder: IPartialShippingOrder) => void }
 
-const Step4 = ({ onClose }: IStep4) => {
+const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
 
     const dispatch = useShippingOrderDispatch();
     const state = useShippingOrderState();
+    const validationError = useSelector((state: RootState) => state.error);
 
-    const purchasedOrder = [...state.data?.shipping_order_purchase_order_product || []].shift()?.purchase_order_products?.purchase_order;
+    const [isActiveFeedBackModal, setIsActiveFeedBackModal] = useState<boolean>(false);
+
+    const columns: ColumnDef<IPartialShippingOrderPurchasedOrderProduct>[] = [
+        {
+            id: "order",
+            header: "Orden",
+            accessorFn: (row) => row.purchase_order_products?.purchase_order?.order_code,
+        },
+        {
+            id: "sku",
+            header: "SKU",
+            accessorFn: (row) => row.purchase_order_products?.product?.sku,
+        },
+        {
+            id: "name",
+            header: "Producto",
+            accessorFn: (row) => row.purchase_order_products?.product?.name,
+        },
+        {
+            accessorKey: "qty",
+            header: "Cantidad",
+        },
+        {
+            id: "warehouse",
+            accessorFn: (row) => row.location?.name,
+            header: "Almacén de envío",
+        },
+    ];
+
+
+    const { purchasedOrder, location } = useMemo(() => {
+        const getValues = () => {
+            const purchaseOrderProduct = [...state.data?.shipping_order_purchase_order_product || []].shift();
+            const purchasedOrder = purchaseOrderProduct?.purchase_order_products?.purchase_order;
+            const location = purchaseOrderProduct?.location;
+            return { purchasedOrder, location };
+        };
+        return getValues();
+    }, [state.data?.shipping_order_purchase_order_product]);
+
+    console.log(location);
+
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch, back_step]);
-    const handleOnClickNextStep = useCallback(() => dispatch(next_step()), [dispatch, next_step]);
+    const handleOnClickNextStep = useCallback(() => {
+        setIsActiveFeedBackModal(true);
+    }, [dispatch, next_step]);
+    const handleOnClickCloseFeedBackModal = useCallback(() => {
+        onCreate(state.data);
+        if (Object.keys(validationError).length > 0) {
+            const errorsEntries = Object.entries(validationError);
+            const errors = errorsEntries.map(([_, value]) => value);
+            errors.forEach(error => toastMantine.error({ message: error as string }));
+            return;
+        }
+        onLeave();
+    }, [onLeave]);
 
-    const toast = ()=>{
-        toastMantine.success({ message: 'Cambios guardados' });
-        toastMantine.feedBackForm({ message: 'No se pudo guardar' });
-        toastMantine.error({ message: 'No se pudo guardar' });
-    }
     return (
         <div className={StyleModule.container}>
             <h2 className={`nunito-bold ${StyleModule.header}`}>Datos de envío</h2>
@@ -35,10 +91,11 @@ const Step4 = ({ onClose }: IStep4) => {
                     <div className={StyleModule.subContent}>
                         <div className={StyleModule.subContentItem}>
                             <span className={`nunito-bold ${StyleModule.boldText}`}>Empresa de Mexicali</span>
-                            <span>contacto@empresamexicali.com</span>
-                            <span>tel. 6861167495</span>
-                            <span>Mexicali, B.C, México</span>
-                            <span>San Luis Río Colorado, B.C, México</span>
+                            <span>{location?.name}</span>
+                            <span>{location?.email}</span>
+                            <span>{`Tel. ${location?.phone}`}</span>
+                            <span>{`${location?.city}, ${location?.state}, ${location?.country}`}</span>
+                            <span>{location?.address}</span>
                         </div>
                         <div className={StyleModule.subContentItem}>
                             <dl>
@@ -91,7 +148,17 @@ const Step4 = ({ onClose }: IStep4) => {
                     </div>
                 </div>
             </div>
-            <div className={StyleModule.contentSection}></div>
+            <div className={StyleModule.contentSection}>
+                <h3 className={`nunito-semibold ${StyleModule.subTitle}`}>{`Order #12345678`}</h3>
+                <GenericTableMemo
+                    modelName="shipping_order_purchase_order_product"
+                    getRowId={(row) => row?.id?.toString() || ""}
+                    columns={columns}
+                    data={state.data?.shipping_order_purchase_order_product || []}
+                    classNameGenericTableContainer={StyleModule.tableContainer}
+                />
+
+            </div>
             <div className={StyleModule.footerSection}>
                 <CriticalActionButton
                     onClick={onClose}
@@ -103,11 +170,28 @@ const Step4 = ({ onClose }: IStep4) => {
                     icon={<ChevronLeft />}
                 />
                 <MainActionButtonCustom
-                    onClick={toast}
-                    label="Siguiente"
+                    onClick={handleOnClickNextStep}
+                    label="Generar envío"
                     icon={<ChevronRight />}
                 />
             </div>
+            {
+                isActiveFeedBackModal &&
+                <FeedBackModal
+                    onClose={handleOnClickCloseFeedBackModal}
+                    title="Tu orden de envío se ha creado correctamente"
+                    icon={<CheckCircle2 />}
+                    messageCustom={
+                        <div>
+                            <MainActionButtonCustom
+                                onClick={handleOnClickNextStep}
+                                label="Ver envío"
+                                icon={<Eye />}
+                            />
+                        </div>
+                    }
+                />
+            }
         </div>
     )
 }

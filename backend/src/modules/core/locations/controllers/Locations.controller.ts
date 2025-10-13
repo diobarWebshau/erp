@@ -576,7 +576,7 @@ class LocationController {
     }
 
     static create = async (req: Request, res: Response, next: NextFunction) => {
-        const { name, description } = req.body;
+        const { name, description, address, mail, phone, city, state, country, is_active } = req.body;
         try {
             const validateName = await LocationModel.findOne({ where: { name: name } });
             if (validateName) {
@@ -588,6 +588,13 @@ class LocationController {
             const response = await LocationModel.create({
                 name,
                 description,
+                address,
+                mail,
+                phone,
+                city,
+                state,
+                country,
+                is_active,
             });
             if (!response) {
                 res.status(200).json({ message: "The location could not be created" });
@@ -717,14 +724,22 @@ class LocationController {
 
     static createComplete = async (req: Request, res: Response, next: NextFunction) => {
 
+
         const transaction = await sequelize.transaction({
             isolationLevel:
                 Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
         });
 
-        const { name, description, types } = req.body as {
+        const { name, description, types, address, mail, phone, city, state, country, is_active } = req.body as {
             name: string;
             description: string;
+            address: string;
+            mail: string;
+            phone: string;
+            city: string;
+            state: string;
+            country: string;
+            is_active: boolean;
             types: LocationTypeAttributes[];
         };
 
@@ -748,7 +763,14 @@ class LocationController {
             // Crear ubicación
             const response = await LocationModel.create({
                 name,
-                description
+                description,
+                address,
+                mail,
+                phone,
+                city,
+                state,
+                country,
+                is_active: is_active ? 1 : 0
             }, { transaction });
 
             if (!response) {

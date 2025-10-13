@@ -4,7 +4,7 @@ const locationSchema = zod.object({
     name: zod.string().min(1, "Name is required"),
     description: zod.string().min(1, "Description is required"),
     types: zod.array(locationTypeSchema).optional(),
-    is_active: zod.boolean().optional(),
+    is_active: zod.number().optional(),
 });
 const validateSafeParse = (input) => {
     const result = locationSchema

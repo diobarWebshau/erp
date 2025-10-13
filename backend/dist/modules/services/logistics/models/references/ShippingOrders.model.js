@@ -6,6 +6,7 @@ class ShippingOrderModel extends Model {
             "id", "status", "carrier_id",
             "load_evidence", "delivery_cost",
             "delivery_date", "shipping_date",
+            "tracking_number", "shipment_type", "transport_method", "comments",
             "created_at", "updated_at"
         ];
     }
@@ -14,6 +15,7 @@ class ShippingOrderModel extends Model {
             "id", "code", "status", "carrier_id",
             "load_evidence", "delivery_cost",
             "delivery_date", "shipping_date",
+            "tracking_number", "shipment_type", "transport_method", "comments",
             "created_at", "updated_at"
         ];
     }
@@ -44,17 +46,33 @@ ShippingOrderModel.init({
         type: DataTypes.JSON,
         allowNull: true
     },
+    tracking_number: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    shipment_type: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    transport_method: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    comments: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
     delivery_cost: {
         type: DataTypes.DECIMAL(14, 4),
         allowNull: false
     },
     delivery_date: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false // como lo tenías
     },
     shipping_date: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false // como lo tenías
     },
     created_at: {
         type: DataTypes.DATE,

@@ -146,8 +146,6 @@ const StandarSelect = <T extends string>({
 }: StandarSelectProps<T>) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    console.log(`value: ${value}`);
-
     // Floating UI setup
     const { refs, floatingStyles, context } = useFloating({
         open: isOpen,

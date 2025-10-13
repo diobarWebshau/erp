@@ -34,6 +34,7 @@ import {
     ClientModel,
     ClientAddressesModel,
     LocationModel,
+    InventoryMovementModel,
 } from "../../../associations.js";
 import {
     ShippingOrderPurchaseOrderProductAttributes,
@@ -47,6 +48,7 @@ import {
 } from "sequelize";
 import path from 'node:path';
 import fs, { constants, mkdir, access } from "node:fs/promises"
+import _ from "lodash";
 
 const deleteLoadEvidences = async (
     evidences: LoadEvidenceItem[] | undefined
@@ -486,7 +488,7 @@ class ShippingOrderController {
             const shippingOrder: ShippingOrderAttributes =
                 validatedShippingOrder.toJSON();
             const evidence: LoadEvidenceItem[] =
-                shippingOrder.load_evidence;
+                shippingOrder.load_evidence || [];
             await deleteLoadEvidences(evidence);
 
             const response: number =
@@ -519,13 +521,19 @@ class ShippingOrderController {
         next: NextFunction
     ) => {
 
+        const body = req.body;
+
+        console.log(body);
         const {
             status, carrier_id,
             load_evidence, delivery_cost,
             shipping_order_purchase_order_product,
             delivery_date,
-            shipping_date
-        } = req.body;
+            shipping_date, tracking_number,
+            shipment_type, transport_method, comments,
+            carrier, load_evidence_deleted,
+            shipping_order_purchase_order_product_aux,
+        } = body as ShippingOrderCreationAttributes;
 
 
         const transaction =
@@ -546,13 +554,15 @@ class ShippingOrderController {
 
             if (!validateCarrier) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(404).json({
                     validation:
                         "The assigned carrier does not exist"
                 });
                 return;
             }
+
+            // ? **** GENERACION DEL CODIGO DE LA ORDEN DE ENVIO ****
 
             const codeObject: { code: string }[] =
                 await sequelize.query(
@@ -566,6 +576,8 @@ class ShippingOrderController {
             const new_code: string =
                 codeObject.shift()?.code as string;
 
+            // ? **** CREACION DE LA ORDEN DE ENVIO ****
+
             const response = await ShippingOrderModel.create({
                 code: new_code,
                 status: status || "released",
@@ -574,12 +586,16 @@ class ShippingOrderController {
                     load_evidence || null,
                 delivery_cost: Number(delivery_cost),
                 delivery_date,
-                shipping_date
+                shipping_date,
+                tracking_number,
+                shipment_type,
+                transport_method,
+                comments
             }, { transaction });
 
             if (!response) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(404).json({
                     validation:
                         "The shipping order could not be created"
@@ -588,18 +604,18 @@ class ShippingOrderController {
             }
             const shipping = response.toJSON();
 
+            // ? **** VALIDAR QUE TODAS LAS POPS EXISTEN ****
 
             const purchase_order_products:
                 ShippingOrderPurchaseOrderProductCreateAttributes[] =
-                JSON.parse(
-                    shipping_order_purchase_order_product?.toString()
-                ) as ShippingOrderPurchaseOrderProductCreateAttributes[];
+                shipping_order_purchase_order_product || [];
 
             const pop: ShippingOrderPurchaseOrderProductCreateAttributes[] =
-                purchase_order_products.map(p => ({
-                    ...p,
-                    shipping_order_id: shipping.id
+                purchase_order_products.map(({ id, ...rest }) => ({
+                    ...rest,
+                    shipping_order_id: shipping.id,
                 }));
+
 
             const popsiD: number[] =
                 pop.map(p => p.purchase_order_product_id);
@@ -616,7 +632,7 @@ class ShippingOrderController {
             if (validatePurchasedOrderProducts.length
                 !== popsiD.length) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(404).json({
                     validation:
                         `Some of the assigned purchase order `
@@ -627,7 +643,7 @@ class ShippingOrderController {
 
             if (popQty.some(q => q <= 0)) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation:
                         `The assigned purchase order product`
@@ -636,6 +652,8 @@ class ShippingOrderController {
                 });
                 return;
             }
+
+            // ? **** VALIDAR QUE LAS POPS PERTENECEN A LA MISMA LOCALIZACION, CLIENTE Y LA MISMA DIRECCION DE ENVIO ****
 
             const popsDetailsResponse: PurchaseOrderProductModel[] =
                 await PurchaseOrderProductModel.findAll({
@@ -717,7 +735,7 @@ class ShippingOrderController {
 
             if (!allSameClient) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation:
                         `The purchase order product does not belong`
@@ -728,7 +746,7 @@ class ShippingOrderController {
 
             if (!allSameAddress) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation:
                         `The purchase order product does not belong`
@@ -739,7 +757,7 @@ class ShippingOrderController {
 
             if (!allSameLocation) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation:
                         `The purchase order product does not belong`
@@ -747,6 +765,8 @@ class ShippingOrderController {
                 });
                 return;
             }
+
+            // ? **** VALIDAR QUE LA CANTIDAD SOLICITADA NO EXCEDE LA CANTIDAD DISPONIBLE ****
 
             for (const p of popsDetails) {
                 const qty_real_pop = p.qty;
@@ -772,16 +792,51 @@ class ShippingOrderController {
                 }
             }
 
-            const response2 =
-                await ShippingOrderPurchaseOrderProductModel
-                    .bulkCreate(
-                        pop,
-                        { transaction }
-                    );
+            // ? **** ACTUALIZAR LA LOCALIZACION EN INVENTORY_MOVEMENT ****
+
+            const filter = pop.filter(
+                p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
+                    !== Number(p.location?.id)
+            );
+
+            if (filter.length > 0) {
+                const promises = filter.map(p => {
+                    const response = InventoryMovementModel.update(
+                        {
+                            location_id: p.location?.id,
+                            location_name: p.location?.name
+                        },
+                        {
+                            where: {
+                                reference_id: p.purchase_order_product_id,
+                                reference_type: "Order",
+                                movement_type: "allocate"
+                            }
+                        });
+                    return response;
+                });
+
+                const responseUpdateLocation = await Promise.all(promises);
+
+                if (responseUpdateLocation.some(r => r[0] === 0)) {
+                    await transaction.rollback();
+                    await deleteLoadEvidences(load_evidence || []);
+                    res.status(500).json({
+                        validation:
+                            `The update of the location in the inventory movement `
+                            + `could not be completed.`
+                    });
+                    return;
+                }
+            }
+
+            // ? **** ASIGNAR LOS PRODUCTOS DE LA ORDEN DE COMPRA AL ENVIO **** 
+
+            const response2 = await ShippingOrderPurchaseOrderProductModel.bulkCreate(pop, { transaction });
 
             if (!response2) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(500).json({
                     validation:
                         `The assignment of the purchase order products `
@@ -790,9 +845,8 @@ class ShippingOrderController {
                 return;
             }
 
-
             const load_evidence_shippingOrder: LoadEvidenceItem[] | undefined =
-                shipping?.load_evidence;
+                shipping?.load_evidence || [];
 
             // obtener la ruta relativa de cada imagen
             const pathImages: string[] | undefined =
@@ -824,12 +878,11 @@ class ShippingOrderController {
 
             // crear la ruta del directorio por id del registro
             //  de la bd
-            const directoryPath: string =
-                path.resolve(
-                    baseUploadFolder,
-                    'shipping-orders',
-                    shipping.id.toString()
-                );
+            const directoryPath: string = path.resolve(
+                baseUploadFolder,
+                'shipping-orders',
+                shipping.id.toString()
+            );
 
             try {
                 await access(directoryPath, constants.F_OK);
@@ -887,7 +940,7 @@ class ShippingOrderController {
 
             if (updatedShippingOrder[0] === 0) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(500).json({
                     validation:
                         "The shipping order "
@@ -902,7 +955,7 @@ class ShippingOrderController {
             res.status(201).json(shipping);
         } catch (error: unknown) {
             await transaction?.rollback();
-            await deleteLoadEvidences(load_evidence);
+            await deleteLoadEvidences(load_evidence || []);
             if (error instanceof Error) {
                 next(error);
             } else {
@@ -953,7 +1006,7 @@ class ShippingOrderController {
             if (!validateShippingOrder) {
                 await transaction.rollback();
                 await deleteLoadEvidences(
-                    completeBody.load_evidence
+                    completeBody.load_evidence || []
                 );
                 res.status(404).json({
                     validation:
@@ -976,7 +1029,7 @@ class ShippingOrderController {
                     if (!validateCarrier) {
                         await transaction?.rollback();
                         await deleteLoadEvidences(
-                            completeBody.load_evidence
+                            completeBody.load_evidence || []
                         );
                         res.status(404).json({
                             validation:
@@ -1030,7 +1083,7 @@ class ShippingOrderController {
             if (!responseUpdate) {
                 await transaction.rollback();
                 await deleteLoadEvidences(
-                    completeBody.load_evidence
+                    completeBody.load_evidence || []
                 );
                 res.status(500).json({
                     validation:
@@ -1081,7 +1134,7 @@ class ShippingOrderController {
 
                             await transaction.rollback();
                             await deleteLoadEvidences(
-                                completeBody.load_evidence
+                                completeBody.load_evidence || []
                             );
                             res.status(404).json({
                                 validation:
@@ -1107,7 +1160,7 @@ class ShippingOrderController {
                         if (!responseDelete) {
                             await transaction.rollback();
                             await deleteLoadEvidences(
-                                completeBody.load_evidence
+                                completeBody.load_evidence || []
                             );
                             res.status(400).json({
                                 validation:
@@ -1138,7 +1191,7 @@ class ShippingOrderController {
                             !== modifiedFiltered.length) {
                             await transaction.rollback();
                             await deleteLoadEvidences(
-                                completeBody.load_evidence
+                                completeBody.load_evidence || []
                             );
                             res.status(404).json({
                                 validation:

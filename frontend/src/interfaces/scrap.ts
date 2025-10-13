@@ -13,6 +13,7 @@ interface IScrap {
     user_id?: number | null;
     user_name?: string | null;
     created_at?: Date;
+    
 }
 
 type IPartialScrap = Partial<IScrap>;

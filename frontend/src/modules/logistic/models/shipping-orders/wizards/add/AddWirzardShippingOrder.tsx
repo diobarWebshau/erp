@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { IPartialShippingOrder } from "../../../../../../interfaces/shippingOrder";
-import { useShippingOrderDispatch, useShippingOrderState } from "../../context/shippingOrderHooks";
+import { useShippingOrderState } from "../../context/shippingOrderHooks";
 import FullContainerModal from "../../../../../../comp/primitives/modal/full-container/FullContainerModal";
 import StyleModule from "./AddWizardShippingOrder.module.css";
 import TransparentButtonCustom from "../../../../../../comp/primitives/button/custom-button/transparent/TransparentButtonCustom";
@@ -23,7 +23,6 @@ const AddWizardShippingOrder = ({
 
     // * Hooks
     const state = useShippingOrderState();
-    const dispatch = useShippingOrderDispatch();
 
     // * States
     const [showWarningModal, setShowWarningModal] = useState(false);
@@ -48,40 +47,29 @@ const AddWizardShippingOrder = ({
                 <div className={StyleModule.mainContent}>
                     {
                         state.current_step === 1 && (
-                            <Step1
-                                onClose={toggleWarningModal}
-                            />
+                            <Step1 onClose={toggleWarningModal} />
                         )
                     }
                     {
                         state.current_step === 2 && (
-                            <Step2
-                                onClose={toggleWarningModal}
-                            />
+                            <Step2 onClose={toggleWarningModal} />
                         )
                     }
                     {
                         state.current_step === 3 && (
-                            <Step3
-                                onClose={toggleWarningModal}
-                            />
+                            <Step3 onClose={toggleWarningModal} />
                         )
                     }
                     {
                         state.current_step === 4 && (
-                            <Step4
-                                onClose={toggleWarningModal}
-                            />
+                            <Step4 onClose={toggleWarningModal} onLeave={onClose} onCreate={onCreate} />
                         )
                     }
                 </div>
             </div>
             {
                 showWarningModal && (
-                    <WarningModal
-                        onClose={toggleWarningModal}
-                        onLeave={onClose}
-                    />
+                    <WarningModal onClose={toggleWarningModal} onLeave={onClose} />
                 )
             }
         </FullContainerModal>

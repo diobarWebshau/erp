@@ -31,8 +31,12 @@ interface IShippingOrder {
     delivery_cost: number;
     delivery_date: Date | null;
     shipping_date: Date | null;
+    transport_method: string;
+    tracking_number: string | null;
+    shipment_type: string;
     created_at: string;
     updated_at: string;
+    comments: string | null;
     shipping_order_purchase_order_product?:
     IPartialShippingOrderPurchasedOrderProduct[],
     shipping_order_purchase_order_product_aux?:
@@ -57,8 +61,12 @@ const defaultValueShippingOrder:
     delivery_cost: 0,
     delivery_date: null,
     shipping_date: null,
+    transport_method: '',
+    tracking_number: null,
+    shipment_type: '',
     created_at: '',
     updated_at: '',
+    comments: null,
 };
 
 const defaultValuePartialShippingOrder:

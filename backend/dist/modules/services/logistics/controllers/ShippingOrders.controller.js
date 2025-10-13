@@ -4,7 +4,7 @@ import { QueryTypes, Transaction } from "sequelize";
 import CarrierModel from "../models/base/Carriers.model.js";
 import ImageHandler from "../../../../classes/ImageHandler.js";
 import { formatImagesDeepRecursive, formatWith64Multiple } from "../../../../scripts/formatWithBase64.js";
-import { PurchaseOrderProductModel, PurchasedOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, LocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ClientModel, ClientAddressesModel, LocationModel, } from "../../../associations.js";
+import { PurchaseOrderProductModel, PurchasedOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, LocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ClientModel, ClientAddressesModel, LocationModel, InventoryMovementModel, } from "../../../associations.js";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { Op } from "sequelize";
 import path from 'node:path';
@@ -307,7 +307,7 @@ class ShippingOrderController {
                 return;
             }
             const shippingOrder = validatedShippingOrder.toJSON();
-            const evidence = shippingOrder.load_evidence;
+            const evidence = shippingOrder.load_evidence || [];
             await deleteLoadEvidences(evidence);
             const response = await ShippingOrderModel.destroy({
                 where: { id: id }, individualHooks: true
@@ -332,7 +332,9 @@ class ShippingOrderController {
         }
     };
     static createComplete = async (req, res, next) => {
-        const { status, carrier_id, load_evidence, delivery_cost, shipping_order_purchase_order_product, delivery_date, shipping_date } = req.body;
+        const body = req.body;
+        console.log(body);
+        const { status, carrier_id, load_evidence, delivery_cost, shipping_order_purchase_order_product, delivery_date, shipping_date, tracking_number, shipment_type, transport_method, comments, carrier, load_evidence_deleted, shipping_order_purchase_order_product_aux, } = body;
         const transaction = await sequelize.transaction({
             isolationLevel: Transaction
                 .ISOLATION_LEVELS
@@ -342,17 +344,19 @@ class ShippingOrderController {
             const validateCarrier = await CarrierModel.findByPk(Number(carrier_id), { transaction });
             if (!validateCarrier) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(404).json({
                     validation: "The assigned carrier does not exist"
                 });
                 return;
             }
+            // ? **** GENERACION DEL CODIGO DE LA ORDEN DE ENVIO ****
             const codeObject = await sequelize.query(`SELECT func_generate_next_shipping_order_code()`
                 + ` AS code;`, {
                 type: QueryTypes.SELECT
             });
             const new_code = codeObject.shift()?.code;
+            // ? **** CREACION DE LA ORDEN DE ENVIO ****
             const response = await ShippingOrderModel.create({
                 code: new_code,
                 status: status || "released",
@@ -360,21 +364,26 @@ class ShippingOrderController {
                 load_evidence: load_evidence || null,
                 delivery_cost: Number(delivery_cost),
                 delivery_date,
-                shipping_date
+                shipping_date,
+                tracking_number,
+                shipment_type,
+                transport_method,
+                comments
             }, { transaction });
             if (!response) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(404).json({
                     validation: "The shipping order could not be created"
                 });
                 return;
             }
             const shipping = response.toJSON();
-            const purchase_order_products = JSON.parse(shipping_order_purchase_order_product?.toString());
-            const pop = purchase_order_products.map(p => ({
-                ...p,
-                shipping_order_id: shipping.id
+            // ? **** VALIDAR QUE TODAS LAS POPS EXISTEN ****
+            const purchase_order_products = shipping_order_purchase_order_product || [];
+            const pop = purchase_order_products.map(({ id, ...rest }) => ({
+                ...rest,
+                shipping_order_id: shipping.id,
             }));
             const popsiD = pop.map(p => p.purchase_order_product_id);
             const popQty = pop.map(p => p.qty);
@@ -385,7 +394,7 @@ class ShippingOrderController {
             if (validatePurchasedOrderProducts.length
                 !== popsiD.length) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(404).json({
                     validation: `Some of the assigned purchase order `
                         + `products do not exist`
@@ -394,7 +403,7 @@ class ShippingOrderController {
             }
             if (popQty.some(q => q <= 0)) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation: `The assigned purchase order product`
                         + ` quantity for the shipping order `
@@ -402,6 +411,7 @@ class ShippingOrderController {
                 });
                 return;
             }
+            // ? **** VALIDAR QUE LAS POPS PERTENECEN A LA MISMA LOCALIZACION, CLIENTE Y LA MISMA DIRECCION DE ENVIO ****
             const popsDetailsResponse = await PurchaseOrderProductModel.findAll({
                 where: {
                     id: {
@@ -457,7 +467,7 @@ class ShippingOrderController {
                     ?.production_line?.location_production_line?.location_id);
             if (!allSameClient) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation: `The purchase order product does not belong`
                         + `to the same client as the shipping order`
@@ -466,7 +476,7 @@ class ShippingOrderController {
             }
             if (!allSameAddress) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation: `The purchase order product does not belong`
                         + `to the same client address as the shipping order`
@@ -475,13 +485,14 @@ class ShippingOrderController {
             }
             if (!allSameLocation) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(400).json({
                     validation: `The purchase order product does not belong`
                         + `to the same location as the shipping order`
                 });
                 return;
             }
+            // ? **** VALIDAR QUE LA CANTIDAD SOLICITADA NO EXCEDE LA CANTIDAD DISPONIBLE ****
             for (const p of popsDetails) {
                 const qty_real_pop = p.qty;
                 const qty_shipped_pop = p.shipping_order_purchase_order_product
@@ -500,18 +511,46 @@ class ShippingOrderController {
                     return;
                 }
             }
-            const response2 = await ShippingOrderPurchaseOrderProductModel
-                .bulkCreate(pop, { transaction });
+            // ? **** ACTUALIZAR LA LOCALIZACION EN INVENTORY_MOVEMENT ****
+            const filter = pop.filter(p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
+                !== Number(p.location?.id));
+            if (filter.length > 0) {
+                const promises = filter.map(p => {
+                    const response = InventoryMovementModel.update({
+                        location_id: p.location?.id,
+                        location_name: p.location?.name
+                    }, {
+                        where: {
+                            reference_id: p.purchase_order_product_id,
+                            reference_type: "Order",
+                            movement_type: "allocate"
+                        }
+                    });
+                    return response;
+                });
+                const responseUpdateLocation = await Promise.all(promises);
+                if (responseUpdateLocation.some(r => r[0] === 0)) {
+                    await transaction.rollback();
+                    await deleteLoadEvidences(load_evidence || []);
+                    res.status(500).json({
+                        validation: `The update of the location in the inventory movement `
+                            + `could not be completed.`
+                    });
+                    return;
+                }
+            }
+            // ? **** ASIGNAR LOS PRODUCTOS DE LA ORDEN DE COMPRA AL ENVIO **** 
+            const response2 = await ShippingOrderPurchaseOrderProductModel.bulkCreate(pop, { transaction });
             if (!response2) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(500).json({
                     validation: `The assignment of the purchase order products `
                         + `to the shipping order could not be completed.`
                 });
                 return;
             }
-            const load_evidence_shippingOrder = shipping?.load_evidence;
+            const load_evidence_shippingOrder = shipping?.load_evidence || [];
             // obtener la ruta relativa de cada imagen
             const pathImages = load_evidence_shippingOrder?.map((product) => product.path);
             // obtener la ruta obsoluta del directorio padre
@@ -556,7 +595,7 @@ class ShippingOrderController {
             const updatedShippingOrder = await ShippingOrderModel.update({ load_evidence: newLoadEvidence }, { where: { id: shipping.id }, transaction });
             if (updatedShippingOrder[0] === 0) {
                 await transaction.rollback();
-                await deleteLoadEvidences(load_evidence);
+                await deleteLoadEvidences(load_evidence || []);
                 res.status(500).json({
                     validation: "The shipping order "
                         + "could not be updated "
@@ -569,7 +608,7 @@ class ShippingOrderController {
         }
         catch (error) {
             await transaction?.rollback();
-            await deleteLoadEvidences(load_evidence);
+            await deleteLoadEvidences(load_evidence || []);
             if (error instanceof Error) {
                 next(error);
             }
@@ -597,7 +636,7 @@ class ShippingOrderController {
             const validateShippingOrder = await ShippingOrderModel.findByPk(id);
             if (!validateShippingOrder) {
                 await transaction.rollback();
-                await deleteLoadEvidences(completeBody.load_evidence);
+                await deleteLoadEvidences(completeBody.load_evidence || []);
                 res.status(404).json({
                     validation: "Shipping order does not exist"
                 });
@@ -609,7 +648,7 @@ class ShippingOrderController {
                     const validateCarrier = await CarrierModel.findByPk(update_values.carrier_id, { transaction });
                     if (!validateCarrier) {
                         await transaction?.rollback();
-                        await deleteLoadEvidences(completeBody.load_evidence);
+                        await deleteLoadEvidences(completeBody.load_evidence || []);
                         res.status(404).json({
                             validation: "The assigned carrier does not exist"
                         });
@@ -649,7 +688,7 @@ class ShippingOrderController {
             });
             if (!responseUpdate) {
                 await transaction.rollback();
-                await deleteLoadEvidences(completeBody.load_evidence);
+                await deleteLoadEvidences(completeBody.load_evidence || []);
                 res.status(500).json({
                     validation: "The shipping order could not be updated"
                 });
@@ -678,7 +717,7 @@ class ShippingOrderController {
                         if (existingSopopsResponse.length
                             !== deletedFiltered.length) {
                             await transaction.rollback();
-                            await deleteLoadEvidences(completeBody.load_evidence);
+                            await deleteLoadEvidences(completeBody.load_evidence || []);
                             res.status(404).json({
                                 validation: `Some products of the shipping order you`
                                     + ` are trying to delete do not exist`,
@@ -696,7 +735,7 @@ class ShippingOrderController {
                         });
                         if (!responseDelete) {
                             await transaction.rollback();
-                            await deleteLoadEvidences(completeBody.load_evidence);
+                            await deleteLoadEvidences(completeBody.load_evidence || []);
                             res.status(400).json({
                                 validation: `The purchased order products of the `
                                     + `shipping order could not be deleted`
@@ -716,7 +755,7 @@ class ShippingOrderController {
                         if (existingSopopsResponse.length
                             !== modifiedFiltered.length) {
                             await transaction.rollback();
-                            await deleteLoadEvidences(completeBody.load_evidence);
+                            await deleteLoadEvidences(completeBody.load_evidence || []);
                             res.status(404).json({
                                 validation: `Some products of the shipping order you`
                                     + ` are trying to modify do not exist`,

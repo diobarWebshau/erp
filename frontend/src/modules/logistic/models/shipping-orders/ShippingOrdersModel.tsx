@@ -71,36 +71,14 @@ const ShippingOrderModel = () => {
     const handleCreate = async (shipping: IPartialShippingOrder) => {
         setLoading(true);
         try {
-            /*
             const new_shipping = { ...shipping }
-            const evidences =
-                shipping.load_evidence as LoadEvidenceItem[] || [];
-            const has_evidences =
-                evidences?.length > 0 || false;
             delete new_shipping.load_evidence;
-
-            if (has_evidences) {
-                new_shipping.load_evidence = evidences.map(
-                    (e) => e.path as File
-                );
-            }
-
-            const responseCreate =
-                await createCompleteShippingOrderInDB(
-                    new_shipping,
-                    dispatch
-                );
-            if (!responseCreate) {
-                return;
-            }
-
+            const responseCreate = await createCompleteShippingOrderInDB(new_shipping, dispatch);
+            if (!responseCreate) { return; }
             setServerError(null);
             fetchs();
-            setIsActiveAddModal(false);
-            */
         } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
+            if (error instanceof Error) setServerError(error.message);
         } finally {
             setLoading(false);
         }
@@ -359,19 +337,11 @@ const ShippingOrderModel = () => {
 
     // * ******************** Efectos ******************** */
 
-
-    useEffect(() => {
-        fetchs();
-    }, []);
+    useEffect(() => { fetchs() }, []);
 
     // * ******************** Hooks ******************** */
 
-    const {
-        shippingOrderDetailById,
-        refetchShippingOrderDetailById
-    } = useShippingOrderDetailById(
-        shippingOrderRecord?.id || null
-    );
+    const { shippingOrderDetailById, refetchShippingOrderDetailById } = useShippingOrderDetailById(shippingOrderRecord?.id || null);
 
     return (
         <div

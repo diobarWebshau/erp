@@ -2,6 +2,7 @@ import ShippingOrderController from "../controllers/ShippingOrders.controller.js
 import validateShippingOrderMiddleware from "../middleware/shipping-order/validationMiddleware.js";
 import uploadImageMiddleware from "../../../../middlewares/multer/multerMiddleware.js";
 import { Router } from "express";
+import { normalizeFormDataBody } from "../../../../helpers/normalizedObjectFromFormData.js";
 const createShippingOrdersRouter = () => {
     const shippingOrdersRouter = Router();
     shippingOrdersRouter.get("/", ShippingOrderController.getAll);
@@ -11,7 +12,7 @@ const createShippingOrdersRouter = () => {
     shippingOrdersRouter.post("/", uploadImageMiddleware, validateShippingOrderMiddleware, ShippingOrderController.create);
     shippingOrdersRouter.patch("/:id", uploadImageMiddleware, validateShippingOrderMiddleware, ShippingOrderController.update);
     shippingOrdersRouter.delete("/:id", ShippingOrderController.delete);
-    shippingOrdersRouter.post("/complete", uploadImageMiddleware, validateShippingOrderMiddleware, ShippingOrderController.createComplete);
+    shippingOrdersRouter.post("/complete", uploadImageMiddleware, validateShippingOrderMiddleware, normalizeFormDataBody(), ShippingOrderController.createComplete);
     shippingOrdersRouter.patch("/complete/:id", uploadImageMiddleware, validateShippingOrderMiddleware, ShippingOrderController.updateComplete);
     return shippingOrdersRouter;
 };

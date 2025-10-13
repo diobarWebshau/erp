@@ -10,7 +10,7 @@ import DateInputMantine from "../../../../../../../../comp/external/mantine/date
 import ObjectSelectCustomMemo from "../../../../../../../../comp/primitives/select/object-select/base/base/ObjectSelectCustom";
 import StandardSelectCustomMemo from "../../../../../../../../comp/primitives/select/object-select/base/base/StandardSelectCustom";
 import useCarriers from "../../../../../../../../modelos/carriers/hooks/useCarriers";
-import type { ICarrier, IPartialCarrier } from "../../../../../../../../interfaces/carriers";
+import type { IPartialCarrier } from "../../../../../../../../interfaces/carriers";
 import NumericInputCustomMemo from "../../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import InputTextCustom from "../../../../../../../../comp/primitives/input/text/custom/InputTextCustom";
 import StandarTextAreaCustom from "../../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
@@ -29,11 +29,11 @@ const Step3 = ({ onClose }: IStep3) => {
 
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(state.data?.shipping_date || null);
     const [carrier, setCarrier] = useState<IPartialCarrier | null>(state.data?.carrier || null);
-    const [transportMethod, setTransportMethod] = useState<string | null>(null);
-    const [shippingType, setShippingType] = useState<string | null>(null);
+    const [transportMethod, setTransportMethod] = useState<string | null>(state.data?.transport_method || null);
+    const [shippingType, setShippingType] = useState<string | null>(state.data?.shipment_type || null);
     const [cost, setCost] = useState<number | undefined>(state.data?.delivery_cost || undefined);
-    const [code, setCode] = useState<string | undefined>(undefined);
-    const [comment, setComment] = useState<string | undefined>(undefined);
+    const [code, setCode] = useState<string | undefined>(state.data?.tracking_number || undefined);
+    const [comment, setComment] = useState<string | undefined>(state.data?.comments || undefined);
 
     const { carriers } = useCarriers();
 
@@ -49,7 +49,11 @@ const Step3 = ({ onClose }: IStep3) => {
             shipping_date: deliveryDate,
             delivery_cost: cost,
             code: code,
-            carrier_id: carrier.id
+            carrier_id: carrier.id,
+            transport_method: transportMethod,
+            shipment_type: shippingType,
+            tracking_number: code,
+            comments: comment,
         }
         dispatch(update_shipping_order(updateShippingOrder));
         dispatch(next_step());
@@ -109,7 +113,10 @@ const Step3 = ({ onClose }: IStep3) => {
                     </div>
                 </div>
                 <div className={StyleModule.commentSection}>
-                    <span className="nunito-bold">Comentarios<span className="nunito-bold">(Opcional)</span></span>
+                    <span className="nunito-bold">
+                        Comentarios
+                        <span className="nunito-bold">(Opcional)</span>
+                    </span>
                     <StandarTextAreaCustom
                         value={comment}
                         onChange={handleOnChangeComment}

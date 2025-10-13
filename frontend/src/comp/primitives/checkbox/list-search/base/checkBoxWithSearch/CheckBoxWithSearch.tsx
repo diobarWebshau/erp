@@ -66,9 +66,7 @@ const CheckBoxWithSearch = ({
                 value={searchQuery}
                 placeholder="Search"
                 onChange={onChangeSearchInput}
-                classNameContainer={`${styles.containerInputTextCustom} ${classNameContainerSearch}`}
-                classNameInput={`${styles.inputCheckbox} ${classNameInputSearch}`}
-                classNameButton={`${styles.buttonInputTextCustom} ${classNameButtonSearch}`}
+                classNameInput={styles.inputSearch}
                 icon={<Search />}
             />
             <div className={`${classNameGroupOptions} ${styles.groupOptions}`}>

@@ -161,20 +161,14 @@ const createCompleteShippingOrderInDB = async (
 
         if (!response.ok) {
             const errorText = await response.json();
+            console.log(errorText);
             if (response.status >= 500) {
                 throw new Error(errorText);
             }
-            dispatch(
-                setError({
-                    key: "createCompleteShippingOrder",
-                    message: errorText
-                })
-            );
+            dispatch(setError({ key: "createCompleteShippingOrder", message: errorText }));
             return null;
         }
-        dispatch(
-            clearError("createCompleteShippingOrder")
-        );
+        dispatch(clearError("createCompleteShippingOrder"));
         const result = await response.json();
         return result;
     } catch (error: unknown) {

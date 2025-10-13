@@ -18,12 +18,17 @@ CREATE TABLE locations(
     id INT AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(100) NOT NULL,
+    address TEXT NOT NULL,
+    mail VARCHAR(100) NOT NULL,
+    phone VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    country VARCHAR(100) NOT NULL,
     is_active TINYINT DEFAULT 1 NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id)
 );
-
 
 CREATE TABLE locations_location_types(
     id INT AUTO_INCREMENT,
@@ -208,6 +213,10 @@ CREATE TABLE shipping_orders(
     status VARCHAR(100) NOT NULL,
     carrier_id INT,
     load_evidence JSON DEFAULT NULL,
+    tracking_number TEXT,
+    shipment_type VARCHAR(100),
+    transport_method VARCHAR(100),
+    comments TEXT,
     -- ! Nuevo campo de fecha de entrega estimada
     delivery_date DATETIME,
     -- ! ----------------------------------------
@@ -644,3 +653,4 @@ SELECT *
 FROM scrap;
 SELECT VERSION();
 
+SELECT * FROM inventory_movements;

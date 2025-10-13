@@ -92,7 +92,7 @@ const columnsProductionOrders = ({
                 const allStages = productionBreakdown?.all_stages;
                 // Encuentra el objeto con el valor más alto
                 const maxItem = allStages?.reduce((prev, current) =>
-                    current.stage > prev.stage ? current : prev
+                    (current?.stage || 0) > (prev?.stage || 0) ? current : prev
                 );
 
                 return (

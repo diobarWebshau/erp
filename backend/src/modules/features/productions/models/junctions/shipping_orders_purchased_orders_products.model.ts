@@ -6,6 +6,7 @@ import {
 import sequelize
     from "../../../../../mysql/configSequelize.js";
 import {
+    LocationAttributes,
     PurchaseOrderProductCreateAttributes
 } from "./../../../../types.js";
 
@@ -13,6 +14,7 @@ interface ShippingOrderPurchaseOrderProductAttributes {
     id: number,
     shipping_order_id: number,
     purchase_order_product_id: number,
+    location?: LocationAttributes,
     qty: number,
     purchase_order_products?: PurchaseOrderProductCreateAttributes
 }

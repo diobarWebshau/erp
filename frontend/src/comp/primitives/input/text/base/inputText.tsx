@@ -33,7 +33,7 @@ const InputText = ({
     classNameInputInvalid,
 }: InputTextProps) => {
 
-    const [isValid, setIsValid] = useState<boolean>(false);
+    const [isValid, setIsValid] = useState<boolean>((value!==undefined || value!==undefined) ? true : false);
 
     const handleOnChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;

@@ -25,7 +25,14 @@ interface ILocation {
   types?: ILocationType[],
   is_active: boolean,
   created_at: string,
-  updated_at: string
+  updated_at: string,
+  address: string,
+  zip_code: string,
+  city: string,
+  state: string,
+  country: string,
+  phone: string,
+  email: string,
   location_production_line?: ILocationProductionLine[]
   inventory?: IInventoryRecord
 }
@@ -41,6 +48,13 @@ interface ILocationManager{
 const defaultValueLocation: ILocation = {
   id: 0,
   name: "",
+  address: "",
+  zip_code: "",
+  city: "",
+  state: "",
+  country: "",
+  phone: "",
+  email: "",
   description: "",
   is_active: true,
   created_at: "",

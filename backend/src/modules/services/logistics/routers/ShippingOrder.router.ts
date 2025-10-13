@@ -5,6 +5,7 @@ import validateShippingOrderMiddleware
 import uploadImageMiddleware
     from "../../../../middlewares/multer/multerMiddleware.js";
 import { Router } from "express";
+import { normalizeFormDataBody } from "../../../../helpers/normalizedObjectFromFormData.js";
 
 const createShippingOrdersRouter = (): Router => {
     const shippingOrdersRouter = Router();
@@ -29,6 +30,7 @@ const createShippingOrdersRouter = (): Router => {
     shippingOrdersRouter.post("/complete",
         uploadImageMiddleware,
         validateShippingOrderMiddleware,
+        normalizeFormDataBody(),
         ShippingOrderController.createComplete);
     shippingOrdersRouter.patch("/complete/:id",
         uploadImageMiddleware,

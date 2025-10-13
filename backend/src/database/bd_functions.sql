@@ -1081,6 +1081,12 @@ BEGIN
 					'name', l.name,
 					'description', l.description,
 					'is_active', l.is_active,
+					'address', l.address,
+					'mail', l.mail,
+					'phone', l.phone,
+					'city', l.city,
+					'state', l.state,
+					'country', l.country,
 					'created_at', l.created_at,
 					'updated_at', l.updated_at
 				)
@@ -1127,6 +1133,12 @@ BEGIN
         'id',          l.id,
         'name',        l.name,
         'description', l.description,
+		'address', l.address,
+		'mail', l.mail,
+		'phone', l.phone,
+		'city', l.city,
+		'state', l.state,
+		'country', l.country,
         'is_active',   l.is_active,
         'created_at',  l.created_at,
         'updated_at',  l.updated_at,
@@ -1334,6 +1346,12 @@ BEGIN
                 'id', l.id,
                 'name', l.name,
                 'description', l.description,
+				'address', l.address,
+				'mail', l.mail,
+				'phone', l.phone,
+				'city', l.city,
+				'state', l.state,
+				'country', l.country,
                 'is_active', l.is_active,
                 'created_at', l.created_at,
                 'updated_at', l.updated_at
@@ -1372,6 +1390,12 @@ BEGIN
 				'id', l.id,
 				'name', l.name,
 				'description', l.description,
+				'address', l.address,
+				'mail', l.mail,
+				'phone', l.phone,
+				'city', l.city,
+				'state', l.state,
+				'country', l.country,
 				'is_active', l.is_active,
 				'created_at', l.created_at,
 				'updated_at', l.updated_at
@@ -1438,6 +1462,12 @@ BEGIN
 					'id', l.id,
 					'name', l.name,
 					'description', l.description,
+					'address', l.address,
+					'mail', l.mail,
+					'phone', l.phone,
+					'city', l.city,
+					'state', l.state,
+					'country', l.country,
 					'is_active', l.is_active,
 					'created_at', l.created_at,
 					'updated_at', l.updated_at
@@ -1542,6 +1572,12 @@ BEGIN
 						'name', l.name,
 						'description', l.description,
 						'is_active', l.is_active,
+						'address', l.address,
+						'mail', l.mail,
+						'phone', l.phone,
+						'city', l.city,
+						'state', l.state,
+						'country', l.country,
 						'created_at', l.created_at,
 						'updated_at', l.updated_at
 					),
@@ -2023,6 +2059,14 @@ BEGIN
 							JSON_OBJECT(
 								'id', l.id,
 								'name', l.name,
+								'description', l.description,
+								'is_active', l.is_active,
+								'address', l.address,
+								'mail', l.mail,
+								'phone', l.phone,
+								'city', l.city,
+								'state', l.state,
+								'country', l.country,
 								'created_at', l.created_at,
 								'updated_at', l.updated_at
 							)
@@ -2049,6 +2093,14 @@ BEGIN
 							JSON_OBJECT(
 								'id', l.id,
 								'name', l.name,
+								'description', l.description,
+								'is_active', l.is_active,
+								'address', l.address,
+								'mail', l.mail,
+								'phone', l.phone,
+								'city', l.city,
+								'state', l.state,
+								'country', l.country,
 								'created_at', l.created_at,
 								'updated_at', l.updated_at
 							)
@@ -2102,6 +2154,14 @@ BEGIN
                    JSON_OBJECT(
                      'id',         l.id,
                      'name',       l.name,
+					 'description', l.description,
+					 'address', l.address,
+					 'mail', l.mail,
+					 'phone', l.phone,
+					 'city', l.city,
+					 'state', l.state,
+					 'country', l.country,
+					 'is_active', l.is_active,
                      'created_at', l.created_at,
                      'updated_at', l.updated_at
                    )
@@ -2131,8 +2191,16 @@ BEGIN
                    JSON_OBJECT(
                      'id',         l.id,
                      'name',       l.name,
-                     'created_at', l.created_at,
-                     'updated_at', l.updated_at
+					 'description', l.description,
+					 'address', l.address,
+					 'mail', l.mail,
+					 'phone', l.phone,
+					 'city', l.city,
+					 'state', l.state,
+					 'country', l.country,
+					 'is_active', l.is_active,
+					 'created_at', l.created_at,
+					 'updated_at', l.updated_at
                    )
                  ),
                  JSON_ARRAY()
@@ -2222,6 +2290,14 @@ BEGIN
                    JSON_OBJECT(
                      'id',         l.id,
                      'name',       l.name,
+					 'description', l.description,
+					 'address', l.address,
+					 'mail', l.mail,
+					 'phone', l.phone,
+					 'city', l.city,
+					 'state', l.state,
+					 'country', l.country,
+					 'is_active', l.is_active,
                      'created_at', l.created_at,
                      'updated_at', l.updated_at
                    )
@@ -2254,6 +2330,14 @@ BEGIN
                    JSON_OBJECT(
                      'id',         l.id,
                      'name',       l.name,
+					 'description', l.description,
+					 'address', l.address,
+					 'mail', l.mail,
+					 'phone', l.phone,
+					 'city', l.city,
+					 'state', l.state,
+					 'country', l.country,
+					 'is_active', l.is_active,
                      'created_at', l.created_at,
                      'updated_at', l.updated_at
                    )

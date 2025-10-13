@@ -11,7 +11,7 @@ const locationSchema = zod.object({
     types:
         zod.array(locationTypeSchema).optional(),
     is_active:
-        zod.boolean().optional(),
+        zod.number().optional(),
 });
 
 const validateSafeParse = (input: object) => {
