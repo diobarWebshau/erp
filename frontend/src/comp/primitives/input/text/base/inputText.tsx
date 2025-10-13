@@ -1,10 +1,9 @@
-import type { ChangeEvent, JSX} from "react";
+import { useState, type ChangeEvent, type JSX } from "react";
 import StyleModule from "./InputText.module.css";
-
+import clsx from "clsx";
 interface InputTextProps {
     value: string | undefined;
     onChange: (value: string) => void;
-    onClick?: () => void;
     id?: string;
     name?: string;
     placeholder?: string;
@@ -13,8 +12,9 @@ interface InputTextProps {
     autoFocus?: boolean;
     classNameContainer?: string;
     classNameInput?: string;
+    classNameInputValid?: string;
+    classNameInputInvalid?: string;
     classNameIcon?: string;
-    classNameButton?: string;
     icon?: JSX.Element;
 }
 
@@ -27,18 +27,31 @@ const InputText = ({
     required,
     autoFocus,
     classNameContainer,
-    onClick,
     icon,
     classNameInput,
-    classNameButton
+    classNameInputValid,
+    classNameInputInvalid,
 }: InputTextProps) => {
 
+    const [isValid, setIsValid] = useState<boolean>(false);
+
     const handleOnChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-        onChange(e.target.value);
+        const value = e.target.value;
+        if (value === "") {
+            setIsValid(false)
+        }
+        if (!isValid) setIsValid(true);
+        onChange(value);
     }
 
+    const classNamesInput = clsx(
+        StyleModule.input,
+        classNameInput,
+        isValid ? classNameInputValid : classNameInputInvalid,
+    );
+
     return (
-        <div className={`${StyleModule.container} ${classNameContainer}`}>
+        <div className={clsx(StyleModule.container, classNameContainer)}>
             <input
                 type="text"
                 placeholder={placeholder}
@@ -48,17 +61,9 @@ const InputText = ({
                 disabled={disabled}
                 required={required}
                 autoFocus={autoFocus}
-                className={`${StyleModule.input} ${ icon && StyleModule.inputWithIcon} ${classNameInput}`}
+                className={classNamesInput}
             />
-            {icon &&
-                <button
-                    className={`${StyleModule.button} ${classNameButton}`}
-                    type="button"
-                    {...(onClick && {onClick: onClick})}
-                >
-                    {icon}
-                </button>
-            }
+            {icon && icon}
         </div>
     )
 }

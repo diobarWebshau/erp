@@ -7,16 +7,19 @@ import { DateUtils } from "../../../../../../utils/dayJsUtils";
 interface IDateInputMantine {
   value: Date | null; // Fecha actual seleccionada, puede ser null
   onChange: (value: Date | null) => void; // Callback al cambiar la fecha
-  className?: string; // Clase opcional para personalizar el contenedor principal
+  classNameInput?: string; // Clase opcional para personalizar el contenedor principal
+  positionPopover: "bottom" | "top" | "left" | "right" | "bottom-start" | "bottom-end" | "top-start" | "top-end" | "left-start" | "left-end" | "right-start" | "right-end"
+
 }
 
 function DateInputMantine({
   value,
   onChange,
-  className
+  classNameInput,
+  positionPopover
 }: IDateInputMantine) {
 
-  const [isValidDate, setIsValidDate] = useState(DateUtils.isValid(value));
+  const [isValidDate, setIsValidDate] = useState<boolean>(DateUtils.isValid(value));
 
   // ---------------------------------------------------------------------------
   // Función que se llama al cambiar el valor del input
@@ -61,10 +64,10 @@ function DateInputMantine({
       // Clases CSS personalizadas usando CSS Modules y clases globales
       // -----------------------------------------------------------------------
       classNames={{
-        root: `${className} ${styles.root}`, // Contenedor principal que envuelve label + input
+        root: styles.root, // Contenedor principal que envuelve label + input
         wrapper: styles.wrapper, // Contenedor que envuelve solo el input
         label: `nunito-regular ${styles.label}`, // Estilo del label
-        input: `nunito-regular ${isValidDate ? styles.input : styles.inputInvalid}`, // Estilo del input
+        input: `${classNameInput} nunito-regular ${isValidDate ? styles.input : styles.inputInvalid}`, // Estilo del input
         description: `nunito-regular ${styles.description}`, // Estilo del texto de ayuda
         error: `nunito-regular ${styles.error}`, // Estilo del mensaje de error
         required: styles.required, // Estilo del indicador de campo requerido
@@ -73,7 +76,7 @@ function DateInputMantine({
         // -------------------------------------------------------------------
         // Contenedor del calendario
         // -------------------------------------------------------------------
-        levelsGroup: `${styles.levelsGroup} ${className}`, // Contenedor principal de los niveles del calendario (mes/año)
+        levelsGroup: styles.levelsGroup, // Contenedor principal de los niveles del calendario (mes/año)
         calendarHeader: styles.calendarHeader, // Contenedor del encabezado del calendario
         calendarHeaderLevel: `nunito-bold ${styles.calendarHeaderLevel}`, // Mes y año en el encabezado
         calendarHeaderControl: styles.calendarHeaderControl, // Botones prev/next
@@ -102,7 +105,7 @@ function DateInputMantine({
       // Props para personalizar el popover del calendario
       // -----------------------------------------------------------------------
       popoverProps={{
-        
+        ...(positionPopover ? { position: positionPopover } : {}),
         classNames: {
           dropdown: styles.dropdown, // Estilo del popover
         },

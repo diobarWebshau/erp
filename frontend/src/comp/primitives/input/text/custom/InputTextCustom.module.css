@@ -1,21 +1,42 @@
-.inputTextCustom {
-    border: 1px solid var(--color-theme-border-table);
-    border-radius: 15px;
-    font-size: 14px;
+.container {
+    /* dimension */
     height: 44px;
+    width: 100%;
+
+    /* distribucion box */
+    border-radius: 15px;
 }
 
-.iconButton {
-    width: 15px;
-    height: 15px;
-    color: var(--color-theme-primary);
+.input {
+    /* distribucion box */
+    border-radius: 15px;
+    /*estilo*/
+    font-size: 14px;
+    border: 1px solid var(--color-theme-border-table);
 }
 
-.inputTextCustom::placeholder {
-    color: var(--color-theme-neutral-primary);
+.input:focus {
+    outline: none;
 }
 
-.inputTextButton {
-    top: 0.2rem;
-    right: 0.8rem;
+.inputValid {
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.inputInvalid.inputInvalid {
+    border: 2px solid var(--color-alert);
+}
+
+.icon {
+    /* posicionamiento */
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    /* dimension */
+    width: 12px;
+    height: 12px;
+    /* estilo svg*/
+    stroke-width: 3px;
+    stroke: var(--color-theme-primary);
 }

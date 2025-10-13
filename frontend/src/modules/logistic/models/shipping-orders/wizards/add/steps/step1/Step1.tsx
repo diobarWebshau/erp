@@ -18,14 +18,11 @@ import type { IPurchasedOrderProduct } from "interfaces/purchasedOrdersProducts"
 import { getEnumoSingleLabel, type TableStatePartial } from "../../../../../../../../comp/primitives/table/tableContext/tableTypes";
 import Tag from "../../../../../../../../comp/primitives/tag/Tag";
 import { generateRandomIds } from "../../../../../../../../helpers/nanoId";
+import toastMantine from "../../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 
-interface IStep1 {
-    onClose: () => void;
-}
+interface IStep1 { onClose: () => void }
 
-const Step1 = ({
-    onClose
-}: IStep1) => {
+const Step1 = ({ onClose }: IStep1) => {
 
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
@@ -138,7 +135,7 @@ const Step1 = ({
                 id: generateRandomIds(),
                 purchase_order_products: p,
                 purchase_order_product_id: p.id,
-                qty: 1,
+                qty: (Number(p.shipping_summary?.order_qty) - Number(p.shipping_summary?.shipping_qty)) || 0,
             }));
             if (sopops.length > 0) {
                 dispatch(add_shipping_order_purchased_order_products_aux(sopops));
@@ -163,12 +160,17 @@ const Step1 = ({
         const rowsRecords = rows.filter(row => keys.includes(row.id));
         const records = rowsRecords.map(row => row.original);
         const condition = records.every((p: IPurchasedOrder) => p.client?.company_name === client);
+        if (!condition) {
+            toastMantine.feedBackForm({ message: 'Las ordenes seleccionadas deben pertenecer al mismo cliente.' });
+        }
         return condition;
     }, [client, purchase_orders]);
 
     const handleOnClickNext = useCallback(() => {
         if (selectedPurchasedOrder.length > 0) {
             dispatch(next_step());
+        }else{
+            toastMantine.feedBackForm({ message: 'Debes seleccionar al menos una orden.' });
         }
     }, [selectedPurchasedOrder, dispatch]);
 
@@ -181,8 +183,8 @@ const Step1 = ({
                     onChange={setSearch}
                     placeholder="Buscar"
                     icon={<Search />}
-
-                    classNameContainer={StyleModule.inputTextCustomContainer}
+                    classNameInput={StyleModule.inputTextCustom}
+                    withValidation={false}
                 />
             </div>
             <GenericTable

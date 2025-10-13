@@ -204,7 +204,7 @@ export const DateUtils = {
    * @example
    * DateUtils.format(new Date(), "DD/MM/YYYY HH:mm");
    */
-  format: (date: DateInput, format = "YYYY-MM-DD"): string =>
+  format: (date: DateInput, format = "DD-MM-YYYY"): string =>
     dayjs(date).format(format),
 
   /**

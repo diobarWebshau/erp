@@ -30,6 +30,7 @@ interface IShippingOrder {
     load_evidence: LoadEvidenceItem[] | File[] | null;
     delivery_cost: number;
     delivery_date: Date | null;
+    shipping_date: Date | null;
     created_at: string;
     updated_at: string;
     shipping_order_purchase_order_product?:
@@ -55,6 +56,7 @@ const defaultValueShippingOrder:
     load_evidence: null,
     delivery_cost: 0,
     delivery_date: null,
+    shipping_date: null,
     created_at: '',
     updated_at: '',
 };

@@ -5,11 +5,12 @@ import styleModule from "./NumericInputCustom.module.css";
 interface NumericInputCustomProps {
     value: number | undefined;
     onChange: (value: number) => void;
+    placeholder?: string;
     min?: number;
+    max?: number;
     onlyCommitOnBlur?: boolean;
     classNameContainer?: string;
     classNameInput?: string;
-    max?: number;
 }
 
 const NumericInputCustom = ({
@@ -18,8 +19,9 @@ const NumericInputCustom = ({
     min,
     onlyCommitOnBlur,
     classNameContainer,
-    classNameInput,
-    max
+    max,
+    placeholder,
+    classNameInput
 }: NumericInputCustomProps) => {
     return (
         <NumericInput
@@ -28,8 +30,13 @@ const NumericInputCustom = ({
             min={min}
             max={max}
             onlyCommitOnBlur={onlyCommitOnBlur}
-            className={`${classNameContainer} ${styleModule.container}`}
-            classNameInput={`${classNameInput} nunito-semibold ${styleModule.input}`}
+            classNameContainer={`${classNameContainer} ${styleModule.container} `}
+            classNameInput={`${classNameInput} ${styleModule.input}`}
+            classNameInputValid={styleModule.inputValid}
+            classNameInputInvalid={styleModule.inputInvalid}
+            classNameControls={styleModule.controls}
+            classNameControlsIcon={styleModule.iconControl}
+            {...(placeholder ? { placeholder } : {})}
         />
     );
 }

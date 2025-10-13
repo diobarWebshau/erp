@@ -1,0 +1,58 @@
+ /* ****** sucessToast ****** */
+
+.successDescription {
+    color: red;
+}
+
+.successToast {
+    background-color: var(--color-theme-neutral-background);
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-primary);
+}
+
+.successTitle {
+    color: var(--color-theme-primary);
+}
+
+.successCloseButton {
+    background-color: transparent;
+    color: var(--color-theme-primary);
+}
+
+.successCloseButton:hover {
+    background-color: var(--color-theme-primary);
+    color: var(--color-theme-neutral-background);
+}
+
+.successIcon {
+    color: var(--color-theme-font-white);
+}
+
+
+/* ****** feedBackToast ****** */
+
+.feedBackFormToast {
+    background-color: var(--color-warning-light);
+    border-radius: 15px;
+    border: 1px solid var(--color-warning);
+}
+
+.feedBackFormTitle {
+    color: var(--color-theme-font-black);
+}
+
+.feedBackFormCloseButton {
+    background-color: transparent;
+    color: var(--color-warning);
+    width: 25px;
+    height: 25px;
+}
+
+.feedBackFormCloseButton:hover {
+    background-color: var(--color-warning);
+    color: var(--color-warning-light);
+}
+
+.feedBackFormIcon {
+    color: var(--color-theme-font-white);
+}

@@ -171,6 +171,7 @@ interface PopoverFloatingProps {
   setOpen?: (value: boolean) => void;   // Setter externo para MODO CONTROLADO
   minHeight?: number | string;          // Altura mínima visual opcional (p.ej. 100 o "8rem")
   maxHeight?: number | string;          // Altura máxima antes de scroll (p.ej. 250 o "20rem")
+  classNamePopoverFloating?: string;
 }
 
 const PopoverFloating = ({
@@ -184,6 +185,7 @@ const PopoverFloating = ({
   setOpen,              // 🔴 Setter externo si es controlado
   minHeight,
   maxHeight,            // 🔴 NUEVO: controla el punto a partir del cual aparece scroll
+  classNamePopoverFloating,
 }: PopoverFloatingProps) => {
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -283,12 +285,11 @@ const PopoverFloating = ({
             // Valor por defecto si no das maxHeight: usa todo el espacio disponible
             computedMaxHeight = `${availableHeight}px`;
           }
-          
 
           Object.assign(elements.floating.style, {
             maxWidth: `${availableWidth}px`,
             maxHeight: maxHeight || computedMaxHeight,
-            minHeight: toCss(minHeight), // puede ser undefined → no se aplica
+            ...(minHeight && { minHeight: toCss(minHeight) }),
             overflowY: "auto",           // 👈 activa scroll vertical interno cuando se supera maxHeight
             // overflowX: "hidden",
             zIndex: "9999",
@@ -364,7 +365,7 @@ const PopoverFloating = ({
                 style={{
                   ...floatingStyles,
                 }}
-                className={StyleModule.popoverFloatingFloating}
+                className={`${classNamePopoverFloating} ${StyleModule.popoverFloatingFloating}`}
               >
                 {
                   typeof childrenFloating === "function"

@@ -1,13 +1,20 @@
-import { memo, useCallback, useEffect, useMemo, useState, type ChangeEvent, type KeyboardEvent } from "react";
+import { memo, useCallback, useEffect, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import styleModule from "./NumericInput.module.css";
+import clsx from "clsx";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface NumericInputProps {
     value: number | undefined;
     onChange: (value: number) => void;
     min?: number;
     max?: number;
-    className?: string;
-    classNameInput?: string;
+    classNameContainer?: string;
+    classNameInput?: string,
+    classNameInputValid?: string;
+    classNameInputInvalid?: string;
+    placeholder?: string;
+    classNameControls?: string;
+    classNameControlsIcon?: string;
     onlyCommitOnBlur?: boolean;
 }
 
@@ -22,13 +29,35 @@ const NumericInput = memo(({
     onChange,
     min = 1,
     max = 100000000000,
-    className,
+    classNameContainer,
     classNameInput,
+    classNameInputValid,
+    classNameInputInvalid,
+    placeholder,
     onlyCommitOnBlur = false,
+    classNameControls,
+    classNameControlsIcon
 }: NumericInputProps) => {
 
     const [inputValue, setInputValue] = useState(value?.toString() ?? "");
     const [isValid, setIsValid] = useState<boolean>(true);
+
+    const handleOnClickUp = useCallback(() => {
+        const val = Number(inputValue);
+        if (val < max) {
+            setInputValue(String(val + 1));
+            onChange(val + 1);
+        }
+    }, [inputValue, max, onChange]);
+
+    const handleOnClickDown = useCallback(() => {
+        const val = Number(inputValue);
+        if (val > min) {
+            setInputValue(String(val - 1));
+            onChange(val - 1);
+        }
+    }, [inputValue, min, onChange]);
+
 
     // ? Funcion que valida que el valor ingresado sea valido
     const computeIsValid = useCallback((val: string) => {
@@ -81,14 +110,15 @@ const NumericInput = memo(({
         }
     }, [onlyCommitOnBlur]);
 
-    // ? useMemo que genera las clases del input y el container
-    const [classNamesContainer, classNamesInput] = useMemo(() => {
-        const containerClassNames = `${className} ` +
-            `${styleModule.container} `;
-        const inputClassNames = `${styleModule.input} ` +
-            `${isValid ? classNameInput : styleModule.inputValidation} `;
+    // ? function que genera las clases del input y el container
+    const [classNamesContainer, classNamesInput] = (() => {
+        const containerClassNames = clsx(classNameContainer, styleModule.container);
+        const inputClassNames = clsx(
+            styleModule.input,
+            classNameInput,
+            isValid ? classNameInputValid : classNameInputInvalid);
         return [containerClassNames, inputClassNames];
-    }, [classNameInput, className, isValid]);
+    })();
 
     // ? useEffect que sincroniza el valor del input con el valor del prop value
     useEffect(() => {
@@ -98,8 +128,9 @@ const NumericInput = memo(({
     }, [value, min, max]);
 
     return (
-        <div className={classNamesContainer}>
+        <div className={clsx(classNamesContainer)}>
             <input
+                {...(placeholder ? { placeholder } : {})}
                 className={classNamesInput}
                 type="number"
                 value={inputValue}
@@ -110,6 +141,14 @@ const NumericInput = memo(({
                 pattern="[0-9]*"
                 min={min}
             />
+            <div className={clsx(classNameControls, styleModule.controls)}>
+                <button onClick={handleOnClickUp}>
+                    <ChevronUp className={clsx(styleModule.iconControl, classNameControlsIcon)} />
+                </button>
+                <button onClick={handleOnClickDown}>
+                    <ChevronDown className={clsx(styleModule.iconControl, classNameControlsIcon)} />
+                </button>
+            </div>
         </div>
     );
 });

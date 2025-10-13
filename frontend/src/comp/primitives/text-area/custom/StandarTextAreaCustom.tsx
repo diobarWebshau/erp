@@ -11,8 +11,6 @@ interface StandardTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaEleme
     maxLength?: number;
 }
 
-
-
 const StandarTextAreaCustom = ({
     classNameContainer,
     classNameTextArea,

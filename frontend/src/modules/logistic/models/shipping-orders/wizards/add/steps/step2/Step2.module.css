@@ -101,30 +101,44 @@
     min-width: 0;
 }
 
-.tableBody{
-    z-index: 20000000;
+.objectSelectInput.objectSelectInput {
+    height: 30px;
 }
 
-.objectSelectContainer{
+.objectSelectOption.objectSelectOption {
+    height: 30px;
+}
+
+.containerNumericInput.containerNumericInput {
+    /* dimension */
+    height: 30px ;
+}
+
+.inputNumericInput.inputNumericInput {
+    background-color: var(--color-theme-background);
+}
+
+
+.objectSelectContainer {
     /* dimension */
     width: 100%;
 }
 
-.tagSuccess{
+.tagSuccess {
     /* estilo */
     background-color: var(--color-success-light);
     color: var(--color-success);
     border: 1px solid var(--color-success);
 }
 
-.tagError{
+.tagError {
     /* estilo */
     background-color: var(--color-alert-light);
     color: var(--color-alert);
     border: 1px solid var(--color-alert);
 }
 
-.tagWarning{
+.tagWarning {
     /* estilo */
     background-color: var(--color-warning-light);
     color: var(--color-warning);
@@ -145,4 +159,3 @@
     flex-wrap: wrap;
     gap: 1rem;
 }
-

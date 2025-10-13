@@ -12,6 +12,7 @@
         "header" auto
         "subheader" auto
         "content" 1fr
+        "commentSection" 1fr
         "footer" auto
         / 100%;
     gap: 1.5rem;
@@ -49,6 +50,14 @@
     /* distribucion grid respecto al padre */
     grid-area: content;
 
+    display:flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.rowContainer {
+    /* distribucion grid respecto al padre */
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -58,15 +67,53 @@
     gap: 1rem;
 }
 
-.content > *{
+.rowContainer > *{
     flex-grow: 1;
     flex-shrink: 0;
     flex-basis: auto;
 
-    border: 1px solid red;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 
+.inputNumeric{
+    height: 44px;
+}
+
+.inputDateInputMantine.inputDateInputMantine{
+    height: 44px;
+}
+
+/* ******** COMMENT SECTION ******** */
+
+.commentSection {
+    /* distribucion grid respecto al padre */
+    grid-area: commentSection;
+
+    display:flex;
+    flex-direction: column;
+}
+
+.commentSection > *:first-child {
+    color: var(--color-theme-primary);
+    font-size: 14px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+}
+
+.commentSection > *:first-child > span {
+    color: var(--color-theme-font-black);
+}
 
 /* ******** FOOTER ******** */
 
@@ -81,4 +128,5 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+
 }

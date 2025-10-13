@@ -1,0 +1,126 @@
+/* ******** TRIGGER ******** */
+
+.trigger {
+    /* dimension */
+    width: 100%;
+    height: 44px;
+
+    /* distribucion box */
+    border-radius: 15px;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    font-size: 14px;
+
+    /* interactividad */
+    cursor: pointer;
+}
+
+.trigger:focus{
+    outline: none;
+}
+
+.triggerInvalid {
+    /* dimension */
+    border: 2px solid var(--color-alert);
+    color: var(--color-theme-neutral-primary);
+}
+
+.triggerValidate {
+    /* dimension */
+    border: 1px solid var(--color-theme-border-table);
+    /* background-color: var(--color-theme-neutral-background); */
+}
+
+.icon {
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    
+    /* estilos svg*/
+    stroke-width: 5px;    
+    stroke: var(--color-theme-primary);
+}
+
+/* ******** TOGGLE ******** */
+
+.toggle {
+    /* distribucion box */
+    border-radius: 15px;
+}
+
+.toggle>* {
+    /* dimension */
+    height: 44px;
+}
+
+.toggle>*:first-child {
+    /* distribucion box */
+    border-radius: 15px 15px 0 0;
+}
+
+.toggle>*:last-child {
+    /* distribucion box */
+    border-radius: 0 0 15px 15px;
+}
+
+.popoverFloating {
+    scrollbar-width: thin;
+    /* dimension */
+    /* scrollbar-gutter: stable both-edges; */
+    /* Firefox */
+    scrollbar-color: var(--color-theme-primary) var(--color-theme-font-white);
+    /* Firefox */
+}
+
+.popoverFloating::-webkit-scrollbar {
+    /* dimension */
+    width: 8px;
+    height: 8px;
+    /* Reserva el canal del scroll y evita overlay */
+    background-color: var(--color-theme-font-white);
+}
+
+.popoverFloating::-webkit-scrollbar-thumb {
+    /* dimension */
+    border-radius: 4px;
+    background-color: var(--color-theme-primary);
+}
+
+.popoverFloating::-webkit-scrollbar-track {
+    /* dimension */
+    background: var(--color-theme-font-white);
+    border-radius: 15px;
+}
+
+
+/* ******** OPTION ******** */
+
+.option {
+    /* dimension */
+    background-color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-border-table);
+
+    /* interactividad */
+    cursor: pointer;
+}
+
+.option:focus {
+    outline: none;
+}
+
+.option:focus:not(.optionSelected) {
+    /* dimension */
+    background-color: var(--color-theme-background);
+}
+
+.option:hover:not(.optionSelected) {
+    /* dimension */
+    background-color: var(--color-theme-background);
+}
+
+.optionSelected {
+    /* dimension */
+    background-color: var(--color-theme-neutral-background);
+    border: 1px solid var(--color-theme-border-table);
+}

@@ -1,3 +1,5 @@
+/* *************** Trigger *************** */
+
 .fieldSelectContainer {
     /* dimension */
     width: 100%;
@@ -25,6 +27,8 @@
     border: none;
 }
 
+/* *************** Toggle *************** */
+
 .toggle{
 
     /* distribucion flex*/
@@ -36,6 +40,8 @@
     /* estilos */
     font-size: 14px;    
 }
+
+/* *************** Option *************** */
 
 .option{
     /* distribucion flex con respecto al padre */

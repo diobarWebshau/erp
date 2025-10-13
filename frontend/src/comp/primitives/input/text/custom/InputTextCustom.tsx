@@ -1,58 +1,46 @@
 import InputText from "../base/inputText"
-import type { JSX} from "react";
+import { memo, type JSX } from "react";
 import StyleModule from "./InputTextCustom.module.css";
 import withClassName from "../../../../../utils/withClassName";
+import clsx from "clsx";
 
 interface InputTextProps {
     value: string | undefined;
     onChange: (value: string) => void;
-    onClick?: () => void;
-    id?: string;
-    name?: string;
     placeholder?: string;
-    disabled?: boolean;
-    required?: boolean;
     autoFocus?: boolean;
     classNameContainer?: string;
     classNameInput?: string;
-    classNameButton?: string;
     icon?: JSX.Element;
+    withValidation?: boolean;
 }
 
-const InputTextCustom = ({
-    placeholder,
+const InputTextCustom = memo(({
     value,
     onChange,
-    name,
-    disabled = false,
-    required = false,
     autoFocus = false,
     classNameContainer,
-    onClick,
     icon,
     classNameInput,
-    classNameButton
+    placeholder,
+    withValidation = true
 }: InputTextProps) => {
 
-    // Clonamos el icono y le agregamos la clase deseada
-    const iconWithClass = icon && withClassName(icon, StyleModule.iconButton)
+    const iconWithClass = icon && withClassName(icon, StyleModule.icon)
 
     return (
         <InputText
-            placeholder={placeholder}
+            {...(placeholder ? { placeholder: placeholder } : {})}
             value={value}
             onChange={onChange}
-            name={name}
-            disabled={disabled}
-            required={required}
-            autoFocus={autoFocus}
-            onClick={onClick}
+            {...(autoFocus && { autoFocus })}
             {...(icon && { icon: iconWithClass })}
-            classNameContainer={`${StyleModule.containerInputTextCustom} ${classNameContainer}`}
-            classNameInput={`nunito-regular ${StyleModule.inputTextCustom} ${classNameInput}`}
-            classNameButton={`${StyleModule.inputTextButton} ${classNameButton}`}
+            classNameContainer={clsx(StyleModule.container, classNameContainer)}
+            classNameInput={clsx(`nunito-regular`, StyleModule.input, classNameInput)}
+            classNameInputValid={StyleModule.inputValid}
+            classNameInputInvalid={clsx(withValidation ? StyleModule.inputInvalid : undefined)}
         />
     )
-}
+})
 
 export default InputTextCustom

@@ -1,18 +1,17 @@
 import PopoverFloating from "../../../../../external/floating/pop-over/PopoverFloating";
 import { memo, useMemo, useRef, useState, type JSX } from "react";
-import styles from "./ObjectSelect.module.css";
+import styles from "./StandardSelect.module.css";
 import clsx from "clsx";
 import withClassName from "../../../../../../utils/withClassName";
 import { ChevronDown } from "lucide-react";
 
-interface IObjectSelect<T> {
+interface IObjectSelect {
     defaultLabel?: string,
-    labelKey: keyof T;
     isInitialOpen?: boolean,
-    options: T[],
+    options: string[],
     icon?: JSX.Element,
-    value: T | null,
-    onChange: (value: T | null) => void,
+    value: string | null,
+    onChange: (value: string | null) => void,
     maxHeightToggle?: string,
     classNameTrigger?: string,
     classNameToggle?: string,
@@ -24,11 +23,10 @@ interface IObjectSelect<T> {
     classNameTriggerValidate?: string,
 }
 
-const ObjectSelect = <T,>({
+const ObjectSelect = ({
     defaultLabel = 'Seleccione una opción',
     isInitialOpen = false,
     options,
-    labelKey,
     value,
     onChange,
     maxHeightToggle,
@@ -41,7 +39,7 @@ const ObjectSelect = <T,>({
     classNamePopoverFloating,
     classNameTriggerInvalid,
     classNameTriggerValidate,
-}: IObjectSelect<T>) => {
+}: IObjectSelect) => {
 
     const [isOpen, setIsOpen] = useState(isInitialOpen);
 
@@ -57,9 +55,9 @@ const ObjectSelect = <T,>({
         const triggerClassNames = clsx(
             styles.fieldSelectContainer,
             classNameTrigger,
-            value === null || String(value?.[labelKey]) === defaultLabel
-                ? clsx(classNameTriggerInvalid)
-                : clsx(classNameTriggerValidate)
+            value === null || String(value) === defaultLabel
+                ? classNameTriggerInvalid
+                : classNameTriggerValidate
         );
         const toggleClassNames = clsx(
             styles.toggle,
@@ -86,9 +84,9 @@ const ObjectSelect = <T,>({
     // Funcion memoizada para obtener el indice inicial o actual
     const initialIndex = useMemo(() => {
         if (!value) return 0;
-        const i = options.findIndex(o => String(o[labelKey]) === String(value[labelKey]));
+        const i = options.findIndex(o => String(o) === String(value));
         return i >= 0 ? i : 0;
-    }, [options, value, labelKey]);
+    }, [options, value]);
 
     // Navegar por flechas
     const navigateFrom = (from: number, delta: number) => {
@@ -127,7 +125,7 @@ const ObjectSelect = <T,>({
                     className={triggerClassNames}
                     onKeyDown={handleTriggerKeyDown}
                 >
-                    {value ? String(value?.[labelKey]) : defaultLabel}
+                    {value ? String(value) : defaultLabel}
                     {iconWithClassNames}
                 </button>
             }
@@ -141,7 +139,6 @@ const ObjectSelect = <T,>({
                                 value={value}
                                 onChange={onChange}
                                 setIsOpen={setIsOpen}
-                                labelKey={labelKey}
                                 classNameOption={classNameOption}
                                 classNameOptionSelected={classNameOptionSelected}
                                 index={index}
@@ -161,11 +158,10 @@ const ObjectSelectMemo = memo(ObjectSelect) as typeof ObjectSelect;
 
 export default ObjectSelectMemo;
 
-interface IObjectOption<T> {
-    option: T,
-    labelKey: keyof T,
-    value: T | null,
-    onChange: (value: T | null) => void,
+interface IObjectOption {
+    option: string,
+    value: string | null,
+    onChange: (value: string | null) => void,
     setIsOpen: (value: boolean) => void,
     classNameOption?: string,
     classNameOptionSelected?: string,
@@ -175,9 +171,8 @@ interface IObjectOption<T> {
     setRef: (index: number, el: HTMLButtonElement | null) => void,
 }
 
-const ObjectOption = <T,>({
+const ObjectOption = ({
     option,
-    labelKey,
     value,
     onChange,
     setIsOpen,
@@ -187,10 +182,10 @@ const ObjectOption = <T,>({
     optionsLen,
     navigateFrom,
     setRef,
-}: IObjectOption<T>) => {
+}: IObjectOption) => {
 
-    const optionLabel = String(option[labelKey]);
-    const isSelected = value?.[labelKey] === option[labelKey];
+    const optionLabel = String(option);
+    const isSelected = value === option;
 
     const optionClassNames = clsx(
         clsx(styles.option, classNameOption),

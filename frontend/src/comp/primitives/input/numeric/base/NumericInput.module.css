@@ -1,35 +1,121 @@
 /* *************** Container *************** */
 
 .container {
-    /* dimension */
-    width: 100%;
-
+    /* posicionamiento */
+    position: relative;
     /* dsitribucion flex */
     display: flex;
     align-items: center;
     justify-content: stretch;
-
 }
 
 /* *************** Input *************** */
 
 .input {
     /* dimension */
+    height: 100%;
+    width: 100%;
+    /* distribucion box */
+    padding-inline-start: 0.5rem;
+    padding-inline-end: 1.5rem;
+}
+
+/* ============================
+   OCULTAR CONTROLES (FLECHAS)
+   EN <input type="number">
+   ============================ */
+
+/* --- Chrome / Edge / Safari (Blink / WebKit) --- */
+/* Selecciona los pseudo-elementos de las flechas del input numérico */
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    /* Quita la UI nativa de las flechas (no se renderizan) */
+    margin: 0;
+    /* Evita espacios residuales que pudieran dejar */
+}
+
+/* --- Firefox (Gecko) + fallback estándar --- */
+/* Aplica solo a <input type="number"> con la clase .input */
+.input[type="number"] {
+    -moz-appearance: textfield;
+    /* En Firefox: renderiza como campo de texto (sin flechas) */
+    appearance: textfield;
+    /* Estándar: ayuda en navegadores modernos (incl. Safari reciente) */
+}
+
+
+/* *************** Controls *************** */
+
+.controls {
+    /* posicionamiento */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.6rem;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* .controls:not(:hover){
+    opacity: 0;
+}
+
+.controls:hover{
+    opacity: 1;
+} */
+
+
+
+.controls button {
+    /* dimension */
+    width: 1rem;
+    height: 0.7rem;
+
+    /* distribucion flex */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* interactividad */
+    cursor: pointer;
+
+    /* distribucion box */
+    border: none;
+
+    /* estilos */
+    background-color: transparent;
+}
+
+/* .controls button:hover .iconControl {
+    stroke: var(--color-theme-secondary-light);
+} */
+
+.controls>*:first-child:hover {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.controls>*:last-child:hover {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.iconControl {
+    /* dimension */
     width: 100%;
     height: 100%;
 
-    /* distribucion flex */
-    border-radius: 15px;
-
-    padding-inline: 1rem;
+    /* estilos svg */
+    stroke-width: 5px;
 }
 
-.input:focus {
-    /* estilos */
-    outline: none;
-}
+/* *************** icon *************** */
 
-.inputValidation {
-    /* estilos */
-    border: 2px solid var(--color-alert);
+.icon {
+    /* posicionamiento */
+    position: absolute;
+    right: 0.5rem;
 }

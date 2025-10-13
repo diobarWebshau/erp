@@ -10,10 +10,9 @@ import DateInputMantine from "./../../../../../../../../comp/external/mantine/da
 import type { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
 import useLocationsProducedOneProduct from "./../../../../../../../../modelos/locations/hooks/useLocationsProducedOneProduct"
-import ObjectSelectCustom from "./../../../../../../../../comp/primitives/select/object-select/custom/ObjectSelectCustom"
 import GeneralTable from "./../../../../../../../../comp/primitives/table/tableContext/GenericTable";
 import type { ILocation } from "interfaces/locations";
-import NumericInputCustom from "./../../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
+import NumericInputCustomMemo from "./../../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import { formatNumber } from "./../../../../../../../../helpers/formttersNumeric";
 import Tag from "./../../../../../../../../comp/primitives/tag/Tag";
 import usePurchasedOrders from "../../../../../../../../modelos/purchased_orders/hooks/usePurchasedOrders";
@@ -21,9 +20,10 @@ import type { IPartialPurchasedOrder, IPurchasedOrder } from "interfaces/purchas
 import SelectPurchasedModal from "../../../../../../../../comp/features/modal-purchase/SelectPurchasedModal";
 import type { ShippingOrderAction } from "../../../../context/shippingOrderTypes";
 import { diffObjectArrays } from "../../../../../../../../utils/validation-on-update/validationOnUpdate";
-import { DateUtils } from "../../../../../../../../utils/dayJsUtils";
 import type { TableStatePartial } from "../../../../../../../../comp/primitives/table/tableContext/tableTypes";
 import { generateRandomIds } from "../../../../../../../../helpers/nanoId";
+import ObjectSelectCustomMemo from "../../../../../../../../comp/primitives/select/object-select/base/base/ObjectSelectCustom";
+import toastMantine from "../../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 
 interface IStep2 {
     onClose: () => void;
@@ -49,7 +49,6 @@ const Step2 = ({
         const initialTableState: TableStatePartial = {
             ...(Object.keys(rowSelectionState).length > 0 ? { rowSelectionState } : {})
         }
-        console.log(initialTableState);
         return [selectedSopops, initialTableState];
     }, [state.data?.shipping_order_purchase_order_product]);
 
@@ -96,18 +95,43 @@ const Step2 = ({
 
     const handleOnClickNextStep = useCallback(() => {
         const updateValues = state.data?.shipping_order_purchase_order_product_aux?.filter(p => sopops.some(sopop => sopop.id === p.id)) || [];
+        console.log(updateValues)
         const locationBase = [...updateValues].shift()?.location;
         const isSameLocation = updateValues?.every((p) => p.location?.id === locationBase?.id);
-        const isValid = updateValues?.every((p) => {
-            const qtyValid = ((p.purchase_order_products?.shipping_summary?.order_qty ?? 0) - (p.purchase_order_products?.shipping_summary?.shipping_qty ?? 0));
-            const isExceedQtyOrder = (p.qty ?? 0) <= qtyValid;
-            const isExceedQtyLocation = (p.qty ?? 0) < (locationBase?.inventory?.available ?? 0);
-            if (!isExceedQtyOrder || !isExceedQtyLocation) return false;
-            return true;
-        });
-        if (updateValues.length === 0) return;
-        if (!isSameLocation || !isValid) return;
-        if (!DateUtils.isValid(deliveryDate)) return;
+        const [isExceedQtyOrder, isExceedQtyLocation] = (
+            (locationBase: ILocation | undefined) => {
+                const isExceedQtyOrder = updateValues?.every((p) => {
+                    const qtyValid = ((p.purchase_order_products?.shipping_summary?.order_qty ?? 0) - (p.purchase_order_products?.shipping_summary?.shipping_qty ?? 0));
+                    return (updateValues.find(p => p.purchase_order_product_id === p.purchase_order_product_id)?.qty ?? 0) <= qtyValid;
+                })
+                const someIsExceedQtyLocation = updateValues?.some((p) => (p.qty ?? 0) > (locationBase?.inventory?.available ?? 0));
+                return [isExceedQtyOrder, someIsExceedQtyLocation];
+            }
+        )(locationBase as ILocation);
+        if (updateValues.length === 0) {
+            toastMantine.feedBackForm({ message: "Debe seleccionar al menos un producto para generar la orden de envio", });
+            return;
+        }
+        if (!isSameLocation) {
+            toastMantine.feedBackForm({ message: "Todos los productos a enviar deben pertenecer a la misma ubicación" });
+            return;
+        }
+        if (isExceedQtyLocation) {
+            toastMantine.feedBackForm({
+                message: 'Verifica que todas las cantidades de los productos puedan ser abastecidos por la ubicación asignada antes de continuar.',
+            });
+            return;
+        }
+        if (!isExceedQtyOrder) {
+            toastMantine.feedBackForm({
+                message: 'Solo puede procesarse la cantidad que aún no ha sido enviada de la orden.',
+            });
+            return;
+        }
+        if (!deliveryDate) {
+            toastMantine.feedBackForm({ message: "Debe seleccionar una fecha de envio valida" });
+            return;
+        }
         const diffObject = diffObjectArrays(state.data?.shipping_order_purchase_order_product ?? [], updateValues);
         if (diffObject.added.length > 0) {
             const added = diffObject.added;
@@ -259,7 +283,7 @@ const Step2 = ({
                         <DateInputMantine
                             value={deliveryDate}
                             onChange={setDeliveryDate}
-                            className={StyleModule.inputDeliveryDate}
+                            positionPopover="bottom-end"
                         />
                     </div>
                     <div>
@@ -297,7 +321,6 @@ const Step2 = ({
                     onClick={handleOnClickNextStep}
                     label="Siguiente"
                     icon={<ChevronRight />}
-                // disabled={sopops.length === 0}
                 />
             </div>
             {
@@ -344,12 +367,14 @@ const QuantityCell = memo(({
     }, [dispatch, record.purchase_order_product_id]);
 
     return (
-        <NumericInputCustom
+        <NumericInputCustomMemo
             value={valueQty}
             onChange={handleChange}
             onlyCommitOnBlur
             max={limitQty}
             min={1}
+            classNameContainer={StyleModule.containerNumericInput}
+            classNameInput={StyleModule.inputNumericInput}
         />
     );
 });
@@ -388,12 +413,14 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
     return (
         <div className={StyleModule.objectSelectContainer}>
             {!loadingLocationsProducedProduct && (
-                <ObjectSelectCustom
+                <ObjectSelectCustomMemo
                     options={locationsProducedProduct}
                     labelKey="name"
                     value={record.location as ILocation}
                     defaultLabel="Selecciona una ubicación"
                     onChange={handleOnChangeLocation}
+                    classNameInput={StyleModule.objectSelectInput}
+                    classNameOption={StyleModule.objectSelectOption}
                 />
             )}
         </div>
