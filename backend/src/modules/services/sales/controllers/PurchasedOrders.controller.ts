@@ -4,24 +4,47 @@ import { Request, Response, NextFunction } from "express";
 import { Op } from "sequelize";
 import { AppliedProductDiscountClientModel, AppliedProductDiscountRangeModel, ProductDiscountClientModel, PurchaseOrderProductModel } from "../associations.js";
 import sequelize from "sequelize";
+import { PurchasedOrderCreateAttributes } from "../types.js";
+
 
 class PurchasedOrderController {
+
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
-        const { filter } = req.query;
+
+        const { filter, ...rest } = req.query as {
+            filter?: string;
+        } & Partial<PurchasedOrderCreateAttributes>;
+
+        // 1) Filtro por texto (opcional)
+        const where: any = {};
+        if (filter && filter.trim()) {
+            const f = `${filter}%`;
+            where[Op.or] = [
+                { order_code: { [Op.like]: f } },
+                { company_name: { [Op.like]: f } },
+                { email: { [Op.like]: f } },
+                { phone: { [Op.like]: f } },
+            ];
+        }
+
+        // 2) Exclusiones: TODO lo que venga en `rest`
+        const excludePerField = Object.fromEntries(
+            Object.entries(rest)
+                .filter(([, v]) => v !== undefined)
+                .map(([k, v]) => [
+                    k,
+                    Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v }
+                ])
+        );
+
+        // Combina (AND implícito)
+        Object.assign(where, excludePerField);
+
         try {
 
             const response = await PurchasedOrderModel.findAll(
                 {
-                    ...((filter !== undefined && filter !== "") && {
-                        where: {
-                            [Op.or]: [
-                                { order_code: { [Op.like]: `${filter ?? ''}%` } },
-                                { company_name: { [Op.like]: `${filter ?? ''}%` } },
-                                { email: { [Op.like]: `${filter ?? ''}%` } },
-                                { phone: { [Op.like]: `${filter ?? ''}%` } },
-                            ],
-                        }
-                    }),
+                    ...(Object.keys(where).length ? { where } : {}),
                     attributes: PurchasedOrderModel.getAllFields(),
                     include: [
                         {
@@ -99,7 +122,7 @@ class PurchasedOrderController {
                                             // nested: true // esto trae todas relaciones de PurchasedOrderModel y a la vez todas las relaciones de las relaciones
                                         }
                                     ]
-                                }, 
+                                },
                                 {
                                     model: PurchasedOrdersProductsLocationsProductionLinesModel,
                                     as: "purchase_order_product_location_production_line",
@@ -167,6 +190,7 @@ class PurchasedOrderController {
             }
         }
     }
+
     static getById = async (req: Request, res: Response, next: NextFunction) => {
         const { id } = req.params;
         try {

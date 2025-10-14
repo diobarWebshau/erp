@@ -1,4 +1,3 @@
-
 import StyleModule from "./KPICard.module.css";
 
 interface KPICardProps {
@@ -22,17 +21,17 @@ const KPICard = ({
 }: KPICardProps) => {
     return (
         <div className={`${StyleModule.container} ${classNameContainer}`}>
-            <section className={`${StyleModule.sectionValue} ${classNameSectionValue}`}>
+            <div className={`${StyleModule.sectionValue} ${classNameSectionValue}`}>
                 {childrenSectionValue}
-            </section>
-            <section className={`${StyleModule.sectionText} ${classNameSectionText}`}>
+            </div>
+            <div className={`${StyleModule.sectionText} ${classNameSectionText}`}>
                 {childrenSectionText}
-            </section>
-            <section className={`${StyleModule.sectionIcon} ${classNameSectionIcon}`}>
+            </div>
+            <div className={`${StyleModule.sectionIcon} ${classNameSectionIcon}`}>
                 {childrenIcon}
-            </section>
+            </div>
         </div>
     )
 }
 
-export default KPICard
+export default KPICard;

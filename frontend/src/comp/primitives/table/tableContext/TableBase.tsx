@@ -5,13 +5,13 @@ import PopoverFloating from "../../../external/floating/pop-over/PopoverFloating
 import equalsBooleanFilter from "../filters/boolean/equalsBooleanFilter";
 import betweenNumberFilter from "../filters/number/betweenNumberFilter";
 import equalsNumberFilter from "../filters/number/equalsNumberFilter";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, type Dispatch } from "react";
 import startsWithFilter from "../filters/string/startsWithFilter";
 import betweenDateFilter from "../filters/date/betweenDateFilter";
 import equalsDateFilter from "../filters/date/equalsDateFilter";
 import { useTableDispatch, useTableState } from "./tableHooks"
 import formatDateToDMY from "../utils/formatDateToDMY";
-import type { RowAction } from "./tableTypes";
+import type { RowAction, TableAction, TableState } from "./tableTypes";
 import { Ellipsis } from "lucide-react";
 import stylesModules from "./TableBase.module.css"
 import GeneratorHeaderTable from "../components/generator-header-table/GeneratorHeaderTable";
@@ -35,7 +35,7 @@ interface TableBaseProps<T> {
     enableRowEditClickHandler?: (record: T) => void;
     conditionalRowSelection?: (updater: RowSelectionState, rows: Row<T>[]) => boolean;
     noResultsMessage?: string;
-    extraComponents?: (table?: Table<T>) => React.ReactNode;
+    extraComponents?: ({table, state, dispatch}: {table: Table<T>, state: TableState, dispatch: Dispatch<TableAction>}) => React.ReactNode;
     footerComponents?: (table: Table<T>) => React.ReactNode;
     classNameGenericTableContainer?: string;
     classNameExtraComponents?: string;
@@ -374,12 +374,14 @@ const TableBase = <T,>({
 
     const rowModel: RowModel<T> = table.getRowModel();
 
+    console.log('loading', isLoadingData);
+
     return (
         <div className={containerClassNames}>
             {extraComponents &&
                 <div className={headerClassNames}>
                     <div className={`${stylesModules.extraComponentsContainer} `}>
-                        {extraComponents(table)}
+                        {extraComponents({table, state, dispatch})}
                     </div>
                 </div>
             }

@@ -1,43 +1,55 @@
-import type {
-    IPurchasedOrder,
-    IPartialPurchasedOrder,
-} from "../../../interfaces/purchasedOrder";
-import {
-    setError,
-    clearError,
-} from "../../../store/slicer/errorSlicer";
-import type {
-    AppDispatchRedux
-} from "../../../store/store";
+import type { IPurchasedOrder, IPartialPurchasedOrder } from "../../../interfaces/purchasedOrder";
+import { setError, clearError } from "../../../store/slicer/errorSlicer";
+import type { AppDispatchRedux } from "../../../store/store";
 
-const API_URL = new URL("http://localhost:3003/production/purchased-orders");
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+const RELATIVE_PATH = "/production/purchased-orders";
+const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
 
-const fetchPurchasedOrdersFromDB = async (
+const fetchPurchasedOrdersFromDB = async ({
+    dispatch,
+    like,
+    conditionsExclude,
+    signal
+}: {
     dispatch: AppDispatchRedux,
     like?: string,
+    conditionsExclude?: IPartialPurchasedOrder,
     signal?: AbortSignal
-): Promise<IPurchasedOrder[]> => {
+}): Promise<IPurchasedOrder[]> => {
     try {
+        // Creamos el objeto params
         const params = new URLSearchParams();
+
+        // Agregamos el parametro de busqueda si se cumple ciertas condiciones
         if (like) params.set("filter", like);
 
-        const response = await fetch(`${API_URL}?${params.toString()}`, {
+        // Agregamos los params de exclusion si se cumplen ciertas condiciones
+        if (conditionsExclude && Object.keys(conditionsExclude).length > 0) {
+            Object.entries(conditionsExclude).forEach(([key, value]) => {
+                if (Array.isArray(value) || typeof value === "object") {
+                    params.set(key, JSON.stringify(value));
+                } else {
+                    params.set(key, value.toString());
+                }
+            });
+        };
+
+        // Creamos el request 
+        const request = new Request(`${API_URL}?${params.toString()}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
-            signal, // <-- pasamos la señal para poder abortar
+            signal,
         });
+
+        // Realizamos la peticion a la DB
+        const response = await fetch(request);
 
         if (!response.ok) {
             const errorText = await response.json();
-            if (response.status >= 500) {
-                throw new Error(`${errorText}`);
-            }
-            dispatch(
-                setError({
-                    key: "purchasedOrders",
-                    message: errorText,
-                })
-            );
+            console.log(errorText);
+            if (response.status >= 500) throw new Error(`${errorText}`)
+            dispatch(setError({ key: "purchasedOrders", message: errorText }));
             return [];
         }
 
@@ -56,7 +68,6 @@ const fetchPurchasedOrdersFromDB = async (
         throw error;
     }
 };
-
 
 const getPurchasedOrderByIdInDB = async (
     dispatch: AppDispatchRedux,

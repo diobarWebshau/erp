@@ -1,245 +1,115 @@
-/* *************** Extra components *************** */
+/* *************** Shipping orders Model *************** */
 
-.containerExtraComponents {
+.containerShippingOrdersModel {
+    /* posicionamiento */
+    position: relative;
+
     /* dimension */
     width: 100%;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
 
     /* distribucion flex */
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    justify-content: space-between;
+    justify-content: start;
+    align-items: stretch;
+    gap: 0.5rem;
 }
 
-.firstBlock {
-    /* dimension */
-    width: 100%;
-    
+/* *************** Header section *************** */
+
+.headerSection {
+    /* distribucion flex respecto al padre*/
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
-    gap: 1rem;
     justify-content: space-between;
     align-items: center;
-    
-    /* estilos */
-    font-size: 16px;
 }
 
-.firstBlock h1 {
-    /* estilos */
+.headerSection h1 {
+    /* dimension */
     font-size: 36px;
     color: var(--color-theme-primary);
 }
 
-.secondBlock {
+/* *************** Content section *************** */
+
+.containerTable {
+    /* distribucion flex respecto al padre*/
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
     /* dimension */
-    width: 100%;
+    min-height: 0;
+    min-width: 0;
+}
+
+.containerExtraComponents {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: space-between;
-    
-    /* estilos */
-    font-size: 16px;
+    align-items: center;
 }
 
 .containerButtons {
-    /* dimension */
-    width: 100%;
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
-    justify-content: end;
+    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    /* estilos */
-    font-size: 16px;
-}
-
-/*? Fade button */
-
-.fadeButtonExtraComponents {
-    /* dimension */
-    height: 48px;
-    width: 250px;
-    
-    /* distribucion flex */
-    border: none;
-    border-radius: 10px;
-    
-    /* estilos */
-    color: var(--color-theme-font-white);
-    background: linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
-}
-
-.fadeButtonSpanExtraComponents {
-    /* distribucion flex */
-    justify-content: center;
-
-    /* estilos */
-    font-size: 16px;
-}
-
-.fadeButtonExtraComponents:hover {
-    /* estilos */
-    background: var(--color-theme-primary-light);
-    color: var(--color-theme-font-white);
-}
-
-.plusIconShippingOrderModel {
-    /* estilos */
-    color: var(--color-theme-font-white);
-}
-
-
-
-/*? Input */
-
-.InputSearchContainerExtraComponents {
-    /* dimension */
-    width: 288px;
-    height: 44px;
-
-    /* estilos */
-    background-color: var(--color-theme-background);
-    font-size: inherit;
-
-    /* distribucion box */
-    border-radius: 10px;
-}
-
-.InputSearchInputExtraComponents {
-    /* distribucion box */
-    border-radius: 10px;
-
-    /* estilos */
-    font-size: inherit;
-    background-color: var(--color-theme-background);
-}
-
-.InputSearchInputExtraComponents::placeholder {
-    /* estilos */
-    font-size: 14px;
-    color: var(--color-theme-primary-light);
-}
-
-.searchIconExtraComponents {
-    /* estilos */
-    color: var(--color-theme-primary-light);
-    cursor: pointer;
-    font-size: inherit;
-}
-
-
-.searchIconExtraComponents:hover {
-    /* estilos */
-    color: var(--color-theme-primary-light);
-    cursor: pointer;
-    font-size: inherit;
-}
-
-
-/*?  Button Inverse */
-
-.toggleInverseButtonExtraComponents {
-    /* dimension */
-    width: 200px;
-    height: 48px;
-
-    /* distribucion box */
-    border: none;
-    border-radius: 10px;
-    
-    /* estilos */
-    font-size: inherit;
-    color: var(--color-theme-primary-light);
-    background-color: var(--color-theme-neutral-background);
-}
-
-
-.toggleInverseButtonSpanExtraComponents {
-    /* distribucion flex */
-    justify-content: center;
     gap: 0.5rem;
-    
-    /* estilos */
-    font-size: inherit;
 }
 
-.toggleInverseButtonExtraComponents:hover {
-    /* estilos */
-    background-color: var(--color-theme-primary-light);
-    color: var(--color-theme-font-white);
-    font-size: inherit;
-}
-
-.toggleInverseButtonExtraComponents:disabled {
-    /* estilos */
-    background-color: var(--color-theme-background);
-    color: var(--color-theme-neutral-primary);
-    cursor: not-allowed;
-    font-size: inherit;
-    opacity: 0.6;
-}
-
-.toggleInverseButtonExtraComponents:disabled :global(svg) {
-    /* estilos */
-    color: var(--color-theme-neutral-primary);
-}
-
-.toggleInverseButtonExtraComponents:not(:disabled):hover :global(svg) {
-    /* estilos */
-    fill: var(--color-theme-primary-light);
-    stroke: var(--color-theme-font-white);
-}
-
-.trash2IconExtraComponents {
+.inputTextCustom.inputTextCustom {
     /* dimension */
-    width: 20px;
-    
-    /* estilos */
-    color: var(--color-theme-primary);
-    font-size: inherit;
-    cursor: pointer;
+    width: 300px;
 }
 
-.downloadIconExtraComponents {
-    /* dimension */
-    width: 20px;
-    
-    /* estilos */
-    color: var(--color-theme-primary);
-    font-size: inherit;
-    cursor: pointer;
-}
+/* *************** KPIs section *************** */
 
-
-/* *************** Shipping orders Model *************** */
-
-.containerShippingOrdersModel {
-    /* dimension */
-    width: 100%;
-    height: 100%;
+.containerKPIs {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
 
     /* distribucion flex */
     display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.containerKPIs>* {
+    height: 100px;
+
+
+    display: flex;
     flex-direction: column;
-
-    position: relative;
-}
-
-.containerTable {
-    width: 100%;
-    height: 100%;
-}
-
-.trash2IconShippingOrderModel {
-    /* dimension */
-    width: 16px;
+    justify-content: center;
+    align-items: center;
     
-    /* estilos */
-    color: var(--color-alert);
-    cursor: pointer;
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-primary);
+
 }

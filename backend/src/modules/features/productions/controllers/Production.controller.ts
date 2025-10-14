@@ -26,7 +26,6 @@ interface ProductionsInProductionOrder
     productions: ProductionAttributes[]
 }
 
-
 class ProductionsController {
     static getAll =
         async (req: Request, res: Response, next: NextFunction) => {

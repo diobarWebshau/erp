@@ -2,9 +2,9 @@ import type { ColumnDef, Row, RowSelectionState, Table } from "@tanstack/react-t
 import type { RowAction} from "../types";
 import ProviderTableContext from "./ProviderTableContext";
 import TableBase from "./TableBase";
-import type { TableState, TableStatePartial } from "./tableTypes";
+import type { TableAction, TableState, TableStatePartial } from "./tableTypes";
 import { DEFAULT_TABLE_STATE } from "./tableTypes";
-import { memo, useMemo } from "react";
+import { memo, useMemo, type Dispatch } from "react";
 
 interface GenericTableProps<T> {
     modelName: string;
@@ -21,7 +21,7 @@ interface GenericTableProps<T> {
     noResultsMessage?: string;
     onRowSelectionChangeExternal?: (selected: T[], table?: Table<T>) => void;
     conditionalRowSelection?: (updater: RowSelectionState, rows: Row<T>[]) => boolean;
-    extraComponents?: (table?: Table<T>) => React.ReactNode;
+    extraComponents?: ({table, state, dispatch}: {table: Table<T>, state: TableState, dispatch: Dispatch<TableAction>}) => React.ReactNode;
     footerComponents?: (table: Table<T>) => React.ReactNode;
     classNameGenericTableContainer?: string;
     classNameTableContainer?: string;
@@ -71,7 +71,6 @@ const GenericTable = <T,>({
     isExpanded,
     initialState,
 }: GenericTableProps<T>) => {
-
     /*
         Calculamos el estado final unicamente si, se establece initialState
         Evita recrear objeto en cada render si initialState no cambia

@@ -20,12 +20,10 @@ import type {
 } from "../../../interfaces/purchasedOrder";
 
 const usePurchasedOrderById = (id: number | undefined | null) => {
-    const dispatch =
-        useDispatch<AppDispatchRedux>();
-    const [purchasedOrderById, setPurchasedOrderById] =
-        useState<IPurchasedOrder | null>(null);
-    const [loadingPurchasedOrderById, setLoadingPurchasedOrderById] =
-        useState<boolean>(true);
+    
+    const dispatch = useDispatch<AppDispatchRedux>();
+    const [purchasedOrderById, setPurchasedOrderById] = useState<IPurchasedOrder | null>(null);
+    const [loadingPurchasedOrderById, setLoadingPurchasedOrderById] = useState<boolean>(true);
 
     const fetchPurchasedOrderByIdFunction = async () => {
         setLoadingPurchasedOrderById(true);

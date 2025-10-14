@@ -52,7 +52,13 @@ const Step1 = ({ onClose }: IStep1) => {
 
     const [search, setSearch] = useState<string>(client);
     const [selectedPurchasedOrder, setSelectedPurchasedOrder] = useState<IPartialPurchasedOrder[]>(purchase_orders);
-    const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders(search, 0);
+    const exclude = useMemo(() => ({ status: "shipping" as const }), []);
+    const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders({
+        like: search,
+        debounce: 500,
+        conditionalExclude: exclude
+    });
+
 
     const columns: ColumnDef<IPurchasedOrder>[] = useMemo(() => [
         {
@@ -164,7 +170,7 @@ const Step1 = ({ onClose }: IStep1) => {
         state.data?.shipping_order_purchase_order_product_aux, dispatch
     ]);
 
-    const conditionalRowSelection = useCallback((updater: RowSelectionState, rows: Row<IPurchasedOrder>[], ): boolean => {
+    const conditionalRowSelection = useCallback((updater: RowSelectionState, rows: Row<IPurchasedOrder>[],): boolean => {
         if (selectedPurchasedOrder.length === 0) {
             if (rows.length === Object.keys(updater).length) {
                 const client = rows[0].original.client?.company_name;
@@ -186,7 +192,7 @@ const Step1 = ({ onClose }: IStep1) => {
                     toastMantine.feedBackForm({ message: 'Las ordenes seleccionadas deben pertenecer al mismo cliente y dirección de envío.' });
                 }
                 return isSameClient && isSameAddress;
-            }else{
+            } else {
                 return true;
             }
         } else {

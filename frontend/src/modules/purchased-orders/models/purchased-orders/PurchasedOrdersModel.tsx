@@ -121,7 +121,9 @@ const PurchasedOrderModel = () => {
         setLoading(true);
         try {
             const response =
-                await fetchPurchasedOrdersFromDB(dispatch);
+                await fetchPurchasedOrdersFromDB({
+                    dispatch,
+                });
             if (response.length > 0) {
                 setPurchasedOrders(response);
             } else {

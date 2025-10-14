@@ -5,21 +5,30 @@ import { AppliedProductDiscountClientModel, AppliedProductDiscountRangeModel, Pr
 import sequelize from "sequelize";
 class PurchasedOrderController {
     static getAll = async (req, res, next) => {
-        const { filter } = req.query;
+        const { filter, ...rest } = req.query;
+        // 1) Filtro por texto (opcional)
+        const where = {};
+        if (filter && filter.trim()) {
+            const f = `${filter}%`;
+            where[Op.or] = [
+                { order_code: { [Op.like]: f } },
+                { company_name: { [Op.like]: f } },
+                { email: { [Op.like]: f } },
+                { phone: { [Op.like]: f } },
+            ];
+        }
+        // 2) Exclusiones: TODO lo que venga en `rest`
+        const excludePerField = Object.fromEntries(Object.entries(rest)
+            .filter(([, v]) => v !== undefined)
+            .map(([k, v]) => [
+            k,
+            Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v }
+        ]));
+        // Combina (AND implícito)
+        Object.assign(where, excludePerField);
         try {
-            console.log(filter);
-            console.log(typeof filter);
             const response = await PurchasedOrderModel.findAll({
-                ...((filter !== undefined && filter !== "") && {
-                    where: {
-                        [Op.or]: [
-                            { order_code: { [Op.like]: `${filter ?? ''}%` } },
-                            { company_name: { [Op.like]: `${filter ?? ''}%` } },
-                            { email: { [Op.like]: `${filter ?? ''}%` } },
-                            { phone: { [Op.like]: `${filter ?? ''}%` } },
-                        ],
-                    }
-                }),
+                ...(Object.keys(where).length ? { where } : {}),
                 attributes: PurchasedOrderModel.getAllFields(),
                 include: [
                     {

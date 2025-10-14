@@ -4,7 +4,7 @@ import { QueryTypes, Transaction } from "sequelize";
 import CarrierModel from "../models/base/Carriers.model.js";
 import ImageHandler from "../../../../classes/ImageHandler.js";
 import { formatImagesDeepRecursive, formatWith64Multiple } from "../../../../scripts/formatWithBase64.js";
-import { PurchaseOrderProductModel, PurchasedOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, LocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ClientModel, ClientAddressesModel, LocationModel, InventoryMovementModel, } from "../../../associations.js";
+import { PurchaseOrderProductModel, PurchasedOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, LocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ClientModel, ClientAddressesModel, LocationModel, InventoryMovementModel } from "../../../associations.js";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { Op } from "sequelize";
 import path from 'node:path';
@@ -16,25 +16,117 @@ const deleteLoadEvidences = async (evidences) => {
 };
 class ShippingOrderController {
     static getAll = async (req, res, next) => {
+        const { filter, ...rest } = req.query;
         try {
-            const response = await ShippingOrderModel.findAll();
+            // 1️⃣ Condición base (para exclusiones)
+            const excludePerField = Object.fromEntries(Object.entries(rest)
+                .filter(([k, v]) => v !== undefined && k !== "code")
+                .map(([k, v]) => [
+                k,
+                Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v },
+            ]));
+            // 2️⃣ Filtro de búsqueda general
+            const filterConditions = [];
+            if (filter && filter.trim()) {
+                const f = `%${filter.trim()}%`; // busca en cualquier parte
+                filterConditions.push({ code: { [Op.like]: f } }, // code del shipping order
+                { "$carrier.name$": { [Op.like]: f } }, // nombre del carrier
+                { "$shipping_order_purchase_order_product.purchase_order_products.purchase_order.client.company_name$": { [Op.like]: f } }, // cliente
+                { "$shipping_order_purchase_order_product.purchase_order_products.purchase_order_product_location_production_line.production_line.location_production_line.location.name$": { [Op.like]: f } } // location
+                );
+            }
+            // 3️⃣ Construimos el WHERE principal
+            const where = {
+                ...excludePerField,
+                ...(filterConditions.length > 0 ? { [Op.or]: filterConditions } : {}),
+            };
+            // 4️⃣ Consulta completa
+            const response = await ShippingOrderModel.findAll({
+                where,
+                attributes: ShippingOrderModel.getAllFields(),
+                include: [
+                    {
+                        model: CarrierModel,
+                        as: "carrier",
+                        required: false, // 🔥 evita perder resultados cuando no hay match
+                        attributes: CarrierModel.getAllFields(),
+                    },
+                    {
+                        model: ShippingOrderPurchaseOrderProductModel,
+                        as: "shipping_order_purchase_order_product",
+                        required: false,
+                        attributes: ShippingOrderPurchaseOrderProductModel.getAllFields(),
+                        include: [
+                            {
+                                model: PurchaseOrderProductModel,
+                                as: "purchase_order_products",
+                                required: false,
+                                attributes: PurchaseOrderProductModel.getAllFields(),
+                                include: [
+                                    {
+                                        model: PurchasedOrdersProductsLocationsProductionLinesModel,
+                                        as: "purchase_order_product_location_production_line",
+                                        required: false,
+                                        attributes: PurchasedOrdersProductsLocationsProductionLinesModel.getAllFields(),
+                                        include: [
+                                            {
+                                                model: ProductionLineModel,
+                                                as: "production_line",
+                                                required: false,
+                                                attributes: ProductionLineModel.getAllFields(),
+                                                include: [
+                                                    {
+                                                        model: LocationsProductionLinesModel,
+                                                        as: "location_production_line",
+                                                        required: false,
+                                                        attributes: LocationsProductionLinesModel.getAllFields(),
+                                                        include: [
+                                                            {
+                                                                model: LocationModel,
+                                                                as: "location",
+                                                                required: false,
+                                                                attributes: LocationModel.getAllFields(),
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        model: PurchasedOrderModel,
+                                        as: "purchase_order",
+                                        required: false,
+                                        attributes: PurchasedOrderModel.getAllFields(),
+                                        include: [
+                                            {
+                                                model: ClientModel,
+                                                as: "client",
+                                                required: false,
+                                                attributes: ClientModel.getAllFields(),
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            });
+            // 5️⃣ Si no hay resultados
             if (response.length < 1) {
-                res.status(200).json({
-                    validation: "Shipping orders no found"
-                });
+                res.status(200).json({ validation: "Shipping orders not found" });
                 return;
             }
+            // 6️⃣ Post-procesamiento
             const shippingOrders = await formatWith64Multiple(response, "load_evidence", "path");
             res.status(200).json(shippingOrders);
         }
         catch (error) {
-            if (error instanceof Error) {
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
-                console.error(`An unexpected error `
-                    + `occurred: ${error}`);
-            }
+            else
+                console.error(`An unexpected error occurred: ${error}`);
         }
     };
     static getDetailsById = async (req, res, next) => {
