@@ -9,8 +9,6 @@ class PurchasedOrderController {
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
         const { filter } = req.query;
         try {
-            console.log(filter);
-            console.log(typeof filter);
 
             const response = await PurchasedOrderModel.findAll(
                 {

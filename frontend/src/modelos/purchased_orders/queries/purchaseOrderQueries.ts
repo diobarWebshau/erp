@@ -10,8 +10,7 @@ import type {
     AppDispatchRedux
 } from "../../../store/store";
 
-const API_URL =
-    "http://localhost:3003/production/purchased-orders";
+const API_URL = new URL("http://localhost:3003/production/purchased-orders");
 
 const fetchPurchasedOrdersFromDB = async (
     dispatch: AppDispatchRedux,
@@ -21,13 +20,13 @@ const fetchPurchasedOrdersFromDB = async (
     try {
         const params = new URLSearchParams();
         if (like) params.set("filter", like);
-        
+
         const response = await fetch(`${API_URL}?${params.toString()}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             signal, // <-- pasamos la señal para poder abortar
         });
-        
+
         if (!response.ok) {
             const errorText = await response.json();
             if (response.status >= 500) {
