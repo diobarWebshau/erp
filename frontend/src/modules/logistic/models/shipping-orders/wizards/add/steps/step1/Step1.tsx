@@ -119,13 +119,14 @@ const Step1 = ({ onClose }: IStep1) => {
                 type: "enum",
                 enumOptions: [
                     { label: "Pendiente", value: "pending" },
-                    { label: "Completado", value: "completed" },
-                    { label: "Entregado", value: "delivered" },
-                    { label: "Cancelado", value: "cancelled" },
+                    { label: "Envío parcial", value: "partially_shipping" },
+                    { label: "Enviado", value: "shipping" },
+                    { label: "Finalizado", value: "finished" },
                 ]
             },
             cell: ({ getValue, column }) => {
                 const valor = getValue() as string;
+                console.log(valor);
                 const labelEnum = getEnumoSingleLabel(column.columnDef, valor) || "";
                 return (
                     <Tag
@@ -146,7 +147,7 @@ const Step1 = ({ onClose }: IStep1) => {
         if (added.length > 0) {
             setSelectedPurchasedOrder(prev => [...prev, ...added]);
             const popsArray: IPurchasedOrderProduct[][] = added.map(p => p.purchase_order_products as IPurchasedOrderProduct[] ?? []);
-            const popsFlat: IPurchasedOrderProduct[] = popsArray.flat();
+            const popsFlat: IPurchasedOrderProduct[] = popsArray.flat().filter(p => Number(p.shipping_summary?.shipping_qty) < Number(p.shipping_summary?.order_qty));
             const sopops: IPartialShippingOrderPurchasedOrderProduct[] = popsFlat.map(p => ({
                 id: generateRandomIds(),
                 purchase_order_products: p,
@@ -166,9 +167,7 @@ const Step1 = ({ onClose }: IStep1) => {
                 dispatch(remove_shipping_order_purchased_order_products_aux(sopopsIds));
             }
         }
-    }, [
-        state.data?.shipping_order_purchase_order_product_aux, dispatch
-    ]);
+    }, [state.data?.shipping_order_purchase_order_product_aux, dispatch]);
 
     const conditionalRowSelection = useCallback((updater: RowSelectionState, rows: Row<IPurchasedOrder>[],): boolean => {
         if (selectedPurchasedOrder.length === 0) {

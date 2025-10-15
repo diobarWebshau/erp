@@ -65,7 +65,6 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
         return getValues();
     }, [state.data?.shipping_order_purchase_order_product]);
 
-    console.log(location);
 
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch, back_step]);
     const handleOnClickNextStep = useCallback(() => {

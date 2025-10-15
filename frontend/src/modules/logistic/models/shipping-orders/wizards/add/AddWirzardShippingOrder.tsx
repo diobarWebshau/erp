@@ -18,7 +18,7 @@ interface IAddWizardShippingOrder {
 
 const AddWizardShippingOrder = ({
     onCreate,
-    onClose
+    onClose,
 }: IAddWizardShippingOrder) => {
 
     // * Hooks
@@ -62,7 +62,7 @@ const AddWizardShippingOrder = ({
                     }
                     {
                         state.current_step === 4 && (
-                            <Step4 onClose={toggleWarningModal} onLeave={onClose} onCreate={onCreate} />
+                            <Step4 onClose={toggleWarningModal} onLeave={onClose} onCreate={onCreate}/>
                         )
                     }
                 </div>

@@ -583,7 +583,6 @@ class ShippingOrderController {
 
         const body = req.body;
 
-        console.log(body);
         const {
             status, carrier_id,
             load_evidence, delivery_cost,
@@ -675,7 +674,6 @@ class ShippingOrderController {
                     ...rest,
                     shipping_order_id: shipping.id,
                 }));
-
 
             const popsiD: number[] =
                 pop.map(p => p.purchase_order_product_id);

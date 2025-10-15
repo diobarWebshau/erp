@@ -1,11 +1,11 @@
-import { useState, type Dispatch } from "react";
+import { useMemo, useState, type Dispatch } from "react";
 import type { IPartialShippingOrder, IShippingOrder, LoadEvidenceItem, LoadEvidenceManager, PartialLoadEvidenceItem } from "../../../../interfaces/shippingOrder";
 import type { AppDispatchRedux } from "../../../../store/store";
 import { deleteShippingOrderInDB, createCompleteShippingOrderInDB, updateCompleteShippingOrderInDB } from "../../../../queries/shippingOrderQueries";
 import { useDispatch } from "react-redux";
 import { columnsShippingOrders } from "./structure/columns";
 import type { RowAction } from "../../../../components/ui/table/types";
-import { Trash2, Download, Plus, Search, Eraser, Truck } from "lucide-react";
+import { Trash2, Download, Plus, Search, Eraser, PackageCheck, PackageSearch, TrendingDown, Ban } from "lucide-react";
 import useShippingOrderDetailById from "./hooks/useShippingOrderDetailById";
 import { diffObjectArrays, diffObjects } from "../../../../utils/validation-on-update/validationOnUpdate"
 import type { IPartialShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProductManager } from "../../../../interfaces/shippingPurchasedProduct";
@@ -21,7 +21,9 @@ import InputTextCustom from "../../../../comp/primitives/input/text/custom/Input
 import MainActionButtonCustom from "../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import SecundaryActionButtonCustom from "../../../../comp/primitives/button/custom-button/secundary-action/SecundaryActionButtonCustom";
 import useShippingOrders from "../../../../modelos/shipping_orders/hooks/useShippingOrders";
-import KPICardCustom from "../../../../comp/primitives/cards/kpi/custom/KPICardCustom";
+import KPICardCustomPurple from "../../../../comp/primitives/cards/kpi/custom/purple/KPICardCustomPurple";
+import KPICardCustomRed from "../../../../comp/primitives/cards/kpi/custom/red/KPICardCustomRed";
+import KPICardCustomGreen from "../../../../comp/primitives/cards/kpi/custom/green/KPICardCustomGreen";
 
 const ShippingOrderModel = () => {
 
@@ -50,10 +52,7 @@ const ShippingOrderModel = () => {
 
     const [search, setSearch] = useState<string>("");
 
-    const { shippingOrders, loadingShippingOrders } = useShippingOrders({
-        like: search,
-        debounce: 500,
-    });
+    const { shippingOrders, loadingShippingOrders, refetchShippingOrders } = useShippingOrders({ like: search, debounce: 500 });
 
     // * ******************** Funciones de operaciones CRUD ******************** 
 
@@ -63,6 +62,7 @@ const ShippingOrderModel = () => {
             const new_shipping = { ...shipping }
             delete new_shipping.load_evidence;
             const responseCreate = await createCompleteShippingOrderInDB(new_shipping, dispatch);
+            refetchShippingOrders();
             if (!responseCreate) return;
             setServerError(null);
         } catch (error) {
@@ -118,11 +118,7 @@ const ShippingOrderModel = () => {
                     IPartialShippingOrderPurchasedOrderProduct)[]
                 ) => arr.length > 0);
 
-            const diff_evidences: LoadEvidenceManager =
-                diffObjectArrays(
-                    evidences_old,
-                    evidences_new
-                );
+            const diff_evidences: LoadEvidenceManager = diffObjectArrays(evidences_old, evidences_new);
 
             const hasChangesEvidences: boolean = [
                 diff_evidences.added,
@@ -239,14 +235,20 @@ const ShippingOrderModel = () => {
 
     // * ******************** Funciones para control de acciones de la tabla ******************** 
 
-    const rowActions: RowAction<IShippingOrder>[] = [
+    const rowActions: RowAction<IShippingOrder>[] = useMemo(() => [
         {
-            label: "Delete",
-            onClick: toggleisActiveDeleteModalSetup,
-            icon: <Trash2 className={StyleModule.trash2IconShippingOrderModel} />
-        }
-    ];
-
+            label: "Eliminar",
+            onClick: (row) => () => { console.log(`Eliminar ${row.id}`) },
+            icon: <Ban className={StyleModule.pencilIconRowActions} />,
+            condition: (row: IShippingOrder) => row.status === "pending"
+        },
+        {
+            label: "Cancelar",
+            onClick: (row) => () => { console.log(`Cancelar ${row.id}`) },
+            icon: <Trash2 className={StyleModule.pencilIconRowActions} />,
+            condition: (row: IShippingOrder) => row.status !== "finished"
+        },
+    ], []);
     // * ******************** Componentes extra para inyectar como props en el GenericTable ******************** 
 
     interface ExtraComponentsProps<T> {
@@ -310,38 +312,35 @@ const ShippingOrderModel = () => {
                 />
             </div>
             <div className={StyleModule.containerKPIs}>
-                <KPICardCustom
-                    childrenSectionValue={
-                        <h2>1</h2>
-                    }
-                    childrenSectionText={
-                        <h2>Enviados</h2>
-                    }
-                    childrenIcon={
-                        <Truck />
-                    }
+                <KPICardCustomPurple
+                    childrenSectionValue={<h2>35</h2>}
+                    childrenSectionText={<span className={StyleModule.containerSectionTextKPICard}>
+                        <span className="nunito-bold">Órdenes entregadas a tiempo</span>
+                        <span className="nunito-bold">
+                            <span className={StyleModule.wrapperText}>+5.2%</span> que la semana pasada<span></span>
+                        </span>
+                    </span>}
+                    icon={<PackageCheck />}
                 />
-                <KPICardCustom
-                    childrenSectionValue={
-                        <h2>2</h2>
-                    }
-                    childrenSectionText={
-                        <h2>Enviados</h2>
-                    }
-                    childrenIcon={
-                        <Truck />
-                    }
+                <KPICardCustomGreen
+                    childrenSectionValue={<h2>56</h2>}
+                    childrenSectionText={<span className={StyleModule.containerSectionTextKPICard}>
+                        <span className="nunito-bold">Órdenes en proceso</span>
+                        <span className="nunito-bold">
+                            <span className={StyleModule.wrapperText}>+2.6%</span> que la semana pasada<span></span>
+                        </span>
+                    </span>}
+                    icon={<PackageSearch />}
                 />
-                <KPICardCustom
-                    childrenSectionValue={
-                        <h2>3</h2>
-                    }
-                    childrenSectionText={
-                        <h2>Enviados</h2>
-                    }
-                    childrenIcon={
-                        <Truck />
-                    }
+                <KPICardCustomRed
+                    childrenSectionValue={<h2>3</h2>}
+                    childrenSectionText={<span className={StyleModule.containerSectionTextKPICard}>
+                        <span className="nunito-bold">Órdenes retrasadas</span>
+                        <span className="nunito-bold">
+                            <span>en los ultimos</span> <span className={StyleModule.wrapperText}>7 dias</span>
+                        </span>
+                    </span>}
+                    icon={<TrendingDown />}
                 />
             </div>
             <GenericTableMemo
@@ -359,6 +358,7 @@ const ShippingOrderModel = () => {
                 enablePagination
                 enableRowEditClick
                 enableRowEditClickHandler={toggleisActiveEditModalSetup}
+                enableOptionsColumn
 
                 /* acciones de la tabla */
                 rowActions={rowActions}

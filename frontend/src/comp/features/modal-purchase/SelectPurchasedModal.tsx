@@ -25,6 +25,9 @@ const SelectPurchasedModal = ({
     onAdd
 }: ISelectPurchasedModal) => {
 
+    const data = useMemo(() => purchasedOrders ?? [], [purchasedOrders]);
+
+
     const [selectedPurchasedOrders, setSelectedPurchasedOrders] = useState<IPurchasedOrder[]>([]);
 
     const handleAddPurchasedOrder = useCallback(() => {
@@ -108,6 +111,7 @@ const SelectPurchasedModal = ({
     ], []);
 
     const handleRowSelectionChange = useCallback((selectedRows: IPurchasedOrder[]) => {
+        console.log(`Filas seleccionadas`, selectedRows);
         setSelectedPurchasedOrders(selectedRows);
     }, []);
 
@@ -125,7 +129,7 @@ const SelectPurchasedModal = ({
 
                         // distribuccion de columnas y rows
                         columns={columns}
-                        data={purchasedOrders ? purchasedOrders : []}
+                        data={data}
 
                         // funcionalidades 
                         enablePagination

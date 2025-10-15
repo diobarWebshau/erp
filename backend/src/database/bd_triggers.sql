@@ -486,27 +486,40 @@ AFTER INSERT ON shipping_orders_purchased_order_products
 FOR EACH ROW
 BEGIN
 	DECLARE v_is_shipping_order BOOLEAN DEFAULT FALSE;
-	DECLARE po_id INT DEFAULT 0;
+	DECLARE v_purchaed_order_id INT DEFAULT 0;
+	DECLARE v_purchaed_order_status VARCHAR(100) DEFAULT '';
+	DECLARE v_purchaed_order_product_id INT DEFAULT 0;
+	DECLARE v_purchaed_order_product_status VARCHAR(100) DEFAULT '';
     
-	SELECT po.id
-	INTO po_id
+	SELECT 
+		po.id,
+		po.status,
+		pop.id,
+		pop.status
+	INTO 
+		v_purchaed_order_id, 
+		v_purchaed_order_status,
+		v_purchaed_order_product_id, 
+		v_purchaed_order_product_status
 	FROM purchased_orders AS po
     JOIN purchased_orders_products AS pop
     ON po.id = pop.purchase_order_id
     WHERE pop.id = NEW.purchase_order_product_id
     LIMIT 1;
-    
-	UPDATE purchased_orders_products 
-	SET status = 'shipping'
-	WHERE id = NEW.purchase_order_product_id
-	AND status != 'shipping';
 
-	SET v_is_shipping_order = is_purchased_order_shipped(po_id);
-    IF  v_is_shipping_order THEN
-		UPDATE purchased_orders
-        SET status = 'shipping'
-        WHERE id = po_id;
-    END IF;
+	IF func_is_purchase_order_fully_shipped(v_purchaed_order_id) THEN
+		IF v_purchaed_order_status != "shipping" THEN
+			UPDATE purchased_orders 
+			SET status = 'shipping'
+			WHERE id = v_purchaed_order_id;
+		END IF;
+	ELSE
+		IF v_purchaed_order_status != "partially_shipped" THEN
+			UPDATE purchased_orders 
+			SET status = 'partially_shipping'
+			WHERE id = v_purchaed_order_id;
+		END IF;
+	END IF;
 END //
 DELIMITER ;
 

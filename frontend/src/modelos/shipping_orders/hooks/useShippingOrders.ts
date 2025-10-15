@@ -1,3 +1,4 @@
+// modelos/shipping_orders/hooks/useShippingOrders.ts
 import { useDispatch } from "react-redux";
 import { clearError } from "../../../store/slicer/errorSlicer";
 import { fetchShippingOrdersFromDB } from "../query/shippingOrderQueries";
@@ -10,6 +11,8 @@ import type { IPartialShippingOrder } from "../../../interfaces/shippingOrder";
 interface UseShippingOrdersResult {
     shippingOrders: IShippingOrder[];
     loadingShippingOrders: boolean;
+    // NUEVO: permite re-ejecutar la última búsqueda (inmediata o con debounce)
+    refetchShippingOrders: (options?: { immediate?: boolean }) => void;
 }
 
 const useShippingOrders = ({
@@ -37,23 +40,32 @@ const useShippingOrders = ({
             return fetchShippingOrdersFromDB({
                 dispatch,
                 like: query,                 // <- usa el query recibido
-                signal,                // <- abort/cancel
+                signal,                      // <- abort/cancel
                 conditionsExclude: conditionalExclude     // <- lo que te pasen (opcional)
             });
         },
         [dispatch] // <- deps mínimas; NO dependas de exclude ni de like
     );
 
-    const { data, loading } = useDebouncedFetch<IShippingOrder[], IPartialShippingOrder>({
+    const { data, loading, refetch } = useDebouncedFetch<IShippingOrder[], IPartialShippingOrder>({
         query: normalizedQuery,
         fetchFn: stableFetch,
         delay: debounce ?? 0,
         conditionalExclude: stableExclude
     });
 
+    // NUEVO: proxy para exponer refetch desde este hook con un nombre de dominio
+    const refetchShippingOrders = useCallback(
+        (options?: { immediate?: boolean }) => {
+            refetch(options);
+        },
+        [refetch]
+    );
+
     return {
         shippingOrders: data ?? [],
-        loadingShippingOrders: loading
+        loadingShippingOrders: loading,
+        refetchShippingOrders
     };
 };
 

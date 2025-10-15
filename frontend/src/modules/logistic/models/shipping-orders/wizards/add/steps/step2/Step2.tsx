@@ -52,9 +52,14 @@ const Step2 = ({
     }, [state.data?.shipping_order_purchase_order_product]);
 
     const [purchase_orders, client_name, purchaseOrder]: [IPartialPurchasedOrder[], string, IPurchasedOrder] = useMemo(() => {
-        const purchase_orders = (state.data?.shipping_order_purchase_order_product_aux ?? [])
-            .map(p => p.purchase_order_products?.purchase_order)
-            .filter((p): p is IPartialPurchasedOrder => p !== undefined);
+        const purchase_orders = Array.from(
+            new Map(
+                (state.data?.shipping_order_purchase_order_product_aux ?? [])
+                    .map(p => p.purchase_order_products?.purchase_order)
+                    .filter((p): p is IPartialPurchasedOrder => p !== undefined)
+                    .map(po => [po.id, po] as const) // clave = id
+            ).values()
+        );
         const purchaseOrder = [...purchase_orders].shift() as IPurchasedOrder;
         const client_name = purchaseOrder?.client?.company_name || "";
         return [purchase_orders, client_name, purchaseOrder];
@@ -62,12 +67,21 @@ const Step2 = ({
 
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(date);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
-    const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders(client_name, 0);
+    const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders({
+        like: client_name,
+        debounce: 0,
+    });
     const [sopops, setSopops] = useState<IPartialShippingOrderPurchasedOrderProduct[]>(selectedSopops);
 
     const filterPurchasedOrderAlreadySelected = useMemo(() => {
-        return purchasedOrders.filter(p => !purchase_orders.some(sp => sp.id === p.id));
-    }, [purchase_orders, purchasedOrders]);
+        const filterPurchasedOrders = purchasedOrders.filter(p =>
+            p.client_id === purchaseOrder.client_id &&
+            p.client_address_id === purchaseOrder.client_address_id &&
+            (!purchase_orders.some(po => po.id === p.id)) &&
+            (p.status === "pending" || p.status === "partially_shipping")
+        );
+        return filterPurchasedOrders;
+    }, [purchase_orders, purchasedOrders, purchaseOrder]);
 
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch, back_step]);
 

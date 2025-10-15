@@ -2,7 +2,7 @@
     /* distribucion flex respecto al padre*/
     flex-basis: 1;
     flex-grow: 1;
-    flex-shrink: 0;
+    flex-shrink: 1;
 
     /* distribucion flex */
     display: flex;
@@ -10,16 +10,12 @@
     align-items: stretch;
     flex-wrap: nowrap;
 }
-.container>* {
-
-    border: 1px solid BLACK;
-}
 
 .container>*:first-child,
 .container>*:last-child {
     /* distribucion flex respecto al padre*/
     flex-grow: 0;
-    flex-shrink: 0;
+    flex-shrink: 1;
     flex-basis: auto;
 }
 

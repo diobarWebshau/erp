@@ -48,7 +48,7 @@ class ShippingOrderController {
                     {
                         model: CarrierModel,
                         as: "carrier",
-                        required: false, // 🔥 evita perder resultados cuando no hay match
+                        required: false,
                         attributes: CarrierModel.getAllFields(),
                     },
                     {

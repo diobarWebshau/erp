@@ -54,27 +54,28 @@
 
 .containerExtraComponents {
     /* distribucion flex respecto al padre */
-    flex-grow: 0;
+    flex-grow: 1;
     flex-shrink: 1;
-    flex-basis: auto;
+    flex-basis: 0;
 
     /* distribucion flex */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
 }
 
 .containerButtons {
     /* distribucion flex respecto al padre */
-    flex-grow: 0;
+    flex-grow: 1;
     flex-shrink: 1;
     flex-basis: auto;
 
     /* distribucion flex */
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: end;
     align-items: center;
     gap: 0.5rem;
 }
@@ -101,15 +102,63 @@
 }
 
 .containerKPIs>* {
-    height: 100px;
 
-
+    /* distribucion flex */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
-    border-radius: 15px;
-    border: 1px solid var(--color-theme-primary);
 
+    /* distribucion box */
+    border-radius: 15px;
+
+}
+
+.containerSectionTextKPICard {
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+
+    /* dimension */
+    font-size: 14px;
+    color: var(--color-theme-font-white);
+}
+
+.containerSectionTextKPICard>* {
+    /* dimension */
+    min-width: max-content;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+
+}
+
+.containerSectionTextKPICard>*:last-child {
+    /* dimension */
+    min-width: max-content;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.2rem
+}
+
+.wrapperText {
+
+    /* distribucion box */
+    border-radius: 15px;
+    padding-inline: 0.4rem;
+    padding-block: 0.2rem;
 }

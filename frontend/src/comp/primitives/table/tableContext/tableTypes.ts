@@ -152,6 +152,7 @@ interface RowAction<T> {
     onClick: (data: T) => void;
     icon?: React.ReactNode;
     disabled?: (data: T) => boolean;
+    condition?: (data: T) => boolean;
 }
 
 const getDefaultResetValue = (meta: string) => {

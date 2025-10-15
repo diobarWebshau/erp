@@ -35,7 +35,7 @@ interface TableBaseProps<T> {
     enableRowEditClickHandler?: (record: T) => void;
     conditionalRowSelection?: (updater: RowSelectionState, rows: Row<T>[]) => boolean;
     noResultsMessage?: string;
-    extraComponents?: ({table, state, dispatch}: {table: Table<T>, state: TableState, dispatch: Dispatch<TableAction>}) => React.ReactNode;
+    extraComponents?: ({ table, state, dispatch }: { table: Table<T>, state: TableState, dispatch: Dispatch<TableAction> }) => React.ReactNode;
     footerComponents?: (table: Table<T>) => React.ReactNode;
     classNameGenericTableContainer?: string;
     classNameExtraComponents?: string;
@@ -374,14 +374,12 @@ const TableBase = <T,>({
 
     const rowModel: RowModel<T> = table.getRowModel();
 
-    console.log('loading', isLoadingData);
-
     return (
         <div className={containerClassNames}>
             {extraComponents &&
                 <div className={headerClassNames}>
                     <div className={`${stylesModules.extraComponentsContainer} `}>
-                        {extraComponents({table, state, dispatch})}
+                        {extraComponents({ table, state, dispatch })}
                     </div>
                 </div>
             }
@@ -442,17 +440,49 @@ export default TableBaseMemo;
 
 // *************************  OptionsRow ******************************
 
-interface OptionsRowProps<T> {
-    typeRowActions: "icon" | "ellipsis";
-    rowActions: RowAction<T>[];
+type IconOptionRowProps<T> = {
+    action: RowAction<T>;
     row: Row<T>;
-}
+    index: number;
+};
+
+const IconOptionRow = <T,>({ action, row }: IconOptionRowProps<T>) => {
+    const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        console.log(row.original);
+        action.onClick(row.original);
+    };
+
+    const disabled = typeof action.disabled === "function"
+        ? action.disabled(row.original)
+        : !!action.disabled;
+
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            className={stylesModules?.optionsColumnButton}
+            title={action.label}
+            aria-label={action.label}
+        >
+            {action.icon}
+        </button>
+    );
+};
+
+const IconOptionRowMemo = memo(IconOptionRow) as typeof IconOptionRow;
 
 const OptionsRow = <T,>({
     typeRowActions,
     rowActions,
     row,
-}: OptionsRowProps<T>) => {
+}: {
+    typeRowActions: "icon" | "ellipsis";
+    rowActions: RowAction<T>[];
+    row: Row<T>;
+}) => {
+    const rowActionsMemo = useMemo(() => rowActions, [rowActions]);
 
     return (
         <div className={stylesModules.optionsColumnContainer}>
@@ -463,23 +493,73 @@ const OptionsRow = <T,>({
                     childrenFloating={<PopoverContentOptionMemo rowActions={rowActions} row={row} />}
                 />
             ) : (
-                <div className={stylesModules.optionsColumn}>
-                    {rowActions?.map((a, i) => (
-                        <button
-                            className={stylesModules.optionsColumnButton}
-                            type="button"
-                            key={i}
-                            onClick={(e) => { e.stopPropagation(); a.onClick(row.original); }}
-                            disabled={a.disabled ? a.disabled(row.original) : false}
-                        >
-                            {a.icon}
-                        </button>
-                    ))}
-                </div>
+                rowActionsMemo?.map((action, index) => {
+                    const passes =
+                        typeof action.condition === "function"
+                            ? action.condition(row.original)
+                            : action.condition ?? true;
+                    console.log(passes);
+
+                    if (!passes) return null;
+
+
+                    return (
+                        <IconOptionRowMemo
+                            key={index}
+                            action={action}
+                            row={row}
+                            index={index}
+                        />
+                    );
+                })
             )}
         </div>
     );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+// const OptionsRow = <T,>({
+//     typeRowActions,
+//     rowActions,
+//     row,
+// }: OptionsRowProps<T>) => {
+
+//     return (
+//         <div className={stylesModules.optionsColumnContainer}>
+//             {typeRowActions === "ellipsis" ? (
+//                 <PopoverFloating
+//                     placement="bottom"
+//                     childrenTrigger={<TriggerButtonOptionsRow />}
+//                     childrenFloating={<PopoverContentOptionMemo rowActions={rowActions} row={row} />}
+//                 />
+//             ) : (
+//                 <div className={stylesModules.optionsColumn}>
+//                     {rowActions?.map((a, i) => (
+//                         <button
+//                             className={stylesModules.optionsColumnButton}
+//                             type="button"
+//                             key={i}
+//                             onClick={(e) => { e.stopPropagation(); a.onClick(row.original); }}
+//                             disabled={a.disabled ? a.disabled(row.original) : false}
+//                         >
+//                             {a.icon}
+//                         </button>
+//                     ))}
+//                 </div>
+//             )}
+//         </div>
+//     );
+// };
 
 const OptionsRowMemo = memo(OptionsRow) as typeof OptionsRow;
 

@@ -2384,12 +2384,55 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP FUNCTION IF EXISTS func_is_purchase_order_fully_shipped;
+DELIMITER //
+CREATE FUNCTION func_is_purchase_order_fully_shipped(
+	in_purchase_order_id INT
+)
+RETURNS BOOLEAN
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+	DECLARE v_is_completed TINYINT DEFAULT 0;
+	--  Evaluamos si ya se envio la sumatoria de todas pops de la orden con respecto a la sumatoria de todas las cantidades enviadas de todas las pops de la orden
+	-- Por ejemplo, si nos encargaron 100 piezas totales de 3 productos(producto1 -> 50, producto2 -> 20, producto3 -> 30) nosotros soloe evaluaremos que si ya se envio esas 100 piezas en general
+    SELECT
+	  (  SUM(COALESCE(s.qty_shipped,0)) >= IFNULL(SUM(pop.qty),0)  ) AS is_po_fully_shipped
+	INTO v_is_completed
+	FROM purchased_orders_products AS pop
+	LEFT JOIN (
+	  SELECT sopop.purchase_order_product_id AS pop_id, IFNULL(SUM(qty),0) AS qty_shipped
+	  FROM shipping_orders_purchased_order_products AS sopop
+	  GROUP BY sopop.purchase_order_product_id
+	) AS s ON s.pop_id = pop.id
+	WHERE pop.purchase_order_id = in_purchase_order_id;
+    RETURN v_is_completed;
+END //
+DELIMITER ;
 
-
-
-
-
-
-
+DROP FUNCTION IF EXISTS func_is_purchase_order_product_fully_shipped;
+DELIMITER //
+CREATE FUNCTION func_is_purchase_order_product_fully_shipped( 
+	in_purchase_order_product_id INT
+)
+RETURNS BOOLEAN
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+	DECLARE v_is_completed TINYINT DEFAULT 0;
+	-- Evaluamos si la sumatoria de las cantidades enviadas es la misma que la del pop
+    SELECT
+	  (  SUM(COALESCE(s.qty_shipped,0)) >= IFNULL(SUM(pop.qty),0)  ) AS is_po_fully_shipped
+	INTO v_is_completed
+	FROM purchased_orders_products AS pop
+	LEFT JOIN (
+	  SELECT sopop.purchase_order_product_id AS pop_id, IFNULL(SUM(qty),0) AS qty_shipped
+	  FROM shipping_orders_purchased_order_products AS sopop
+	  GROUP BY sopop.purchase_order_product_id
+	) AS s ON s.pop_id = pop.id
+	WHERE pop.id = in_purchase_order_product_id;
+    RETURN v_is_completed;
+END //
+DELIMITER ;
 
 
