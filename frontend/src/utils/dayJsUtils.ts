@@ -208,6 +208,28 @@ export const DateUtils = {
     dayjs(date).format(format),
 
   /**
+ * Devuelve la hora en formato 12h con AM/PM.
+ * @param date  Fecha de entrada. Si no se pasa, usa ahora (sistema).
+ * @param opts  Opciones:
+ *  - includeSeconds: incluye segundos (por defecto false)
+ *  - tz: zona IANA (ej. "America/Tijuana"). Si no se pasa, usa zona local actual.
+ *  - uppercase: AM/PM en mayúsculas (A) o minúsculas (a). Por defecto true (A).
+ * @returns string, p.ej. "01:42 PM" o "01:42:10 pm"
+ */
+  formatTime12h(
+    date?: DateInput,
+    opts?: { includeSeconds?: boolean; tz?: string; uppercase?: boolean }
+  ): string {
+    const { includeSeconds = false, tz, uppercase = true } = opts ?? {};
+    const base = date !== undefined ? dayjs(date) : dayjs();
+    const d = tz ? base.tz(tz) : base;
+    const meridiem = uppercase ? "A" : "a";
+    const fmt = includeSeconds ? `hh:mm:ss ${meridiem}` : `hh:mm ${meridiem}`;
+    return d.format(fmt);
+  },
+
+
+  /**
    * Convierte a string ISO 8601 completo. Si la instancia está en UTC, incluirá "Z".
    * @example
    * DateUtils.toISOString(DateUtils.toUTC(new Date()));
@@ -444,7 +466,7 @@ export const DateUtils = {
    */
   duration: (value?: DurationInputArg1, unit?: DurationUnit): Duration =>
     dayjs.duration(value as any, unit as any),
-  
+
 
   // ===========================
   // SEMANA / TRIMESTRE / DÍA DEL AÑO

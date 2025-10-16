@@ -449,7 +449,6 @@ type IconOptionRowProps<T> = {
 const IconOptionRow = <T,>({ action, row }: IconOptionRowProps<T>) => {
     const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        console.log(row.original);
         action.onClick(row.original);
     };
 
@@ -498,11 +497,8 @@ const OptionsRow = <T,>({
                         typeof action.condition === "function"
                             ? action.condition(row.original)
                             : action.condition ?? true;
-                    console.log(passes);
 
                     if (!passes) return null;
-
-
                     return (
                         <IconOptionRowMemo
                             key={index}
@@ -516,50 +512,6 @@ const OptionsRow = <T,>({
         </div>
     );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-// const OptionsRow = <T,>({
-//     typeRowActions,
-//     rowActions,
-//     row,
-// }: OptionsRowProps<T>) => {
-
-//     return (
-//         <div className={stylesModules.optionsColumnContainer}>
-//             {typeRowActions === "ellipsis" ? (
-//                 <PopoverFloating
-//                     placement="bottom"
-//                     childrenTrigger={<TriggerButtonOptionsRow />}
-//                     childrenFloating={<PopoverContentOptionMemo rowActions={rowActions} row={row} />}
-//                 />
-//             ) : (
-//                 <div className={stylesModules.optionsColumn}>
-//                     {rowActions?.map((a, i) => (
-//                         <button
-//                             className={stylesModules.optionsColumnButton}
-//                             type="button"
-//                             key={i}
-//                             onClick={(e) => { e.stopPropagation(); a.onClick(row.original); }}
-//                             disabled={a.disabled ? a.disabled(row.original) : false}
-//                         >
-//                             {a.icon}
-//                         </button>
-//                     ))}
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
 
 const OptionsRowMemo = memo(OptionsRow) as typeof OptionsRow;
 

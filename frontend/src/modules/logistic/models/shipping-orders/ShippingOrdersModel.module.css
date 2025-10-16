@@ -162,3 +162,12 @@
     padding-inline: 0.4rem;
     padding-block: 0.2rem;
 }
+
+/* *************** Row actions *************** */
+
+.IconRowActions {
+    /* dimension */
+    width: 16px;
+    height: 16px;
+    stroke: var(--color-alert);
+}

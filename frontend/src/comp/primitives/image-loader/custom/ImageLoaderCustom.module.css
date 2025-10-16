@@ -1,0 +1,98 @@
+.container {
+    /* distribucion flex */
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.triggerContainer {
+    /* distribucion flex */
+    justify-content: center;
+}
+
+.previewContainer {
+    /* distribucion flex */
+    justify-content: center;
+    gap: 1rem;
+
+    /* distribucion box */
+    padding: 1rem;
+    border-radius: 15px;
+
+    /* scroll */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-theme-primary) transparent;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.previewContainer::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.previewContainer::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.previewContainer::-webkit-scrollbar-thumb {
+    background: var(--color-theme-primary);
+    border-radius: 5px;
+}
+
+.imageCard {
+    /* distribucion box */
+    border: 5px solid var(--color-theme-border-table);
+    border-radius: 15px;
+}
+
+.removeButton,
+.editButton {
+    /* interactividad */
+    cursor: pointer;
+
+}
+
+.actions {
+    gap: 0.1rem;
+}
+
+.removeButton, .editButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 15px;
+    padding: 0.1rem;
+    background-color:rgba(255, 255, 255, 0.7);
+}
+
+.removeButtonIcon.removeButtonIcon {
+    width: 90%;
+    height: 90%;
+    color: var(--color-alert);
+}
+
+.editButtonIcon.editButtonIcon {
+    width: 90%;
+    height: 90%;
+    color: var(--color-partial);
+}
+
+.removeButton:hover {
+    background-color: var(--color-alert);
+    color: var(--color-theme-font-white);
+}
+
+.removeButton:hover .removeButtonIcon {
+    color: var(--color-theme-font-white);
+}
+
+.editButton:hover {
+    background-color: var(--color-partial);
+    color: var(--color-theme-font-white);
+}
+
+.editButton:hover .editButtonIcon {
+    color: var(--color-theme-font-white);
+}

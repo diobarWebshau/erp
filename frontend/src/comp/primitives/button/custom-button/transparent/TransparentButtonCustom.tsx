@@ -12,7 +12,7 @@ interface ITransparentButtonCustomProps {
     classNameSpan?: string;
     disabled?: boolean;
     classNameLabel?: string;
-
+    typeOrderIcon?: "first" | "last";
 }
 
 const TransparentButtonCustom = ({
@@ -22,7 +22,8 @@ const TransparentButtonCustom = ({
     classNameButton,
     classNameSpan,
     disabled,
-    classNameLabel
+    classNameLabel,
+    typeOrderIcon = "first"
 }: ITransparentButtonCustomProps) => {
 
     const [iconWithClass, buttonClassNames, spanClassNames, labelClassNames] = useMemo(() => {
@@ -39,7 +40,7 @@ const TransparentButtonCustom = ({
             label={label}
             onClick={onClick}
             type="button"
-            typeOrderIcon="first"
+            typeOrderIcon={typeOrderIcon}
             classNameButton={buttonClassNames}
             classNameLabel={labelClassNames}
             classNameSpan={spanClassNames}

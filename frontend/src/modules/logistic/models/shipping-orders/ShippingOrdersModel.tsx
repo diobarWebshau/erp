@@ -3,7 +3,7 @@ import type { IPartialShippingOrder, IShippingOrder, LoadEvidenceItem, LoadEvide
 import type { AppDispatchRedux } from "../../../../store/store";
 import { deleteShippingOrderInDB, createCompleteShippingOrderInDB, updateCompleteShippingOrderInDB } from "../../../../queries/shippingOrderQueries";
 import { useDispatch } from "react-redux";
-import { columnsShippingOrders } from "./structure/columns";
+import { generateColumnsShippingOrders } from "./structure/columns";
 import type { RowAction } from "../../../../components/ui/table/types";
 import { Trash2, Download, Plus, Search, Eraser, PackageCheck, PackageSearch, TrendingDown, Ban } from "lucide-react";
 import useShippingOrderDetailById from "./hooks/useShippingOrderDetailById";
@@ -24,6 +24,7 @@ import useShippingOrders from "../../../../modelos/shipping_orders/hooks/useShip
 import KPICardCustomPurple from "../../../../comp/primitives/cards/kpi/custom/purple/KPICardCustomPurple";
 import KPICardCustomRed from "../../../../comp/primitives/cards/kpi/custom/red/KPICardCustomRed";
 import KPICardCustomGreen from "../../../../comp/primitives/cards/kpi/custom/green/KPICardCustomGreen";
+import LoadModal from "./modals/load/LoadModal";
 
 const ShippingOrderModel = () => {
 
@@ -49,6 +50,23 @@ const ShippingOrderModel = () => {
         useState<boolean>(false);
     const [isActiveDeleteModal, setIsActiveDeleteModal] =
         useState<boolean>(false);
+    const [isActiveLoadModal, setIsActiveLoadModal] =
+        useState<boolean>(false);
+    const [isActiveFinishedModal, setIsActiveFinishedModal] =
+        useState<boolean>(false);
+
+    const toggleIsActiveLoadModal = () => setIsActiveLoadModal((prev) => !prev);
+    const toggleIsActiveLoadModalSetup = () => {
+        setIsActiveLoadModal(true)
+        console.log("modal de carga")
+    }
+
+    const toggleIsActiveFinishedModal = () => setIsActiveFinishedModal((prev) => !prev);
+    const toggleIsActiveFinishedModalSetup = () => {
+        // setIsActiveFinishedModal(true)
+        console.log("modal de finalizado")
+    }
+
 
     const [search, setSearch] = useState<string>("");
 
@@ -237,16 +255,16 @@ const ShippingOrderModel = () => {
 
     const rowActions: RowAction<IShippingOrder>[] = useMemo(() => [
         {
-            label: "Eliminar",
-            onClick: (row) => () => { console.log(`Eliminar ${row.id}`) },
-            icon: <Ban className={StyleModule.pencilIconRowActions} />,
-            condition: (row: IShippingOrder) => row.status === "pending"
+            label: "Cancelar",
+            onClick: (row: IShippingOrder) => { console.log(`Cancelar`, row) },
+            icon: <Ban className={StyleModule.IconRowActions} />,
+            condition: (row: IShippingOrder) => row.status !== "finished" && row.status !== "released"
         },
         {
-            label: "Cancelar",
-            onClick: (row) => () => { console.log(`Cancelar ${row.id}`) },
-            icon: <Trash2 className={StyleModule.pencilIconRowActions} />,
-            condition: (row: IShippingOrder) => row.status !== "finished"
+            label: "Eliminar",
+            onClick: (row: IShippingOrder) => { console.log(`Eliminar`, row) },
+            icon: <Trash2 className={StyleModule.IconRowActions} />,
+            condition: (row: IShippingOrder) => row.status === "released"
         },
     ], []);
     // * ******************** Componentes extra para inyectar como props en el GenericTable ******************** 
@@ -296,6 +314,19 @@ const ShippingOrderModel = () => {
             </div>
         );
     }
+
+    interface StatusActionsProps {
+        value: string;
+        onClick?: () => void;
+    }
+    const statusActions = useMemo((): StatusActionsProps[] => {
+        return [
+            { value: "released", onClick: toggleIsActiveLoadModalSetup },
+            { value: "finished", onClick: toggleIsActiveFinishedModal }
+        ]
+    }, [toggleIsActiveLoadModalSetup, toggleIsActiveFinishedModal]);
+
+    const columnsMemo = useMemo(() => generateColumnsShippingOrders(statusActions), [statusActions]);
 
     // * ******************** Hooks ******************** */
 
@@ -348,7 +379,7 @@ const ShippingOrderModel = () => {
 
                 /* distribucion de columnas y rows */
                 getRowId={(row) => row.id.toString()}
-                columns={columnsShippingOrders}
+                columns={columnsMemo}
                 data={shippingOrders}
                 isLoadingData={loadingShippingOrders}
 
@@ -379,6 +410,14 @@ const ShippingOrderModel = () => {
                             onClose={toggleisActiveAddModal}
                         />
                     </ShippingOrderModuleProvider>
+                )
+            }
+            {
+                isActiveLoadModal && shippingOrderDetailById && (
+                    <LoadModal
+                        onClose={toggleIsActiveLoadModal}
+                        shippingOrder={shippingOrderDetailById}
+                    />
                 )
             }
         </div>

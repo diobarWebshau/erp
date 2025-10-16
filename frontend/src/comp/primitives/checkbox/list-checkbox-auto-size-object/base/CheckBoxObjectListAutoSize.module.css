@@ -1,0 +1,36 @@
+/*  ********* GROUP OPTIONS ********* */
+
+.groupOptions {
+    /* dimension */
+    min-width: 0;
+    min-height: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+
+    /* desplazamiento */
+    overflow-y: auto;
+}
+
+
+/*  ********* OPTION ********* */
+
+.option {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-border-table);
+    padding-left: 0.7rem;
+
+    /* interactividad */
+    cursor: pointer;
+
+    /* transiciones */
+    transition: background-color 0.5s ease;
+}

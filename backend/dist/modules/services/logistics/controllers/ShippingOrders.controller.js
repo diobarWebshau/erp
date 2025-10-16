@@ -425,7 +425,6 @@ class ShippingOrderController {
     };
     static createComplete = async (req, res, next) => {
         const body = req.body;
-        console.log(body);
         const { status, carrier_id, load_evidence, delivery_cost, shipping_order_purchase_order_product, delivery_date, shipping_date, tracking_number, shipment_type, transport_method, comments, carrier, load_evidence_deleted, shipping_order_purchase_order_product_aux, } = body;
         const transaction = await sequelize.transaction({
             isolationLevel: Transaction

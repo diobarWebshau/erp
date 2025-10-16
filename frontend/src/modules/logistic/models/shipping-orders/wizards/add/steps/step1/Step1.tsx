@@ -126,7 +126,6 @@ const Step1 = ({ onClose }: IStep1) => {
             },
             cell: ({ getValue, column }) => {
                 const valor = getValue() as string;
-                console.log(valor);
                 const labelEnum = getEnumoSingleLabel(column.columnDef, valor) || "";
                 return (
                     <Tag

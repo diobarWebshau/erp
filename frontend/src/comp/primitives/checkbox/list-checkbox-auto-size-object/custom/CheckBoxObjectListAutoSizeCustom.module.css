@@ -1,15 +1,14 @@
-.groupOptions {
-    /* dimension */
-    width: 100%;
+/*  ********* GROUP OPTIONS ********* */
+
+.container {
 
     /* distribucion flex */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: stretch;
 
-    /* distribucion box */
-    border-radius: 15px;
+    /* desplazamiento */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-theme-primary) transparent;
 
     /* estilos */
     font-family: inherit;
@@ -17,24 +16,44 @@
     background-color: var(--color-theme-font-white);
 }
 
-.groupOptions>*:first-child {
+.container>* {
+    /* distribucion flex */
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: auto;
+}
+
+.container>*:first-child {
     /* distribucion box */
-    /* arriba izquierda, arriba derecha. abajo izquierda, abajo derecha */
     border-radius: 15px 15px 0 0;
 }
 
-.groupOptions>*:last-child {
+.container>*:last-child {
     /* distribucion box */
-    /* arriba izquierda, arriba derecha. abajo izquierda, abajo derecha */
     border-radius: 0 0 15px 15px;
 }
 
-/* ? ****  OPCIONES **** */
+.container::-webkit-scrollbar {
+    /* dimension */
+    width: 8px;
+    height: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+    /* estilos */
+    background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+    /* distribucion box */
+    border-radius: 4px;
+    /* estilos */
+    background-color: var(--color-theme-primary);
+}
+
+/*  ********* OPTION ********* */
 
 .option {
-    /* distribucion box */
-    padding: 6px 10px;
-
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -44,6 +63,7 @@
 
     /* distribucion box */
     border: 1px solid var(--color-theme-border-table);
+    padding-left: 0.7rem;
 
     /* interactividad */
     cursor: pointer;
@@ -52,9 +72,15 @@
     transition: background-color 0.5s ease;
 }
 
-.selected {
+.selectedOption {
+    /* estilos */
     background-color: var(--color-theme-neutral-background);
+}
 
+.option:not(.selectedOption):hover {
+    /* estilos */
+    background-color: var(--color-theme-background);
+    color: var(--color-theme-font-black);
 }
 
 /* ? ****  CHECKBOX OPTION **** */
@@ -78,7 +104,6 @@
 
     /* distribucion box */
     border: 2px solid var(--color-theme-primary);
-    /* border-radius: 5px; */
 
     /* interactividad */
     cursor: pointer;
@@ -89,6 +114,7 @@
 
 /* Estilo de la caja del checkbox cuando esta seleccionado */
 .inputCheckbox:checked {
+    /* estilos */
     background-color: var(--color-theme-primary);
 }
 
@@ -136,10 +162,4 @@
 
     /* estilos */
     content: "";
-}
-
-.option:not(.selected):hover {
-    /* estilos */
-    background-color: var(--color-theme-background);
-    color: var(--color-theme-font-black);
 }

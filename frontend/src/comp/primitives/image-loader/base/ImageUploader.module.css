@@ -1,0 +1,111 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  padding: 1.5rem;
+  background-color: black;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.wrapper:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadButton {
+  background-color: #2563eb; /* blue-600 */
+  color: white;
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: fit-content;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.uploadButton:hover {
+  background-color: #1d4ed8; /* blue-700 */
+  transform: translateY(-1px);
+}
+
+.previewContainer {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.imageBox {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #f3f4f6; /* gray-100 */
+  border: 1px solid #e5e7eb; /* gray-200 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.imageBox:hover {
+  transform: scale(1.02);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+.removeButton,
+.editButton {
+  background-color: rgba(31, 41, 55, 0.8); /* gray-800 semi-transparent */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.removeButton:hover {
+  background-color: rgba(239, 68, 68, 0.9); /* red-500 */
+}
+
+.editButton:hover {
+  background-color: rgba(59, 130, 246, 0.9); /* blue-500 */
+}
+
+.emptyMessage {
+  color: #9ca3af; /* gray-400 */
+  font-style: italic;
+  font-size: 0.95rem;
+  text-align: center;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.imageBox:hover {
+    transform: scale(2);
+    z-index: 2; /* antes era 1.02 */
+  }
+  
