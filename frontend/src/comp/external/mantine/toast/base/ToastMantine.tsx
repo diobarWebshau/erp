@@ -1,6 +1,6 @@
 // src/ui/notify/toast.ts
 import { notifications } from '@mantine/notifications';
-import { Check, AlertTriangle, Info, X, AlertCircle,  } from 'lucide-react';
+import { Check, Info, X, AlertCircle,  } from 'lucide-react';
 import type { ReactNode } from 'react';
 import StyleModule from './ToastMantine.module.css';
 
@@ -15,7 +15,7 @@ const defaults = {
     autoClose: 2500,
 } satisfies Partial<Parameters<typeof notifications.show>[0]>;
 
-const toastMantine = {
+const ToastMantine = {
     success: (o: ToastOpts) =>
         notifications.show({
             ...defaults,
@@ -111,7 +111,7 @@ const toastMantine = {
     clear: () => notifications.clean(),
 };
 
-export default toastMantine;
+export default ToastMantine;
 
 
 /* Como se usaria */

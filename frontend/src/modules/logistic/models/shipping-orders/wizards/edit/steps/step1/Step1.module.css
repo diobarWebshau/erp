@@ -1,0 +1,161 @@
+/* ******** CONTAINER ******** */
+
+.container {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "header" auto
+        "subheader" auto
+        "content" 1fr
+        "footer" auto
+        / 100%;
+    gap: 1.5rem;
+}
+
+/* ******** HEADER ******** */
+
+.header {
+    /* distribucion grid respecto al padre */
+    grid-area: header;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header>h2 {
+    /* estilo */
+    color: var(--color-theme-primary);
+    font-size: 24px;
+}
+
+/* ******** SUBHEADER ******** */
+
+.subheader {
+    /* distribucion grid respecto al padre */
+    grid-area: subheader;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.subheader>* {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    /* dimension */
+    font-size: 14px;
+}
+
+.subHeaderRight {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.subHeaderRight>*:first-child {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+
+.subHeaderRight>*:first-child>span {
+    /* estilo */
+    color: var(--color-theme-primary);
+}
+
+.inputDeliveryDate {
+    /* dimension */
+}
+
+
+/* ******** CONTENT ******** */
+
+.content {
+    /* distribucion grid respecto al padre */
+    grid-area: content;
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+}
+
+.genericTableContainer {
+    /* dimension */
+    max-height: 100%;
+    min-height: 0;
+    min-width: 0;
+}
+
+.objectSelectInput.objectSelectInput {
+    height: 30px;
+}
+
+.objectSelectOption.objectSelectOption {
+    height: 30px;
+}
+
+.containerNumericInput.containerNumericInput {
+    /* dimension */
+    height: 30px ;
+}
+
+.inputNumericInput.inputNumericInput {
+    background-color: var(--color-theme-background);
+}
+
+
+.objectSelectContainer {
+    /* dimension */
+    width: 100%;
+}
+
+.tagSuccess {
+    /* estilo */
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}
+
+.tagError {
+    /* estilo */
+    background-color: var(--color-alert-light);
+    color: var(--color-alert);
+    border: 1px solid var(--color-alert);
+}
+
+.tagWarning {
+    /* estilo */
+    background-color: var(--color-warning-light);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+}
+
+/* ******** FOOTER ******** */
+
+.footerSection {
+    /* distribucion grid respecto al padre */
+    grid-area: footer;
+
+    /* distibucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}

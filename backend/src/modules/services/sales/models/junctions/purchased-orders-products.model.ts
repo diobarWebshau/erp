@@ -8,7 +8,8 @@ import {
     PurchasedOrderCreateAttributes,
     PurchasedOrdersProductsLocationsProductionLinesCreateAttributes,
     ShippingOrderPurchaseOrderProductCreateAttributes,
-    ProductionOrderCreationAttributes
+    ProductionOrderCreationAttributes,
+    LocationAttributes
 } from "../../../../../modules/types.js";
 
 interface ProductionSummary {
@@ -33,6 +34,25 @@ interface ShippingSummary {
     shipping_qty: number;
 }
 
+
+interface InventoryCommited {
+    id: number;
+    item_id: number;
+    is_locked: number;
+    item_name: string;
+    item_type: string;
+    qty: number;
+    description: string;
+    location_id: number;
+    reference_id: number;
+    location_name: string;
+    movement_type: string;
+    production_id: number;
+    reference_type: string;
+    location: LocationAttributes;
+}
+
+
 interface PurchaseOrderProductAttributes {
     id: number,
     purchase_order_id: number
@@ -53,7 +73,8 @@ interface PurchaseOrderProductAttributes {
     applied_product_discount_range?: AppliedProductDiscountRangeCreateAttributes,
     stock_available?: StockAvailable,
     shipping_summary?: ShippingSummary,
-    production_order?: ProductionOrderCreationAttributes
+    production_order?: ProductionOrderCreationAttributes,
+    inventory_commited?: InventoryCommited
 }
 
 interface PurchasedOrderProductManager {

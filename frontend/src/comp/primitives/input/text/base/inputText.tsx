@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type JSX } from "react";
+import { memo, useState, type ChangeEvent, type JSX } from "react";
 import StyleModule from "./InputText.module.css";
 import clsx from "clsx";
 interface InputTextProps {
@@ -18,7 +18,7 @@ interface InputTextProps {
     icon?: JSX.Element;
 }
 
-const InputText = ({
+const InputText = memo(({
     placeholder,
     value,
     onChange,
@@ -66,6 +66,6 @@ const InputText = ({
             {icon && icon}
         </div>
     )
-}
+})
 
 export default InputText;

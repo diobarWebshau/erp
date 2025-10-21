@@ -1181,8 +1181,8 @@ BEGIN
               inv.id    AS inventory_id,
               IFNULL(SUM(
                 CASE
-                  WHEN im.movement_type  = 'out'
-                   AND im.reference_type IN ('Transfer','Scrap')
+                  WHEN im.movement_type  = 'allocate'
+                   AND im.reference_type NOT IN ('Transfer','Scrap')
                    AND im.is_locked      = 1
                   THEN im.qty ELSE 0
                 END

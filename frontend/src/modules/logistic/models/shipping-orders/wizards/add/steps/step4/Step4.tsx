@@ -68,9 +68,6 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
 
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch, back_step]);
     const handleOnClickNextStep = useCallback(() => {
-        setIsActiveFeedBackModal(true);
-    }, [dispatch, next_step]);
-    const handleOnClickCloseFeedBackModal = useCallback(() => {
         onCreate(state.data);
         if (Object.keys(validationError).length > 0) {
             const errorsEntries = Object.entries(validationError);
@@ -78,8 +75,8 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
             errors.forEach(error => toastMantine.error({ message: error as string }));
             return;
         }
-        onLeave();
-    }, [onLeave]);
+        setIsActiveFeedBackModal(true);
+    }, [onCreate]);
 
     return (
         <div className={StyleModule.container}>
@@ -177,13 +174,13 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
             {
                 isActiveFeedBackModal &&
                 <FeedBackModal
-                    onClose={handleOnClickCloseFeedBackModal}
-                    title="Tu orden de envío se ha creado correctamente"
+                    onClose={onLeave}
+                    title="Tu orden de envío se ha creado correctamentessd"
                     icon={<CheckCircle2 />}
                     messageCustom={
                         <div>
                             <MainActionButtonCustom
-                                onClick={handleOnClickNextStep}
+                                onClick={()=>{}}
                                 label="Ver envío"
                                 icon={<Eye />}
                             />

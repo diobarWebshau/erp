@@ -1242,17 +1242,17 @@ class ShippingOrderPurchaseOrderProductController {
                     });
                     return;
                 }
-                if (location_productionline_details.location_production_line.location_id !==
-                    purchased_order_product_details
-                        .purchase_order_product_location_production_line.production_line
-                        .location_production_line.location_id) {
-                    res.status(200).json({
-                        validation:
-                            "The purchase order product does not belong to "
-                            + "the same location as the shipping order"
-                    });
-                    return;
-                }
+                // if (location_productionline_details.location_production_line.location_id !==
+                //     purchased_order_product_details
+                //         .purchase_order_product_location_production_line.production_line
+                //         .location_production_line.location_id) {
+                //     res.status(200).json({
+                //         validation:
+                //             "The purchase order product does not belong to "
+                //             + "the same location as the shipping order"
+                //     });
+                //     return;
+                // }
             }
             if (update_values?.purchase_order_product_id) {
                 const validationPurchasedOrderProductDuplicate:

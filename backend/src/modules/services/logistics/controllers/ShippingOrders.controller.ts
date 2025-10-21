@@ -8,7 +8,7 @@ import { QueryTypes, Transaction } from "sequelize";
 import CarrierModel from "../models/base/Carriers.model.js";
 import ImageHandler from "../../../../classes/ImageHandler.js";
 import { formatImagesDeepRecursive, formatWith64Multiple } from "../../../../scripts/formatWithBase64.js";
-import { PurchaseOrderProductModel, PurchasedOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, LocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ClientModel, ClientAddressesModel, LocationModel, InventoryMovementModel } from "../../../associations.js";
+import { PurchaseOrderProductModel, PurchasedOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ProductionLineModel, LocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ClientModel, ClientAddressesModel, LocationModel, InventoryMovementModel, ProductModel } from "../../../associations.js";
 import { ShippingOrderPurchaseOrderProductAttributes, ShippingOrderPurchaseOrderProductCreateAttributes, ShippingOrderPurchaseOrderProductManager } from "../../../types.js";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { Op } from "sequelize";
@@ -85,7 +85,16 @@ class ShippingOrderController {
                                 model: PurchaseOrderProductModel,
                                 as: "purchase_order_products",
                                 required: false,
-                                attributes: PurchaseOrderProductModel.getAllFields(),
+                                attributes: [
+                                    ...PurchaseOrderProductModel.getAllFields(),
+                                    [
+                                        sequelize.fn(
+                                            "func_get_inventory_movements_commited_pop",
+                                            sequelize.col("shipping_order_purchase_order_product->purchase_order_products.id")
+                                        ),
+                                        "inventory_commited"
+                                    ]
+                                ],
                                 include: [
                                     {
                                         model: PurchasedOrdersProductsLocationsProductionLinesModel,
@@ -116,6 +125,12 @@ class ShippingOrderController {
                                                 ],
                                             },
                                         ],
+                                    },
+                                    {
+                                        model: ProductModel,
+                                        as: "product",
+                                        required: false,
+                                        attributes: ProductModel.getAllFields(),
                                     },
                                     {
                                         model: PurchasedOrderModel,
@@ -174,6 +189,13 @@ class ShippingOrderController {
                             .getAllFields(),
                     include: [
                         {
+                            model: CarrierModel,
+                            as: "carrier",
+                            attributes:
+                                CarrierModel
+                                    .getAllFields()
+                        },
+                        {
                             model:
                                 ShippingOrderPurchaseOrderProductModel,
                             as: "shipping_order_purchase_order_product",
@@ -185,34 +207,17 @@ class ShippingOrderController {
                                     model:
                                         PurchaseOrderProductModel,
                                     as: "purchase_order_products",
-                                    attributes:
-                                        PurchaseOrderProductModel
-                                            .getAllFields(),
+                                    attributes: [
+                                        ...PurchaseOrderProductModel.getAllFields(),
+                                        [
+                                            sequelize.fn(
+                                                "func_get_inventory_movements_commited_pop",
+                                                sequelize.col("shipping_order_purchase_order_product->purchase_order_products.id")
+                                            ),
+                                            "inventory_commited"
+                                        ]
+                                    ],
                                     include: [
-                                        {
-                                            model:
-                                                PurchasedOrderModel,
-                                            as: "purchase_order",
-                                            attributes:
-                                                PurchasedOrderModel
-                                                    .getAllFields(),
-                                            include: [
-                                                {
-                                                    model:
-                                                        ClientModel,
-                                                    as: "client",
-                                                    attributes:
-                                                        ClientModel
-                                                            .getAllFields()
-                                                }, {
-                                                    model: ClientAddressesModel,
-                                                    as: "client_address",
-                                                    attributes:
-                                                        ClientAddressesModel
-                                                            .getAllFields()
-                                                }
-                                            ]
-                                        },
                                         {
                                             model:
                                                 PurchasedOrdersProductsLocationsProductionLinesModel,
@@ -254,18 +259,42 @@ class ShippingOrderController {
                                                     ]
                                                 }
                                             ]
-                                        }
+                                        },
+                                        {
+                                            model:
+                                                ProductModel,
+                                            as:
+                                                "product",
+                                            attributes:
+                                                ProductModel.getAllFields(),
+                                        },
+                                        {
+                                            model:
+                                                PurchasedOrderModel,
+                                            as: "purchase_order",
+                                            attributes:
+                                                PurchasedOrderModel
+                                                    .getAllFields(),
+                                            include: [
+                                                {
+                                                    model:
+                                                        ClientModel,
+                                                    as: "client",
+                                                    attributes:
+                                                        ClientModel
+                                                            .getAllFields()
+                                                }, {
+                                                    model: ClientAddressesModel,
+                                                    as: "client_address",
+                                                    attributes:
+                                                        ClientAddressesModel
+                                                            .getAllFields()
+                                                }
+                                            ]
+                                        },
                                     ]
                                 }
                             ]
-                        },
-                        {
-
-                            model: CarrierModel,
-                            as: "carrier",
-                            attributes:
-                                CarrierModel
-                                    .getAllFields()
                         }
                     ]
                 });
@@ -813,16 +842,16 @@ class ShippingOrderController {
                 return;
             }
 
-            if (!allSameLocation) {
-                await transaction.rollback();
-                await deleteLoadEvidences(load_evidence || []);
-                res.status(400).json({
-                    validation:
-                        `The purchase order product does not belong`
-                        + `to the same location as the shipping order`
-                });
-                return;
-            }
+            // if (!allSameLocation) {
+            //     await transaction.rollback();
+            //     await deleteLoadEvidences(load_evidence || []);
+            //     res.status(400).json({
+            //         validation:
+            //             `The purchase order product does not belong`
+            //             + `to the same location as the shipping order`
+            //     });
+            //     return;
+            // }
 
             // ? **** VALIDAR QUE LA CANTIDAD SOLICITADA NO EXCEDE LA CANTIDAD DISPONIBLE ****
 
@@ -1043,8 +1072,6 @@ class ShippingOrderController {
         const { id } = req.params;
         const completeBody = req.body;
 
-        let urlImageOld: LoadEvidenceItem[] = [];
-        let IsAddNewImage: boolean = false;
         let IsDeleteImage: boolean = false;
         let isSuccessFully: boolean = false;
 
@@ -1061,6 +1088,7 @@ class ShippingOrderController {
             const validateShippingOrder =
                 await ShippingOrderModel.findByPk(id);
 
+            /* validamos que la orden de envio exista */
             if (!validateShippingOrder) {
                 await transaction.rollback();
                 await deleteLoadEvidences(
@@ -1073,9 +1101,11 @@ class ShippingOrderController {
                 return;
             }
 
+            /* convertimos la orden obtenida a json */
             const shippingOrder =
                 validateShippingOrder.toJSON();
 
+            /* validamos que existan campos para actualizar */
             if (Object.keys(update_values)?.length > 0) {
                 if (update_values?.carrier_id) {
                     const validateCarrier =
@@ -1098,12 +1128,11 @@ class ShippingOrderController {
                 }
             }
 
-            if (completeBody.load_evidence_deleted &&
-                JSON.parse(completeBody.load_evidence_deleted).length > 0) {
-                IsDeleteImage = true;
-            }
+            /* validamos que existan evidencias para eliminar */
+            if (completeBody.load_evidence_deleted && JSON.parse(completeBody.load_evidence_deleted).length > 0) IsDeleteImage = true;
 
-            const load_evidence_old: LoadEvidenceItem[] = (() => {
+            /* convertimos las evidencias antiguas a json */
+            let load_evidence_old: LoadEvidenceItem[] = (() => {
                 try {
                     const raw = completeBody?.load_evidence_old;
                     return typeof raw === 'string' ? JSON.parse(raw) : [];
@@ -1111,17 +1140,37 @@ class ShippingOrderController {
                     return [];
                 }
             })();
+
+            let load_evidence_deleted: LoadEvidenceItem[] = (() => {
+                try {
+                    const raw = completeBody?.load_evidence_deleted;
+                    return typeof raw === 'string' ? JSON.parse(raw) : [];
+                } catch {
+                    return [];
+                }
+            })();
+
+            /* convertimos las evidencias nuevas a json */
             const load_evidence_new: LoadEvidenceItem[] =
                 update_values?.load_evidence ?? [];
 
+            // convertimos los path del backend(Files) a path(string)
             if (load_evidence_new.length > 0) {
                 load_evidence_new.map((e) => e.path = e.id)
             }
 
+            // convertimos las evidencias frontend(path(string)) a path(string)
             if (load_evidence_old.length > 0) {
                 load_evidence_old.map((e) => e.path = e.id)
             }
 
+            // eliminamos las evidencias que se desean eliminar
+            if (load_evidence_deleted.length > 0) {
+                load_evidence_deleted.map((e) => e.path = e.id);
+                load_evidence_old = load_evidence_old.filter((e) => !load_evidence_deleted.some((e2) => e2.path === e.path));
+            }
+
+            // actualizamos la orden de envio
             const responseUpdate =
                 await ShippingOrderModel.update(
                     {
@@ -1591,18 +1640,18 @@ class ShippingOrderController {
                             return;
                         }
 
-                        if (!allSameLocation) {
-                            await transaction.rollback();
-                            await deleteLoadEvidences(
-                                completeBody.load_evidence
-                            );
-                            res.status(400).json({
-                                validation:
-                                    "The purchase order product does not belong"
-                                    + "to the same location as the shipping order"
-                            });
-                            return;
-                        }
+                        // if (!allSameLocation) {
+                        //     await transaction.rollback();
+                        //     await deleteLoadEvidences(
+                        //         completeBody.load_evidence
+                        //     );
+                        //     res.status(400).json({
+                        //         validation:
+                        //             "The purchase order product does not belong"
+                        //             + "to the same location as the shipping order"
+                        //     });
+                        //     return;
+                        // }
 
                         for (const p of new_pops) {
                             const qty_real_pop = p.qty;
@@ -1673,6 +1722,188 @@ class ShippingOrderController {
                         }
                     }
                 }
+            }
+
+            await transaction.commit();
+
+            isSuccessFully = true;
+
+            res.status(201).json({
+                message:
+                    "Shipping order updated successfully"
+            })
+
+        } catch (error: unknown) {
+            await transaction.rollback();
+            await deleteLoadEvidences(
+                completeBody.load_evidence
+            );
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(
+                    `An unexpected error `
+                    + `ocurred ${error} `);
+            }
+        } finally {
+            if (IsDeleteImage && isSuccessFully) {
+                const load_evidence_deleted: PartialLoadEvidenceItem[] =
+                    JSON.parse(completeBody.load_evidence_deleted);
+                const evidence_delete = load_evidence_deleted.map((item) => {
+                    return {
+                        path: item.id,
+                        id: item.id
+                    }
+                }) as LoadEvidenceItem[];
+
+                await deleteLoadEvidences(
+                    evidence_delete
+                );
+            }
+        }
+    }
+
+    static load = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        const transaction =
+            await sequelize.transaction({
+                isolationLevel:
+                    Transaction
+                        .ISOLATION_LEVELS
+                        .REPEATABLE_READ
+            });
+
+        const { id } = req.params;
+        const completeBody = req.body;
+
+        let IsDeleteImage: boolean = false;
+        let isSuccessFully: boolean = false;
+
+        try {
+
+            const editableFields =
+                ShippingOrderModel.getEditableFields();
+            const update_values: ShippingOrderCreationAttributes =
+                collectorUpdateFields(
+                    editableFields,
+                    completeBody
+                ) as ShippingOrderCreationAttributes;
+
+            const validateShippingOrder =
+                await ShippingOrderModel.findByPk(id);
+
+            /* validamos que la orden de envio exista */
+            if (!validateShippingOrder) {
+                await transaction.rollback();
+                await deleteLoadEvidences(
+                    completeBody.load_evidence || []
+                );
+                res.status(404).json({
+                    validation:
+                        "Shipping order does not exist"
+                });
+                return;
+            }
+
+            /* convertimos la orden obtenida a json */
+            const shippingOrder =
+                validateShippingOrder.toJSON();
+
+            /* validamos que existan campos para actualizar */
+            if (Object.keys(update_values)?.length > 0) {
+                if (update_values?.carrier_id) {
+                    const validateCarrier =
+                        await CarrierModel.findByPk(
+                            update_values.carrier_id,
+                            { transaction }
+                        );
+
+                    if (!validateCarrier) {
+                        await transaction?.rollback();
+                        await deleteLoadEvidences(
+                            completeBody.load_evidence || []
+                        );
+                        res.status(404).json({
+                            validation:
+                                "The assigned carrier does not exist"
+                        });
+                        return;
+                    }
+                }
+            }
+
+            /* validamos que existan evidencias para eliminar */
+            if (completeBody.load_evidence_deleted && JSON.parse(completeBody.load_evidence_deleted).length > 0) IsDeleteImage = true;
+
+            /* convertimos las evidencias antiguas a json */
+            let load_evidence_old: LoadEvidenceItem[] = (() => {
+                try {
+                    const raw = completeBody?.load_evidence_old;
+                    return typeof raw === 'string' ? JSON.parse(raw) : [];
+                } catch {
+                    return [];
+                }
+            })();
+
+            let load_evidence_deleted: LoadEvidenceItem[] = (() => {
+                try {
+                    const raw = completeBody?.load_evidence_deleted;
+                    return typeof raw === 'string' ? JSON.parse(raw) : [];
+                } catch {
+                    return [];
+                }
+            })();
+
+            /* convertimos las evidencias nuevas a json */
+            const load_evidence_new: LoadEvidenceItem[] =
+                update_values?.load_evidence ?? [];
+
+            // convertimos los path del backend(Files) a path(string)
+            if (load_evidence_new.length > 0) {
+                load_evidence_new.map((e) => e.path = e.id)
+            }
+
+            // convertimos las evidencias frontend(path(string)) a path(string)
+            if (load_evidence_old.length > 0) {
+                load_evidence_old.map((e) => e.path = e.id)
+            }
+
+            // eliminamos las evidencias que se desean eliminar
+            if (load_evidence_deleted.length > 0) {
+                load_evidence_deleted.map((e) => e.path = e.id);
+                load_evidence_old = load_evidence_old.filter((e) => !load_evidence_deleted.some((e2) => e2.path === e.path));
+            }
+
+            // actualizamos la orden de envio
+            const responseUpdate =
+                await ShippingOrderModel.update(
+                    {
+                        ...update_values,
+                        load_evidence: [
+                            ...load_evidence_old,
+                            ...load_evidence_new,
+                        ],
+                        status: "shipping"
+                    },
+                    {
+                        where: { id: id },
+                        transaction
+                    }
+                );
+
+            if (!responseUpdate) {
+                await transaction.rollback();
+                await deleteLoadEvidences(
+                    completeBody.load_evidence || []
+                );
+                res.status(500).json({
+                    validation:
+                        "The shipping order could not be updated"
+                });
+                return;
             }
 
             await transaction.commit();

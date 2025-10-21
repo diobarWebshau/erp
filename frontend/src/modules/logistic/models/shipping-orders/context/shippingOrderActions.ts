@@ -64,6 +64,69 @@ const update_shipping_order_purchased_order_products_aux = (
     payload
 });
 
+// ? Acciones directas al objeto de draft shipping order
+
+const set_draft_shipping_order = (
+    payload: IPartialShippingOrder
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.SET_DRAFT_SHIPPING_ORDER,
+    payload
+});
+
+const update_draft_shipping_order = (
+    payload: IPartialShippingOrder
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.UPDATE_DRAFT_SHIPPING_ORDER,
+    payload
+});
+
+// ? Acciones directas al array de shipping order purchased order products
+
+const add_draft_shipping_order_purchased_order_products = (
+    payload: IPartialShippingOrderPurchasedOrderProduct[]
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.ADD_DRAFT_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS,
+    payload
+});
+
+const remove_draft_shipping_order_purchased_order_products = (
+    payload: (number | string)[]
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.REMOVE_DRAFT_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS,
+    payload
+});
+
+const update_draft_shipping_order_purchased_order_products = (
+    payload: { id: number | string; attributes: IPartialShippingOrderPurchasedOrderProduct }
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.UPDATE_DRAFT_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS,
+    payload
+});
+// ? Acciones directas al array de shipping order purchased order products aux
+
+const add_draft_shipping_order_purchased_order_products_aux = (
+    payload: IPartialShippingOrderPurchasedOrderProduct[]
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.ADD_DRAFT_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS_AUX,
+    payload
+});
+
+const remove_draft_shipping_order_purchased_order_products_aux = (
+    payload: (number | string)[]
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.REMOVE_DRAFT_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS_AUX,
+    payload
+});
+
+const update_draft_shipping_order_purchased_order_products_aux = (
+    payload: { id: number | string; attributes: IPartialShippingOrderPurchasedOrderProduct }
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.UPDATE_DRAFT_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS_AUX,
+    payload
+});
+
+
+
 // ? Acciones de los steps
 
 const set_step = (
@@ -97,6 +160,14 @@ export {
     add_shipping_order_purchased_order_products_aux,
     remove_shipping_order_purchased_order_products_aux,
     update_shipping_order_purchased_order_products_aux,
+    set_draft_shipping_order,
+    update_draft_shipping_order,
+    add_draft_shipping_order_purchased_order_products,
+    remove_draft_shipping_order_purchased_order_products,
+    update_draft_shipping_order_purchased_order_products,
+    add_draft_shipping_order_purchased_order_products_aux,
+    remove_draft_shipping_order_purchased_order_products_aux,
+    update_draft_shipping_order_purchased_order_products_aux,
     set_step,
     back_step,
     next_step,

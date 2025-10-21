@@ -238,6 +238,68 @@ const updateCompleteShippingOrderInDB = async (
     }
 };
 
+const loadCompleteShippingOrderInDB = async (
+    id: number | null,
+    data: IPartialShippingOrder,
+    dispatch: AppDispatchRedux
+): Promise<any> => {
+    try {
+        if (!id) return;
+        const formData = new FormData();
+
+        Object.entries(data).forEach(([key, value]) => {
+            if (value === null || value === undefined) {
+                return;
+            }
+            // 👇 Si es arreglo de File
+            if (Array.isArray(value) && value.every(v => v instanceof File)) {
+                value.forEach((file) => {
+                    formData.append(key, file); // o `${key}` si el backend no usa []
+                });
+            }
+            // 👇 Si es un solo File
+            else if (value instanceof File) {
+                formData.append(key, value);
+            }
+            // 👇 Si es un objeto común (no File ni array de File)
+            else if (typeof value === "object") {
+                formData.append(key, JSON.stringify(value));
+            }
+            // 👇 Para primitivos: string, number, boolean
+            else {
+                formData.append(key, value.toString());
+            }
+        });
+
+        const response = await fetch(API_URL + "/load/" + id, {
+            method: "PATCH",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorText = await response.json();
+            console.log(errorText);
+            if (response.status >= 500) {
+                throw new Error(errorText);
+            }
+            dispatch(
+                setError({
+                    key: "loadCompleteShippingOrder",
+                    message: errorText
+                })
+            );
+            return null;
+        }
+        dispatch(
+            clearError("loadCompleteShippingOrder")
+        );
+        const result = await response.json();
+        return result;
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
 const deleteShippingOrderInDB = async (
     id: number | null,
     dispatch: AppDispatchRedux
@@ -279,6 +341,7 @@ export {
     createCompleteShippingOrderInDB,
     createShippingOrderInDB,
     updateCompleteShippingOrderInDB,
+    loadCompleteShippingOrderInDB,
     deleteShippingOrderInDB,
     fetchShippingOrderDetailByIdFromDB,
 };

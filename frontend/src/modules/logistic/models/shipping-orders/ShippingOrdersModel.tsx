@@ -1,21 +1,18 @@
-import { useMemo, useState, type Dispatch } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import type { IPartialShippingOrder, IShippingOrder, LoadEvidenceItem, LoadEvidenceManager, PartialLoadEvidenceItem } from "../../../../interfaces/shippingOrder";
 import type { AppDispatchRedux } from "../../../../store/store";
-import { deleteShippingOrderInDB, createCompleteShippingOrderInDB, updateCompleteShippingOrderInDB } from "../../../../queries/shippingOrderQueries";
+import { deleteShippingOrderInDB, createCompleteShippingOrderInDB, updateCompleteShippingOrderInDB, loadCompleteShippingOrderInDB } from "../../../../queries/shippingOrderQueries";
 import { useDispatch } from "react-redux";
 import { generateColumnsShippingOrders } from "./structure/columns";
 import type { RowAction } from "../../../../components/ui/table/types";
 import { Trash2, Download, Plus, Search, Eraser, PackageCheck, PackageSearch, TrendingDown, Ban } from "lucide-react";
-import useShippingOrderDetailById from "./hooks/useShippingOrderDetailById";
 import { diffObjectArrays, diffObjects } from "../../../../utils/validation-on-update/validationOnUpdate"
 import type { IPartialShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProductManager } from "../../../../interfaces/shippingPurchasedProduct";
-import type { Table } from "@tanstack/react-table";
 import StyleModule from "./ShippingOrdersModel.module.css";
 import { clearAllErrors } from "../../../../store/slicer/errorSlicer";
 import ShippingOrderModuleProvider from "./context/ShippingOrderModuleProvider";
 import AddWizardShippingOrder from "./wizards/add/AddWirzardShippingOrder";
 import GenericTableMemo from "./../../../../comp/primitives/table/tableContext/GenericTable";
-import type { TableState, TableAction } from "./../../../../comp/primitives/table/tableContext/tableTypes";
 import { reset_column_filters } from "./../../../../comp/primitives/table/tableContext/tableActions";
 import InputTextCustom from "../../../../comp/primitives/input/text/custom/InputTextCustom";
 import MainActionButtonCustom from "../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
@@ -25,6 +22,9 @@ import KPICardCustomPurple from "../../../../comp/primitives/cards/kpi/custom/pu
 import KPICardCustomRed from "../../../../comp/primitives/cards/kpi/custom/red/KPICardCustomRed";
 import KPICardCustomGreen from "../../../../comp/primitives/cards/kpi/custom/green/KPICardCustomGreen";
 import LoadModal from "./modals/load/LoadModal";
+import EditWizardShippingOrder from "./wizards/edit/EditWizardShippingOrder";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useTableDispatch, useTableState } from "../../../../comp/primitives/table/tableContext/tableHooks";
 
 const ShippingOrderModel = () => {
 
@@ -55,26 +55,14 @@ const ShippingOrderModel = () => {
     const [isActiveFinishedModal, setIsActiveFinishedModal] =
         useState<boolean>(false);
 
-    const toggleIsActiveLoadModal = () => setIsActiveLoadModal((prev) => !prev);
-    const toggleIsActiveLoadModalSetup = () => {
-        setIsActiveLoadModal(true)
-        console.log("modal de carga")
-    }
-
-    const toggleIsActiveFinishedModal = () => setIsActiveFinishedModal((prev) => !prev);
-    const toggleIsActiveFinishedModalSetup = () => {
-        // setIsActiveFinishedModal(true)
-        console.log("modal de finalizado")
-    }
-
-
     const [search, setSearch] = useState<string>("");
 
     const { shippingOrders, loadingShippingOrders, refetchShippingOrders } = useShippingOrders({ like: search, debounce: 500 });
 
+
     // * ******************** Funciones de operaciones CRUD ******************** 
 
-    const handleCreate = async (shipping: IPartialShippingOrder) => {
+    const handleCreate = useCallback(async (shipping: IPartialShippingOrder) => {
         setLoading(true);
         try {
             const new_shipping = { ...shipping }
@@ -88,18 +76,101 @@ const ShippingOrderModel = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [dispatch]);
 
-    const handleUpdate = async (shipping: IPartialShippingOrder) => {
+    const handleLoad = useCallback(async (shipping: IPartialShippingOrder, shippingOrderDetailById: IPartialShippingOrder) => {
         setLoading(true);
         try {
-
             const shipping_old = {
                 ...shippingOrderDetailById,
                 delivery_cost:
                     Number(shippingOrderDetailById?.delivery_cost)
             };
 
+            const shipping_new = shipping;
+
+            /* Nos quedamos unicamente con los archivos */
+            const evidences_old = shipping_old.load_evidence || [];
+            delete shipping_old.load_evidence;
+            delete shipping_old.shipping_order_purchase_order_product;
+
+            /* Nos quedamos unicamente con los archivos */
+            const evidences_new = shipping_new.load_evidence || [];
+            delete shipping_new.load_evidence;
+            delete shipping_new.shipping_order_purchase_order_product;
+
+            // Obtenemos las diferencias entre los archivos
+            const diff_evidences: LoadEvidenceManager = await diffObjectArrays(evidences_old, evidences_new);
+
+            /* Obtenemos si hay cambios en los archivos */
+            const hasChangesEvidences: boolean = [
+                diff_evidences.added,
+                diff_evidences.deleted,
+                diff_evidences.modified
+            ].some((arr: (
+                LoadEvidenceItem |
+                PartialLoadEvidenceItem
+            )[]) => arr.length > 0);
+
+            if (hasChangesEvidences) {
+
+                const excludedIds = new Set<string>(
+                    [
+                        ...diff_evidences.added,
+                        ...diff_evidences.deleted,
+                        ...diff_evidences.modified
+                    ].map(item => item.id)
+                );
+
+                const load_evidence_old =
+                    shippingOrderDetailById?.load_evidence?.filter(
+                        (evidence) => {
+                            if (evidence instanceof File) return false;
+                            return !excludedIds.has(evidence.id);
+                        }
+                    ) as LoadEvidenceItem[];
+
+                const new_shipping: IPartialShippingOrder = {
+                    load_evidence:
+                        diff_evidences.added.map(
+                            (e) => e.path as File
+                        ) || [],
+                    load_evidence_deleted:
+                        diff_evidences.deleted.map(
+                            (e) => { return { id: e.id } }
+                        ) as PartialLoadEvidenceItem[] || [],
+                    load_evidence_old:
+                        load_evidence_old.map(
+                            (e) => { return { id: e.id } }
+                        ) as PartialLoadEvidenceItem[] || [],
+                }
+
+                const response =
+                    await loadCompleteShippingOrderInDB(
+                        shippingOrderRecord?.id || null,
+                        new_shipping,
+                        dispatch
+                    );
+
+                if (!response) return;
+            }
+            refetchShippingOrders();
+        } catch (error) {
+            if (error instanceof Error) setServerError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [shippingOrderRecord]);
+
+    const handleUpdate = useCallback(async (shipping: IPartialShippingOrder, shippingOrderDetail: IPartialShippingOrder) => {
+        setLoading(true);
+
+        try {
+            const shipping_old = {
+                ...shippingOrderDetail,
+                delivery_cost:
+                    Number(shippingOrderDetail?.delivery_cost)
+            };
             const shipping_new = shipping;
 
             const sopops_old =
@@ -118,13 +189,9 @@ const ShippingOrderModel = () => {
             delete shipping_new.load_evidence;
             delete shipping_new.shipping_order_purchase_order_product;
 
-            const diff_shipping: IPartialShippingOrder =
-                await diffObjects(
-                    shipping_old,
-                    shipping_new
-                );
+            const diff_shipping: IPartialShippingOrder = await diffObjects(shipping_old, shipping_new);
 
-            const diff_sopops: IShippingOrderPurchasedOrderProductManager = diffObjectArrays(sopops_old, sopops_new);
+            const diff_sopops: IShippingOrderPurchasedOrderProductManager = await diffObjectArrays(sopops_old, sopops_new);
 
             const hasChangesSopops: boolean = [
                 diff_sopops.added,
@@ -136,7 +203,7 @@ const ShippingOrderModel = () => {
                     IPartialShippingOrderPurchasedOrderProduct)[]
                 ) => arr.length > 0);
 
-            const diff_evidences: LoadEvidenceManager = diffObjectArrays(evidences_old, evidences_new);
+            const diff_evidences: LoadEvidenceManager = await diffObjectArrays(evidences_old, evidences_new);
 
             const hasChangesEvidences: boolean = [
                 diff_evidences.added,
@@ -161,8 +228,9 @@ const ShippingOrderModel = () => {
                     ].map(item => item.id)
                 );
 
+
                 const load_evidence_old =
-                    shippingOrderDetailById?.load_evidence?.filter(
+                    shippingOrderDetail?.load_evidence?.filter(
                         (evidence) => {
                             if (evidence instanceof File) return false;
                             return !excludedIds.has(evidence.id);
@@ -197,7 +265,6 @@ const ShippingOrderModel = () => {
                 if (!response) {
                     return;
                 }
-                await refetchShippingOrderDetailById();
             }
             setServerError(null);
             setIsActiveEditModal(false);
@@ -207,9 +274,9 @@ const ShippingOrderModel = () => {
         } finally {
             setLoading(false);
         }
-    }
+    }, [shippingOrderRecord]);
 
-    const handleDelete = async () => {
+    const handleDelete = useCallback(async () => {
         setLoading(true);
         try {
             await deleteShippingOrderInDB(
@@ -223,33 +290,52 @@ const ShippingOrderModel = () => {
         } finally {
             setLoading(false);
         }
-    }
+    }, [shippingOrderRecord]);
 
     // * ******************** Funciones para control de modales ******************** 
 
-    const toggleisActiveAddModal = () => {
-        setIsActiveAddModal(!isActiveAddModal);
-    }
-
-    const toggleisActiveEditModalSetup = (record: IShippingOrder) => {
+    const toggleisActiveDeleteModalSetup = useCallback((record: IShippingOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
         setShippingOrderRecord(record);
-    }
+    }, [dispatch]);
 
-    const toggleisActiveEditModal = () => {
-        setIsActiveEditModal(!isActiveEditModal);
-    }
+    const toggleisActiveDeleteModal = useCallback(() => {
+        setIsActiveDeleteModal(v => !v);
+    }, []);
 
-    const toggleisActiveDeleteModalSetup = (record: IShippingOrder) => {
+    // Handlers estables
+    const toggleisActiveAddModal = useCallback(() => {
+        setIsActiveAddModal(v => !v);
+    }, []);
+
+    const toggleisActiveEditModal = useCallback(() => {
+        setIsActiveEditModal(v => !v);
+    }, []);
+
+    const toggleisActiveEditModalSetup = useCallback((record: IShippingOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
         setShippingOrderRecord(record);
-    }
+        setIsActiveEditModal(v => !v);
+    }, [dispatch]);
 
-    const toggleisActiveDeleteModal = () => {
-        setIsActiveDeleteModal(!isActiveDeleteModal);
-    }
+    const toggleIsActiveLoadModal = useCallback(() => {
+        setIsActiveLoadModal(v => !v);
+    }, []);
+
+    const toggleIsActiveLoadModalSetup = useCallback((
+        record: IShippingOrder
+    ) => {
+        dispatch(clearAllErrors());
+        setServerError(null);
+        setShippingOrderRecord(record);
+        setIsActiveLoadModal(v => !v);
+    }, []);
+
+    const toggleIsActiveFinishedModal = useCallback(() => {
+        setIsActiveFinishedModal(v => !v);
+    }, []);
 
     // * ******************** Funciones para control de acciones de la tabla ******************** 
 
@@ -269,32 +355,39 @@ const ShippingOrderModel = () => {
     ], []);
     // * ******************** Componentes extra para inyectar como props en el GenericTable ******************** 
 
-    interface ExtraComponentsProps<T> {
-        table: Table<T>,
-        state: TableState,
-        dispatch: Dispatch<TableAction>
+    interface StatusActionsProps {
+        value: string;
+        onClick?: (record: IShippingOrder) => void;
     }
+    const statusActions = useMemo((): StatusActionsProps[] => {
+        return [
+            { value: "released", onClick: toggleIsActiveLoadModalSetup },
+            { value: "finished", onClick: toggleIsActiveFinishedModal }
+        ]
+    }, [ shippingOrders, toggleIsActiveLoadModalSetup, toggleIsActiveFinishedModal]);
 
-    const ExtraComponents = ({ table, state, dispatch }: ExtraComponentsProps<IShippingOrder>) => {
+    const ExtraComponents = useCallback(() => {
+        const state = useTableState();
+        const dispatch = useTableDispatch();
 
 
         const handleClearFilters = () => {
-            dispatch(reset_column_filters())
+            dispatch(reset_column_filters());
         }
-
         const handleExportTable = () => {
             console.log("exporting table")
         }
 
         return (
             <div className={StyleModule.containerExtraComponents}>
-                <div className={StyleModule.containerInputSearch}>
+                <div className={StyleModule.searchSection}>
                     <InputTextCustom
                         value={search}
                         onChange={setSearch}
                         placeholder="Buscar"
                         icon={<Search />}
                         classNameInput={StyleModule.inputTextCustom}
+                        classNameContainer={StyleModule.containerInputSearch}
                         withValidation={false}
                     />
                 </div>
@@ -302,38 +395,101 @@ const ShippingOrderModel = () => {
                     <SecundaryActionButtonCustom
                         label="Limpiar filtros"
                         onClick={handleClearFilters}
-                        disabled={state.columnFiltersState.length <= 0}
                         icon={<Eraser />}
+                        disabled={state.columnFiltersState.length === 0}
                     />
                     <SecundaryActionButtonCustom
                         label="Exportar tabla"
                         onClick={handleExportTable}
                         icon={<Download />}
+                        disabled={Object.keys(state.rowSelectionState).length === 0}
                     />
                 </div>
             </div>
         );
-    }
+    }, [search]);
 
-    interface StatusActionsProps {
-        value: string;
-        onClick?: () => void;
-    }
-    const statusActions = useMemo((): StatusActionsProps[] => {
-        return [
-            { value: "released", onClick: toggleIsActiveLoadModalSetup },
-            { value: "finished", onClick: toggleIsActiveFinishedModal }
-        ]
-    }, [toggleIsActiveLoadModalSetup, toggleIsActiveFinishedModal]);
 
-    const columnsMemo = useMemo(() => generateColumnsShippingOrders(statusActions), [statusActions]);
-
-    // * ******************** Hooks ******************** */
-
-    const { shippingOrderDetailById, refetchShippingOrderDetailById } = useShippingOrderDetailById(shippingOrderRecord?.id || null);
+    const columnsMemo: ColumnDef<IShippingOrder>[] = useMemo(() => generateColumnsShippingOrders(statusActions), [statusActions]);
 
     return (
         <div className={StyleModule.containerShippingOrdersModel}>
+            <HeaderComponent
+                toggleisActiveAddModal={toggleisActiveAddModal}
+            />
+            <GenericTableMemo
+                modelName="Ordenes de envio"
+
+                /* distribucion de columnas y rows */
+                getRowId={(row) => row.id.toString()}
+                columns={columnsMemo}
+                data={shippingOrders}
+                isLoadingData={loadingShippingOrders}
+
+                /* funcionalidades habilitadas */
+                enableFilters
+                enableSorting
+                enablePagination
+                enableRowEditClick
+                enableRowEditClickHandler={toggleisActiveEditModalSetup}
+                enableOptionsColumn
+                extraComponents={ExtraComponents}
+                /* acciones de la tabla */
+                rowActions={rowActions}
+                typeRowActions="icon"
+                /* estilos */
+                classNameGenericTableContainer={StyleModule.containerTable}
+            />
+            {
+                isActiveAddModal && (
+                    <ShippingOrderModuleProvider
+                        initialStep={1}
+                        totalSteps={4}
+                    >
+                        <AddWizardShippingOrder
+                            onCreate={handleCreate}
+                            onClose={toggleisActiveAddModal}
+                        />
+                    </ShippingOrderModuleProvider>
+                )
+            }
+            {
+                isActiveEditModal && shippingOrderRecord &&  (
+                    <ShippingOrderModuleProvider
+                        initialStep={3}
+                        totalSteps={3}
+                        data={shippingOrderRecord}
+                    >
+                        <EditWizardShippingOrder
+                            onClose={toggleisActiveEditModal}
+                        />
+                    </ShippingOrderModuleProvider>
+                )
+            }
+            {
+                isActiveLoadModal && shippingOrderRecord && (
+                    <LoadModal
+                        onClose={toggleIsActiveLoadModal}
+                        shippingOrder={shippingOrderRecord}
+                        onUpdate={handleLoad}
+                    />
+                )
+            }
+        </div>
+    );
+}
+
+export default ShippingOrderModel;
+
+interface HeaderComponentProps {
+    toggleisActiveAddModal: () => void;
+}
+
+const HeaderComponent = memo(({
+    toggleisActiveAddModal,
+}: HeaderComponentProps) => {
+    return (
+        <div className={StyleModule.containerHeader}>
             <div className={`nunito-medium ${StyleModule.headerSection}`}>
                 <h1 className="nunito-bold">Logistica</h1>
                 <MainActionButtonCustom
@@ -374,54 +530,6 @@ const ShippingOrderModel = () => {
                     icon={<TrendingDown />}
                 />
             </div>
-            <GenericTableMemo
-                modelName="Ordenes de envio"
-
-                /* distribucion de columnas y rows */
-                getRowId={(row) => row.id.toString()}
-                columns={columnsMemo}
-                data={shippingOrders}
-                isLoadingData={loadingShippingOrders}
-
-                /* funcionalidades habilitadas */
-                enableFilters
-                enableSorting
-                enablePagination
-                enableRowEditClick
-                enableRowEditClickHandler={toggleisActiveEditModalSetup}
-                enableOptionsColumn
-
-                /* acciones de la tabla */
-                rowActions={rowActions}
-                typeRowActions="icon"
-                extraComponents={ExtraComponents}
-
-                /* estilos */
-                classNameGenericTableContainer={StyleModule.containerTable}
-            />
-            {
-                isActiveAddModal && (
-                    <ShippingOrderModuleProvider
-                        initialStep={1}
-                        totalSteps={4}
-                    >
-                        <AddWizardShippingOrder
-                            onCreate={handleCreate}
-                            onClose={toggleisActiveAddModal}
-                        />
-                    </ShippingOrderModuleProvider>
-                )
-            }
-            {
-                isActiveLoadModal && shippingOrderDetailById && (
-                    <LoadModal
-                        onClose={toggleIsActiveLoadModal}
-                        shippingOrder={shippingOrderDetailById}
-                    />
-                )
-            }
         </div>
     );
-}
-
-export default ShippingOrderModel;
+});

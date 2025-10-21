@@ -27,6 +27,7 @@ const Step1 = ({ onClose }: IStep1) => {
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
 
+
     const [purchase_orders, client, initialState]: [IPartialPurchasedOrder[], string, TableStatePartial] = useMemo(() => {
 
         const map = new Map<number | string, IPartialPurchasedOrder>();
@@ -137,11 +138,11 @@ const Step1 = ({ onClose }: IStep1) => {
         }
     ], []);
 
-    const handleRowSelectionChange = useCallback((selected: IPurchasedOrder[]) => {
+    const handleRowSelectionChange = useCallback(async (selected: IPurchasedOrder[]) => {
         const diffObject: {
             added: IPurchasedOrder[],
             deleted: IPurchasedOrder[]
-        } = diffObjectArrays(selectedPurchasedOrder, selected);
+        } = await diffObjectArrays(selectedPurchasedOrder, selected);
         const { added, deleted } = diffObject;
         if (added.length > 0) {
             setSelectedPurchasedOrder(prev => [...prev, ...added]);

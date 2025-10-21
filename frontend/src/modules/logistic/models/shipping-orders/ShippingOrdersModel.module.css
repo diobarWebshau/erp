@@ -1,6 +1,12 @@
 /* *************** Shipping orders Model *************** */
 
 .containerShippingOrdersModel {
+
+    /* distribucion flex */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 100%;
+
     /* posicionamiento */
     position: relative;
 
@@ -37,6 +43,32 @@
     /* dimension */
     font-size: 36px;
     color: var(--color-theme-primary);
+}
+
+/* *************** Search section *************** */
+
+.searchSection {
+    /* distribucion flex respecto al padre*/
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.containerInputSearch.containerInputSearch {
+    /* dimension */
+    width: 300px;
+}
+
+.inputTextCustom.inputTextCustom {
+    /* dimension */
+    background-color: var(--color-theme-background);
 }
 
 /* *************** Content section *************** */
@@ -78,11 +110,6 @@
     justify-content: end;
     align-items: center;
     gap: 0.5rem;
-}
-
-.inputTextCustom.inputTextCustom {
-    /* dimension */
-    width: 300px;
 }
 
 /* *************** KPIs section *************** */

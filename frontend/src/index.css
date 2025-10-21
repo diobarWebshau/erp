@@ -1,140 +1,141 @@
     /* dimension */
-:root {
+    :root {
 
-  /* ************ Mejora de renderizado ************ */
-  font-family: "Nunito";
-  font-optical-sizing: auto;
-  font-style: normal;
+      /* ************ Mejora de renderizado ************ */
+      font-family: "Nunito";
+      font-optical-sizing: auto;
+      font-style: normal;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
 
-  /* ************ Variables ************ */
+      /* ************ Variables ************ */
 
-  /* Variables de tema */
-  --color-theme-primary: #423DD9;
-  --color-theme-primary-light: #7466E1;
-  --color-theme-secondary: rgba(139, 136, 231, 1);
-  --color-theme-secondary-light: #BDBBF1;
-  --color-theme-background: #F3F4FA;
-  --color-theme-neutral-background: #DEDDF8;
-  --color-theme-neutral: #CCCFE4;
-  --color-theme-neutral-secondary: #A0A4BC;
-  --color-theme-neutral-primary: #888DB2;
-  --color-theme-font-white: #FFFFFF;
-  --color-theme-font-black: #000000;
-  --color-theme-border-table: #E1E2FB;
-  --color-theme-gray: rgba(204, 201, 221, 1);
+      /* Variables de tema */
+      --color-theme-primary: #423DD9;
+      --color-theme-primary-light: #7466E1;
+      --color-theme-secondary: rgba(139, 136, 231, 1);
+      --color-theme-secondary-light: #BDBBF1;
+      --color-theme-background: #F3F4FA;
+      --color-theme-neutral-background: #DEDDF8;
+      --color-theme-neutral: #CCCFE4;
+      --color-theme-neutral-secondary: #A0A4BC;
+      --color-theme-neutral-primary: #888DB2;
+      --color-theme-font-white: #FFFFFF;
+      --color-theme-font-black: #000000;
+      --color-theme-border-table: #E1E2FB;
+      --color-theme-gray: rgba(204, 201, 221, 1);
 
-  /* Varibles de alertas */
-  --color-ready: rgba(60, 145, 230, 1);
-  --color-ready-light: rgba(191, 223, 255, 1);
-  --color-warning: #DFA60B;
-  --color-warning-light: #FFF6BA;
-  --color-success: #369965;
-  --color-success-light: #D6F1C4;
-  --color-alert-light: #FFC8C9;
-  --color-alert: #FF4076;
-  --color-alert-2: #E44471;
-  --color-partial-light: #F4D1B6;
-  --color-partial: #EF924B;
-  --color-overlay: rgba(0, 0, 0, 0.4);
+      /* Varibles de alertas */
+      --color-ready: rgba(60, 145, 230, 1);
+      --color-ready-light: rgba(191, 223, 255, 1);
+      --color-warning: #DFA60B;
+      --color-warning-light: #FFF6BA;
+      --color-success: #369965;
+      --color-success-light: #D6F1C4;
+      --color-alert-light: #FFC8C9;
+      --color-alert: #FF4076;
+      --color-alert-2: #E44471;
+      --color-partial-light: #F4D1B6;
+      --color-partial: #EF924B;
+      --color-overlay: rgba(0, 0, 0, 0.4);
 
-  /* variables gradientes */
-  --color-theme-gradient-start: #5A63FF;
-  --color-theme-gradient-end: #423DD9;
+      /* variables gradientes */
+      --color-theme-gradient-start: #5A63FF;
+      --color-theme-gradient-end: #423DD9;
 
-  --color-gradient-purple:
-    linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
+      --color-gradient-purple:
+        linear-gradient(var(--color-theme-gradient-start), var(--color-theme-gradient-end));
 
-  --linear-gradient-primary: linear-gradient(360deg,
-      var(--color-theme-primary) 0%,
-      #5A55DE 50%,
-      #3B34DA 100%);
+      --linear-gradient-primary: linear-gradient(360deg,
+          var(--color-theme-primary) 0%,
+          #5A55DE 50%,
+          #3B34DA 100%);
 
 
-  --color-gradient-purple-white: linear-gradient(90deg,
-      #423DD9 0%,
-      #7265E0 100%);
+      --color-gradient-purple-white: linear-gradient(90deg,
+          #423DD9 0%,
+          #7265E0 100%);
 
-  --color-gradient-red-white: linear-gradient(90deg,
-      #FF4076 0%,
-      #FF628E 100%);
+      --color-gradient-red-white: linear-gradient(90deg,
+          #FF4076 0%,
+          #FF628E 100%);
 
-  --color-gradient-green-white: linear-gradient(90deg,
-      #369965 0%,
-      #4CB47E 100%);
+      --color-gradient-green-white: linear-gradient(90deg,
+          #369965 0%,
+          #4CB47E 100%);
 
-}
+    }
 
-/* ************ Layout base ************ */
+    /* ************ Layout base ************ */
 
-/* Reset global */
-* {
-  /* distribucion box */
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    /* Reset global */
+    * {
+      /* distribucion box */
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-/* Layout base */
-body,
-html {
-  /* dimension */
-  width: 100vw;
-  height: 100vh;
-  max-width: 100vw;
-  min-width: 100vw;
-  max-height: 100vh;
-  min-height: 100vh;
-  overflow: hidden;
-  height: 100vh;
 
-  /* tipografia */
-  font-family: "Nunito", sans-serif;
-  font-optical-sizing: auto;
-  font-style: normal;
-}
+    /* Layout base */
+    body,
+    html {
+      /* dimension */
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      min-width: 100vw;
+      max-height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
+      height: 100vh;
 
-#root {
-  /* dimension */
-  width: 100%;
-  height: 100%;
-}
+      /* tipografia */
+      font-family: "Nunito", sans-serif;
+      font-optical-sizing: auto;
+      font-style: normal;
+    }
 
-/* ************ Tipografía ************ */
+    #root {
+      /* dimension */
+      width: 100%;
+      height: 100%;
+    }
 
-/* Nunito */
-.nunito-extralight {
-  font-weight: 200;
-}
+    /* ************ Tipografía ************ */
 
-.nunito-light {
-  font-weight: 300;
-}
+    /* Nunito */
+    .nunito-extralight {
+      font-weight: 200;
+    }
 
-.nunito-regular {
-  font-weight: 400;
-}
+    .nunito-light {
+      font-weight: 300;
+    }
 
-.nunito-medium {
-  font-weight: 500;
-}
+    .nunito-regular {
+      font-weight: 400;
+    }
 
-.nunito-semibold {
-  font-weight: 600;
-}
+    .nunito-medium {
+      font-weight: 500;
+    }
 
-.nunito-bold {
-  font-weight: 700;
-}
+    .nunito-semibold {
+      font-weight: 600;
+    }
 
-.nunito-extrabold {
-  font-weight: 800;
-}
+    .nunito-bold {
+      font-weight: 700;
+    }
 
-.nunito-black {
-  font-weight: 900;
-}
+    .nunito-extrabold {
+      font-weight: 800;
+    }
+
+    .nunito-black {
+      font-weight: 900;
+    }

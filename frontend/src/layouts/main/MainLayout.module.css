@@ -996,6 +996,12 @@ height: define el grosor del scrollbar horizontal.
     /* distribucion grid respecto al padre */
     grid-area: main;
 
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+
     /* dimension */
     min-height: 0;
 

@@ -89,8 +89,8 @@ const Step2 = ({
         setIsActiveAddNewOrderModal(!isActiveAddNewOrderModal);
     }, [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal]);
 
-    const handleRowSelectionChange = (selected: IPartialShippingOrderPurchasedOrderProduct[]) => {
-        const diffObject = diffObjectArrays(sopops, selected);
+    const handleRowSelectionChange = async (selected: IPartialShippingOrderPurchasedOrderProduct[]) => {
+        const diffObject = await diffObjectArrays(sopops, selected);
         const { added, deleted } = diffObject;
         if (added.length > 0) {
             setSopops(prev => [...prev, ...added]);
@@ -106,7 +106,7 @@ const Step2 = ({
         dispatch(add_shipping_order_purchased_order_products_aux(sopposWithId));
     }, [dispatch]);
 
-    const handleOnClickNextStep = useCallback(() => {
+    const handleOnClickNextStep = useCallback(async () => {
         const updateValues = state.data?.shipping_order_purchase_order_product_aux?.filter(p => sopops.some(sopop => sopop.id === p.id)) || [];
         const locationBase = [...updateValues].shift()?.location;
         const isSameLocation = updateValues?.every((p) => p.location?.id === locationBase?.id);
@@ -155,7 +155,7 @@ const Step2 = ({
             });
             return;
         }
-        const diffObject = diffObjectArrays(state.data?.shipping_order_purchase_order_product ?? [], updateValues);
+        const diffObject = await diffObjectArrays(state.data?.shipping_order_purchase_order_product ?? [], updateValues);
         if (diffObject.added.length > 0) {
             const added = diffObject.added;
             dispatch(add_shipping_order_purchased_order_products(added));

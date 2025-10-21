@@ -1,6 +1,6 @@
 /* *************** Container *************** */
 
-.container {
+.containerModal {
     /* dimensions */
     min-height: 0;
     min-width: 0;
@@ -12,6 +12,56 @@
     flex-shrink: 0;
     flex-basis: 100%;
 
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.headerModal {
+
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+
+.headerModal > div {
+    display:flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+
+.headerModal > h1 {
+    font-size: 36px;
+    color: var(--color-theme-primary);
+}
+
+
+
+
+/* *************** Container Content *************** */
+
+.contentModal {
+    /* dimensions */
+    min-height: 0;
+    min-width: 0;
+    max-height: 100%;
+    max-width: 100%;
+
+    /* ditribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 0;
+
     /* distribucion grid */
     display: grid;
     grid-template:
@@ -21,6 +71,13 @@
         "footer" auto
         / 100%;
     gap: 1rem;
+
+    /* distribucion box */
+    padding-block: 1rem;
+    padding-inline: 3rem;
+    border-radius: 15px;
+    background-color: var(--color-theme-background);
+    
 }
 
 .headerSection {
@@ -143,7 +200,7 @@
     font-size: 14px;
 }
 
-.confirmSection > p {
+.confirmSection>p {
     /* dimension */
     font-size: 14px;
 }

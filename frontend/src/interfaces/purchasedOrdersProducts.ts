@@ -22,7 +22,8 @@ import type {
 import type {
     IPartialPurchasedOrderProductLocationProductionLine
 } from "./popProductionLines";
-import type { IPartialProductionOrder, IProductionOrder } from "./productionOrder";
+import type { IPartialProductionOrder } from "./productionOrder";
+import type { IPartialLocation } from "./locations";
 
 interface IProductionSummary {
     production_qty: number;
@@ -31,22 +32,37 @@ interface IProductionSummary {
 }
 
 interface IStockAvailable {
-    location_id: number;      
-    location_name: string;    
-    stock: number;          
-    maximum_stock: number;   
-    minimum_stock: number;   
-    available: number;       
-    product_id: number;       
-    product_name: string;     
+    location_id: number;
+    location_name: string;
+    stock: number;
+    maximum_stock: number;
+    minimum_stock: number;
+    available: number;
+    product_id: number;
+    product_name: string;
 }
-
 
 interface IShippingSummary {
     order_qty: number;
     shipping_qty: number;
 }
 
+interface IInventoryCommited {
+    id: number;
+    item_id: number;
+    is_locked: number;
+    item_name: string;
+    item_type: string;
+    qty: number;
+    description: string;
+    location_id: number;
+    reference_id: number;
+    location_name: string;
+    movement_type: string;
+    production_id: number;
+    reference_type: string;
+    location?: IPartialLocation;
+}
 
 interface IPurchasedOrderProduct {
     id: number;
@@ -72,6 +88,7 @@ interface IPurchasedOrderProduct {
     stock_available?: IStockAvailable,
     shipping_summary?: IShippingSummary,
     production_order?: IPartialProductionOrder,
+    inventory_commited?: IInventoryCommited,
 }
 
 interface IPurchasedOrderProductManager {

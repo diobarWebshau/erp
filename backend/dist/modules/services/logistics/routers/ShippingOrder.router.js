@@ -14,6 +14,7 @@ const createShippingOrdersRouter = () => {
     shippingOrdersRouter.delete("/:id", ShippingOrderController.delete);
     shippingOrdersRouter.post("/complete", uploadImageMiddleware, validateShippingOrderMiddleware, normalizeFormDataBody(), ShippingOrderController.createComplete);
     shippingOrdersRouter.patch("/complete/:id", uploadImageMiddleware, validateShippingOrderMiddleware, ShippingOrderController.updateComplete);
+    shippingOrdersRouter.patch("/load/:id", uploadImageMiddleware, validateShippingOrderMiddleware, ShippingOrderController.load);
     return shippingOrdersRouter;
 };
 export default createShippingOrdersRouter;

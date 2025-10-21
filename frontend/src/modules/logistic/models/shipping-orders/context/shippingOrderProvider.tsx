@@ -1,6 +1,6 @@
 import type { IPartialShippingOrder } from "../../../../../interfaces/shippingOrder";
 import type { ShippingOrderState, ShippingOrderAction } from "./shippingOrderTypes";
-import { useReducer } from "react";
+import { useMemo, useReducer } from "react";
 import type { Dispatch, ReactNode } from "react";
 import { ShippingOrderStateContext, ShippingOrderDispatchContext } from "./shippingOrderContext";
 import ShippingOrderReducer from "./shippingOrderReducer"
@@ -22,21 +22,23 @@ const ShippingOrderProvider = ({
     data
 }: IProviderShippingOrder) => {
 
-    const baseData: IPartialShippingOrder = {
+    const baseData = useMemo(() => ({
         ...initialShippingOrderState.data,
         ...data
-    };
+    }), [data]);
 
-    const initialState: ShippingOrderState = {
+    const initialState = useMemo<ShippingOrderState>(() => ({
         ...initialShippingOrderState,
         current_step: currentStep,
         total_steps: totalSteps,
         data: baseData
-    };
+    }), [baseData, currentStep, totalSteps]);
+
 
     const [state, dispatch]: [ShippingOrderState, Dispatch<ShippingOrderAction>] =
         useReducer(ShippingOrderReducer, initialState);
-        return (
+
+    return (
         <ShippingOrderStateContext.Provider value={state}>
             <ShippingOrderDispatchContext.Provider value={dispatch}>
                 {children}

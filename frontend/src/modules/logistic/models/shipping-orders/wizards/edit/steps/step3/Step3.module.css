@@ -1,0 +1,222 @@
+.container {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    min-width: max-content;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "header" auto
+        "subHeader" auto
+        "content" 1fr
+        "footer" auto / 100%;
+    gap: 2rem;
+}
+
+/* ******** HEADER ********* */
+
+.header {
+    /* distribucion grid respecto al padre */
+    grid-area: header;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header>h2 {
+    /* estilos */
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+.dlStatus {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+    /* estilos */
+    font-size: 14px;
+}
+
+.tag {
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* dimension */
+    width: 120px;
+    height: 30px;
+
+    border-radius: 10px;
+    /* estilos */
+    text-transform: capitalize;
+}
+
+.released {
+    background-color: var(--color-alert-light);
+    color: var(--color-alert);
+    border: 1px solid var(--color-alert);
+}
+
+.shipped {
+    background-color: var(--color-partial-liht);
+    color: var(--color-partial);
+    border: 1px solid var(--color-partial);
+}
+
+.finished {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}
+
+/* ******** SUBHEADER ******** */
+
+.subHeader {
+    /* distribucion grid respecto al padre */
+    grid-area: subHeader;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 3rem;
+}
+
+.rightContent,
+.leftContent {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distrubucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+
+    /* distribucion box */
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-border-table);
+    padding: 1rem;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    font-size: 14px;
+}
+
+.subTitle {
+    /* estilos */
+    color: var(--color-theme-primary);
+    font-size: 20px;
+}
+
+.subContent {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: start;
+    flex-wrap: nowrap;
+    gap: 1rem;
+
+    /* distribucion box */
+    padding-left: 1rem;
+
+}
+
+.subContentItem {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+}
+
+.subContentItem>dl {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+
+.boldText {
+    /* estilos */
+    font-size: 14px;
+    color: var(--color-theme-font-black);
+}
+
+.boldPrimary {
+    /* estilos */
+    font-size: 14px;
+    color: var(--color-theme-primary);
+}
+
+
+/* ******** CONTENT ******** */
+
+.contentSection {
+    /* distribucion grid respecto al padre */
+    grid-area: content;
+
+    /* dimension */
+    min-height: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.contentSection>h3 {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+
+.contentSection>.tableContainer {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+
+.tableContainer {
+    /* dimension */
+    max-height: 100%;
+}
+
+/* ******** FOOTER ******** */
+
+.footerSection {
+    /* distribucion grid respecto al padre */
+    grid-area: footer;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}

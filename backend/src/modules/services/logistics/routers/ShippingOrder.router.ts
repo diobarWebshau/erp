@@ -36,6 +36,10 @@ const createShippingOrdersRouter = (): Router => {
         uploadImageMiddleware,
         validateShippingOrderMiddleware,
         ShippingOrderController.updateComplete);
+    shippingOrdersRouter.patch("/load/:id",
+        uploadImageMiddleware,
+        validateShippingOrderMiddleware,
+        ShippingOrderController.load);
     return shippingOrdersRouter;
 }
 
