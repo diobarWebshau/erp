@@ -27,8 +27,14 @@ const SelectPurchasedModal = ({
 
     const data = useMemo(() => purchasedOrders ?? [], [purchasedOrders]);
 
-
     const [selectedPurchasedOrders, setSelectedPurchasedOrders] = useState<IPurchasedOrder[]>([]);
+
+    const asignedMaxQty = useCallback((pop: IPurchasedOrderProduct) => {
+        const orderQty = Number(pop.qty ?? 0);
+        const shippedQty = Number(pop.shipping_summary?.shipping_qty ?? 0);
+        const remaining = orderQty - shippedQty;
+        return remaining;
+    }, []);
 
     const handleAddPurchasedOrder = useCallback(() => {
         if (selectedPurchasedOrders.length === 0) return;
@@ -37,7 +43,7 @@ const SelectPurchasedModal = ({
         const sopops: IPartialShippingOrderPurchasedOrderProduct[] = popsFlat.map(p => ({
             purchase_order_products: p,
             purchase_order_product_id: p.id,
-            qty: 1,
+            qty: asignedMaxQty(p),
         }));
         onAdd(sopops);
         onClose();
@@ -114,8 +120,7 @@ const SelectPurchasedModal = ({
         console.log(`Filas seleccionadas`, selectedRows);
         setSelectedPurchasedOrders(selectedRows);
     }, []);
-
-
+    
     return (
         <DialogModal
             className={styleModule.containerDialogModal}

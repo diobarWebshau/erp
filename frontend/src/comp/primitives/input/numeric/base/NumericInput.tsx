@@ -90,12 +90,12 @@ const NumericInput = memo(({
         if (ok) {
             onChange(Number(inputValue));
         } else {
-            onChange(min);
-            const fallback = String(min);
+            onChange(max);
+            const fallback = String(max);
             setInputValue(fallback);
             setIsValid(true);
         }
-    }, [computeIsValid, inputValue, onChange, min]);
+    }, [computeIsValid, inputValue, onChange, max]);
 
     // ? Funcion que maneja el blur del input
     const handleBlur = useCallback(() => {

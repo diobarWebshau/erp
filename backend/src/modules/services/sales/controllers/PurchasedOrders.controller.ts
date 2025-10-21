@@ -263,6 +263,42 @@ class PurchasedOrderController {
                                             ProductDiscountRangeModel.getAllFields()
                                     }
                                 ]
+                            }, {
+                                model: PurchasedOrderModel,
+                                as: "purchase_order",
+                                attributes: PurchasedOrderModel.getAllFields(),
+                                include: [
+                                    {
+                                        all: true, // esto trae TODO el árbol de relaciones de PurchasedOrderModel
+                                        // nested: true // esto trae todas relaciones de PurchasedOrderModel y a la vez todas las relaciones de las relaciones
+                                    }
+                                ]
+                            },
+                            {
+                                model: PurchasedOrdersProductsLocationsProductionLinesModel,
+                                as: "purchase_order_product_location_production_line",
+                                attributes: PurchasedOrdersProductsLocationsProductionLinesModel.getAllFields(),
+                                include: [
+                                    {
+                                        model: ProductionLineModel,
+                                        as: "production_line",
+                                        attributes: ProductionLineModel.getAllFields(),
+                                        include: [
+                                            {
+                                                model: LocationsProductionLinesModel,
+                                                as: "location_production_line",
+                                                attributes: LocationsProductionLinesModel.getAllFields(),
+                                                include: [
+                                                    {
+                                                        model: LocationModel,
+                                                        as: "location",
+                                                        attributes: LocationModel.getAllFields()
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ],
                     },
@@ -296,6 +332,163 @@ class PurchasedOrderController {
                 return;
             }
             const purchasedOrder = response.toJSON();
+            res.status(200).json(purchasedOrder);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error ocurred ${error}`);
+            }
+        }
+    }
+
+    static getByIds = async (req: Request, res: Response, next: NextFunction) => {
+        const raw = req.query.id;
+        const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+        const ids = arr.map(Number).filter(Number.isFinite);
+        console.log(`Obtieniendo ids`);
+        console.log(raw);
+        console.log(arr);
+        console.log(ids);
+        try {
+            const response = await PurchasedOrderModel.findAll({
+                where: { id: { [Op.in]: ids } },
+                attributes: PurchasedOrderModel.getAllFields(),
+                include: [
+                    {
+                        model: PurchaseOrderProductModel,
+                        as: "purchase_order_products",
+                        attributes: [
+                            ...PurchaseOrderProductModel.getAllFields(),
+                            [
+                                sequelize.literal("func_get_production_summary_of_pop(`purchase_order_products`.id)"),
+                                "production_summary"
+                            ],
+                            [
+                                sequelize.literal("funct_get_stock_available_of_pop_on_location(`purchase_order_products`.id)"),
+                                "stock_available"
+                            ],
+                            [
+                                sequelize.literal("func_summary_shipping_on_client_order(`purchase_order_products`.id)"),
+                                "shipping_summary"
+                            ]
+                        ],
+                        include: [
+                            {
+                                model: ProductModel,
+                                as: "product",
+                                attributes: [
+                                    ...ProductModel.getAllFields(),
+                                    [
+                                        sequelize.literal("funct_get_info_location_stock_product(`purchase_order_products->product`.id)"),
+                                        "summary_location"
+                                    ]
+                                ],
+                                include: [
+                                    {
+                                        model: ProductDiscountRangeModel,
+                                        as: "product_discount_ranges",
+                                        attributes:
+                                            ProductDiscountRangeModel.getAllFields()
+                                    }
+                                ]
+                            },
+                            {
+                                model: AppliedProductDiscountClientModel,
+                                as: "applied_product_discount_client",
+                                attributes:
+                                    AppliedProductDiscountClientModel.getAllFields(),
+                                include: [
+                                    {
+                                        model: ProductDiscountClientModel,
+                                        as: "product_discount_client",
+                                        attributes:
+                                            ProductDiscountClientModel.getAllFields()
+                                    }
+                                ]
+                            },
+                            {
+                                model: AppliedProductDiscountRangeModel,
+                                as: "applied_product_discount_range",
+                                attributes:
+                                    AppliedProductDiscountRangeModel.getAllFields(),
+                                include: [
+                                    {
+                                        model: ProductDiscountRangeModel,
+                                        as: "product_discount_range",
+                                        attributes:
+                                            ProductDiscountRangeModel.getAllFields()
+                                    }
+                                ]
+                            }, {
+                                model: PurchasedOrderModel,
+                                as: "purchase_order",
+                                attributes: PurchasedOrderModel.getAllFields(),
+                                include: [
+                                    {
+                                        all: true, // esto trae TODO el árbol de relaciones de PurchasedOrderModel
+                                        // nested: true // esto trae todas relaciones de PurchasedOrderModel y a la vez todas las relaciones de las relaciones
+                                    }
+                                ]
+                            },
+                            {
+                                model: PurchasedOrdersProductsLocationsProductionLinesModel,
+                                as: "purchase_order_product_location_production_line",
+                                attributes: PurchasedOrdersProductsLocationsProductionLinesModel.getAllFields(),
+                                include: [
+                                    {
+                                        model: ProductionLineModel,
+                                        as: "production_line",
+                                        attributes: ProductionLineModel.getAllFields(),
+                                        include: [
+                                            {
+                                                model: LocationsProductionLinesModel,
+                                                as: "location_production_line",
+                                                attributes: LocationsProductionLinesModel.getAllFields(),
+                                                include: [
+                                                    {
+                                                        model: LocationModel,
+                                                        as: "location",
+                                                        attributes: LocationModel.getAllFields()
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                    },
+                    {
+                        model: ClientModel,
+                        as: "client",
+                        attributes:
+                            ClientModel.getAllFields(),
+                        include: [{
+                            model: ProductDiscountClientModel,
+                            as: "pruduct_discounts_client",
+                            attributes: ProductDiscountClientModel.getAllFields()
+                        }, {
+                            model: ClientAddressesModel,
+                            as: "addresses",
+                            attributes:
+                                ClientAddressesModel.getAllFields()
+                        }]
+                    },
+                    {
+                        model: ClientAddressesModel,
+                        as: "client_address",
+                        attributes:
+                            ClientAddressesModel.getAllFields()
+                    }
+                ]
+            });
+
+            if (!response) {
+                res.status(404).json([]);
+                return;
+            }
+            const purchasedOrder = response.map((p) => p.toJSON());
             res.status(200).json(purchasedOrder);
         } catch (error: unknown) {
             if (error instanceof Error) {

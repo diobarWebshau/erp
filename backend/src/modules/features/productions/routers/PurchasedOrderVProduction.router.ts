@@ -12,6 +12,8 @@ const createPurchasedOrderVProductionRouter = (): Router => {
         PurchasedOrdersVProduction.getById);
     purchasedOrderRouter.get("/client/:client_id",
         PurchasedOrdersVProduction.getByClientId);
+    purchasedOrderRouter.get("/ids",
+        PurchasedOrdersVProduction.getByIds);
     purchasedOrderRouter.post("/",
         validatepurchasedOrdersMiddleware,
         PurchasedOrdersVProduction.create);

@@ -8,13 +8,16 @@ import { useShippingOrderState } from "../../context/shippingOrderHooks";
 import Step1 from "./steps/step1/Step1";
 import Step3 from "./steps/step3/Step3";
 import Step2 from "./steps/step2/Step2";
+import type { IPartialShippingOrder } from "interfaces/shippingOrder";
 
 interface IEditWizardShippingOrder {
     onClose: () => void;
+    onUpdate: (updateShippingOrder: IPartialShippingOrder) => void;
 }
 
 const EditWizardShippingOrder = ({
     onClose,
+    onUpdate,
 }: IEditWizardShippingOrder) => {
 
     const state = useShippingOrderState();
@@ -24,7 +27,7 @@ const EditWizardShippingOrder = ({
     const toggleWarningModal = () => {
         setShowWarningModal(!showWarningModal);
     }
-    
+
     return (
         <FullContainerModal>
             <div className={StyleModule.containerEditWizardShippingOrder}>
@@ -40,12 +43,12 @@ const EditWizardShippingOrder = ({
                 <div className={StyleModule.mainContent}>
                     {
                         state.current_step === 1 && (
-                            <Step1 onClose={onClose} />
+                            <Step1 />
                         )
                     }
                     {
                         state.current_step === 2 && (
-                            <Step2 />
+                            <Step2 onUpdate={onUpdate} />
                         )
                     }
                     {

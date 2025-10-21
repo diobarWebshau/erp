@@ -19,6 +19,13 @@ const update_shipping_order = (
     payload
 });
 
+const set_from_server = (
+    payload: IPartialShippingOrder
+): ShippingOrderAction => ({
+    type: shippingOrderActionsTypes.SET_FROM_SERVER,
+    payload
+});
+
 // ? Acciones directas al array de shipping order purchased order products
 
 const add_shipping_order_purchased_order_products = (
@@ -154,6 +161,7 @@ const clear = (): ShippingOrderAction => ({
 export {
     set_shipping_order,
     update_shipping_order,
+    set_from_server,
     add_shipping_order_purchased_order_products,
     remove_shipping_order_purchased_order_products,
     update_shipping_order_purchased_order_products,

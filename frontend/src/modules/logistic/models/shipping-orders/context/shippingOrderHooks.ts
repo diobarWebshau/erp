@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import type { Dispatch } from "react";
-import { ShippingOrderDispatchContext, ShippingOrderStateContext } from "./shippingOrderContext";
-import type { ShippingOrderAction, ShippingOrderState } from "./shippingOrderTypes";
+import { ShippingOrderDispatchContext, ShippingOrderStateContext, ShippingOrderCommandsContext } from "./shippingOrderContext";
+import type { ShippingOrderAction, ShippingOrderState, ShippingOrderCommands } from "./shippingOrderTypes";
 
 const useShippingOrderState = (): ShippingOrderState => {
     const state = useContext(ShippingOrderStateContext);
@@ -23,7 +23,18 @@ const useShippingOrderDispatch = (): Dispatch<ShippingOrderAction> => {
     return dispatch;
 };
 
+const useShippingOrderCommand = (): ShippingOrderCommands => {
+    const commands = useContext(ShippingOrderCommandsContext);
+    if (!commands) {
+        throw new Error(
+            "useShippingOrderCommand must be used within a ProviderShippingOrder"
+        );
+    }
+    return commands;
+};
+
 export {
     useShippingOrderState,
-    useShippingOrderDispatch
+    useShippingOrderDispatch,
+    useShippingOrderCommand
 };

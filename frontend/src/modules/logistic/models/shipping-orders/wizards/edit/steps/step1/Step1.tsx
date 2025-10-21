@@ -1,15 +1,14 @@
-import CriticalActionButton from "../../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
+import { ChevronRight, Plus } from "lucide-react";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
 import {
-    add_draft_shipping_order_purchased_order_products,
-    add_shipping_order_purchased_order_products,
-    remove_draft_shipping_order_purchased_order_products,
+    update_draft_shipping_order_purchased_order_products_aux,
+    add_draft_shipping_order_purchased_order_products_aux,
     update_draft_shipping_order,
+    next_step,
+    add_draft_shipping_order_purchased_order_products,
+    remove_draft_shipping_order_purchased_order_products,
     update_draft_shipping_order_purchased_order_products,
-    back_step, next_step,
 } from "../../../../context/shippingOrderActions";
 import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
 import DateInputMantine from "./../../../../../../../../comp/external/mantine/date/input/base/DateInputMantine"
@@ -24,24 +23,31 @@ import Tag from "./../../../../../../../../comp/primitives/tag/Tag";
 import usePurchasedOrders from "../../../../../../../../modelos/purchased_orders/hooks/usePurchasedOrders";
 import type { IPartialPurchasedOrder, IPurchasedOrder } from "interfaces/purchasedOrder";
 import SelectPurchasedModal from "../../../../../../../../comp/features/modal-purchase/SelectPurchasedModal";
-import type { ShippingOrderAction } from "../../../../context/shippingOrderTypes";
-import { diffObjectArrays } from "../../../../../../../../utils/validation-on-update/validationOnUpdate";
+import type { ShippingOrderAction, ShippingOrderState } from "../../../../context/shippingOrderTypes";
+import { diffObjectArrays } from "../../../../../../../../utils/validation-on-update/ValidationOnUpdate2";
 import type { TableStatePartial } from "../../../../../../../../comp/primitives/table/tableContext/tableTypes";
 import { generateRandomIds } from "../../../../../../../../helpers/nanoId";
 import ObjectSelectCustomMemo from "../../../../../../../../comp/primitives/select/object-select/base/base/ObjectSelectCustom";
 import toastMantine from "../../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import StyleModule from "./Step1.module.css";
+import WarningModal from "../../../../../../../../comp/primitives/modal2/dialog-modal/custom/warning/WarningModal";
+import { set_step } from "../../../../context/shippingOrderActions";
+import CriticalActionButton from "../../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 
-interface IStep1 {
-    onClose: () => void;
-}
-
-const Step1 = ({
-    onClose
-}: IStep1) => {
+const Step1 = () => {
 
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
+
+    const [isActiveWarningModal, setIsActiveWarningModal] = useState<boolean>(false);
+
+    const toggleWarningModal = useCallback(() => {
+        setIsActiveWarningModal(prev => !prev);
+    }, [dispatch]);
+
+    const toggleBackStep = useCallback(() => {
+        dispatch(set_step(3));
+    }, [dispatch]);
 
     const date = useMemo(() => state.draft?.delivery_date || null, [state.draft?.delivery_date]);
 
@@ -60,7 +66,7 @@ const Step1 = ({
     const [purchase_orders, client_name, purchaseOrder]: [IPartialPurchasedOrder[], string, IPurchasedOrder] = useMemo(() => {
         const purchase_orders = Array.from(
             new Map(
-                (state.draft?.shipping_order_purchase_order_product ?? [])
+                (state.draft?.shipping_order_purchase_order_product_aux ?? [])
                     .map(p => p.purchase_order_products?.purchase_order)
                     .filter((p): p is IPartialPurchasedOrder => p !== undefined)
                     .map(po => [po.id, po] as const) // clave = id
@@ -69,10 +75,7 @@ const Step1 = ({
         const purchaseOrder = [...purchase_orders].shift() as IPurchasedOrder;
         const client_name = purchaseOrder?.client?.company_name || "";
         return [purchase_orders, client_name, purchaseOrder];
-    }, [state.draft?.shipping_order_purchase_order_product]);
-
-    console.log(state.draft?.shipping_order_purchase_order_product)
-
+    }, [state.draft?.shipping_order_purchase_order_product_aux]);
 
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(date);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
@@ -92,15 +95,27 @@ const Step1 = ({
         return filterPurchasedOrders;
     }, [purchase_orders, purchasedOrders, purchaseOrder]);
 
-    const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch, back_step]);
+    const isExcededQtyOrder = useCallback((sopop: IPartialShippingOrderPurchasedOrderProduct) => {
+        const orderQty = Number(sopop.purchase_order_products?.shipping_summary?.order_qty ?? 0);
+        const shippedQty = Number(sopop.purchase_order_products?.shipping_summary?.shipping_qty ?? 0);
+        const remaining = orderQty - shippedQty;
+        const originalQty = Number(state.data?.shipping_order_purchase_order_product?.find(p => p.id === sopop.id)?.qty ?? 0);
+        return (remaining + originalQty) > orderQty;
+    }, [state.data]);
+
 
     const toggleAddNewOrderModal = useCallback(() => {
         setIsActiveAddNewOrderModal(!isActiveAddNewOrderModal);
     }, [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal]);
 
-    const handleRowSelectionChange = async (selected: IPartialShippingOrderPurchasedOrderProduct[]) => {
-        const diffObject = await diffObjectArrays(sopops, selected);
-        const { added, deleted } = diffObject;
+    const handleRowSelectionChange = useCallback(async (selected: IPartialShippingOrderPurchasedOrderProduct[]) => {
+        const diff = await diffObjectArrays(sopops, selected, {
+            keys: ['qty', 'location'],
+            objectKeyById: ['location'],
+            nullUndefEqual: true,
+            coerceNumberStrings: true,
+        });
+        const { added, deleted } = diff;
         if (added.length > 0) {
             setSopops(prev => [...prev, ...added]);
         }
@@ -108,29 +123,22 @@ const Step1 = ({
             const del = new Set(deleted.map(d => d.id));
             setSopops(prev => prev.filter(p => !del.has(p.id)));
         }
-    };
+    }, [sopops]);
 
     const handleAddPurchasedOrder = useCallback((sopops: IPartialShippingOrderPurchasedOrderProduct[]) => {
         const sopposWithId = sopops.map(sopop => ({ ...sopop, id: generateRandomIds() }));
-        dispatch(add_shipping_order_purchased_order_products(sopposWithId));
+        dispatch(add_draft_shipping_order_purchased_order_products_aux(sopposWithId));
     }, [dispatch]);
 
     const handleOnClickNextStep = useCallback(async () => {
-        const updateValues = state.draft?.shipping_order_purchase_order_product?.filter(p => sopops.some(sopop => sopop.id === p.id)) || [];
+        const updateValues = state.draft?.shipping_order_purchase_order_product_aux?.filter(p => sopops.some(sopop => sopop.id === p.id)) || [];
         const locationBase = [...updateValues].shift()?.location;
-        const isSameLocation = updateValues?.every((p) => p.location?.id === locationBase?.id);
+        const isSameLocation = updateValues?.every((p) => {
+            return p.location?.id === locationBase?.id
+        });
         const [isAnyExceeds, isExceedQtyLocation] = (
             () => {
-                const anyExceeds = updateValues?.some((item) => {
-                    const orderQty = Number(item.purchase_order_products?.shipping_summary?.order_qty ?? 0);
-                    const shippedQty = Number(item.purchase_order_products?.shipping_summary?.shipping_qty ?? 0);
-                    const remaining = orderQty - shippedQty;
-                    const requested = Number(item.qty ?? 0);
-                    console.log('requested', requested);
-                    console.log('remaining', remaining);
-                    return requested > remaining;
-                }) ?? false;
-
+                const anyExceeds = updateValues?.some((item) => isExcededQtyOrder(item));
                 const someIsExceedQtyLocation = updateValues?.some((p) => (p.qty ?? 0) > (p?.location?.inventory?.available ?? 0));
                 return [anyExceeds, someIsExceedQtyLocation];
             }
@@ -183,7 +191,8 @@ const Step1 = ({
         }
         dispatch(update_draft_shipping_order({ delivery_date: deliveryDate }));
         dispatch(next_step());
-    }, [sopops, state.draft?.shipping_order_purchase_order_product, state.draft?.shipping_order_purchase_order_product, deliveryDate, date]);
+        return;
+    }, [sopops, state.draft?.shipping_order_purchase_order_product_aux, state.draft?.shipping_order_purchase_order_product, deliveryDate, date, isExcededQtyOrder,]);
 
     const columns: ColumnDef<IPartialShippingOrderPurchasedOrderProduct>[] = useMemo(() => [
         {
@@ -253,6 +262,7 @@ const Step1 = ({
                 <QuantityCell
                     record={row.original}
                     dispatch={dispatch}
+                    state={state}
                 />
             ),
             meta: {
@@ -319,6 +329,7 @@ const Step1 = ({
                             value={deliveryDate}
                             onChange={setDeliveryDate}
                             positionPopover="bottom-end"
+                            min={state.draft?.created_at ? new Date(state.draft?.created_at) : undefined}
                         />
                     </div>
                     <div>
@@ -333,7 +344,7 @@ const Step1 = ({
                 <GeneralTable
                     modelName="shipping_order_purchase_order_product"
                     columns={columns}
-                    data={state.draft?.shipping_order_purchase_order_product as IPartialShippingOrderPurchasedOrderProduct[]}
+                    data={state.draft?.shipping_order_purchase_order_product_aux as IPartialShippingOrderPurchasedOrderProduct[]}
                     enableRowSelection
                     classNameGenericTableContainer={StyleModule.genericTableContainer}
                     classNameTableBody={StyleModule.tableBody}
@@ -344,13 +355,8 @@ const Step1 = ({
             </div>
             <div className={StyleModule.footerSection}>
                 <CriticalActionButton
-                    onClick={onClose}
+                    onClick={toggleWarningModal}
                     label="Cancelar"
-                />
-                <TertiaryActionButtonCustom
-                    onClick={handleOnClickPrevious}
-                    label="Regresar"
-                    icon={<ChevronLeft />}
                 />
                 <MainActionButtonCustom
                     onClick={handleOnClickNextStep}
@@ -367,6 +373,14 @@ const Step1 = ({
                     />
                 )
             }
+            {
+                isActiveWarningModal && (
+                    <WarningModal
+                        onClose={toggleWarningModal}
+                        onLeave={toggleBackStep}
+                    />
+                )
+            }
         </div>
     )
 }
@@ -377,24 +391,26 @@ export default Step1;
 
 interface QuantityCellProps {
     record: IPartialShippingOrderPurchasedOrderProduct;
-    dispatch: Dispatch<ShippingOrderAction>;
+    dispatch: Dispatch<ShippingOrderAction>
+    state: ShippingOrderState,
 }
 
 const QuantityCell = memo(({
     record,
     dispatch,
+    state
 }: QuantityCellProps) => {
 
     const [valueQty, limitQty] = useMemo(() => {
         const valueQty = record.qty || 0;
-        const limitQty = (Number(record.purchase_order_products?.qty ?? 0) -
-            Number(record.purchase_order_products?.shipping_summary?.shipping_qty ?? 0));
+        const limitQty = ((Number(record.purchase_order_products?.shipping_summary?.order_qty ?? 0) - Number(record.purchase_order_products?.shipping_summary?.shipping_qty ?? 0))) +
+            (state.data?.shipping_order_purchase_order_product?.find((item) => item.id === record.id)?.qty || 0);
         return [valueQty, limitQty];
-    }, [record]);
+    }, [record.purchase_order_products, record.qty, state.data]);
 
     const handleChange = useCallback((value: number) => {
         dispatch(
-            update_draft_shipping_order_purchased_order_products({
+            update_draft_shipping_order_purchased_order_products_aux({
                 id: record.id ?? 0,
                 attributes: { qty: value },
             })
@@ -422,28 +438,34 @@ interface LocationCellProps {
 }
 
 const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
-
     const product = record.purchase_order_products?.product;
-
-    const { loadingLocationsProducedProduct, locationsProducedProduct } = useLocationsProducedOneProduct(product?.id ?? 0);
+    const { loadingLocationsProducedProduct, locationsProducedProduct } =
+        useLocationsProducedOneProduct(product?.id ?? 0);
 
     const handleOnChangeLocation = useCallback(
         (location: ILocation | null | undefined) => {
-            dispatch(update_draft_shipping_order_purchased_order_products({
+            dispatch(update_draft_shipping_order_purchased_order_products_aux({
                 id: record.id ?? 0,
                 attributes: { location: location ?? undefined }
             }));
-        }, [dispatch, record]);
+        }, [dispatch, record.id] // usa record.id (no todo record) para no re-crear la fn
+    );
 
+    // Solo asigna una vez: si ya hay location, no cambies nada
     useEffect(() => {
         if (!record.location && locationsProducedProduct.length > 0) {
             const initialLocation = locationsProducedProduct.find(
                 loc => loc.id === record.purchase_order_products?.purchase_order_product_location_production_line
                     ?.production_line?.location_production_line?.location?.id
-            );
+            ) ?? locationsProducedProduct[0]; // fallback estable
             if (initialLocation) handleOnChangeLocation(initialLocation);
         }
-    }, [locationsProducedProduct, handleOnChangeLocation, record]);
+    }, [
+        record.location, // si ya existe, no rehagas
+        locationsProducedProduct,
+        record.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.id,
+        handleOnChangeLocation
+    ]);
 
     return (
         <div className={StyleModule.objectSelectContainer}>
@@ -451,7 +473,9 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
                 <ObjectSelectCustomMemo
                     options={locationsProducedProduct}
                     labelKey="name"
-                    value={record.location as ILocation || record.purchase_order_products?.inventory_commited?.location as ILocation}
+                    // Mantén una sola fuente: prioriza record.location si está seteada
+                    value={(record.location as ILocation)
+                        ?? (record.purchase_order_products?.inventory_commited?.location as ILocation)}
                     defaultLabel="Selecciona una ubicación"
                     onChange={handleOnChangeLocation}
                     classNameInput={StyleModule.objectSelectInput}
@@ -461,6 +485,7 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
         </div>
     );
 });
+
 
 /* ********** Tag ********** */
 

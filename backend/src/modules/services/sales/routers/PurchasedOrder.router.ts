@@ -10,6 +10,8 @@ const createPurchasedOrderRouter = (): Router => {
         PurchasedOrderController.getAll);
     purchasedOrderRouter.get("/id/:id",
         PurchasedOrderController.getById);
+    purchasedOrderRouter.get("/ids",
+        PurchasedOrderController.getByIds);
     purchasedOrderRouter.get("/like/:filter",
         PurchasedOrderController.getByLike);
     purchasedOrderRouter.get("/client/:client_id",

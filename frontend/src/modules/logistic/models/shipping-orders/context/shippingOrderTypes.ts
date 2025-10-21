@@ -8,6 +8,11 @@ interface ShippingOrderState {
     draft: IPartialShippingOrder,
 }
 
+type ShippingOrderCommands = {
+    refetch: () => Promise<void>;
+    reset: () => void;
+};
+
 const initialShippingOrderState: ShippingOrderState = {
     total_steps: 2,
     current_step: 1,
@@ -24,6 +29,7 @@ const initialShippingOrderState: ShippingOrderState = {
 const shippingOrderActionsTypes = {
     SET_SHIPPING_ORDER: "SET_SHIPPING_ORDER",
     UPDATE_SHIPPING_ORDER: "UPDATE_SHIPPING_ORDER",
+    SET_FROM_SERVER: "SET_FROM_SERVER",
     ADD_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS: "ADD_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS",
     REMOVE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS: "REMOVE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS",
     UPDATE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS: "UPDATE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS",
@@ -51,6 +57,7 @@ type ShippingOrderAction =
     // Acciones directas al objeto de shipping order
     | { type: typeof shippingOrderActionsTypes.SET_SHIPPING_ORDER, payload: IPartialShippingOrder }
     | { type: typeof shippingOrderActionsTypes.UPDATE_SHIPPING_ORDER, payload: IPartialShippingOrder }
+    | { type: typeof shippingOrderActionsTypes.SET_FROM_SERVER, payload: IPartialShippingOrder }
     // Acciones directas al array de shipping order purchased order products
     | { type: typeof shippingOrderActionsTypes.ADD_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS, payload: IPartialShippingOrderPurchasedOrderProduct[] }
     | { type: typeof shippingOrderActionsTypes.REMOVE_SHIPPING_ORDER_PURCHASE_ORDER_PRODUCTS, payload: (number | string)[] }
@@ -81,6 +88,7 @@ export type {
     ShippingOrderState,
     ShippingOrderAction,
     ShippingOrderActionType,
+    ShippingOrderCommands,
 };
 
 export {

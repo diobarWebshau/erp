@@ -215,6 +215,13 @@ class ShippingOrderController {
                                                 sequelize.col("shipping_order_purchase_order_product->purchase_order_products.id")
                                             ),
                                             "inventory_commited"
+                                        ],
+                                        [
+                                            sequelize.fn(
+                                                "func_summary_shipping_on_client_order",
+                                                sequelize.col("shipping_order_purchase_order_product->purchase_order_products.id")
+                                            ),
+                                            "shipping_summary"
                                         ]
                                     ],
                                     include: [

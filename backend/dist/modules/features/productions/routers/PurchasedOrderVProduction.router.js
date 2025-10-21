@@ -6,6 +6,7 @@ const createPurchasedOrderVProductionRouter = () => {
     purchasedOrderRouter.get("/", PurchasedOrdersVProduction.getAll);
     purchasedOrderRouter.get("/id/:id", PurchasedOrdersVProduction.getById);
     purchasedOrderRouter.get("/client/:client_id", PurchasedOrdersVProduction.getByClientId);
+    purchasedOrderRouter.get("/ids", PurchasedOrdersVProduction.getByIds);
     purchasedOrderRouter.post("/", validatepurchasedOrdersMiddleware, PurchasedOrdersVProduction.create);
     purchasedOrderRouter.patch("/:id", validatepurchasedOrdersMiddleware, PurchasedOrdersVProduction.updateComplete);
     purchasedOrderRouter.delete("/:id", PurchasedOrdersVProduction.delete);

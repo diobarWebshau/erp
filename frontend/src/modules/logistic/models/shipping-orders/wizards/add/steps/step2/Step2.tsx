@@ -256,6 +256,7 @@ const Step2 = ({
             header: "Disponibilidad",
             cell: (row) => {
                 const record = row.row.original;
+                console.log(record);
                 return (
                     <TagTable
                         qty={record.qty || 0}
@@ -384,11 +385,11 @@ const QuantityCell = memo(({
     const handleChange = useCallback((value: number) => {
         dispatch(
             update_shipping_order_purchased_order_products_aux({
-                id: record.purchase_order_product_id ?? 0,
+                id: record.id ?? 0,
                 attributes: { qty: value },
             })
         );
-    }, [dispatch, record.purchase_order_product_id]);
+    }, [dispatch, record.id]);
 
     return (
         <NumericInputCustomMemo
@@ -419,10 +420,10 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
     const handleOnChangeLocation = useCallback(
         (location: ILocation | null | undefined) => {
             dispatch(update_shipping_order_purchased_order_products_aux({
-                id: record.purchase_order_product_id ?? 0,
+                id: record.id ?? 0,
                 attributes: { location: location ?? undefined }
             }));
-        }, [dispatch, record]);
+        }, [dispatch, record.id]);
 
     useEffect(() => {
         if (!record.location && locationsProducedProduct.length > 0) {

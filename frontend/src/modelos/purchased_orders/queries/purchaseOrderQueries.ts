@@ -3,8 +3,9 @@ import { setError, clearError } from "../../../store/slicer/errorSlicer";
 import type { AppDispatchRedux } from "../../../store/store";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-const RELATIVE_PATH = "/production/purchased-orders";
+const RELATIVE_PATH = "production/purchased-orders/";
 const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
+
 
 const fetchPurchasedOrdersFromDB = async ({
     dispatch,
@@ -102,6 +103,68 @@ const getPurchasedOrderByIdInDB = async (
         throw error;
     }
 }
+
+const getPurchasedOrderByIdsInDB = async (
+    dispatch: AppDispatchRedux,
+    id: number | number[],
+    signal?: AbortSignal
+): Promise<IPurchasedOrder[] | null> => {
+    try {
+        /* Generamos los params */
+        const params = new URLSearchParams();
+        if (Array.isArray(id)) {
+            id.forEach((v) => params.append("id", v.toString()));
+        } else {
+            params.append("id", id.toString());
+        }
+
+        /* Generamos la URL */
+        const url = new URL(`ids`, API_URL); // respeta tu uso de '/ids'
+        url.search = params.toString();
+
+
+        /* Generamos el request */
+        const request = new Request(url.toString(), {
+            method: "GET",
+            headers: { Accept: "application/json" }, // GET no necesita Content-Type
+            signal,
+        });
+
+        /* Realizamos la petición */
+        const response = await fetch(request);
+
+        /* Validamos la respuesta */
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(
+                    `${errorText}`
+                );
+            }
+            dispatch(
+                setError({
+                    key: "getAllDetailsPurchasedOrder",
+                    message: errorText
+                })
+            )
+            return null;
+        }
+
+        // Limpia la MISMA clave que usaste al setear
+        dispatch(clearError("getAllDetailsIdsPurchasedOrder"));
+
+        const data: unknown = await response.json();
+
+        return data as IPurchasedOrder[];
+    } catch (error: unknown) {
+        // Ignoramos abortError, solo lanzamos otros errores
+        if (error instanceof DOMException && error.name === "AbortError") {
+            console.log("abort");
+            return []; // fetch cancelado, retornamos vacío
+        }
+        throw error;
+    }
+};
 
 const fetchPurchasedOrdersLike = async (
     query: string
@@ -312,5 +375,6 @@ export {
     updatePurchasedOrderInDB,
     deletePurchasedOrderInDB,
     getAllDetailsPurchasedOrderByIdInDB,
-    fetchPurchasedOrdersLike
+    fetchPurchasedOrdersLike,
+    getPurchasedOrderByIdsInDB
 };

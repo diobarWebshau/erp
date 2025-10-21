@@ -1,1 +1,132 @@
+/* ******** CONTAINER ******** */
 
+.container {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "header" auto
+        "subheader" auto
+        "content" 1fr
+        "commentSection" 1fr
+        "footer" auto
+        / 100%;
+    gap: 1.5rem;
+}
+
+/* ******** HEADER ******** */
+
+.header {
+    /* distribucion grid respecto al padre */
+    grid-area: header;
+
+    /* estilo */
+    text-align: start;
+    font-size: 24px;
+    color: var(--color-theme-primary);
+
+}
+
+/* ******** SUBHEADER ******** */
+
+.subheader {
+    /* distribucion grid respecto al padre */
+    grid-area: subheader;
+
+    /* estilo */
+    text-align: start;
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+
+/* ******** CONTENT ******** */
+
+.content {
+    /* distribucion grid respecto al padre */
+    grid-area: content;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.rowContainer {
+    /* distribucion grid respecto al padre */
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.rowContainer>* {
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+
+.inputNumeric {
+    height: 44px;
+}
+
+.inputDateInputMantine.inputDateInputMantine {
+    height: 44px;
+}
+
+/* ******** COMMENT SECTION ******** */
+
+.commentSection {
+    /* distribucion grid respecto al padre */
+    grid-area: commentSection;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.commentSection>*:first-child {
+    color: var(--color-theme-primary);
+    font-size: 14px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+}
+
+.commentSection>*:first-child>span {
+    color: var(--color-theme-font-black);
+}
+
+/* ******** FOOTER ******** */
+
+.footerSection {
+    /* distribucion grid respecto al padre */
+    grid-area: footer;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+}

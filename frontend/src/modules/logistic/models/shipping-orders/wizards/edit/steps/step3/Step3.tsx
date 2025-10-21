@@ -18,7 +18,7 @@ import { set_draft_shipping_order, set_step } from "../../../../context/shipping
 
 interface IStep3 { onClose: () => void }
 
-const Step3 = ({  }: IStep3) => {
+const Step3 = ({ }: IStep3) => {
 
     const dispatch = useShippingOrderDispatch();
     const state = useShippingOrderState();
@@ -50,7 +50,6 @@ const Step3 = ({  }: IStep3) => {
         },
     ];
 
-
     const { purchasedOrder, location } = useMemo(() => {
         const getValues = () => {
             const sopop = [...state.data?.shipping_order_purchase_order_product || []].shift();
@@ -64,7 +63,7 @@ const Step3 = ({  }: IStep3) => {
     const handleOnClickEdit = useCallback(() => {
         dispatch(set_draft_shipping_order(state.data));
         dispatch(set_step(1));
-    }, [dispatch,]);
+    }, [dispatch, state.data]);
 
     const tagStatusClassName = useMemo(() => {
         return clsx(StyleModule[state.data?.status?.toLowerCase() || ""])

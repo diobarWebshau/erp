@@ -9,14 +9,17 @@ interface IDateInputMantine {
   onChange: (value: Date | null) => void; // Callback al cambiar la fecha
   classNameInput?: string; // Clase opcional para personalizar el contenedor principal
   positionPopover: "bottom" | "top" | "left" | "right" | "bottom-start" | "bottom-end" | "top-start" | "top-end" | "left-start" | "left-end" | "right-start" | "right-end"
-
+  min?: Date;
+  max?: Date;
 }
 
 function DateInputMantine({
   value,
   onChange,
   classNameInput,
-  positionPopover
+  positionPopover,
+  min,
+  max
 }: IDateInputMantine) {
 
   const [isValidDate, setIsValidDate] = useState<boolean>(DateUtils.isValid(value));
@@ -56,7 +59,8 @@ function DateInputMantine({
       headerControlsOrder={['level', 'previous', 'next']} // Orden de los controles del header
       weekdayFormat={weekdayFormat} // Función para mostrar los días de la semana
       locale="es" // Idioma español
-
+      {...(min ? { minDate: min } : {})}
+      {...(max ? { maxDate: max } : {})}
       placeholder="Selecciona una fecha" // Texto cuando no hay valor
       rightSection={<Calendar size={18} color="blue" />} // Icono del calendario dentro del input
       rightSectionPointerEvents="none" // Evita que el icono bloquee la interacción con el input
