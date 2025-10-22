@@ -23,6 +23,9 @@ const Step3 = ({ }: IStep3) => {
     const dispatch = useShippingOrderDispatch();
     const state = useShippingOrderState();
 
+    console.log(`state:`, state);
+
+
     const columns: ColumnDef<IPartialShippingOrderPurchasedOrderProduct>[] = [
         {
             id: "order",
@@ -45,7 +48,7 @@ const Step3 = ({ }: IStep3) => {
         },
         {
             id: "warehouse",
-            accessorFn: (row) => row.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.name,
+            accessorFn: (row) => row.purchase_order_products?.inventory_commited?.location?.name,
             header: "Almacén de envío",
         },
     ];
@@ -54,7 +57,7 @@ const Step3 = ({ }: IStep3) => {
         const getValues = () => {
             const sopop = [...state.data?.shipping_order_purchase_order_product || []].shift();
             const purchasedOrder = sopop?.purchase_order_products?.purchase_order;
-            const location = sopop?.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location;
+            const location = sopop?.purchase_order_products?.inventory_commited?.location;
             return { purchasedOrder, location };
         };
         return getValues();
@@ -68,7 +71,6 @@ const Step3 = ({ }: IStep3) => {
     const tagStatusClassName = useMemo(() => {
         return clsx(StyleModule[state.data?.status?.toLowerCase() || ""])
     }, [state.data?.status]);
-
 
     const processStatus = useMemo(() => {
         const status = state.data?.status?.toLowerCase() || "";

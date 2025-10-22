@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { generateColumnsShippingOrders } from "./structure/columns";
 import type { RowAction } from "../../../../components/ui/table/types";
 import { Trash2, Download, Plus, Search, Eraser, PackageCheck, PackageSearch, TrendingDown, Ban } from "lucide-react";
-import { diffObjectArrays, diffObjects } from "../../../../utils/validation-on-update/validationOnUpdate"
+import { diffObjectArrays, diffObjects } from "../../../../utils/validation-on-update/ValidationOnUpdate2"
 import type { IPartialShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProductManager } from "../../../../interfaces/shippingPurchasedProduct";
 import StyleModule from "./ShippingOrdersModel.module.css";
 import { clearAllErrors } from "../../../../store/slicer/errorSlicer";
@@ -164,6 +164,8 @@ const ShippingOrderModel = () => {
 
     const handleUpdate = useCallback(async (original: IPartialShippingOrder, updated: IPartialShippingOrder) => {
         setLoading(true);
+        console.log(`original:`, original.shipping_order_purchase_order_product);
+        console.log(`updated:`, updated.shipping_order_purchase_order_product);
         try {
             const shipping_old = {
                 ...original,
@@ -193,9 +195,13 @@ const ShippingOrderModel = () => {
 
             const diff_shipping: IPartialShippingOrder = await diffObjects(shipping_old, shipping_new);
 
-            const diff_sopops: IShippingOrderPurchasedOrderProductManager = await diffObjectArrays(sopops_old, sopops_new);
+            const diff_sopops: IShippingOrderPurchasedOrderProductManager = await diffObjectArrays(sopops_old, sopops_new, {
+                objectKeyById: ['location'],
+                nullUndefEqual: true,
+                coerceNumberStrings: true,
+            });
 
-            console.log(diff_sopops);
+            console.log(`diff_sopops:`, diff_sopops);
 
             const hasChangesSopops: boolean = [
                 diff_sopops.added,
@@ -206,6 +212,7 @@ const ShippingOrderModel = () => {
                     IShippingOrderPurchasedOrderProduct |
                     IPartialShippingOrderPurchasedOrderProduct)[]
                 ) => arr.length > 0);
+
 
             const diff_evidences: LoadEvidenceManager = await diffObjectArrays(evidences_old, evidences_new);
 
@@ -251,6 +258,7 @@ const ShippingOrderModel = () => {
                     load_evidence_deleted: diff_evidences.deleted?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                     load_evidence_old: load_evidence_old?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                 }
+                console.log(`new_shipping:`, new_shipping);
                 const response =
                     await updateCompleteShippingOrderInDB(
                         shippingOrderRecord?.id || null,
@@ -263,6 +271,7 @@ const ShippingOrderModel = () => {
             }
             setServerError(null);
         } catch (error) {
+            console.log(`error:`, error);
             if (error instanceof Error) setServerError(error.message);
         } finally {
             setLoading(false);

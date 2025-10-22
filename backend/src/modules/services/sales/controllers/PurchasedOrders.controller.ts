@@ -360,10 +360,6 @@ class PurchasedOrderController {
         const raw = req.query.id;
         const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
         const ids = arr.map(Number).filter(Number.isFinite);
-        console.log(`Obtieniendo ids`);
-        console.log(raw);
-        console.log(arr);
-        console.log(ids);
         try {
             const response = await PurchasedOrderModel.findAll({
                 where: { id: { [Op.in]: ids } },
@@ -385,6 +381,13 @@ class PurchasedOrderController {
                             [
                                 sequelize.literal("func_summary_shipping_on_client_order(`purchase_order_products`.id)"),
                                 "shipping_summary"
+                            ],
+                            [
+                                sequelize.fn(
+                                    "func_get_inventory_movements_commited_pop",
+                                    sequelize.col("purchase_order_products.id")
+                                ),
+                                "inventory_commited"
                             ]
                         ],
                         include: [

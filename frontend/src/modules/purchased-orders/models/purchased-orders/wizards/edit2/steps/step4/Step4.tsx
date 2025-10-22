@@ -132,8 +132,8 @@ const Step4 = ({
                     const qty = row.original.qty ?? 0;
                     const available_stock = row.original.stock_available?.available ?? 0;
                     const committed = row.original.inventory_commited?.qty ?? 0;
-                    const production = row.original?.production_order?.production_breakdown?.finished ?? 0;
-                    const available = available_stock + production + committed;
+                    // const production = row.original?.production_order?.production_breakdown?.finished ?? 0;
+                    const available = available_stock > 0 ? available_stock : 0;
 
                     const minStock = row.original.stock_available?.minimum_stock ?? 0;
 

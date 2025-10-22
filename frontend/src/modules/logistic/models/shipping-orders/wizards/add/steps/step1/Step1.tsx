@@ -27,27 +27,21 @@ const Step1 = ({ onClose }: IStep1) => {
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
 
-
     const [purchase_orders, client, initialState]: [IPartialPurchasedOrder[], string, TableStatePartial] = useMemo(() => {
-
         const map = new Map<number | string, IPartialPurchasedOrder>();
         for (const item of state.data?.shipping_order_purchase_order_product_aux ?? []) {
             const po = item.purchase_order_products?.purchase_order as IPartialPurchasedOrder | undefined;
             if (po?.id != null) map.set(po.id, po);
         }
         const purchase_orders = [...map.values()];
-
         const client = [...purchase_orders].shift()?.client?.company_name || "";
-
         const rowSelectionState: RowSelectionState = {}
         purchase_orders.forEach(p => {
             rowSelectionState[p?.id?.toString() || ""] = true;
         });
-
         const initialState: TableStatePartial = {
             ...(Object.keys(rowSelectionState).length > 0 ? { rowSelectionState } : {})
         }
-
         return [purchase_orders, client, initialState];
     }, [state.data?.shipping_order_purchase_order_product_aux]);
 
@@ -59,7 +53,6 @@ const Step1 = ({ onClose }: IStep1) => {
         debounce: 500,
         conditionalExclude: exclude
     });
-
 
     const columns: ColumnDef<IPurchasedOrder>[] = useMemo(() => [
         {
@@ -162,7 +155,7 @@ const Step1 = ({ onClose }: IStep1) => {
             const poIds = deleted.map(p => p.id);
             setSelectedPurchasedOrder(prev => prev.filter(p => !poIds.includes(p.id || 0)));
             const pops = state.data?.shipping_order_purchase_order_product_aux?.filter(p => poIds.includes(p.purchase_order_products?.purchase_order_id || 0));
-            const sopopsIds = (pops?.map(p => p.purchase_order_product_id) ?? []).filter((p): p is number => p !== undefined);
+            const sopopsIds = (pops?.map(p => p.id) ?? []).filter((p): p is number => p !== undefined);
             if (sopopsIds.length > 0) {
                 dispatch(remove_shipping_order_purchased_order_products_aux(sopopsIds));
             }
@@ -242,12 +235,10 @@ const Step1 = ({ onClose }: IStep1) => {
             </div>
             <GenericTable
                 modelName="purchased_orders"
-
                 /* distribuccion de columnas y rows */
                 columns={columns}
                 data={purchasedOrders ? purchasedOrders : []}
                 isLoadingData={loadingPurchasedOrders}
-
                 /* funcionalidades */
                 enablePagination
                 enableFilters
@@ -271,7 +262,6 @@ const Step1 = ({ onClose }: IStep1) => {
                     icon={<ChevronRight />}
                 />
             </div>
-
         </div>
     )
 }

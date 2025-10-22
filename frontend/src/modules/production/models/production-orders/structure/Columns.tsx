@@ -6,7 +6,7 @@ import type {
     IProductionOrder
 } from "../../../../../interfaces/productionOrder";
 import stylesModules from "./columns.module.css";
-import SingleProgressBarMantine from "../../../../../comp/external/mantine/progress-bar/single-progress-bar/SingleProgressBarMantine";
+import SingleProgressBarMantine from "../../../../../comp/external/mantine/progress-bar/single-progress-bar/base/SingleProgressBarMantine";
 
 interface IColumnsProductionOrdersProps {
     onClickContent: (e: React.MouseEvent, row: Row<IProductionOrder>) => void;

@@ -11,14 +11,8 @@ const Tag = ({ label, className, onClick }: ITagProps) => {
 
     const handleClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
-        console.log("click")
-        console.log(onClick)
         if (onClick) {
-            console.log("onClick")
             onClick();
-            console.log("onClick ejecutado")
-        }else{
-            console.log("no hay onClick")
         }
     }, [onClick]);
 

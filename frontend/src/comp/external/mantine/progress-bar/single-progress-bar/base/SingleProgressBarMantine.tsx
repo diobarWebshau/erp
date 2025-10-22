@@ -1,6 +1,6 @@
 import { Progress } from "@mantine/core";
 import StyleModule from "./SingleProgressBarMantine.module.css";
-
+import { formatNumber } from "../../../../../../helpers/formttersNumeric";
 
 interface PropsSingleProgressBarMantine {
     value: number;
@@ -14,9 +14,9 @@ interface PropsSingleProgressBarMantine {
 type Status = "completed" | "inProgress" | "pending";
 const statusVar = (s: Status) =>
     s === "completed"
-        ? "var(--color-success)"
+        ? "var(--color-success-light)"
         : s === "inProgress"
-            ? "var(--color-warning)"
+            ? "var(--color-warning-light)"
             : "var(--color-theme-background)";
 
 const SingleProgressBarMantine = ({
@@ -36,11 +36,11 @@ const SingleProgressBarMantine = ({
         total <= 0
             ? "pending"
             : value >= total
+            
                 ? "completed"
                 : value > 0
                     ? "inProgress"
                     : "pending";
-
     return (
         <Progress.Root
             className={`${StyleModule.progressBarRoot} ${classNameRoot}`}
@@ -55,7 +55,7 @@ const SingleProgressBarMantine = ({
                 showLabel &&
                 <Progress.Label
                     className={`${StyleModule.labelProgressBar} ${classNameLabel}`}>
-                    {value}/{total}
+                    {`${formatNumber(value)} / ${formatNumber(total)}`}
                 </Progress.Label>
             }
         </Progress.Root>

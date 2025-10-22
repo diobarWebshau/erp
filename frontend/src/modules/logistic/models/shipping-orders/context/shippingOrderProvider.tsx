@@ -104,11 +104,13 @@ const ShippingOrderProvider = ({
                 id: generateRandomIds(),
                 purchase_order_products: p,
                 purchase_order_product_id: p.id,
+                location: p.inventory_commited?.location,
                 // qty pendiente: order_qty - shipping_qty (si no hay summary, queda 0)
                 qty:
                     (Number(p.shipping_summary?.order_qty) || 0) -
                     (Number(p.shipping_summary?.shipping_qty) || 0),
             }));
+            console.log(`sopops:`, sopops);
 
             return {
                 ...data,

@@ -90,7 +90,7 @@ const keyOf = (o: any): string | null => {
   return id === undefined || id === null ? null : String(id);
 };
 
-// ⚠️ NUEVO: aplasta claves-objeto a solo { id }
+// (Se conserva por si después lo quieres reutilizar, pero YA NO se usa para aplastar antes de comparar)
 function stripObjectKeysById<T extends Record<string, any>>(
   obj: T,
   keys: string[] = []
@@ -132,9 +132,9 @@ async function diffObjects(
     return {};
   }
 
-  // ⚠️ NUEVO: defénsivo — aplasta { id } en este nivel para claves byId
-  obj1 = stripObjectKeysById(obj1, opts.objectKeyById);
-  obj2 = stripObjectKeysById(obj2, opts.objectKeyById);
+  // ❌ Antes aplastabas aquí ⇒ eso te dejaba { id } y perdías campos
+  // obj1 = stripObjectKeysById(obj1, opts.objectKeyById);
+  // obj2 = stripObjectKeysById(obj2, opts.objectKeyById);
 
   let keys = Array.from(new Set([...Object.keys(obj1 ?? {}), ...Object.keys(obj2 ?? {})]));
   if (opts.keys?.length) keys = keys.filter((k) => opts.keys!.includes(k));
@@ -146,11 +146,43 @@ async function diffObjects(
     const val1 = (obj1 as any)[key];
     const val2 = (obj2 as any)[key];
 
-    // Si es clave-objeto a comparar por id, ya están aplastadas ⇒ compara {id}
+    // ✅ Tratamiento especial para claves "byId":
+    // si cambia el id ⇒ reemplaza TODO el objeto por val2
+    // si NO cambia ⇒ deep-diff de sus campos internos
     if (opts.objectKeyById?.includes(key)) {
       const id1 = keyOf(val1);
       const id2 = keyOf(val2);
-      if (id1 !== id2) result[key] = val2; // diferente id
+
+      // Uno es null y el otro no, o ambos existen pero distintos
+      if (id1 !== id2) {
+        result[key] = val2;
+        continue;
+      }
+
+      // Si ambos son objetos y el id coincide, diff profundo
+      const bothObjects =
+        typeof val1 === "object" && val1 !== null && typeof val2 === "object" && val2 !== null;
+      if (bothObjects) {
+        const nested = await diffObjects(val1, val2, opts);
+        if (Object.keys(nested).length > 0) result[key] = nested;
+      } else {
+        // Si alguno no es objeto (o ambos son null), aplica comparación normal
+        const _n = (v: any) =>
+          opts.nullUndefEqual && (v === null || v === undefined) ? null : normalizeScalar(key, v);
+
+        const coerce = (v: any) => {
+          if (!opts.coerceNumberStrings) return v;
+          if (typeof v === "string" || typeof v === "number") {
+            const n = Number(v);
+            if (!Number.isNaN(n) && String(n) === String(v)) return n;
+          }
+          return v;
+        };
+
+        const n1 = coerce(_n(val1));
+        const n2 = coerce(_n(val2));
+        if (n1 !== n2) result[key] = val2;
+      }
       continue;
     }
 
@@ -213,7 +245,8 @@ async function diffObjectArrays(
   const added: any[] = [];
   const deleted: any[] = [];
 
-  const hasFiles = arr1.some((x) => x instanceof File) || arr2.some((x) => x instanceof File);
+  const hasFiles =
+    arr1.some((x) => x instanceof File) || arr2.some((x) => x instanceof File);
   if (hasFiles) {
     const ids1: string[] = [];
     const ids2: string[] = [];
@@ -223,19 +256,23 @@ async function diffObjectArrays(
     for (const f of arr1) {
       if (f instanceof File) {
         const id = await getFileId(f);
-        ids1.push(id); map1.set(id, f);
+        ids1.push(id);
+        map1.set(id, f);
       } else if (f && typeof f === "object" && f.path instanceof File) {
         const id = f.id ?? (await getFileId(f.path));
-        ids1.push(id); map1.set(id, f.path);
+        ids1.push(id);
+        map1.set(id, f.path);
       }
     }
     for (const f of arr2) {
       if (f instanceof File) {
         const id = await getFileId(f);
-        ids2.push(id); map2.set(id, f);
+        ids2.push(id);
+        map2.set(id, f);
       } else if (f && typeof f === "object" && f.path instanceof File) {
         const id = f.id ?? (await getFileId(f.path));
-        ids2.push(id); map2.set(id, f.path);
+        ids2.push(id);
+        map2.set(id, f.path);
       }
     }
 
@@ -280,11 +317,12 @@ async function diffObjectArrays(
     const obj1 = map1.get(k);
     if (!obj1) continue;
 
-    // ⚠️ NUEVO: aplasta por id ANTES de comparar
-    const a = stripObjectKeysById(obj1, opts.objectKeyById);
-    const b = stripObjectKeysById(obj2, opts.objectKeyById);
+    // ❌ Antes "aplastabas" aquí
+    // const a = stripObjectKeysById(obj1, opts.objectKeyById);
+    // const b = stripObjectKeysById(obj2, opts.objectKeyById);
 
-    const diff = await diffObjects(a, b, opts);
+    // ✅ Deja que diffObjects maneje objectKeyById con la rama especializada
+    const diff = await diffObjects(obj1, obj2, opts);
     if (diff && Object.keys(diff).length > 0) {
       modified.push({ id: obj2.id, ...diff });
     }

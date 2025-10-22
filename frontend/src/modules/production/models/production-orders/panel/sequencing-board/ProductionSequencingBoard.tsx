@@ -40,7 +40,7 @@ import type { IInternalProductProductionOrder } from "../../../../../../interfac
 import type { IPartialProductProcess } from "../../../../../../interfaces/productsProcesses";
 import type { IProductionLineQueue } from "../../../../../../interfaces/productionLineQueue";
 import { updateProductionLineQueue } from "../../../../../../modelos/productionLineQueue/query/ProductionLineQueue";
-import SingleProgressBarMantine from "../../../../../../comp/external/mantine/progress-bar/single-progress-bar/SingleProgressBarMantine";
+import SingleProgressBarMantine from "../../../../../../comp/external/mantine/progress-bar/single-progress-bar/base/SingleProgressBarMantine";
 
 interface IProductionSequencingBoard {
     onClose: () => void

@@ -29,7 +29,10 @@ const shippingTypeOptions = ["Internacional", "Nacional"];
 
 const Step2 = ({ onUpdate }: IStep2) => {
 
+    
+
     const state = useShippingOrderState();
+    console.log(`state:`, state);
     const { refetch } = useShippingOrderCommand();
     const errorRedux = useSelector((state: RootState) => state.error);
     const dispatch = useShippingOrderDispatch();
@@ -87,34 +90,58 @@ const Step2 = ({ onUpdate }: IStep2) => {
         dispatch(set_step(3));
     }, [dispatch, refetch]);
 
-    const handleOnClickNextStep = useCallback(() => {
-        if (!state.draft?.carrier || !state.draft?.shipping_date || !state.draft?.transport_method ||
-            !state.draft?.shipment_type || cost <= 0 ||
-            state.draft?.delivery_cost === null || state.draft?.delivery_cost === 0 || !state.draft?.tracking_number) {
+    const handleOnClickNextStep = useCallback(async () => {
+        // 1) Validaciones de requeridos
+        const draft = state.draft;
+        if (
+            !draft?.carrier ||
+            !draft?.shipping_date ||
+            !draft?.transport_method ||
+            !draft?.shipment_type ||
+            cost <= 0 ||
+            draft?.delivery_cost == null || draft.delivery_cost === 0 ||
+            !draft?.tracking_number
+        ) {
             toastMantine.feedBackForm({ message: 'Debes completar todos los campos requeridos.' });
             return;
         }
+
+        // 2) Construir lista coherente de SOPoP
+        const selectedIds = new Set(
+            (draft.shipping_order_purchase_order_product ?? []).map(x => x.id)
+        );
+
+        const shippingOrderPurchaseOrderProduct =
+            (draft.shipping_order_purchase_order_product_aux ?? [])
+                .filter(x => selectedIds.has(x.id));
+
+        // 3) Payload de actualización
         const updateShippingOrder: IPartialShippingOrder = {
-            ...state.draft,
-            carrier: state.draft?.carrier,
-            shipping_date: state.draft?.shipping_date,
-            delivery_cost: state.draft?.delivery_cost,
-            tracking_number: state.draft?.tracking_number,
-            carrier_id: state.draft?.carrier?.id,
-            transport_method: state.draft?.transport_method,
-            shipment_type: state.draft?.shipment_type,
-            comments: state.draft?.comments
-        }
-        dispatch(update_draft_shipping_order(updateShippingOrder));
-        onUpdate(state.data, updateShippingOrder);
+            ...draft,
+            shipping_order_purchase_order_product: shippingOrderPurchaseOrderProduct,
+        };
+
+        // 4) Esperar la actualización antes de leer errores
+        await onUpdate(state.data, updateShippingOrder);
+
+        // 5) Mostrar errores si llegaron; si no, abrir modal
         if (Object.keys(errorRedux).length > 0) {
-            Object.entries(errorRedux).forEach(([_, value]) => {
-                toastMantine.error({ message: value });
-            })
+            Object.values(errorRedux).forEach((msg) => {
+                toastMantine.error({ message: String(msg) });
+            });
             return;
         }
+
         setIsActiveFeedBackModal(true);
-    }, [dispatch, state.draft, state.data, onUpdate]);
+    }, [
+        state.draft,
+        state.data,
+        cost,
+        onUpdate,
+        errorRedux,
+        toastMantine,
+        setIsActiveFeedBackModal,
+    ]);
 
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch]);
 

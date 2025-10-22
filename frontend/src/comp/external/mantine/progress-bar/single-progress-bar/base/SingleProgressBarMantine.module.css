@@ -1,17 +1,16 @@
-
 .progressBarRoot {
+    /* dimension */
     width: 100%;
-
-    background-color: var(--color-theme-neutral-background);
-    border-radius: 15px;
+    height: 100%;
+    /* estilos */
 }
 
 .labelProgressBar {
+    /* posicionamiento */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    /* estilos */
     font-size: 12px;
-    color: var(--color-theme-font-white);
 }
-

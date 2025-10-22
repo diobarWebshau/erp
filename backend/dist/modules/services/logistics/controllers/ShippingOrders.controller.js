@@ -64,6 +64,14 @@ class ShippingOrderController {
                                 attributes: [
                                     ...PurchaseOrderProductModel.getAllFields(),
                                     [
+                                        sequelize.literal("func_get_production_summary_of_pop(`shipping_order_purchase_order_product->purchase_order_products`.id)"),
+                                        "production_order"
+                                    ],
+                                    [
+                                        sequelize.literal("funct_get_stock_available_of_pop_on_location(`shipping_order_purchase_order_product->purchase_order_products`.id)"),
+                                        "stock_available"
+                                    ],
+                                    [
                                         sequelize.fn("func_get_inventory_movements_commited_pop", sequelize.col("shipping_order_purchase_order_product->purchase_order_products.id")),
                                         "inventory_commited"
                                     ]
@@ -166,6 +174,14 @@ class ShippingOrderController {
                                 as: "purchase_order_products",
                                 attributes: [
                                     ...PurchaseOrderProductModel.getAllFields(),
+                                    [
+                                        sequelize.literal("func_get_production_summary_of_pop(`shipping_order_purchase_order_product->purchase_order_products`.id)"),
+                                        "production_order"
+                                    ],
+                                    [
+                                        sequelize.literal("funct_get_stock_available_of_pop_on_location(`shipping_order_purchase_order_product->purchase_order_products`.id)"),
+                                        "stock_available"
+                                    ],
                                     [
                                         sequelize.fn("func_get_inventory_movements_commited_pop", sequelize.col("shipping_order_purchase_order_product->purchase_order_products.id")),
                                         "inventory_commited"
@@ -746,6 +762,7 @@ class ShippingOrderController {
         const completeBody = req.body;
         let IsDeleteImage = false;
         let isSuccessFully = false;
+        console.log(`*************************************`, completeBody);
         try {
             // ? **** OBTENER LOS CAMPOS EDITABLES ****
             const editableFields = ShippingOrderModel.getEditableFields();
@@ -947,6 +964,35 @@ class ShippingOrderController {
                             transaction
                         });
                         const new_pops = [...popsDetailsResponse].map(m => m.toJSON());
+                        console.log(`modifiedFiltered`, modifiedFiltered);
+                        const filter = modifiedFiltered.filter(p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
+                            !== Number(p.location?.id));
+                        console.log("filter", filter);
+                        if (filter.length > 0) {
+                            const promises = filter.map(p => {
+                                const response = InventoryMovementModel.update({
+                                    location_id: p.location?.id,
+                                    location_name: p.location?.name
+                                }, {
+                                    where: {
+                                        reference_id: p.id,
+                                        reference_type: "Order",
+                                        movement_type: "allocate"
+                                    }
+                                });
+                                return response;
+                            });
+                            const responseUpdateLocation = await Promise.all(promises);
+                            if (responseUpdateLocation.some(r => r[0] === 0)) {
+                                await transaction.rollback();
+                                await deleteLoadEvidences(completeBody.load_evidence || []);
+                                res.status(500).json({
+                                    validation: `The update of the location in the inventory movement `
+                                        + `could not be completed.`
+                                });
+                                return;
+                            }
+                        }
                         for (const p of new_pops) {
                             const qty_real_pop = p.qty;
                             const qty_shipped_pop = p.shipping_order_purchase_order_product
@@ -974,18 +1020,16 @@ class ShippingOrderController {
                             const sopops = existingSopopsResponse.map(m => m.toJSON());
                             const sopop = sopops.find(po => po.purchase_order_product_id === p.id);
                             const sopop_update = modifiedFiltered.find(po => po.id === sopop?.id);
+                            console.log("se va a actualizar", sopop_update);
                             const update = await ShippingOrderPurchaseOrderProductModel
                                 .update({ qty: sopop_update?.qty }, {
                                 where: {
-                                    [Op.and]: [{
-                                            purchase_order_product_id: sopop?.purchase_order_product_id
-                                        }, {
-                                            shipping_order_id: sopop?.shipping_order_id
-                                        }]
+                                    id: sopop?.id
                                 },
                                 transaction
                             });
                             if (!(update[0] > 0)) {
+                                console.log("no se actualizo", update[0]);
                                 await transaction?.rollback();
                                 await deleteLoadEvidences(completeBody.load_evidence);
                                 res.status(400).json({
@@ -994,6 +1038,9 @@ class ShippingOrderController {
                                         + `could not be updated`
                                 });
                                 return;
+                            }
+                            else {
+                                console.log("se actualizo", update[0]);
                             }
                         }
                     }
@@ -1161,8 +1208,10 @@ class ShippingOrderController {
                         // ? *** ACTUALIZAMOS LA UBICACION EN EL INVENTARIO SI LO REQUIERE **** */
                         const filter = addsFiltered.filter(p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
                             !== Number(p.location?.id));
+                        console.log("filter", filter);
                         if (filter.length > 0) {
                             const promises = filter.map(p => {
+                                console.log("p", p.id);
                                 const response = InventoryMovementModel.update({
                                     location_id: p.location?.id,
                                     location_name: p.location?.name
@@ -1175,6 +1224,7 @@ class ShippingOrderController {
                                 });
                                 return response;
                             });
+                            console.log("promises", promises);
                             const responseUpdateLocation = await Promise.all(promises);
                             if (responseUpdateLocation.some(r => r[0] === 0)) {
                                 await transaction.rollback();
@@ -1211,15 +1261,17 @@ class ShippingOrderController {
                                 });
                                 return;
                             }
-                            const new_sopops = addsFiltered.map((item) => {
-                                return {
-                                    ...item,
-                                    shipping_order_id: shippingOrder.id
-                                };
-                            });
+                            const found = addsFiltered.find(p => p.id === p.id);
+                            if (!found) {
+                                throw new Error('POP no encontrado para crear ShippingOrderPurchaseOrderProduct');
+                            }
+                            const new_sopop = {
+                                ...found,
+                                shipping_order_id: shippingOrder.id
+                            };
                             const responseCreate = await ShippingOrderPurchaseOrderProductModel
-                                .bulkCreate(new_sopops, { transaction });
-                            if (responseCreate.length !== addsFiltered.length) {
+                                .create(new_sopop, { transaction });
+                            if (!responseCreate) {
                                 await transaction?.rollback();
                                 await deleteLoadEvidences(completeBody.load_evidence);
                                 res.status(400).json({
