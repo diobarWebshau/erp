@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import type { IPartialShippingOrder, IShippingOrder, LoadEvidenceItem, LoadEvidenceManager, PartialLoadEvidenceItem } from "../../../../interfaces/shippingOrder";
 import type { AppDispatchRedux } from "../../../../store/store";
 import { deleteShippingOrderInDB, createCompleteShippingOrderInDB, updateCompleteShippingOrderInDB, loadCompleteShippingOrderInDB } from "../../../../queries/shippingOrderQueries";
@@ -162,16 +162,18 @@ const ShippingOrderModel = () => {
         }
     }, [shippingOrderRecord]);
 
-    const handleUpdate = useCallback(async (shipping: IPartialShippingOrder, shippingOrderDetail: IPartialShippingOrder) => {
+    const handleUpdate = useCallback(async (original: IPartialShippingOrder, updated: IPartialShippingOrder) => {
         setLoading(true);
-
         try {
             const shipping_old = {
-                ...shippingOrderDetail,
+                ...original,
                 delivery_cost:
-                    Number(shippingOrderDetail?.delivery_cost)
+                    Number(original?.delivery_cost)
             };
-            const shipping_new = shipping;
+            const shipping_new = updated;
+
+            delete shipping_old.shipping_order_purchase_order_product_aux;
+            delete shipping_new.shipping_order_purchase_order_product_aux;
 
             const sopops_old =
                 shipping_old.shipping_order_purchase_order_product || [];
@@ -193,6 +195,8 @@ const ShippingOrderModel = () => {
 
             const diff_sopops: IShippingOrderPurchasedOrderProductManager = await diffObjectArrays(sopops_old, sopops_new);
 
+            console.log(diff_sopops);
+
             const hasChangesSopops: boolean = [
                 diff_sopops.added,
                 diff_sopops.deleted,
@@ -204,6 +208,7 @@ const ShippingOrderModel = () => {
                 ) => arr.length > 0);
 
             const diff_evidences: LoadEvidenceManager = await diffObjectArrays(evidences_old, evidences_new);
+
 
             const hasChangesEvidences: boolean = [
                 diff_evidences.added,
@@ -219,7 +224,6 @@ const ShippingOrderModel = () => {
                 hasChangesSopops ||
                 hasChangesEvidences
             ) {
-
                 const excludedIds = new Set<string>(
                     [
                         ...diff_evidences.added,
@@ -228,9 +232,8 @@ const ShippingOrderModel = () => {
                     ].map(item => item.id)
                 );
 
-
                 const load_evidence_old =
-                    shippingOrderDetail?.load_evidence?.filter(
+                    updated?.load_evidence?.filter(
                         (evidence) => {
                             if (evidence instanceof File) return false;
                             return !excludedIds.has(evidence.id);
@@ -239,38 +242,28 @@ const ShippingOrderModel = () => {
 
                 const new_shipping: IPartialShippingOrder = {
                     ...diff_shipping,
-                    shipping_order_purchase_order_product_manager:
-                        diff_sopops,
-                    load_evidence:
-                        diff_evidences.added.map(
-                            (e) => e.path as File
-                        ) || [],
-                    load_evidence_deleted:
-                        diff_evidences.deleted.map(
-                            (e) => { return { id: e.id } }
-                        ) as PartialLoadEvidenceItem[] || [],
-                    load_evidence_old:
-                        load_evidence_old.map(
-                            (e) => { return { id: e.id } }
-                        ) as PartialLoadEvidenceItem[] || [],
+                    shipping_order_purchase_order_product_manager: {
+                        added: diff_sopops.added?.map(({ id, ...rest }) => rest) || [],
+                        deleted: diff_sopops.deleted,
+                        modified: diff_sopops.modified
+                    },
+                    load_evidence: diff_evidences.added?.map((e) => e.path as File) || [],
+                    load_evidence_deleted: diff_evidences.deleted?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
+                    load_evidence_old: load_evidence_old?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                 }
-
                 const response =
                     await updateCompleteShippingOrderInDB(
                         shippingOrderRecord?.id || null,
                         new_shipping,
                         dispatch
                     );
-
                 if (!response) {
                     return;
                 }
             }
             setServerError(null);
-            setIsActiveEditModal(false);
         } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
+            if (error instanceof Error) setServerError(error.message);
         } finally {
             setLoading(false);
         }
@@ -364,7 +357,7 @@ const ShippingOrderModel = () => {
             { value: "released", onClick: toggleIsActiveLoadModalSetup },
             { value: "finished", onClick: toggleIsActiveFinishedModal }
         ]
-    }, [ shippingOrders, toggleIsActiveLoadModalSetup, toggleIsActiveFinishedModal]);
+    }, [shippingOrders, toggleIsActiveLoadModalSetup, toggleIsActiveFinishedModal]);
 
     const ExtraComponents = useCallback(() => {
         const state = useTableState();
@@ -454,7 +447,7 @@ const ShippingOrderModel = () => {
                 )
             }
             {
-                isActiveEditModal && shippingOrderRecord &&  (
+                isActiveEditModal && shippingOrderRecord && (
                     <ShippingOrderModuleProvider
                         initialStep={3}
                         totalSteps={3}
@@ -462,6 +455,7 @@ const ShippingOrderModel = () => {
                     >
                         <EditWizardShippingOrder
                             onClose={toggleisActiveEditModal}
+                            onUpdate={handleUpdate}
                         />
                     </ShippingOrderModuleProvider>
                 )

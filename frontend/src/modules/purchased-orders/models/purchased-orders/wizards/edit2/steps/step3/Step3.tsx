@@ -252,12 +252,15 @@ const Step3 = ({
                 accessorFn: (row) => row.stock_available?.available,
                 header: "Disponibilidad",
                 cell: ({ row }) => {
-                    const typeRow = row.original;
-                    const available = typeRow.id ?
-                        typeRow.stock_available?.available ?? 0 :
-                        typeRow.product?.summary_location?.available ?? 0;
-                    const minStock = typeRow.stock_available?.minimum_stock ?? 0;
-                    const qty = typeRow.qty ?? 0;
+
+                    const qty = row.original.qty ?? 0;
+                    const available_stock = row.original.stock_available?.available ?? 0;
+                    const committed = row.original.inventory_commited?.qty ?? 0;
+                    const production  = row.original?.production_order?.production_breakdown?.finished ?? 0;
+                    const available = available_stock + production + committed;
+
+
+                    const minStock = row.original.stock_available?.minimum_stock ?? 0;
 
                     let className = styleModule.unavailable;
 
@@ -281,12 +284,13 @@ const Step3 = ({
                 header: "Producción",
                 cell: ({ row }) => {
                     const isNew = row.original.id ? false : true;
+                    const record = row.original;
 
-                    let production_summary, total_order = 0, total_production = 0, progress = 0, isCompleted = false;
+                    let total_order = 0, total_production = 0, progress = 0, isCompleted = false;
 
                     if (isNew) {
-                        const qty = row?.original?.qty ?? 0;
-                        const available = row?.original?.product?.summary_location?.available ?? 0;
+                        const qty = record.qty ?? 0;
+                        const available = record.product?.summary_location?.available ?? 0;
                         if (qty >= available) {
                             total_order = qty - available;
                             total_production = 0;
@@ -296,9 +300,8 @@ const Step3 = ({
                             isCompleted = true;
                         }
                     } else {
-                        production_summary = row.original.production_summary;
-                        total_order = production_summary?.production_order_qty ?? 0;
-                        total_production = production_summary?.production_qty ?? 0;
+                        total_order = record.production_order?.production_breakdown?.order_qty ?? 0;
+                        total_production = record.production_order?.production_breakdown?.finished ?? 0;
                         progress = (total_production / total_order) * 100;
                         isCompleted = progress === 100 || total_order === total_production ? true : false;
                     }

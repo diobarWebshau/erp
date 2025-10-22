@@ -256,11 +256,16 @@ const Step2 = ({
             header: "Disponibilidad",
             cell: (row) => {
                 const record = row.row.original;
-                console.log(record);
+
+                const commited = record.purchase_order_products?.inventory_commited?.qty || 0;
+                const production = record.purchase_order_products?.production_order?.production_breakdown?.finished || 0;
+                const available_location = (record.location?.inventory?.available || 0) 
+                console.log(commited, production, available_location, record.purchase_order_products?.product_name);
+                const available = commited + production + available_location;
                 return (
                     <TagTable
                         qty={record.qty || 0}
-                        available={record.location?.inventory?.available || 0}
+                        available={available || 0}
                         minimumStock={record.location?.inventory?.minimum_stock || 0}
                     />
                 );

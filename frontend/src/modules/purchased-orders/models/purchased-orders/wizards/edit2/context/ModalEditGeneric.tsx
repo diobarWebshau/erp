@@ -9,7 +9,7 @@ import type {
 interface IModalAddGeneric {
     record: IPartialPurchasedOrder;
     onClose: () => void;
-    onEdit: (record: IPartialPurchasedOrder, updateRecord: IPartialPurchasedOrder) => void;
+    onEdit: (record: IPartialPurchasedOrder | null, updateRecord: IPartialPurchasedOrder | null) => void;
     onDelete: () => void;
 }
 

@@ -182,8 +182,8 @@ const PurchasedOrderModel = () => {
             const diff_purchased_order: IPartialPurchasedOrder =
                 await diffObjects(original, update);
 
-            const productDiffs: IPurchasedOrderProductManager =
-                diffObjectArrays(
+            const productDiffs: IPurchasedOrderProductManager = 
+                await diffObjectArrays(
                     original_purchase_order_products || [],
                     update_purchase_order_products || []
                 );
@@ -384,7 +384,6 @@ const PurchasedOrderModel = () => {
                 onDeleteSelected={
                     () => console.log("borrado selectivo")}
                 noResultsMessage="No hay ventas existentes."
-
                 
                 extraComponents={
                     (table) => ExtraComponents(table)}

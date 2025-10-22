@@ -747,10 +747,11 @@ class ShippingOrderController {
         let IsDeleteImage = false;
         let isSuccessFully = false;
         try {
+            // ? **** OBTENER LOS CAMPOS EDITABLES ****
             const editableFields = ShippingOrderModel.getEditableFields();
             const update_values = collectorUpdateFields(editableFields, completeBody);
+            // ? **** VALIDAMOS QUE LA ORDEN DE ENVIO EXISTA **** */
             const validateShippingOrder = await ShippingOrderModel.findByPk(id);
-            /* validamos que la orden de envio exista */
             if (!validateShippingOrder) {
                 await transaction.rollback();
                 await deleteLoadEvidences(completeBody.load_evidence || []);
@@ -759,9 +760,8 @@ class ShippingOrderController {
                 });
                 return;
             }
-            /* convertimos la orden obtenida a json */
             const shippingOrder = validateShippingOrder.toJSON();
-            /* validamos que existan campos para actualizar */
+            // ? **** VALIDAMOS QUE EXISTAN CAMPOS PARA ACTUALIZAR **** */
             if (Object.keys(update_values)?.length > 0) {
                 if (update_values?.carrier_id) {
                     const validateCarrier = await CarrierModel.findByPk(update_values.carrier_id, { transaction });
@@ -775,10 +775,10 @@ class ShippingOrderController {
                     }
                 }
             }
-            /* validamos que existan evidencias para eliminar */
+            // ? **** VALIDAMOS QUE EXISTAN EVIDENCIAS PARA ELIMINAR **** */
             if (completeBody.load_evidence_deleted && JSON.parse(completeBody.load_evidence_deleted).length > 0)
                 IsDeleteImage = true;
-            /* convertimos las evidencias antiguas a json */
+            // ? **** TRATAMOS LAS EVIDENCIAS **** */
             let load_evidence_old = (() => {
                 try {
                     const raw = completeBody?.load_evidence_old;
@@ -812,6 +812,7 @@ class ShippingOrderController {
                 load_evidence_deleted.map((e) => e.path = e.id);
                 load_evidence_old = load_evidence_old.filter((e) => !load_evidence_deleted.some((e2) => e2.path === e.path));
             }
+            // ? **** ACTUALIZAMOS LA ORDEN DE ENVIO **** */
             // actualizamos la orden de envio
             const responseUpdate = await ShippingOrderModel.update({
                 ...update_values,
@@ -831,6 +832,7 @@ class ShippingOrderController {
                 });
                 return;
             }
+            // ? **** ACTUALIZAMOS LOS PRODUCTOS DE LA ORDEN DE ENVIO **** */
             if (completeBody?.shipping_order_purchase_order_product_manager) {
                 const sopopManager = JSON.parse(completeBody
                     .shipping_order_purchase_order_product_manager);
@@ -839,10 +841,12 @@ class ShippingOrderController {
                     sopopManager.deleted,
                     sopopManager.modified
                 ].some((p) => p?.length > 0);
+                // ? **** VALIDAMOS QUE EXISTAN PRODUCTOS PARA ACTUALIZAR **** */
                 if (flagProductsInputsUpdate) {
                     const adds = sopopManager.added;
                     const deletes = sopopManager.deleted;
                     const modified = sopopManager.modified;
+                    // ? **** VALIDAMOS QUE EXISTAN PRODUCTOS PARA ELIMINAR **** */
                     if (deletes.length > 0) {
                         const deletedFiltered = deletes.filter(d => d.id !== undefined);
                         const existingSopopsResponse = await ShippingOrderPurchaseOrderProductModel.findAll({
@@ -880,6 +884,7 @@ class ShippingOrderController {
                             return;
                         }
                     }
+                    // ? **** VALIDAMOS QUE EXISTAN PRODUCTOS PARA MODIFICAR **** */
                     if (modified.length > 0) {
                         const modifiedFiltered = modified.filter(d => d.id !== undefined);
                         const popsiD = modifiedFiltered.map(d => d.id);
@@ -992,9 +997,11 @@ class ShippingOrderController {
                             }
                         }
                     }
+                    // ? **** VALIDAMOS QUE EXISTAN PRODUCTOS PARA AGREGAR **** */
                     if (adds.length > 0) {
                         const addsFiltered = adds;
                         const popsiD = addsFiltered.map(d => d.purchase_order_product_id);
+                        // ? **** VALIDAMOS QUE EXISTAN LOS POPS A AGERGAR **** */
                         const existingSopopsResponse = await PurchaseOrderProductModel.findAll({
                             where: {
                                 id: { [Op.in]: popsiD }
@@ -1012,6 +1019,7 @@ class ShippingOrderController {
                             });
                             return;
                         }
+                        // ? **** OBTENEMOS LAS SOPOPS ASOCIADAS AL ENVIO, PARA OBTENER UNA REFERENCIA DEL CLIENTE, LA DIRECCION Y LA UBICACION **** */
                         const validateShippingOrderClientOnShippingOrder = await ShippingOrderPurchaseOrderProductModel.findAll({
                             where: { shipping_order_id: id },
                             attributes: ShippingOrderPurchaseOrderProductModel
@@ -1047,6 +1055,7 @@ class ShippingOrderController {
                                 }],
                             transaction
                         });
+                        // ? **** OBTENEMOS LOS POPS A DETALLE PARA ANALIZAR LA AGREGACION **** */
                         const popsDetailsResponse = await PurchaseOrderProductModel.findAll({
                             where: {
                                 id: {
@@ -1089,10 +1098,13 @@ class ShippingOrderController {
                             ],
                             transaction
                         });
+                        // ? **** PROCESAMOS LAS SOPOPS EN FORMATO JSON, Y TOMAMOS UNA COMO REFERENCIA **** */
                         const sopopsInShippingOrder = validateShippingOrderClientOnShippingOrder
                             .map(m => m.toJSON());
                         const pop_test_from_sopops = [...sopopsInShippingOrder].shift();
+                        // ? **** OBTENEMOS LOS POPS A AGREGAR YA EN FORMATO JSON **** */
                         const new_pops = [...popsDetailsResponse].map(m => m.toJSON());
+                        // ? **** ANALIZAMOS SI TODOS LOS POPS TIENEN EL MISMO CLIENTE, DIRECCION, Y LOCALIZACION **** */
                         const allSameClient = new_pops.every(p => p.purchase_order?.client_id ===
                             pop_test_from_sopops
                                 ?.purchase_order_products
@@ -1103,16 +1115,19 @@ class ShippingOrderController {
                                 ?.purchase_order_products
                                 ?.purchase_order
                                 ?.client_address_id);
-                        const allSameLocation = new_pops.every(p => p.purchase_order_product_location_production_line
-                            ?.production_line
-                            ?.location_production_line
-                            ?.location_id ===
-                            pop_test_from_sopops
-                                ?.purchase_order_products
-                                ?.purchase_order_product_location_production_line
-                                ?.production_line
-                                ?.location_production_line
-                                ?.location_id);
+                        // const allSameLocation: boolean =
+                        //     new_pops.every(p =>
+                        //         p.purchase_order_product_location_production_line
+                        //             ?.production_line
+                        //             ?.location_production_line
+                        //             ?.location_id ===
+                        //         pop_test_from_sopops
+                        //             ?.purchase_order_products
+                        //             ?.purchase_order_product_location_production_line
+                        //             ?.production_line
+                        //             ?.location_production_line
+                        //             ?.location_id
+                        //     );
                         if (!allSameClient) {
                             await transaction.rollback();
                             await deleteLoadEvidences(completeBody.load_evidence);
@@ -1143,6 +1158,35 @@ class ShippingOrderController {
                         //     });
                         //     return;
                         // }
+                        // ? *** ACTUALIZAMOS LA UBICACION EN EL INVENTARIO SI LO REQUIERE **** */
+                        const filter = addsFiltered.filter(p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
+                            !== Number(p.location?.id));
+                        if (filter.length > 0) {
+                            const promises = filter.map(p => {
+                                const response = InventoryMovementModel.update({
+                                    location_id: p.location?.id,
+                                    location_name: p.location?.name
+                                }, {
+                                    where: {
+                                        reference_id: p.purchase_order_product_id,
+                                        reference_type: "Order",
+                                        movement_type: "allocate"
+                                    }
+                                });
+                                return response;
+                            });
+                            const responseUpdateLocation = await Promise.all(promises);
+                            if (responseUpdateLocation.some(r => r[0] === 0)) {
+                                await transaction.rollback();
+                                await deleteLoadEvidences(completeBody.load_evidence || []);
+                                res.status(500).json({
+                                    validation: `The update of the location in the inventory movement `
+                                        + `could not be completed.`
+                                });
+                                return;
+                            }
+                        }
+                        // ? **** VALIDAMOS QUE LOS POPS NO EXCEDAN LA CANTIDAD ORIGINAL ORDENADA **** */
                         for (const p of new_pops) {
                             const qty_real_pop = p.qty;
                             const qty_shipped_pop = p.shipping_order_purchase_order_product

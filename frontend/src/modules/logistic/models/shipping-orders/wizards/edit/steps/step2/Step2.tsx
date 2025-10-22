@@ -2,7 +2,7 @@ import { Bookmark, ChevronLeft, CircleCheck, Type } from "lucide-react";
 import CriticalActionButton from "../../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
+import { useShippingOrderCommand, useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
 import { useCallback, useState, type ChangeEvent } from "react";
 import { back_step, update_draft_shipping_order } from "../../../../context/shippingOrderActions";
 import StyleModule from "./Step2.module.css";
@@ -22,7 +22,7 @@ import type { RootState } from "store/store";
 import { useSelector } from "react-redux";
 import WarningModal from "../../../../../../../../comp/primitives/modal2/dialog-modal/custom/warning/WarningModal";
 
-interface IStep2 { onUpdate: (updateShippingOrder: IPartialShippingOrder) => void }
+interface IStep2 { onUpdate: (original: IPartialShippingOrder, updated: IPartialShippingOrder) => void }
 
 const transporteOptions = ["Terrestre", "Marítimo", "Aéreo"];
 const shippingTypeOptions = ["Internacional", "Nacional"];
@@ -30,6 +30,7 @@ const shippingTypeOptions = ["Internacional", "Nacional"];
 const Step2 = ({ onUpdate }: IStep2) => {
 
     const state = useShippingOrderState();
+    const { refetch } = useShippingOrderCommand();
     const errorRedux = useSelector((state: RootState) => state.error);
     const dispatch = useShippingOrderDispatch();
 
@@ -63,8 +64,8 @@ const Step2 = ({ onUpdate }: IStep2) => {
         dispatch(update_draft_shipping_order({ delivery_cost: cost }));
     }, [dispatch]);
 
-    const onChangeCode = useCallback((code: string) => {
-        dispatch(update_draft_shipping_order({ tracking_number: code }));
+    const onChangeCode = useCallback((trackingNumber: string) => {
+        dispatch(update_draft_shipping_order({ tracking_number: trackingNumber }));
     }, [dispatch]);
 
     const onChangeComment = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -82,8 +83,9 @@ const Step2 = ({ onUpdate }: IStep2) => {
     const { carriers } = useCarriers();
 
     const handlebackMainStep = useCallback(() => {
+        refetch();
         dispatch(set_step(3));
-    }, [dispatch]);
+    }, [dispatch, refetch]);
 
     const handleOnClickNextStep = useCallback(() => {
         if (!state.draft?.carrier || !state.draft?.shipping_date || !state.draft?.transport_method ||
@@ -97,15 +99,14 @@ const Step2 = ({ onUpdate }: IStep2) => {
             carrier: state.draft?.carrier,
             shipping_date: state.draft?.shipping_date,
             delivery_cost: state.draft?.delivery_cost,
-            code: state.draft?.tracking_number,
+            tracking_number: state.draft?.tracking_number,
             carrier_id: state.draft?.carrier?.id,
             transport_method: state.draft?.transport_method,
             shipment_type: state.draft?.shipment_type,
-            tracking_number: state.draft?.tracking_number,
             comments: state.draft?.comments
         }
         dispatch(update_draft_shipping_order(updateShippingOrder));
-        // onUpdate(updateShippingOrder);
+        onUpdate(state.data, updateShippingOrder);
         if (Object.keys(errorRedux).length > 0) {
             Object.entries(errorRedux).forEach(([_, value]) => {
                 toastMantine.error({ message: value });
@@ -113,7 +114,7 @@ const Step2 = ({ onUpdate }: IStep2) => {
             return;
         }
         setIsActiveFeedBackModal(true);
-    }, [dispatch, state.draft, onUpdate]);
+    }, [dispatch, state.draft, state.data, onUpdate]);
 
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch]);
 

@@ -74,7 +74,7 @@ interface PurchaseOrderProductAttributes {
     stock_available?: StockAvailable,
     shipping_summary?: ShippingSummary,
     production_order?: ProductionOrderCreationAttributes,
-    inventory_commited?: InventoryCommited
+    inventory_commited?: InventoryCommited,
 }
 
 interface PurchasedOrderProductManager {

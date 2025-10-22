@@ -670,44 +670,30 @@ RETURNS JSON
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE v_production_summary JSON;
-	DECLARE v_purchased_order_product_qty DECIMAL(14,4);
-	DECLARE v_production_order_qty DECIMAL(14,4);
-	DECLARE v_production_qty DECIMAL(14,4);
-
-	SELECT
-		IFNULL(pop.qty, 0),
-		IFNULL(po_sum.production_order_qty, 0),
-		IFNULL(p_sum.production_qty, 0)
-	INTO
-		v_purchased_order_product_qty,
-		v_production_order_qty,
-		v_production_qty
-	FROM purchased_orders_products pop
-	LEFT JOIN (
-		SELECT order_id, SUM(qty) AS production_order_qty
-		FROM production_orders
-		WHERE order_type = 'client'
-		AND status NOT IN ('cancel')
-		GROUP BY order_id
-	) po_sum ON po_sum.order_id = pop.id
-	LEFT JOIN (
-		SELECT po.order_id, SUM(p.qty) AS production_qty
-		FROM productions p
-		JOIN production_orders po ON p.production_order_id = po.id
-		WHERE po.order_type = 'client'
-		AND po.status NOT IN ('cancel')
-		GROUP BY po.order_id
-	) p_sum ON p_sum.order_id = pop.id
-	WHERE pop.id = in_pop_id;
-
-	SET v_production_summary = JSON_OBJECT(
-		"purchased_order_product_qty", v_purchased_order_product_qty,
-		"production_order_qty", v_production_order_qty,
-		"production_qty", v_production_qty
-	);
-
-	RETURN v_production_summary;
+	DECLARE production_order_json JSON;
+	SELECT 
+		JSON_OBJECT(
+			'id', po.id,
+			'order_type', po.order_type,
+			'order_id', po.order_id,
+			'product_id', po.product_id,
+			'product_name', po.product_name,
+			'qty', po.qty,
+			'status', po.status,
+			'created_at', po.created_at,
+			'updated_at', po.updated_at, 
+			'production_breakdown', (
+				SELECT func_get_order_progress_snapshot(po.id)
+			)
+		)
+    INTO production_order_json 
+    FROM production_orders AS po
+    JOIN purchased_orders_products AS pop
+    ON po.order_id = pop.id
+    WHERE po.order_type = 'client'
+	AND pop.id = in_pop_id;
+	
+	RETURN production_order_json;
 END //
 DELIMITER ;
 

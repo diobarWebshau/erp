@@ -12,7 +12,7 @@ import type { IPartialShippingOrder } from "interfaces/shippingOrder";
 
 interface IEditWizardShippingOrder {
     onClose: () => void;
-    onUpdate: (updateShippingOrder: IPartialShippingOrder) => void;
+    onUpdate: (original: IPartialShippingOrder, updated: IPartialShippingOrder) => void;
 }
 
 const EditWizardShippingOrder = ({
@@ -41,27 +41,13 @@ const EditWizardShippingOrder = ({
 
                 </div>
                 <div className={StyleModule.mainContent}>
-                    {
-                        state.current_step === 1 && (
-                            <Step1 />
-                        )
-                    }
-                    {
-                        state.current_step === 2 && (
-                            <Step2 onUpdate={onUpdate} />
-                        )
-                    }
-                    {
-                        state.current_step === 3 && (
-                            <Step3 onClose={onClose} />
-                        )
-                    }
+                    {state.current_step === 1 && (<Step1 />)}
+                    {state.current_step === 2 && (<Step2 onUpdate={onUpdate} />)}
+                    {state.current_step === 3 && (<Step3 onClose={onClose} />)}
                 </div>
             </div>
             {
-                showWarningModal && (
-                    <WarningModal onClose={toggleWarningModal} onLeave={onClose} />
-                )
+                showWarningModal && (<WarningModal onClose={toggleWarningModal} onLeave={onClose} />)
             }
         </FullContainerModal>
     );

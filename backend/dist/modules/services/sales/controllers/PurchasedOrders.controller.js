@@ -38,7 +38,7 @@ class PurchasedOrderController {
                             ...PurchaseOrderProductModel.getAllFields(),
                             [
                                 sequelize.literal("func_get_production_summary_of_pop(`purchase_order_products`.id)"),
-                                "production_summary"
+                                "production_order"
                             ],
                             [
                                 sequelize.literal("funct_get_stock_available_of_pop_on_location(`purchase_order_products`.id)"),
@@ -47,7 +47,11 @@ class PurchasedOrderController {
                             [
                                 sequelize.literal("func_summary_shipping_on_client_order(`purchase_order_products`.id)"),
                                 "shipping_summary"
-                            ]
+                            ],
+                            [
+                                sequelize.fn("func_get_inventory_movements_commited_pop", sequelize.col("purchase_order_products.id")),
+                                "inventory_commited"
+                            ],
                         ],
                         include: [
                             {
@@ -181,7 +185,7 @@ class PurchasedOrderController {
                             ...PurchaseOrderProductModel.getAllFields(),
                             [
                                 sequelize.literal("func_get_production_summary_of_pop(`purchase_order_products`.id)"),
-                                "production_summary"
+                                "production_order"
                             ],
                             [
                                 sequelize.literal("funct_get_stock_available_of_pop_on_location(`purchase_order_products`.id)"),
@@ -190,7 +194,11 @@ class PurchasedOrderController {
                             [
                                 sequelize.literal("func_summary_shipping_on_client_order(`purchase_order_products`.id)"),
                                 "shipping_summary"
-                            ]
+                            ],
+                            [
+                                sequelize.fn("func_get_inventory_movements_commited_pop", sequelize.col("purchase_order_products.id")),
+                                "inventory_commited"
+                            ],
                         ],
                         include: [
                             {

@@ -27,6 +27,9 @@ const SelectPurchasedModal = ({
 
     const data = useMemo(() => purchasedOrders ?? [], [purchasedOrders]);
 
+    const getRowId = useCallback((row: IPurchasedOrder) => row.id.toString(), []);
+
+
     const [selectedPurchasedOrders, setSelectedPurchasedOrders] = useState<IPurchasedOrder[]>([]);
 
     const asignedMaxQty = useCallback((pop: IPurchasedOrderProduct) => {
@@ -116,11 +119,18 @@ const SelectPurchasedModal = ({
         }
     ], []);
 
-    const handleRowSelectionChange = useCallback((selectedRows: IPurchasedOrder[]) => {
-        console.log(`Filas seleccionadas`, selectedRows);
-        setSelectedPurchasedOrders(selectedRows);
+    const handleRowSelectionChange = useCallback((next: IPurchasedOrder[]) => {
+        setSelectedPurchasedOrders(prev => {
+            if (
+                prev.length === next.length &&
+                prev.every((p, i) => p.id === next[i]?.id)
+            ) {
+                return prev;
+            }
+            return next;
+        });
     }, []);
-    
+
     return (
         <DialogModal
             className={styleModule.containerDialogModal}
@@ -142,7 +152,7 @@ const SelectPurchasedModal = ({
                         onRowSelectionChangeExternal={handleRowSelectionChange}
 
                         // acciones 
-                        getRowId={(row, _) => row.id.toString()}
+                        getRowId={getRowId}
                         classNameGenericTableContainer={styleModule.genericTableContainer}
                     />
                 </div>

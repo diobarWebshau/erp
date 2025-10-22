@@ -129,9 +129,13 @@ const Step4 = ({
                 header: "Disponibilidad",
                 cell: ({ row }) => {
 
-                    const available = row.original.stock_available?.available ?? 0;
-                    const minStock = row.original.stock_available?.minimum_stock ?? 0;
                     const qty = row.original.qty ?? 0;
+                    const available_stock = row.original.stock_available?.available ?? 0;
+                    const committed = row.original.inventory_commited?.qty ?? 0;
+                    const production = row.original?.production_order?.production_breakdown?.finished ?? 0;
+                    const available = available_stock + production + committed;
+
+                    const minStock = row.original.stock_available?.minimum_stock ?? 0;
 
                     let className = styleModule.unavailable;
 
@@ -154,9 +158,9 @@ const Step4 = ({
                 accessorFn: (row) => row.production_summary,
                 header: "Producción",
                 cell: ({ row }) => {
-                    const production_summary = row.original.production_summary;
-                    const total_order = production_summary?.production_order_qty ?? 0;
-                    const total_production = production_summary?.production_qty ?? 0;
+                    const record = row.original;
+                    const total_order = record.production_order?.production_breakdown?.order_qty ?? 0;
+                    const total_production = record.production_order?.production_breakdown?.finished ?? 0;
                     const progress = (total_production / total_order) * 100;
                     const isCompleted = progress === 100 || total_order === total_production ? true : false;
 
@@ -337,14 +341,14 @@ const Step4 = ({
                 </section>
                 <section className={styleModule.secondBlock}>
                     <div className={styleModule.containerDescriptionDate}>
-                            <div className={`nunito-bold ${styleModule.containerDate}`}>
-                                <label>Fecha de creación:</label>
-                                <p className="nunito-semibold">{formatDateToDMY(state.data.created_at ?? "")}</p>
-                            </div>
-                            <div className={`nunito-bold ${styleModule.containerDate}`}>
-                                <label>Fecha estimada de entrega:</label>
-                                <p className="nunito-semibold">{formatDateToDMY(state.data.delivery_date ?? "")}</p>
-                            </div>
+                        <div className={`nunito-bold ${styleModule.containerDate}`}>
+                            <label>Fecha de creación:</label>
+                            <p className="nunito-semibold">{formatDateToDMY(state.data.created_at ?? "")}</p>
+                        </div>
+                        <div className={`nunito-bold ${styleModule.containerDate}`}>
+                            <label>Fecha estimada de entrega:</label>
+                            <p className="nunito-semibold">{formatDateToDMY(state.data.delivery_date ?? "")}</p>
+                        </div>
                     </div>
                     <section className={styleModule.AddressOrderSection}>
                         <div className={styleModule.subTitleContainer}>
