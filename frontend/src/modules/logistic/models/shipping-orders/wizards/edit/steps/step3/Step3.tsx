@@ -23,7 +23,6 @@ const Step3 = ({ }: IStep3) => {
     const dispatch = useShippingOrderDispatch();
     const state = useShippingOrderState();
 
-    console.log(`state:`, state);
 
 
     const columns: ColumnDef<IPartialShippingOrderPurchasedOrderProduct>[] = [
@@ -48,7 +47,7 @@ const Step3 = ({ }: IStep3) => {
         },
         {
             id: "warehouse",
-            accessorFn: (row) => row.purchase_order_products?.inventory_commited?.location?.name,
+            accessorFn: (row) => row.location_name,
             header: "Almacén de envío",
         },
     ];

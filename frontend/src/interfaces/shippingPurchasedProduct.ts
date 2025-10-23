@@ -9,6 +9,8 @@ interface IShippingOrderPurchasedOrderProduct {
     shipping_order_id: number | null;
     purchase_order_product_id: number;
     qty: number;
+    location_id: number;
+    location_name: string;
     purchase_order_products?: IPartialPurchasedOrderProduct;
     location?: IPartialLocation;
 }
@@ -28,6 +30,8 @@ const defaultValueShippingOrderPurchasedOrderProduct:
     id: 0,
     shipping_order_id: null,
     purchase_order_product_id: 0,
+    location_id: 0,
+    location_name: "",
 };
 
 const defaultValuePartialShippingOrderPurchasedOrderProduct:
@@ -35,6 +39,8 @@ const defaultValuePartialShippingOrderPurchasedOrderProduct:
     qty: 0,
     shipping_order_id: null,
     purchase_order_product_id: 0,
+    location_id: 0,
+    location_name: "",
 };
 
 export type {

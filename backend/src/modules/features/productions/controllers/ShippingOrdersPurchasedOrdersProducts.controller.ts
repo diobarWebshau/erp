@@ -9,8 +9,6 @@ import {
     ProductionLineModel,
     LocationsProductionLinesModel,
     LocationModel,
-    InventoryModel,
-    InventoryLocationItemModel,
     ProductionOrderModel
 } from "../../../associations.js";
 import {

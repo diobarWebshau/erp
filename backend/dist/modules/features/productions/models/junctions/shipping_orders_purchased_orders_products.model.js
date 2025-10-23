@@ -5,6 +5,8 @@ class ShippingOrderPurchaseOrderProductModel extends Model {
         return [
             "shipping_order_id",
             "purchase_order_product_id",
+            "location_id",
+            "location_name",
             "qty"
         ];
     };
@@ -12,6 +14,8 @@ class ShippingOrderPurchaseOrderProductModel extends Model {
         return [
             "id", "shipping_order_id",
             "purchase_order_product_id",
+            "location_id",
+            "location_name",
             "qty"
         ];
     }
@@ -28,6 +32,17 @@ ShippingOrderPurchaseOrderProductModel.init({
             model: "shipping_orders",
             key: "id"
         },
+    },
+    location_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: "locations",
+            key: "id"
+        }
+    },
+    location_name: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     purchase_order_product_id: {
         type: DataTypes.INTEGER,

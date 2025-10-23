@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import TertiaryActionButtonCustom from "../../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import { useShippingOrderDispatch, useShippingOrderState } from "../../../../context/shippingOrderHooks";
 import { add_shipping_order_purchased_order_products, add_shipping_order_purchased_order_products_aux, back_step, next_step, remove_shipping_order_purchased_order_products, update_shipping_order, update_shipping_order_purchased_order_products, update_shipping_order_purchased_order_products_aux } from "../../../../context/shippingOrderActions";
-import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
+import { memo, useCallback, useMemo, useState, type Dispatch } from "react";
 import DateInputMantine from "./../../../../../../../../comp/external/mantine/date/input/base/DateInputMantine"
 import type { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
@@ -120,10 +120,7 @@ const Step2 = ({
 
 
     const getAvailableLocation = useCallback((record: IPartialShippingOrderPurchasedOrderProduct) => {
-        // const commited = record.purchase_order_products?.inventory_commited?.qty || 0;
-        // const production = record.purchase_order_products?.production_order?.production_breakdown?.finished || 0;
         const available_location = (record.purchase_order_products?.stock_available?.stock || 0)
-        // const available = commited + production + available_location;
         const available = available_location;
         return available
     }, []);
@@ -138,7 +135,6 @@ const Step2 = ({
             }) ?? false;
 
             const someIsExceedQtyLocation = updateValues?.some((p) => {
-                // console.log(`${p.purchase_order_products?.product_name} - ${p.qty} , ${getAvailableLocation(p)}`);
                 return (p.qty ?? 0) > (getAvailableLocation(p) ?? 0)
             });
             return [anyExceeds, someIsExceedQtyLocation];
@@ -461,25 +457,20 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
 
     const product = record.purchase_order_products?.product;
 
-    const { loadingLocationsProducedProduct, locationsProducedProduct } = useLocationsProducedOneProduct(product?.id ?? 0);
+    const { loadingLocationsProducedProduct, locationsProducedProduct } =
+        useLocationsProducedOneProduct(product?.id ?? 0);
 
     const handleOnChangeLocation = useCallback(
         (location: ILocation | null | undefined) => {
             dispatch(update_shipping_order_purchased_order_products_aux({
                 id: record.id ?? 0,
-                attributes: { location: location ?? undefined }
+                attributes: {
+                    location: location ?? undefined,
+                    location_id: location?.id ?? undefined,
+                    location_name: location?.name ?? undefined
+                }
             }));
         }, [dispatch, record.id]);
-
-    useEffect(() => {
-        if (!record.location && locationsProducedProduct.length > 0) {
-            const initialLocation = locationsProducedProduct.find(
-                loc => loc.id === record.purchase_order_products?.purchase_order_product_location_production_line
-                    ?.production_line?.location_production_line?.location?.id
-            );
-            if (initialLocation) handleOnChangeLocation(initialLocation);
-        }
-    }, [locationsProducedProduct, handleOnChangeLocation, record]);
 
     return (
         <div className={StyleModule.objectSelectContainer}>

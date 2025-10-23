@@ -38,6 +38,8 @@ const uploadImageMiddleware = async (
           { name: 'photo', maxCount: 1 },
           { name: 'load_evidence', maxCount: 20 }
         ])(req, res, (err: any) => {
+          console.log("entro a multer");
+          console.log(req.files);
           if (err) return reject(err);
 
           // 📂 Ruta base para archivos estáticos
@@ -51,7 +53,9 @@ const uploadImageMiddleware = async (
           }
           // Procesar 'load_evidence'
           if (req.files && 'load_evidence' in req.files) {
+            console.log("entro a load_evidence");
             const files = (req.files as any).load_evidence;
+            console.log(files);
             req.body.load_evidence = files.map((file: Express.Multer.File) => {
               const relativePath = path.relative(baseUploadFolder, file.path);
               const normalizedPath = relativePath.replace(/\\/g, '/');

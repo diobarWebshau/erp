@@ -25,6 +25,8 @@ const uploadImageMiddleware = async (req, res, next) => {
                     { name: 'photo', maxCount: 1 },
                     { name: 'load_evidence', maxCount: 20 }
                 ])(req, res, (err) => {
+                    console.log("entro a multer");
+                    console.log(req.files);
                     if (err)
                         return reject(err);
                     // 📂 Ruta base para archivos estáticos
@@ -37,7 +39,9 @@ const uploadImageMiddleware = async (req, res, next) => {
                     }
                     // Procesar 'load_evidence'
                     if (req.files && 'load_evidence' in req.files) {
+                        console.log("entro a load_evidence");
                         const files = req.files.load_evidence;
+                        console.log(files);
                         req.body.load_evidence = files.map((file) => {
                             const relativePath = path.relative(baseUploadFolder, file.path);
                             const normalizedPath = relativePath.replace(/\\/g, '/');

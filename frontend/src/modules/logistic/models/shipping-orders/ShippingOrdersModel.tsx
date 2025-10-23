@@ -59,7 +59,6 @@ const ShippingOrderModel = () => {
 
     const { shippingOrders, loadingShippingOrders, refetchShippingOrders } = useShippingOrders({ like: search, debounce: 500 });
 
-
     // * ******************** Funciones de operaciones CRUD ******************** 
 
     const handleCreate = useCallback(async (shipping: IPartialShippingOrder) => {
@@ -144,6 +143,7 @@ const ShippingOrderModel = () => {
                             (e) => { return { id: e.id } }
                         ) as PartialLoadEvidenceItem[] || [],
                 }
+                console.log(`new_shipping:`, new_shipping);
 
                 const response =
                     await loadCompleteShippingOrderInDB(

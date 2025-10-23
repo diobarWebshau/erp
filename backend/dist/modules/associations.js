@@ -297,6 +297,14 @@ ShippingOrderPurchaseOrderProductModel.belongsTo(PurchaseOrderProductModel, {
     foreignKey: "purchase_order_product_id",
     as: "purchase_order_products"
 });
+ShippingOrderPurchaseOrderProductModel.belongsTo(LocationModel, {
+    foreignKey: "location_id",
+    as: "location"
+});
+LocationModel.hasMany(ShippingOrderPurchaseOrderProductModel, {
+    foreignKey: "location_id",
+    as: "shipping_order_purchase_order_product"
+});
 /* PurchasedOrderProduct-ProductionLines
     (purchased_order_product_location_production_line)
 * PurchasedOrderProduct solo puede tener un

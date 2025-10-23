@@ -442,6 +442,8 @@ CREATE TABLE shipping_orders_purchased_order_products(
     id INT AUTO_INCREMENT,
     shipping_order_id INT,
     purchase_order_product_id INT,
+    location_id INT,
+    location_name VARCHAR(100),
     qty INT NOT NULL,
     PRIMARY KEY(id),
     FOREIGN KEY(shipping_order_id) REFERENCES shipping_orders(id) ON DELETE CASCADE,
@@ -526,7 +528,8 @@ CREATE TABLE inventory_movements (
         'Transfer',
         "Purchased",
         "Scrap",
-        "Internal Production Order"
+        "Internal Production Order",
+        "Shipping"
     ),
     production_id INT,
     description TEXT,

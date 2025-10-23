@@ -34,16 +34,17 @@ const Step3 = ({ onClose }: IStep3) => {
     const [cost, setCost] = useState<number | undefined>(state.data?.delivery_cost || undefined);
     const [code, setCode] = useState<string | undefined>(state.data?.tracking_number || undefined);
     const [comment, setComment] = useState<string | undefined>(state.data?.comments || undefined);
-
     const { carriers } = useCarriers();
 
     const handleOnClickNextStep = useCallback(() => {
+
         if (!carrier || !deliveryDate || !transportMethod ||
             !shippingType || cost === undefined ||
             cost === null || cost === 0 || !code) {
             toastMantine.feedBackForm({ message: 'Debes completar todos los campos requeridos.' });
             return;
         }
+
         const updateShippingOrder: IPartialShippingOrder = {
             carrier: carrier,
             shipping_date: deliveryDate,
@@ -55,9 +56,11 @@ const Step3 = ({ onClose }: IStep3) => {
             tracking_number: code,
             comments: comment,
         }
+        
         dispatch(update_shipping_order(updateShippingOrder));
         dispatch(next_step());
-    }, [dispatch, shippingType, carrier, deliveryDate, transportMethod, cost, code]);
+
+    }, [dispatch, shippingType, carrier, deliveryDate, transportMethod, cost, code, comment]);
 
     const handleOnClickPrevious = useCallback(() => dispatch(back_step()), [dispatch, back_step]);
 

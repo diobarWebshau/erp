@@ -10,7 +10,7 @@ import {
     remove_draft_shipping_order_purchased_order_products,
     update_draft_shipping_order_purchased_order_products,
 } from "../../../../context/shippingOrderActions";
-import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
+import { memo, useCallback, useMemo, useState, type Dispatch } from "react";
 import DateInputMantine from "./../../../../../../../../comp/external/mantine/date/input/base/DateInputMantine"
 import type { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
@@ -39,8 +39,6 @@ const Step1 = () => {
 
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
-
-    console.log(`state:`, state);
 
     const [isActiveWarningModal, setIsActiveWarningModal] = useState<boolean>(false);
 
@@ -153,7 +151,6 @@ const Step1 = () => {
             () => {
                 const anyExceeds = updateValues?.some((item) => isExcededQtyOrder(item));
                 const someIsExceedQtyLocation = updateValues?.some((p) => {
-                    // console.log(`${p.purchase_order_products?.product_name} - ${p.qty} , ${getAvailableLocation(p)}`);
                     return (p.qty ?? 0) > (getAvailableLocation(p) ?? 0)
                 });
                 return [anyExceeds, someIsExceedQtyLocation];
@@ -490,25 +487,10 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
         (location: ILocation | null | undefined) => {
             dispatch(update_draft_shipping_order_purchased_order_products_aux({
                 id: record.id ?? 0,
-                attributes: { location: location ?? undefined }
+                attributes: { location: location ?? undefined, location_name: location?.name ?? undefined, location_id: location?.id ?? undefined }
             }));
         }, [dispatch, record.id] // usa record.id (no todo record) para no re-crear la fn
     );
-
-    // Solo asigna una vez: si ya hay location, no cambies nada
-    useEffect(() => {
-        if (!record.location && locationsProducedProduct.length > 0) {
-            const initialLocation = locationsProducedProduct.find(
-                loc => loc.id === record.purchase_order_products?.inventory_commited?.location?.id
-            ) ?? locationsProducedProduct[0]; // fallback estable
-            if (initialLocation) handleOnChangeLocation(initialLocation);
-        }
-    }, [
-        record.location, // si ya existe, no rehagas
-        locationsProducedProduct,
-        record.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.id,
-        handleOnChangeLocation
-    ]);
 
     return (
         <div className={StyleModule.objectSelectContainer}>
@@ -516,9 +498,7 @@ const LocationCell = memo(({ record, dispatch }: LocationCellProps) => {
                 <ObjectSelectCustomMemo
                     options={locationsProducedProduct}
                     labelKey="name"
-                    // Mantén una sola fuente: prioriza record.location si está seteada
-                    value={(record.location as ILocation)
-                        ?? (record.purchase_order_products?.inventory_commited?.location as ILocation)}
+                    value={(record.location as ILocation)}
                     defaultLabel="Selecciona una ubicación"
                     onChange={handleOnChangeLocation}
                     classNameInput={StyleModule.objectSelectInput}

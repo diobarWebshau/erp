@@ -42,10 +42,10 @@ const ShippingOrderProvider = ({
     totalSteps,
     children,
 }: IProviderShippingOrder) => {
+
     // Si no hay orderId, el hook no hará fetch real
     const { shippingOrderDetailById, refetchShippingOrderDetailById } =
         useShippingOrderDetailById(orderId ?? null);
-
     const dispatchRedux: AppDispatchRedux = useDispatch();
 
     // Seed inicial: prioriza initialData — solo en el montaje (lazy init)
@@ -62,10 +62,6 @@ const ShippingOrderProvider = ({
     const processShippingOrderDetailById = useCallback(
         async (data: IPartialShippingOrder): Promise<IPartialShippingOrder> => {
             // Recolecta IDs únicos de purchase_orders existentes en los SOPoPs del SO
-
-            const sopopsWithLocation = data?.shipping_order_purchase_order_product?.map(sopop => ({
-                ...sopop, location: sopop.purchase_order_products?.inventory_commited?.location
-            }));
 
 
             const posMap = new Map<number, IPurchasedOrder>();
@@ -100,21 +96,22 @@ const ShippingOrderProvider = ({
                     ) ?? false)
             );
 
-            const sopops = popsFiltered.map((p) => ({
+            const popsFilteredShippingComplete = popsFiltered?.filter((pop) => pop.shipping_summary?.shipping_qty !== pop.shipping_summary?.order_qty);
+
+            const sopops = popsFilteredShippingComplete?.map((p) => ({
                 id: generateRandomIds(),
                 purchase_order_products: p,
                 purchase_order_product_id: p.id,
                 location: p.inventory_commited?.location,
-                // qty pendiente: order_qty - shipping_qty (si no hay summary, queda 0)
+                location_id: p.inventory_commited?.location?.id,
+                location_name: p.inventory_commited?.location?.name,
                 qty:
                     (Number(p.shipping_summary?.order_qty) || 0) -
                     (Number(p.shipping_summary?.shipping_qty) || 0),
             }));
-            console.log(`sopops:`, sopops);
 
             return {
                 ...data,
-                shipping_order_purchase_order_product: sopopsWithLocation,
                 shipping_order_purchase_order_product_aux: [
                     ...(data?.shipping_order_purchase_order_product ?? []),
                     ...sopops,

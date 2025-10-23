@@ -244,6 +244,7 @@ const loadCompleteShippingOrderInDB = async (
     dispatch: AppDispatchRedux
 ): Promise<any> => {
     try {
+        console.log(`data:`, data);
         if (!id) return;
         const formData = new FormData();
 
@@ -254,6 +255,7 @@ const loadCompleteShippingOrderInDB = async (
             // 👇 Si es arreglo de File
             if (Array.isArray(value) && value.every(v => v instanceof File)) {
                 value.forEach((file) => {
+                    console.log(`keyFile:`, key);
                     formData.append(key, file); // o `${key}` si el backend no usa []
                 });
             }

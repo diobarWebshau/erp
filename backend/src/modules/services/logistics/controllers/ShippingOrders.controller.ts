@@ -14,6 +14,7 @@ import sequelize from "../../../../mysql/configSequelize.js";
 import { Op } from "sequelize";
 import path from 'node:path';
 import fs, { constants, mkdir, access } from "node:fs/promises"
+import { coerceValue } from "../../../../helpers/normalizedObjectFromFormData.js";
 
 const deleteLoadEvidences = async (
     evidences: LoadEvidenceItem[] | undefined
@@ -156,6 +157,12 @@ class ShippingOrderController {
                                     },
                                 ],
                             },
+                            {
+                                model: LocationModel,
+                                as: "location",
+                                required: false,
+                                attributes: LocationModel.getAllFields(),
+                            }
                         ],
                     },
                 ],
@@ -316,9 +323,16 @@ class ShippingOrderController {
                                             ]
                                         },
                                     ]
+                                },
+                                {
+                                    model: LocationModel,
+                                    as: "location",
+                                    required: false,
+                                    attributes: LocationModel.getAllFields(),
                                 }
                             ]
-                        }
+                        },
+
                     ]
                 });
 
@@ -905,9 +919,14 @@ class ShippingOrderController {
             // ? **** ACTUALIZAR LA LOCALIZACION EN INVENTORY_MOVEMENT ****
 
             const filter = pop.filter(
-                p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
+                p =>
+                    p.location &&
+                    p.purchase_order_products?.shipping_summary &&
+                    Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
                     !== Number(p.location?.id)
             );
+
+            console.log(filter);
 
             if (filter.length > 0) {
                 const promises = filter.map(p => {
@@ -928,6 +947,8 @@ class ShippingOrderController {
                 });
 
                 const responseUpdateLocation = await Promise.all(promises);
+
+                console.log(responseUpdateLocation);
 
                 if (responseUpdateLocation.some(r => r[0] === 0)) {
                     await transaction.rollback();
@@ -1099,8 +1120,6 @@ class ShippingOrderController {
         let IsDeleteImage: boolean = false;
         let isSuccessFully: boolean = false;
 
-        console.log(`*************************************`, completeBody);
-
         try {
 
             // ? **** OBTENER LOS CAMPOS EDITABLES ****
@@ -1198,16 +1217,26 @@ class ShippingOrderController {
 
             // ? **** ACTUALIZAMOS LA ORDEN DE ENVIO **** */
 
+            const update_values_process: ShippingOrderCreationAttributes = {
+                ...update_values,
+                shipping_date: coerceValue(update_values.shipping_date),
+            }
+
+            const isEvidenceUpdate =
+                completeBody.load_evidence_deleted && JSON.parse(completeBody.load_evidence_deleted).length > 0 ||
+                completeBody.load_evidence && JSON.parse(completeBody.load_evidence).length > 0;
+
             // actualizamos la orden de envio
             const responseUpdate =
                 await ShippingOrderModel.update(
                     {
-                        ...update_values,
-                        load_evidence: [
-                            ...load_evidence_old,
-                            ...load_evidence_new,
-                        ]
-
+                        ...update_values_process,
+                        ...(isEvidenceUpdate && {
+                            load_evidence: [
+                                ...load_evidence_old,
+                                ...load_evidence_new,
+                            ]
+                        })
                     },
                     {
                         where: { id: id },
@@ -1317,13 +1346,13 @@ class ShippingOrderController {
                             ShippingOrderPurchaseOrderProductCreateAttributes[] =
                             modified.filter(d => d.id !== undefined);
 
-                        const popsiD: number[] =
+                        const sopopiD: number[] =
                             modifiedFiltered.map(d => d.id as number);
 
                         const existingSopopsResponse =
                             await ShippingOrderPurchaseOrderProductModel.findAll({
                                 where: {
-                                    id: { [Op.in]: popsiD }
+                                    id: { [Op.in]: sopopiD }
                                 }, transaction,
                                 lock: transaction.LOCK.SHARE,
                             });
@@ -1341,6 +1370,9 @@ class ShippingOrderController {
                             });
                             return;
                         }
+
+                        const sopopsJson = existingSopopsResponse.map(sopop => sopop.toJSON());
+                        const popsiD: number[] = sopopsJson.map(sopop => sopop.purchase_order_product_id);
 
                         const popsDetailsResponse: PurchaseOrderProductModel[] =
                             await PurchaseOrderProductModel.findAll({
@@ -1395,18 +1427,27 @@ class ShippingOrderController {
 
                         const new_pops = [...popsDetailsResponse].map(m => m.toJSON());
 
-                        console.log(`modifiedFiltered`, modifiedFiltered);
+                        console.log(`modifiedFiltered:`, modifiedFiltered);
 
                         const filter = modifiedFiltered.filter(
-                            p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
+                            p => p.location && Number(p.purchase_order_products?.inventory_commited?.location_id)
                                 !== Number(p.location?.id)
                         );
 
-                        console.log("filter", filter);
+                        console.log(`filter:`, filter);
+
 
                         if (filter.length > 0) {
 
-                            const promises = filter.map(p => {
+                            const sopopsWithPops = filter.map(p => {
+                                const pop = new_pops.find(pop => pop.shipping_order_purchase_order_product?.find(sopop => sopop.id === p.id));
+                                return {
+                                    ...p,
+                                    purchase_order_product_id: pop?.id
+                                }
+                            });
+
+                            const promises = sopopsWithPops.map(p => {
                                 const response = InventoryMovementModel.update(
                                     {
                                         location_id: p.location?.id,
@@ -1414,7 +1455,7 @@ class ShippingOrderController {
                                     },
                                     {
                                         where: {
-                                            reference_id: p.id,
+                                            reference_id: p.purchase_order_product_id,
                                             reference_type: "Order",
                                             movement_type: "allocate"
                                         },
@@ -1429,6 +1470,7 @@ class ShippingOrderController {
                             if (responseUpdateLocation.some(r => r[0] === 0)) {
                                 await transaction.rollback();
                                 await deleteLoadEvidences(completeBody.load_evidence || []);
+                                console.log(`Aqui trueno`);
                                 res.status(500).json({
                                     validation:
                                         `The update of the location in the inventory movement `
@@ -1482,35 +1524,32 @@ class ShippingOrderController {
 
                             const sopop_update = modifiedFiltered.find(po => po.id === sopop?.id);
 
-                            console.log("se va a actualizar", sopop_update);
+                            if (sopop_update?.qty) {
+                                const update: [affectedCount: number] =
+                                    await ShippingOrderPurchaseOrderProductModel
+                                        .update(
+                                            { qty: sopop_update.qty }, {
+                                            where: {
+                                                id: sopop?.id
+                                            },
+                                            transaction
+                                        }
+                                        );
 
-                            const update: [affectedCount: number] =
-                                await ShippingOrderPurchaseOrderProductModel
-                                    .update(
-                                        { qty: sopop_update?.qty }, {
-                                        where: {
-                                            id: sopop?.id
-                                        },
-                                        transaction
-                                    }
+
+                                if (!(update[0] > 0)) {
+                                    await transaction?.rollback();
+                                    await deleteLoadEvidences(
+                                        completeBody.load_evidence
                                     );
-
-
-                            if (!(update[0] > 0)) {
-                                console.log("no se actualizo", update[0]);
-                                await transaction?.rollback();
-                                await deleteLoadEvidences(
-                                    completeBody.load_evidence
-                                );
-                                res.status(400).json({
-                                    validation:
-                                        `The purchase order product of `
-                                        + `the shipping order`
-                                        + `could not be updated`
-                                });
-                                return;
-                            }else{
-                                console.log("se actualizo", update[0]);
+                                    res.status(400).json({
+                                        validation:
+                                            `The purchase order product of `
+                                            + `the shipping order`
+                                            + `could not be updated`
+                                    });
+                                    return;
+                                }
                             }
                         }
 
@@ -1733,15 +1772,16 @@ class ShippingOrderController {
                         // ? *** ACTUALIZAMOS LA UBICACION EN EL INVENTARIO SI LO REQUIERE **** */
 
                         const filter = addsFiltered.filter(
-                            p => Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
-                                !== Number(p.location?.id)
+                            p => {
+                                const location_asigned = Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id);
+                                const location_current = Number(p.location?.id);
+                                return location_asigned !== location_current;
+                            }
                         );
 
-                        console.log("filter", filter);
 
                         if (filter.length > 0) {
                             const promises = filter.map(p => {
-                                console.log("p", p.id);
                                 const response = InventoryMovementModel.update(
                                     {
                                         location_id: p.location?.id,
@@ -1758,7 +1798,6 @@ class ShippingOrderController {
                                 return response;
                             });
 
-                            console.log("promises", promises);
 
                             const responseUpdateLocation = await Promise.all(promises);
 
