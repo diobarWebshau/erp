@@ -218,17 +218,22 @@ CREATE TABLE shipping_orders(
     transport_method VARCHAR(100),
     comments TEXT,
     -- ! Nuevo campo de fecha de entrega estimada
-    delivery_date DATETIME,
+    delivery_date DATETIME NULL,
+    scheduled_ship_date DATETIME NULL,
     -- ! ----------------------------------------
     -- ! Nuevo campo de fecha de envio
-    shipping_date DATETIME,
+    shipping_date DATETIME NULL,
+    finished_date DATETIME NULL,
+    comments_finish TEXT,
+    received_by VARCHAR(100) NULL,
+    user_id INT NULL,
+    user_name VARCHAR(100) NULL,
     -- ! ----------------------------------------
     delivery_cost DECIMAL(14, 4) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
-    FOREIGN KEY(carrier_id) REFERENCES carriers(id) ON DELETE
-    SET NULL
+    FOREIGN KEY(carrier_id) REFERENCES carriers(id) ON DELETE SET NULL
 );
 -- LOGS
 CREATE TABLE tables(

@@ -1,45 +1,15 @@
-import {
-    useTableDispatch,
-    useTableState
-} from "./tableHooks"
-import {
-    set_row_selection,
-    set_sorting,
-    clear_row_selection,
-    add_column_filter,
-    set_column_visibility,
-    remove_column_filter,
-    toggle_column_visibility,
-    set_column_filters,
-    set_pagination,
-} from "./tableActions"
-import {
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    useReactTable,
-
-} from "@tanstack/react-table";
-import type {
-    Column,
-    ColumnDef,
-    HeaderContext,
-    Row,
-    Table
-} from "@tanstack/react-table";
+import { useTableDispatch, useTableState } from "./tableHooks"
+import { set_row_selection, set_sorting, clear_row_selection, add_column_filter, set_column_visibility, remove_column_filter, toggle_column_visibility, set_column_filters, set_pagination } from "./tableActions"
+import { getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import type { Column, ColumnDef, HeaderContext, Row, Table } from "@tanstack/react-table";
 import type {
     BooleanFilter, ColumnTypeDataFilter,
     EnumFilter, ObjectDateFilter,
     ObjectNumericFilter, RowAction,
     TopButtonAction, WrappedRowAction
 } from "../types";
-import {
-    useEffect,
-    useRef, useState,
-    type MouseEvent,
-    type RefObject
-} from "react";
+import { useEffect, useRef, useState } from "react";
+import type { MouseEvent, RefObject } from "react"
 import {
     useClickOutside
 } from "../customHooks/useClickOutside";
@@ -798,7 +768,7 @@ const TableBase = <T,>({
                 style={{
                     gap: footerComponents ? "1rem" : "0rem"
                 }}
-                >
+            >
                 <section
                     className={
                         `${stylesModules.containerTable} ${classNameTableContainer} `

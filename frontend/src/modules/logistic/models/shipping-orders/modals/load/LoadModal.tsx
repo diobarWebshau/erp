@@ -63,6 +63,7 @@ const LoadModal = ({ onClose, shippingOrder, onUpdate }: ILoadModal) => {
 
         const updateRecord: IPartialShippingOrder = {
             ...shippingOrderDetailById,
+            shipping_date: new Date(),
             load_evidence: evidence,
         }
         onUpdate(updateRecord, shippingOrderDetailById);

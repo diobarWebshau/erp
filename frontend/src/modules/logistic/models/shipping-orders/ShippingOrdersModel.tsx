@@ -312,12 +312,14 @@ const ShippingOrderModel = () => {
     const toggleisActiveEditModalSetup = useCallback((record: IShippingOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        if (record.status === "pending") {
+        if (record.status === "released") {
+            console.log(record?.status);
             setIsActiveEditModal(v => !v);
             setShippingOrderRecord(record);
             return;
         }
         if (record.status === "finished" || record.status === "shipping") {
+            console.log(record?.status);
             setIsActivePreviewModal(v => !v);
             setShippingOrderRecord(record);
             return;

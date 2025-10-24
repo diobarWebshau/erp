@@ -16,8 +16,18 @@ const logisticSchema = zod.object({
     load_evidence: zod.any().optional(),
     load_evidence_old: zod.any().optional(),
     load_evidence_deleted: zod.any().optional(),
-    delivery_date: zod.string(),
-    shipping_date: zod.string()
+    delivery_date: zod.string().optional(),
+    shipping_date: zod.string().optional(),
+    tracking_number: zod.string().optional(),
+    shipment_type: zod.string().optional(),
+    transport_method: zod.string().optional(),
+    comments: zod.string().optional(),
+    comments_finish: zod.string().optional(),
+    received_by: zod.string().optional(),
+    user_id: zod.string().optional(),
+    user_name: zod.string().optional(),
+    scheduled_ship_date: zod.string().optional(),
+    finished_date: zod.string().optional(),
 });
 const validateSafeParse = (input) => {
     const result = logisticSchema.safeParse(input);

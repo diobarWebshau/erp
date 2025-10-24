@@ -23,15 +23,23 @@ interface ShippingOrderAttributes {
   carrier_id: number;
   load_evidence: LoadEvidenceItem[] | null;
 
-  // NUEVOS CAMPOS
   tracking_number: string | null;
   shipment_type: string | null;
   transport_method: string | null;
   comments: string | null;
-
+  
+  /* informacion  */
+  comments_finish: string | null;
+  received_by: string | null;
+  user_id: number | null;
+  user_name: string | null;
   delivery_cost: number;
-  delivery_date: Date;
-  shipping_date: Date;
+
+  /* fechas */
+  delivery_date: Date | null;
+  scheduled_ship_date: Date | null;
+  shipping_date: Date | null;
+  finished_date: Date | null;
   created_at: Date;
   updated_at: Date;
 
@@ -44,18 +52,7 @@ interface ShippingOrderAttributes {
   carrier?: CarrierCreateAttributes;
 }
 
-interface ShippingOrderCreationAttributes
-  extends Optional<
-    ShippingOrderAttributes,
-    | "id"
-    | "created_at"
-    | "updated_at"
-    | "load_evidence"
-    | "tracking_number"
-    | "shipment_type"
-    | "transport_method"
-    | "comments"
-  > {}
+type ShippingOrderCreationAttributes = Partial<ShippingOrderAttributes>;
 
 class ShippingOrderModel extends Model<ShippingOrderAttributes, ShippingOrderCreationAttributes> {
   static getEditableFields(): string[] {
@@ -64,7 +61,9 @@ class ShippingOrderModel extends Model<ShippingOrderAttributes, ShippingOrderCre
       "load_evidence", "delivery_cost",
       "delivery_date", "shipping_date",
       "tracking_number", "shipment_type", "transport_method", "comments",
-      "created_at", "updated_at"
+      "created_at", "updated_at",
+      "comments_finish", "received_by", "user_id", "user_name", "delivery_cost",
+      "delivery_date", "scheduled_ship_date", "shipping_date", "finished_date"
     ];
   }
   static getAllFields(): string[] {
@@ -73,7 +72,9 @@ class ShippingOrderModel extends Model<ShippingOrderAttributes, ShippingOrderCre
       "load_evidence", "delivery_cost",
       "delivery_date", "shipping_date",
       "tracking_number", "shipment_type", "transport_method", "comments",
-      "created_at", "updated_at"
+      "created_at", "updated_at",
+      "comments_finish", "received_by", "user_id", "user_name", "delivery_cost",
+      "delivery_date", "scheduled_ship_date", "shipping_date", "finished_date"
     ];
   }
 }
@@ -122,18 +123,45 @@ ShippingOrderModel.init(
       type: DataTypes.TEXT,
       allowNull: true
     },
-
+    comments_finish: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    received_by: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "users",
+        key: "id"
+      },
+      allowNull: true
+    },
+    user_name: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    scheduled_ship_date: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    finished_date: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     delivery_cost: {
       type: DataTypes.DECIMAL(14, 4),
       allowNull: false
     },
     delivery_date: {
       type: DataTypes.DATE,
-      allowNull: false       // como lo tenías
+      allowNull: true
     },
     shipping_date: {
       type: DataTypes.DATE,
-      allowNull: false       // como lo tenías
+      allowNull: true
     },
     created_at: {
       type: DataTypes.DATE,

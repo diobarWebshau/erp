@@ -5,12 +5,14 @@ interface ImageLoaderCustomProps {
     typeLoader: "multiple" | "single";
     value: File[];
     onChange: (files: File[]) => void;
+    isEditable?: boolean
 }
 
 const ImageLoaderCustom = ({
     typeLoader,
     value,
-    onChange
+    onChange,
+    isEditable = true
 }: ImageLoaderCustomProps) => {
     return (
         <ImageLoader
@@ -28,6 +30,7 @@ const ImageLoaderCustom = ({
             classNameTriggerContainer={StyleModule.triggerContainer}
             classNameRemoveButtonIcon={StyleModule.removeButtonIcon}
             classNameEditButtonIcon={StyleModule.editButtonIcon}
+            isEditable={isEditable}
         />
     )
 }

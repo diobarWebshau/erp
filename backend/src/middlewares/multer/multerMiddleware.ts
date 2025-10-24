@@ -53,7 +53,6 @@ const uploadImageMiddleware = async (
           }
           // Procesar 'load_evidence'
           if (req.files && 'load_evidence' in req.files) {
-            console.log("entro a load_evidence");
             const files = (req.files as any).load_evidence;
             console.log(files);
             req.body.load_evidence = files.map((file: Express.Multer.File) => {

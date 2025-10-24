@@ -1,0 +1,239 @@
+/* *************** Dialog Modal ***************** */
+
+
+.containerDialogModal{
+    width: 1340px;
+    height: 800px;
+}
+
+
+/* *************** Container *************** */
+
+.containerModal {
+    /* dimensions */
+    min-height: 0;
+    min-width: 0;
+    max-height: 100%;
+    max-width: 100%;
+
+    /* ditribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.headerModal>div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+
+.headerModal>h1 {
+    font-size: 36px;
+    color: var(--color-theme-primary);
+}
+
+
+
+
+/* *************** Container Content *************** */
+
+.contentModal {
+    /* dimensions */
+    min-height: 0;
+    min-width: 0;
+    max-height: 100%;
+    max-width: 100%;
+
+    /* ditribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "header" auto
+        "confirm" auto
+        "image" 1fr
+        "footer" auto
+        / 100%;
+    gap: 1rem;
+
+    /* distribucion box */
+    padding-block: 1rem;
+    padding-inline: 3rem;
+    border-radius: 15px;
+    background-color: var(--color-theme-background);
+
+}
+
+.headerSection {
+    /* distribucion grid respecto al padre */
+    grid-area: header;
+}
+
+.confirmSection {
+    /* distribucion grid respecto al padre */
+    grid-area: confirm;
+}
+
+.optionCheckBoxObjectListAutoSize {
+    height: 44px;
+}
+
+.footerSection {
+    /* distribucion grid respecto al padre */
+    grid-area: footer;
+}
+
+.imageSection {
+    /* distribucion grid respecto al padre */
+    grid-area: image;
+}
+
+/* *************** Header Section *************** */
+
+.headerSection {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.headerSection>*:first-child {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+}
+
+.headerSection>*:last-child {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+
+.dataList {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: start;
+    gap: 0.5rem;
+
+    /* dimension */
+    font-size: 14px;
+}
+
+.dataList dt {
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+.dataList dd {
+    /* estilos */
+    color: var(--color-theme-font-black);
+}
+
+/* ? ****** Title Section ****** */
+
+.titleSection {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.titleSection>h2 {
+    /* estilos */
+    color: var(--color-theme-primary);
+    font-size: 24px;
+}
+
+.titleSection>* {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+}
+
+/* ? ****** Date Section ****** */
+
+.dateSection {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+}
+
+/* *************** Confirm Section *************** */
+
+.confirmSection {
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0.5rem;
+
+    /* dimension */
+    font-size: 14px;
+}
+
+.confirmSection>p {
+    /* dimension */
+    font-size: 14px;
+}
+
+.containerCheckBoxObjectListAutoSize {
+    /* dimension */
+    max-height: 200px;
+}
+
+/* ************** Image Section ************** */
+
+.imageSection {
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0.5rem;
+
+    /* border: 1px solid blue; */
+
+}
+
+.imageSection p {
+    /* dimension */
+    font-size: 14px;
+}
+
+/* *************** Footer *************** */
+
+.footerSection {
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}

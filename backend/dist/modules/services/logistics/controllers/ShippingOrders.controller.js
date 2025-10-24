@@ -480,7 +480,7 @@ class ShippingOrderController {
     };
     static createComplete = async (req, res, next) => {
         const body = req.body;
-        const { status, carrier_id, load_evidence, delivery_cost, shipping_order_purchase_order_product, delivery_date, shipping_date, tracking_number, shipment_type, transport_method, comments, carrier, load_evidence_deleted, shipping_order_purchase_order_product_aux, } = body;
+        const { status, carrier_id, load_evidence, delivery_cost, shipping_order_purchase_order_product, delivery_date, shipping_date, tracking_number, shipment_type, transport_method, comments, carrier, load_evidence_deleted, shipping_order_purchase_order_product_aux, received_by, user_id, user_name, scheduled_ship_date, finished_date, comments_finish, } = body;
         const transaction = await sequelize.transaction({
             isolationLevel: Transaction
                 .ISOLATION_LEVELS
@@ -510,11 +510,17 @@ class ShippingOrderController {
                 load_evidence: load_evidence || null,
                 delivery_cost: Number(delivery_cost),
                 delivery_date,
-                shipping_date,
+                shipping_date: shipping_date || null,
                 tracking_number,
                 shipment_type,
                 transport_method,
-                comments
+                comments: comments || null,
+                user_id: Number(user_id),
+                user_name: user_name || null,
+                scheduled_ship_date: scheduled_ship_date || null,
+                finished_date: finished_date || null,
+                comments_finish: comments_finish || null,
+                received_by: received_by || null,
             }, { transaction });
             if (!response) {
                 await transaction.rollback();

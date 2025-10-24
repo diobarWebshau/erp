@@ -28,33 +28,31 @@ const formatWithBase64 = async (models, imageKey = "photo") => {
     }));
 };
 /**
- * Transforma un arreglo de objetos con una propiedad de path de imagen a base64.
- * @param models Arreglo de instancias Sequelize.
+ * Transforma un arreglo de objetos con una propiedad de path de imagen a base64 (data URI).
+ * @param models Arreglo de instancias Sequelize (o similares con .toJSON()).
  * @param ObjectKey Propiedad que contiene el arreglo de imágenes (por defecto 'load_evidence').
  * @param imgKey Clave dentro del objeto que contiene el path (por defecto 'path').
  */
 const formatWith64Multiple = async (models, ObjectKey = "load_evidence", imgKey = "path") => {
     return await Promise.all(models.map(async (model) => {
-        const data = model.toJSON();
-        const imgsPath = data[ObjectKey];
+        const data = model?.toJSON?.() ?? model;
+        const imgsPath = data?.[ObjectKey];
         if (Array.isArray(imgsPath)) {
-            const newImgsPath = await Promise.all(imgsPath.map(async (load_evidence) => {
-                const img = load_evidence[imgKey];
-                if (typeof img === "string") {
+            const newImgsPath = await Promise.all(imgsPath.map(async (item) => {
+                const img = item?.[imgKey];
+                if (typeof img === "string" && img.trim() !== "") {
                     const normalizedPath = path.normalize(img);
-                    const imgBase64 = await ImageHandler
-                        .convertToBase64(normalizedPath);
-                    return {
-                        ...load_evidence,
-                        [imgKey]: imgBase64 || null,
-                    };
+                    const base64 = await ImageHandler.convertToBase64(normalizedPath);
+                    if (base64) {
+                        const mimeType = mime.getType(normalizedPath) || "application/octet-stream";
+                        return {
+                            ...item,
+                            [imgKey]: `data:${mimeType};base64,${base64}`,
+                        };
+                    }
                 }
-                else {
-                    return {
-                        ...load_evidence,
-                        [imgKey]: null,
-                    };
-                }
+                // Si no hay string válido o no se pudo convertir, dejar en null
+                return { ...item, [imgKey]: null };
             }));
             data[ObjectKey] = newImgsPath;
         }

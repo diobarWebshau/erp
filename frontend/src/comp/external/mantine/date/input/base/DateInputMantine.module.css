@@ -4,12 +4,14 @@
     padding-inline-start: 0.5rem;
     padding-inline-end: 1.5rem;
     border-radius: 15px !important;
+}
+
+.inputValid {
     border: 1px solid var(--color-theme-border-table) !important;
 }
 
 .inputInvalid {
     border: 2px solid var(--color-alert) !important;
-    border-radius: 15px !important;
 }
 
 .inputInvalid:focus {
@@ -17,7 +19,7 @@
 }
 
 /* Foco */
-.input:focus {
+.inputValid:focus {
     outline: none !important;
 }
 
@@ -138,6 +140,7 @@
     /* menos contraste */
 }
 
+
 /* Evitar que se vean como seleccionables */
 .day[data-outside]:hover {
     background: none;
@@ -179,4 +182,17 @@
     /* bloquea clics */
     cursor: default;
     /* cursor normal */
+}
+
+/* Todas las fechas bloqueadas (fuera de min/max) */
+.monthCell:has(.day[data-disabled]) {
+    color: var(--color-theme-neutral-primary);
+    /* Texto gris */
+    border-radius: 30%;
+    cursor: not-allowed;
+    background-color: var(--color-theme-neutral);
+}
+
+.day[data-disabled]{
+    cursor: not-allowed;
 }

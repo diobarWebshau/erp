@@ -23,61 +23,51 @@ interface LoadEvidenceManager {
 }
 
 interface IShippingOrder {
+    /* datos unicos de SO */
     id: number;
     code: string | null;
     status: string;
+
+    /* logisitica */
     carrier_id: number | null;
     load_evidence: LoadEvidenceItem[] | File[] | null;
-    delivery_cost: number;
-    delivery_date: Date | null;
-    shipping_date: Date | null;
     transport_method: string;
     tracking_number: string | null;
+    delivery_cost: number;
     shipment_type: string;
-    created_at: string;
-    updated_at: string;
-    comments: string | null;
+    carrier?: IPartialCarrier,
+    load_evidence_old?: PartialLoadEvidenceItem[],
+    load_evidence_deleted?: PartialLoadEvidenceItem[],
+
+    /* comentarios */
+    comments?: string | null;
+    comments_finish?: string | null;
+
+    /* informacion  */
+    received_by?: string | null;
+    user_id?: number | null;
+    user_name?: string | null;
+
+    /* fechas */
+    delivery_date?: Date | null;
+    scheduled_ship_date: Date | null;
+    shipping_date: Date | null;
+    finished_date?: Date | null;
+    created_at: Date;
+    updated_at: Date;
+
+    /* auxiliares */
     shipping_order_purchase_order_product?:
     IPartialShippingOrderPurchasedOrderProduct[],
     shipping_order_purchase_order_product_aux?:
     IPartialShippingOrderPurchasedOrderProduct[],
     shipping_order_purchase_order_product_manager?:
     IShippingOrderPurchasedOrderProductManager,
-    carrier?: IPartialCarrier,
-    load_evidence_old?: PartialLoadEvidenceItem[],
-    load_evidence_deleted?: PartialLoadEvidenceItem[],
 };
 
 type IPartialShippingOrder =
     Partial<IShippingOrder>;
 
-const defaultValueShippingOrder:
-    IShippingOrder = {
-    id: 0,
-    code: null,
-    status: '',
-    carrier_id: null,
-    load_evidence: null,
-    delivery_cost: 0,
-    delivery_date: null,
-    shipping_date: null,
-    transport_method: '',
-    tracking_number: null,
-    shipment_type: '',
-    created_at: '',
-    updated_at: '',
-    comments: null,
-};
-
-const defaultValuePartialShippingOrder:
-    IPartialShippingOrder = {
-    code: null,
-    status: '',
-    carrier_id: null,
-    load_evidence: null,
-    delivery_cost: 0,
-    delivery_date: null,
-};
 
 export type {
     IShippingOrder,
@@ -85,9 +75,4 @@ export type {
     LoadEvidenceItem,
     LoadEvidenceManager,
     PartialLoadEvidenceItem
-};
-
-export {
-    defaultValueShippingOrder,
-    defaultValuePartialShippingOrder,
 };

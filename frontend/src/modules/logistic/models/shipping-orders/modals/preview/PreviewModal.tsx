@@ -14,6 +14,7 @@ import { Loader } from "@mantine/core";
 import ShippingIcon from "../../../../../../comp/icons/ShippingIcon";
 import FullContainerModal from "../../../../../../comp/primitives/modal/full-container/FullContainerModal";
 import TransparentButtonCustom from "../../../../../../comp/primitives/button/custom-button/transparent/TransparentButtonCustom";
+import EvidenceModal from "./../preview/evidence/EvidenceModal"
 import Tag from "../../../../../../comp/primitives/tag/Tag";
 import clsx from "clsx";
 
@@ -203,7 +204,11 @@ const PreviewModal = ({ onClose, record }: IPreviewModal) => {
             </div>
             {
                 isActiveEvidenceModal && (
-                    <div></div>
+                    <EvidenceModal
+                        onClose={toggleIsActiveEvidenceModal} 
+                        record={record}
+
+                    />
                 )
             }
         </FullContainerModal>

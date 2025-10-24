@@ -233,7 +233,6 @@ const Step1 = ({ onClose }: IStep1) => {
                     placeholder="Buscar"
                     icon={<Search />}
                     classNameInput={StyleModule.inputTextCustom}
-                    withValidation={false}
                 />
             </div>
             <GenericTable

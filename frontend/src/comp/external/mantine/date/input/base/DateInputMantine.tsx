@@ -9,8 +9,9 @@ interface IDateInputMantine {
   onChange: (value: Date | null) => void; // Callback al cambiar la fecha
   classNameInput?: string; // Clase opcional para personalizar el contenedor principal
   positionPopover: "bottom" | "top" | "left" | "right" | "bottom-start" | "bottom-end" | "top-start" | "top-end" | "left-start" | "left-end" | "right-start" | "right-end"
-  min?: Date;
-  max?: Date;
+  min?: Date,
+  max?: Date,
+  withValidate?: boolean
 }
 
 function DateInputMantine({
@@ -19,7 +20,8 @@ function DateInputMantine({
   classNameInput,
   positionPopover,
   min,
-  max
+  max,
+  withValidate = false
 }: IDateInputMantine) {
 
   const [isValidDate, setIsValidDate] = useState<boolean>(DateUtils.isValid(value));
@@ -51,6 +53,8 @@ function DateInputMantine({
     return abbr.charAt(0).toUpperCase(); // tomamos la primera letra y la ponemos en mayúscula
   };
 
+  console.log(`min`, min)
+
   return (
     <DateInput
       value={value} // Fecha actual seleccionada
@@ -71,7 +75,7 @@ function DateInputMantine({
         root: styles.root, // Contenedor principal que envuelve label + input
         wrapper: styles.wrapper, // Contenedor que envuelve solo el input
         label: `nunito-regular ${styles.label}`, // Estilo del label
-        input: `${classNameInput} nunito-regular ${isValidDate ? styles.input : styles.inputInvalid}`, // Estilo del input
+        input: `${classNameInput} nunito-regular ${styles.input} ${isValidDate ? styles.inputValid : withValidate ? styles.inputInvalid : ""}`, // Estilo del input
         description: `nunito-regular ${styles.description}`, // Estilo del texto de ayuda
         error: `nunito-regular ${styles.error}`, // Estilo del mensaje de error
         required: styles.required, // Estilo del indicador de campo requerido
@@ -95,6 +99,7 @@ function DateInputMantine({
         weekday: `nunito-regular ${styles.weekday}`, // Celda de cada día de la semana
         monthCell: styles.monthCell, // Celda de cada día del mes
         day: `nunito-regular ${styles.day}`, // Estilo del día individual
+        
       }}
 
       withCellSpacing={true} // Espacio entre las celdas del calendario

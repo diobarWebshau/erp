@@ -22,6 +22,7 @@ interface ImageLoaderProps {
     classNameRemoveButtonIcon?: string;
     classNameEditButtonIcon?: string;
     triggerComponent?: (args: { onClick: () => void }) => ReactNode;
+    isEditable?: boolean
 }
 
 const ImageLoader = ({
@@ -40,6 +41,7 @@ const ImageLoader = ({
     classNameRemoveButtonIcon,
     classNameEditButtonIcon,
     triggerComponent,
+    isEditable = true
 }: ImageLoaderProps) => {
 
     // Referencia al <input type="file"> para invocarlo programáticamente (click())
@@ -148,40 +150,47 @@ const ImageLoader = ({
                                     alt={`preview-${index}`}
                                     className={clsx(StyleModule.image, classNameImage)}
                                 />
-                                <div className={clsx(StyleModule.actions, classNameActions)}>
-                                    <button
-                                        type="button"
-                                        className={clsx(StyleModule.removeButton, classNameRemoveButton)}
-                                        onClick={handleRemove(index)}
-                                    >
-                                        <X className={clsx(StyleModule.removeButtonIcon, classNameRemoveButtonIcon)} />
-                                    </button>
-                                    {typeLoader === "multiple" && (
-                                        <button
-                                            type="button"
-                                            className={clsx(StyleModule.editButton, classNameEditButton)}
-                                            onClick={handleReplace(index)}
-                                        >
-                                            <Pencil className={clsx(StyleModule.editButtonIcon, classNameEditButtonIcon)} />
-                                        </button>
-                                    )}
-                                </div>
+                                {
+                                    isEditable ?
+                                        <div className={clsx(StyleModule.actions, classNameActions)}>
+                                            <button
+                                                type="button"
+                                                className={clsx(StyleModule.removeButton, classNameRemoveButton)}
+                                                onClick={handleRemove(index)}
+                                            >
+                                                <X className={clsx(StyleModule.removeButtonIcon, classNameRemoveButtonIcon)} />
+                                            </button>
+                                            {typeLoader === "multiple" && (
+                                                <button
+                                                    type="button"
+                                                    className={clsx(StyleModule.editButton, classNameEditButton)}
+                                                    onClick={handleReplace(index)}
+                                                >
+                                                    <Pencil className={clsx(StyleModule.editButtonIcon, classNameEditButtonIcon)} />
+                                                </button>
+                                            )}
+                                        </div>
+                                        : null
+                                }
                             </div>
                         ))}
                     </div>
-
                 </div>
             }
-            <div className={clsx(StyleModule.triggerContainer, classNameTriggerContainer)}>
-                {triggerComponent ? triggerComponent({ onClick: handleUpload }) : (
-                    <TransparentButtonCustom
-                        typeOrderIcon="last"
-                        label="Cargar fotografias "
-                        onClick={handleUpload}
-                        icon={<Upload />}
-                    />
-                )}
-            </div>
+            {
+                isEditable ?
+                    <div className={clsx(StyleModule.triggerContainer, classNameTriggerContainer)}>
+                        {triggerComponent ? triggerComponent({ onClick: handleUpload }) : (
+                            <TransparentButtonCustom
+                                typeOrderIcon="last"
+                                label="Cargar fotografias "
+                                onClick={handleUpload}
+                                icon={<Upload />}
+                            />
+                        )}
+                    </div>
+                    : null
+            }
         </div>
     )
 }

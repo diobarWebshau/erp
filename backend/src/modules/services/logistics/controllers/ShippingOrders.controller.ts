@@ -657,6 +657,13 @@ class ShippingOrderController {
             shipment_type, transport_method, comments,
             carrier, load_evidence_deleted,
             shipping_order_purchase_order_product_aux,
+            received_by,
+            user_id,
+            user_name,
+            scheduled_ship_date,
+            finished_date,
+            comments_finish,
+
         } = body as ShippingOrderCreationAttributes;
 
 
@@ -710,11 +717,17 @@ class ShippingOrderController {
                     load_evidence || null,
                 delivery_cost: Number(delivery_cost),
                 delivery_date,
-                shipping_date,
+                shipping_date: shipping_date || null,
                 tracking_number,
                 shipment_type,
                 transport_method,
-                comments
+                comments: comments || null,
+                user_id: Number(user_id),
+                user_name: user_name || null,
+                scheduled_ship_date: scheduled_ship_date || null,
+                finished_date: finished_date || null,
+                comments_finish: comments_finish || null,
+                received_by: received_by || null,
             }, { transaction });
 
             if (!response) {
@@ -1098,7 +1111,6 @@ class ShippingOrderController {
         }
     }
 
-
     static updateComplete = async (
         req: Request,
         res: Response,
@@ -1480,34 +1492,34 @@ class ShippingOrderController {
                         // }
 
                         for (const p of new_pops) {
-                            
+
                             const editableFieldsSOPOP = ShippingOrderPurchaseOrderProductModel.getEditableFields();
-                            
+
                             const qty_real_pop = p.qty;
                             const qty_shipped_pop =
-                            p.shipping_order_purchase_order_product
-                            ?.reduce((acc, value) => acc + value.qty, 0) || 0;
-                            
+                                p.shipping_order_purchase_order_product
+                                    ?.reduce((acc, value) => acc + value.qty, 0) || 0;
+
                             const qty_pop_old =
-                            p.shipping_order_purchase_order_product
-                            ?.find(po => po.purchase_order_product_id === p.id)
-                            ?.qty || 0;
-                            
+                                p.shipping_order_purchase_order_product
+                                    ?.find(po => po.purchase_order_product_id === p.id)
+                                    ?.qty || 0;
+
                             const update_values =
-                            modifiedFiltered
-                            .find(po =>
+                                modifiedFiltered
+                                    .find(po =>
                                         +po.purchase_order_product_id
                                         === p.id
                                     );
-                                    
-                                    const qty_request: number =
-                                    update_values?.qty || 0;
-                                    
-                                    if ((qty_request + (qty_shipped_pop - qty_pop_old)) > qty_real_pop) {
-                                        await transaction?.rollback();
-                                        await deleteLoadEvidences(
-                                            completeBody.load_evidence
-                                        );
+
+                            const qty_request: number =
+                                update_values?.qty || 0;
+
+                            if ((qty_request + (qty_shipped_pop - qty_pop_old)) > qty_real_pop) {
+                                await transaction?.rollback();
+                                await deleteLoadEvidences(
+                                    completeBody.load_evidence
+                                );
                                 res.status(400).json({
                                     validation:
                                         `The qty "${qty_request}" for the product `
@@ -1516,16 +1528,16 @@ class ShippingOrderController {
                                         `(${p.purchase_order?.order_code}) "${qty_real_pop}".
                                         The qty available for the purchase order is `
                                         + `"${qty_real_pop - (qty_shipped_pop - qty_pop_old)}"`,
-                                    });
-                                    return;
-                                }
-                                
-                                const sopops = existingSopopsResponse.map(m => m.toJSON());
-                                
-                                const sopop = sopops.find(po => po.purchase_order_product_id === p.id);
-                                
-                                const sopop_update = modifiedFiltered.find(po => po.id === sopop?.id);
-                                const updateValuesSOPOP = collectorUpdateFields(editableFieldsSOPOP, sopop_update);
+                                });
+                                return;
+                            }
+
+                            const sopops = existingSopopsResponse.map(m => m.toJSON());
+
+                            const sopop = sopops.find(po => po.purchase_order_product_id === p.id);
+
+                            const sopop_update = modifiedFiltered.find(po => po.id === sopop?.id);
+                            const updateValuesSOPOP = collectorUpdateFields(editableFieldsSOPOP, sopop_update);
 
                             if (Object.keys(updateValuesSOPOP).length > 0) {
                                 const update: [affectedCount: number] =
@@ -1533,11 +1545,11 @@ class ShippingOrderController {
                                         .update(
                                             updateValuesSOPOP,
                                             {
-                                            where: {
-                                                id: sopop?.id
-                                            },
-                                            transaction
-                                        }
+                                                where: {
+                                                    id: sopop?.id
+                                                },
+                                                transaction
+                                            }
                                         );
 
 

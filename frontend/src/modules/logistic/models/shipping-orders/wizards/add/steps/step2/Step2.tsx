@@ -26,13 +26,9 @@ import StyleModule from "./Step2.module.css";
 import SingleProgressBarMantineCustom from "../../../../../../../../comp/external/mantine/progress-bar/single-progress-bar/custom/SingleProgressBarMantineCustom";
 import Tag from "../../../../../../../../comp/primitives/tag/Tag";
 
-interface IStep2 {
-    onClose: () => void;
-}
+interface IStep2 { onClose: () => void; }
 
-const Step2 = ({
-    onClose
-}: IStep2) => {
+const Step2 = ({ onClose }: IStep2) => {
 
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
@@ -66,7 +62,7 @@ const Step2 = ({
         return [purchase_orders, client_name, purchaseOrder];
     }, [state.data?.shipping_order_purchase_order_product_aux]);
 
-    const [deliveryDate, setDeliveryDate] = useState<Date | null>(date);
+    const [deliveryDate, setDeliveryDate] = useState<Date | null>(state.data?.delivery_date || null);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
     const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders({
         like: client_name,
@@ -117,8 +113,6 @@ const Step2 = ({
         // state.data
     ]);
 
-
-
     const getAvailableLocation = useCallback((record: IPartialShippingOrderPurchasedOrderProduct) => {
         const available_location = (record.purchase_order_products?.stock_available?.stock || 0)
         const available = available_location;
@@ -163,12 +157,12 @@ const Step2 = ({
             });
             return;
         }
-        if (!deliveryDate) {
-            toastMantine.feedBackForm({
-                message: "Debe seleccionar una fecha de envio valida."
-            });
-            return;
-        }
+        // if (!deliveryDate) {
+        //     toastMantine.feedBackForm({
+        //         message: "Debe seleccionar una fecha de envio valida."
+        //     });
+        //     return;
+        // }
         const diffObject = await diffObjectArrays(state.data?.shipping_order_purchase_order_product ?? [], updateValues);
         if (diffObject.added.length > 0) {
             const added = diffObject.added;
@@ -351,6 +345,7 @@ const Step2 = ({
                             value={deliveryDate}
                             onChange={setDeliveryDate}
                             positionPopover="bottom-end"
+                            min={new Date()}
                         />
                     </div>
                     <div>

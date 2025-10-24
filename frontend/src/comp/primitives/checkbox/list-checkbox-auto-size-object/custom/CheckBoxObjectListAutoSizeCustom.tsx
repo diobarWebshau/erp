@@ -24,6 +24,7 @@ interface CheckBoxObjectListAutoSizeCustomProps<T extends Object> {
     classNameContainer?: string;
     classNameOption?: string;
     classNameSelectedOption?: string;
+    isEditable?: boolean
 }
 
 const CheckBoxObjectListAutoSizeCustom = <T extends Object>({
@@ -36,6 +37,7 @@ const CheckBoxObjectListAutoSizeCustom = <T extends Object>({
     classNameContainer,
     classNameOption,
     classNameSelectedOption,
+    isEditable = true
 }: CheckBoxObjectListAutoSizeCustomProps<T>) => {
 
     return (
@@ -46,9 +48,9 @@ const CheckBoxObjectListAutoSizeCustom = <T extends Object>({
             labelKey={labelKey}
             valueKey={valueKey}
             classNameContainer={clsx(StylesModule.container, classNameContainer)}
-            classNameOption={clsx(StylesModule.option, classNameOption)}
-            classNameSelectedOption={clsx(StylesModule.selectedOption, classNameSelectedOption)}
-            classNameInputOption={StylesModule.inputCheckbox}
+            classNameOption={clsx(StylesModule.option, classNameOption, isEditable ? StylesModule.optionEditable : "")}
+            classNameSelectedOption={clsx(isEditable ? StylesModule.selectedOption : "", !isEditable ? classNameSelectedOption : "")}
+            classNameInputOption={clsx(isEditable ? StylesModule.inputCheckbox : StylesModule?.inputCheckboxNoEditable)}
             renderLabel={renderLabel}
         />
     )

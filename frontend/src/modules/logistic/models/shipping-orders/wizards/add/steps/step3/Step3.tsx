@@ -47,7 +47,7 @@ const Step3 = ({ onClose }: IStep3) => {
 
         const updateShippingOrder: IPartialShippingOrder = {
             carrier: carrier,
-            shipping_date: deliveryDate,
+            scheduled_ship_date: deliveryDate,
             delivery_cost: cost,
             code: code,
             carrier_id: carrier.id,
@@ -79,6 +79,7 @@ const Step3 = ({ onClose }: IStep3) => {
                             value={deliveryDate}
                             positionPopover="bottom-end"
                             classNameInput={StyleModule.inputDateInputMantine}
+                            withValidate
                         />
                         <ObjectSelectCustomMemo
                             options={carriers || []}

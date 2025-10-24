@@ -77,13 +77,22 @@
     background-color: var(--color-theme-neutral-background);
 }
 
-.option:not(.selectedOption):hover {
+.optionEditable:not(.selectedOption):hover {
     /* estilos */
     background-color: var(--color-theme-background);
     color: var(--color-theme-font-black);
 }
 
 /* ? ****  CHECKBOX OPTION **** */
+
+.inputCheckboxNoEditable {
+    /* Google chrome y Edge */
+    -webkit-appearance: none;
+    /* Safari */
+    -moz-appearance: none;
+    /* Firefox */
+    appearance: none;
+}
 
 /* estilo base del checkbox */
 .inputCheckbox {
@@ -111,6 +120,7 @@
     /* estilos */
     background-color: transparent;
 }
+
 
 /* Estilo de la caja del checkbox cuando esta seleccionado */
 .inputCheckbox:checked {
