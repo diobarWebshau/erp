@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 import ImageLoader from "../../../../../../comp/primitives/image-loader/custom/ImageLoaderCustom";
 import { DateUtils } from "../../../../../../utils/dayJsUtils";
 import type { IShippingOrderPurchasedOrderProduct } from "interfaces/shippingPurchasedProduct";
-import type { IPartialShippingOrder} from "interfaces/shippingOrder";
+import type { IPartialShippingOrder } from "interfaces/shippingOrder";
 import FullContainerModal from "../../../../../../comp/primitives/modal/full-container/FullContainerModal";
 import TransparentButtonCustom from "../../../../../../comp/primitives/button/custom-button/transparent/TransparentButtonCustom";
 import { ChevronLeft, CircleCheck } from "lucide-react";
@@ -28,7 +28,7 @@ interface ILoadModal {
 
 const LoadModal = ({ onClose, shippingOrder, onUpdate }: ILoadModal) => {
 
-    const { shippingOrderDetailById} = useShippingOrderDetailById(shippingOrder.id ?? null);
+    const { shippingOrderDetailById } = useShippingOrderDetailById(shippingOrder.id ?? null);
 
     const errorRedux = useSelector((state: RootState) => state.error);
 
@@ -78,8 +78,7 @@ const LoadModal = ({ onClose, shippingOrder, onUpdate }: ILoadModal) => {
     }
 
     return (
-        <FullContainerModal
-        >
+        <FullContainerModal>
             <div className={StyleModule.containerModal}>
                 <div className={StyleModule.headerModal}>
                     <div>
@@ -115,13 +114,14 @@ const LoadModal = ({ onClose, shippingOrder, onUpdate }: ILoadModal) => {
                     </div>
                     <div className={StyleModule.confirmSection}>
                         <p className={"nunito-semibold"}>Antes de continuar, verifica que estén listos todos los productos para subir a la unidad</p>
-                        <CheckBoxObjectListAutoSizeCustom<IShippingOrderPurchasedOrderProduct>
+                        <CheckBoxObjectListAutoSizeCustom
                             value={selected}
                             options={sopops}
                             onChange={(selected) => setSelected(selected)}
                             renderLabel={(item) =>
-                                item.purchase_order_products?.product?.name?.toString() ??
-                                `${String(item.purchase_order_products?.purchase_order?.order_code ?? "")} - ${item.purchase_order_products?.product?.name}`
+                                `${String(item.purchase_order_products?.purchase_order?.order_code)} -` +
+                                `${String(item.purchase_order_products?.product?.name)} - ` +
+                                `${String(item.qty)} piezas`
                             }
                             valueKey="id"
                             labelKey="id"

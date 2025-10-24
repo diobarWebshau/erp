@@ -8,16 +8,18 @@ import { useShippingOrderState } from "../../context/shippingOrderHooks";
 import Step1 from "./steps/step1/Step1";
 import Step3 from "./steps/step3/Step3";
 import Step2 from "./steps/step2/Step2";
-import type { IPartialShippingOrder } from "interfaces/shippingOrder";
+import type { IPartialShippingOrder, IShippingOrder } from "interfaces/shippingOrder";
 
 interface IEditWizardShippingOrder {
     onClose: () => void;
     onUpdate: (original: IPartialShippingOrder, updated: IPartialShippingOrder) => void;
+    onLoad: (data: IShippingOrder) => void;
 }
 
 const EditWizardShippingOrder = ({
     onClose,
     onUpdate,
+    onLoad,
 }: IEditWizardShippingOrder) => {
 
     const state = useShippingOrderState();
@@ -43,7 +45,7 @@ const EditWizardShippingOrder = ({
                 <div className={StyleModule.mainContent}>
                     {state.current_step === 1 && (<Step1 />)}
                     {state.current_step === 2 && (<Step2 onUpdate={onUpdate} />)}
-                    {state.current_step === 3 && (<Step3 onClose={onClose} />)}
+                    {state.current_step === 3 && (<Step3 onLoad={onLoad} />)}
                 </div>
             </div>
             {

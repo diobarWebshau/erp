@@ -41,6 +41,8 @@
       --color-partial-light: #F4D1B6;
       --color-partial: #EF924B;
       --color-overlay: rgba(0, 0, 0, 0.4);
+      --color-shipping-light: #E0F0EE;
+      --color-shipping: #369965;
 
       /* variables gradientes */
       --color-theme-gradient-start: #5A63FF;

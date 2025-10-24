@@ -146,9 +146,9 @@ const Step1 = ({ onClose }: IStep1) => {
                 purchase_order_products: p,
                 purchase_order_product_id: p.id,
                 qty: (Number(p.shipping_summary?.order_qty) - Number(p.shipping_summary?.shipping_qty)) || 0,
-                location: p.inventory_commited?.location,
-                location_id: p.inventory_commited?.location?.id,
-                location_name: p.inventory_commited?.location?.name,
+                location: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location,
+                location_id: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.id,
+                location_name: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.name,
             }));
             if (sopops.length > 0) {
                 dispatch(add_shipping_order_purchased_order_products_aux(sopops));

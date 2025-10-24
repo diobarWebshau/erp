@@ -63,31 +63,37 @@ const ShippingOrderProvider = ({
         async (data: IPartialShippingOrder): Promise<IPartialShippingOrder> => {
             // Recolecta IDs únicos de purchase_orders existentes en los SOPoPs del SO
 
-
+            // Generamos un map de las purchased orders
             const posMap = new Map<number, IPurchasedOrder>();
+
+            // Obtenemos todas las purchased orders asociadas a la orden de envío
             const purchasedOrders =
                 data?.shipping_order_purchase_order_product?.map(
                     (item) => item.purchase_order_products?.purchase_order as IPurchasedOrder
                 ) ?? [];
 
+            // Agregamos las purchased orders al map
             for (const po of purchasedOrders) {
                 if (po?.id != null) posMap.set(po.id, po);
             }
 
+            // Obtenemos los ids de las purchased orders
             const poIds = [...posMap.keys()];
             if (poIds.length === 0) {
-                // No hay POPs que enriquecer
+                // No hay POPs para enriquecer
                 return {
                     ...data,
                     shipping_order_purchase_order_product_aux: [],
                 };
             }
 
+            // Obtenemos las purchase orders con todas sus POPs
             const responsePurchaseOrders = await getPurchasedOrderByIdsInDB(dispatchRedux, poIds);
 
+            // Aplana los POPs de todas las purchase orders en un solo array
             const allPops = responsePurchaseOrders?.map((p) => p.purchase_order_products ?? []).flat() ?? [];
 
-            // Filtra POPs que pertenecen al SO actual (por id) y arma auxiliares con qty pendiente
+            // Filtra POPs que no pertenecen al SO actual
             const popsFiltered = allPops.filter(
                 (pop): pop is IPurchasedOrderProduct =>
                     pop &&
@@ -96,20 +102,23 @@ const ShippingOrderProvider = ({
                     ) ?? false)
             );
 
+            // Filtra POPs que no han sido completados en un contexto de envío
             const popsFilteredShippingComplete = popsFiltered?.filter((pop) => pop.shipping_summary?.shipping_qty !== pop.shipping_summary?.order_qty);
 
+            // Generamos las POPS auxiliares
             const sopops = popsFilteredShippingComplete?.map((p) => ({
                 id: generateRandomIds(),
                 purchase_order_products: p,
                 purchase_order_product_id: p.id,
-                location: p.inventory_commited?.location,
-                location_id: p.inventory_commited?.location?.id,
-                location_name: p.inventory_commited?.location?.name,
+                location: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location,
+                location_id: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.id,
+                location_name: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.name,
                 qty:
                     (Number(p.shipping_summary?.order_qty) || 0) -
                     (Number(p.shipping_summary?.shipping_qty) || 0),
             }));
 
+            // Retornamos el objeto con los datos enriquecidos
             return {
                 ...data,
                 shipping_order_purchase_order_product_aux: [

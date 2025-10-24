@@ -894,4 +894,10 @@ DELIMITER ;
 SELECT func_get_inventory_movements_commited_pop(1);
 
 
+           SELECT IFNULL(SUM(im2.qty), 0)
+                FROM inventory_movements AS im2
+                WHERE im2.reference_id = 2
+                  AND im2.reference_type = 'Shipping'
+                  AND im2.movement_type = 'allocate';
+
 

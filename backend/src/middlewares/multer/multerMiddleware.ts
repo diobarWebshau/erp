@@ -36,7 +36,7 @@ const uploadImageMiddleware = async (
       return new Promise((resolve, reject) => {
         upload.fields([
           { name: 'photo', maxCount: 1 },
-          { name: 'load_evidence', maxCount: 20 }
+          { name: 'load_evidence', maxCount: 50 }
         ])(req, res, (err: any) => {
           console.log("entro a multer");
           console.log(req.files);

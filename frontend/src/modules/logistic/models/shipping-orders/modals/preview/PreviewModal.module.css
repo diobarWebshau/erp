@@ -1,0 +1,329 @@
+.containerModal {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+
+    /* dimension*/
+    min-height: 0;
+    min-width: 0;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+
+/* ******** HEADER MODAL ******** */
+.headerModal {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+
+}
+
+.headerModal>h1 {
+    /* estilos */
+    font-size: 36px;
+    color: var(--color-theme-primary);
+}
+
+
+/* ******** CONTAINER LOADING ******** */
+
+.containerLoading {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ******** CONTAINER CONTENT ******** */
+
+.containerContent {
+
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+    max-width: 100%;
+    max-height: 100%;
+
+    /* distribucion box */
+    padding-block: 1rem;
+    padding-inline: 3rem;
+    border-radius: 15px;
+    background-color: var(--color-theme-background);
+}
+
+/* ******** CONTENT SECTION ******** */
+
+.contentSection {
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+    max-width: 100%;
+    max-height: 100%;
+
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 0;
+
+    /* distribucion grid */
+    display: grid;
+    grid-template:
+        "header" auto
+        "subHeader" auto
+        "content" 1fr
+        "footer" auto / 100%;
+    gap: 2rem;
+}
+
+/* ******** HEADER CONTENT ******** */
+
+
+.headerContent {
+    /* distribucion grid respecto al padre */
+    grid-area: header;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+}
+
+.headerContent>h2 {
+    /* estilos */
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+.dlStatus {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+    /* estilos */
+    font-size: 14px;
+}
+
+.tag {
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* dimension */
+    width: 120px;
+    height: 30px;
+
+    /* distribucion box */
+    border-radius: 10px;
+
+    /* estilos */
+    text-transform: capitalize;
+}
+
+.released {
+    /* distribucion box */
+    border: 1px solid var(--color-alert);
+
+    /* estilos */
+    background-color: var(--color-alert-light);
+    color: var(--color-alert);
+}
+
+.shipping {
+    /* distribucion box */
+    border: 1px solid var(--color-shipping);
+
+    /* estilos */
+    background-color: var(--color-shipping-light);
+    color: var(--color-shipping);
+}
+
+.finished {
+    /* distribucion box */
+    border: 1px solid var(--color-success);
+
+    /* estilos */
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+}
+
+/* ******** SUBHEADER CONTENT ******** */
+
+.subHeader {
+    /* distribucion grid respecto al padre */
+    grid-area: subHeader;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 3rem;
+}
+
+.rightContent,
+.leftContent {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distrubucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+
+    /* distribucion box */
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-border-table);
+    padding: 1rem;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+    font-size: 14px;
+}
+
+.subTitle {
+    /* estilos */
+    color: var(--color-theme-primary);
+    font-size: 20px;
+}
+
+.subContent {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: start;
+    flex-wrap: nowrap;
+    gap: 1rem;
+
+    /* distribucion box */
+    padding-left: 1rem;
+
+}
+
+.subContentItem {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+}
+
+.subContentItem>dl {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+
+.boldText {
+    /* estilos */
+    font-size: 14px;
+    color: var(--color-theme-font-black);
+}
+
+.boldPrimary {
+    /* estilos */
+    font-size: 14px;
+    color: var(--color-theme-primary);
+}
+
+
+/* ******** CONTENT ******** */
+
+.contentSection {
+    /* distribucion grid respecto al padre */
+    grid-area: content;
+
+    /* dimension */
+    min-height: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.contentSection>h3 {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+
+.contentSection>.tableContainer {
+    /* distribucion flex con respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    /* dimension */
+    max-height: 100%;
+}
+
+
+/* ******** FOOTER ******** */
+
+.footerSection {
+    /* distribucion grid respecto al padre */
+    grid-area: footer;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+}

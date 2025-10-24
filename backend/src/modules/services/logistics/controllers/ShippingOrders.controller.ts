@@ -562,7 +562,6 @@ class ShippingOrderController {
                     }
                 }
 
-
                 const response =
                     await ShippingOrderModel.update(
                         update_values,
@@ -918,49 +917,49 @@ class ShippingOrderController {
 
             // ? **** ACTUALIZAR LA LOCALIZACION EN INVENTORY_MOVEMENT ****
 
-            const filter = pop.filter(
-                p =>
-                    p.location &&
-                    p.purchase_order_products?.shipping_summary &&
-                    Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
-                    !== Number(p.location?.id)
-            );
+            // const filter = pop.filter(
+            //     p =>
+            //         p.location &&
+            //         p.purchase_order_products?.shipping_summary &&
+            //         Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id)
+            //         !== Number(p.location?.id)
+            // );
 
-            console.log(filter);
+            // console.log(filter);
 
-            if (filter.length > 0) {
-                const promises = filter.map(p => {
-                    const response = InventoryMovementModel.update(
-                        {
-                            location_id: p.location?.id,
-                            location_name: p.location?.name
-                        },
-                        {
-                            where: {
-                                reference_id: p.purchase_order_product_id,
-                                reference_type: "Order",
-                                movement_type: "allocate"
-                            },
-                            transaction
-                        });
-                    return response;
-                });
+            // if (filter.length > 0) {
+            //     const promises = filter.map(p => {
+            //         const response = InventoryMovementModel.update(
+            //             {
+            //                 location_id: p.location?.id,
+            //                 location_name: p.location?.name
+            //             },
+            //             {
+            //                 where: {
+            //                     reference_id: p.purchase_order_product_id,
+            //                     reference_type: "Order",
+            //                     movement_type: "allocate"
+            //                 },
+            //                 transaction
+            //             });
+            //         return response;
+            //     });
 
-                const responseUpdateLocation = await Promise.all(promises);
+            //     const responseUpdateLocation = await Promise.all(promises);
 
-                console.log(responseUpdateLocation);
+            //     console.log(responseUpdateLocation);
 
-                if (responseUpdateLocation.some(r => r[0] === 0)) {
-                    await transaction.rollback();
-                    await deleteLoadEvidences(load_evidence || []);
-                    res.status(500).json({
-                        validation:
-                            `The update of the location in the inventory movement `
-                            + `could not be completed.`
-                    });
-                    return;
-                }
-            }
+            //     if (responseUpdateLocation.some(r => r[0] === 0)) {
+            //         await transaction.rollback();
+            //         await deleteLoadEvidences(load_evidence || []);
+            //         res.status(500).json({
+            //             validation:
+            //                 `The update of the location in the inventory movement `
+            //                 + `could not be completed.`
+            //         });
+            //         return;
+            //     }
+            // }
 
             // ? **** ASIGNAR LOS PRODUCTOS DE LA ORDEN DE COMPRA AL ENVIO **** 
 
@@ -1427,85 +1426,88 @@ class ShippingOrderController {
 
                         const new_pops = [...popsDetailsResponse].map(m => m.toJSON());
 
-                        console.log(`modifiedFiltered:`, modifiedFiltered);
+                        // console.log(`modifiedFiltered:`, modifiedFiltered);
 
-                        const filter = modifiedFiltered.filter(
-                            p => p.location && Number(p.purchase_order_products?.inventory_commited?.location_id)
-                                !== Number(p.location?.id)
-                        );
+                        // const filter = modifiedFiltered.filter(
+                        //     p => p.location && Number(p.purchase_order_products?.inventory_commited?.location_id)
+                        //         !== Number(p.location?.id)
+                        // );
 
-                        console.log(`filter:`, filter);
+                        // console.log(`filter:`, filter);
 
 
-                        if (filter.length > 0) {
+                        // if (filter.length > 0) {
 
-                            const sopopsWithPops = filter.map(p => {
-                                const pop = new_pops.find(pop => pop.shipping_order_purchase_order_product?.find(sopop => sopop.id === p.id));
-                                return {
-                                    ...p,
-                                    purchase_order_product_id: pop?.id
-                                }
-                            });
+                        //     const sopopsWithPops = filter.map(p => {
+                        //         const pop = new_pops.find(pop => pop.shipping_order_purchase_order_product?.find(sopop => sopop.id === p.id));
+                        //         return {
+                        //             ...p,
+                        //             purchase_order_product_id: pop?.id
+                        //         }
+                        //     });
 
-                            const promises = sopopsWithPops.map(p => {
-                                const response = InventoryMovementModel.update(
-                                    {
-                                        location_id: p.location?.id,
-                                        location_name: p.location?.name
-                                    },
-                                    {
-                                        where: {
-                                            reference_id: p.purchase_order_product_id,
-                                            reference_type: "Order",
-                                            movement_type: "allocate"
-                                        },
-                                        transaction
-                                    },
-                                );
-                                return response;
-                            });
+                        //     const promises = sopopsWithPops.map(p => {
+                        //         const response = InventoryMovementModel.update(
+                        //             {
+                        //                 location_id: p.location?.id,
+                        //                 location_name: p.location?.name
+                        //             },
+                        //             {
+                        //                 where: {
+                        //                     reference_id: p.purchase_order_product_id,
+                        //                     reference_type: "Order",
+                        //                     movement_type: "allocate"
+                        //                 },
+                        //                 transaction
+                        //             },
+                        //         );
+                        //         return response;
+                        //     });
 
-                            const responseUpdateLocation = await Promise.all(promises);
+                        //     const responseUpdateLocation = await Promise.all(promises);
 
-                            if (responseUpdateLocation.some(r => r[0] === 0)) {
-                                await transaction.rollback();
-                                await deleteLoadEvidences(completeBody.load_evidence || []);
-                                console.log(`Aqui trueno`);
-                                res.status(500).json({
-                                    validation:
-                                        `The update of the location in the inventory movement `
-                                        + `could not be completed.`
-                                });
-                                return;
-                            }
-                        }
+                        //     if (responseUpdateLocation.some(r => r[0] === 0)) {
+                        //         await transaction.rollback();
+                        //         await deleteLoadEvidences(completeBody.load_evidence || []);
+                        //         console.log(`Aqui trueno`);
+                        //         res.status(500).json({
+                        //             validation:
+                        //                 `The update of the location in the inventory movement `
+                        //                 + `could not be completed.`
+                        //         });
+                        //         return;
+                        //     }
+                        // }
 
                         for (const p of new_pops) {
+                            
+                            const editableFieldsSOPOP = ShippingOrderPurchaseOrderProductModel.getEditableFields();
+                            
                             const qty_real_pop = p.qty;
                             const qty_shipped_pop =
-                                p.shipping_order_purchase_order_product
-                                    ?.reduce((acc, value) => acc + value.qty, 0) || 0;
-
+                            p.shipping_order_purchase_order_product
+                            ?.reduce((acc, value) => acc + value.qty, 0) || 0;
+                            
                             const qty_pop_old =
-                                p.shipping_order_purchase_order_product
-                                    ?.find(po => po.purchase_order_product_id === p.id)
-                                    ?.qty || 0;
-
+                            p.shipping_order_purchase_order_product
+                            ?.find(po => po.purchase_order_product_id === p.id)
+                            ?.qty || 0;
+                            
                             const update_values =
-                                modifiedFiltered
-                                    .find(po =>
+                            modifiedFiltered
+                            .find(po =>
                                         +po.purchase_order_product_id
                                         === p.id
                                     );
-
-                            const qty_request: number =
-                                update_values?.qty || 0;
-
-                            if ((qty_request + (qty_shipped_pop - qty_pop_old)) > qty_real_pop) {
-                                await transaction?.rollback();
-                                await deleteLoadEvidences(
-                                    completeBody.load_evidence
-                                );
+                                    
+                                    const qty_request: number =
+                                    update_values?.qty || 0;
+                                    
+                                    if ((qty_request + (qty_shipped_pop - qty_pop_old)) > qty_real_pop) {
+                                        await transaction?.rollback();
+                                        await deleteLoadEvidences(
+                                            completeBody.load_evidence
+                                        );
                                 res.status(400).json({
                                     validation:
                                         `The qty "${qty_request}" for the product `
@@ -1514,21 +1516,23 @@ class ShippingOrderController {
                                         `(${p.purchase_order?.order_code}) "${qty_real_pop}".
                                         The qty available for the purchase order is `
                                         + `"${qty_real_pop - (qty_shipped_pop - qty_pop_old)}"`,
-                                });
-                                return;
-                            }
+                                    });
+                                    return;
+                                }
+                                
+                                const sopops = existingSopopsResponse.map(m => m.toJSON());
+                                
+                                const sopop = sopops.find(po => po.purchase_order_product_id === p.id);
+                                
+                                const sopop_update = modifiedFiltered.find(po => po.id === sopop?.id);
+                                const updateValuesSOPOP = collectorUpdateFields(editableFieldsSOPOP, sopop_update);
 
-                            const sopops = existingSopopsResponse.map(m => m.toJSON());
-
-                            const sopop = sopops.find(po => po.purchase_order_product_id === p.id);
-
-                            const sopop_update = modifiedFiltered.find(po => po.id === sopop?.id);
-
-                            if (sopop_update?.qty) {
+                            if (Object.keys(updateValuesSOPOP).length > 0) {
                                 const update: [affectedCount: number] =
                                     await ShippingOrderPurchaseOrderProductModel
                                         .update(
-                                            { qty: sopop_update.qty }, {
+                                            updateValuesSOPOP,
+                                            {
                                             where: {
                                                 id: sopop?.id
                                             },
@@ -1771,47 +1775,47 @@ class ShippingOrderController {
 
                         // ? *** ACTUALIZAMOS LA UBICACION EN EL INVENTARIO SI LO REQUIERE **** */
 
-                        const filter = addsFiltered.filter(
-                            p => {
-                                const location_asigned = Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id);
-                                const location_current = Number(p.location?.id);
-                                return location_asigned !== location_current;
-                            }
-                        );
+                        // const filter = addsFiltered.filter(
+                        //     p => {
+                        //         const location_asigned = Number(p.purchase_order_products?.purchase_order_product_location_production_line?.production_line?.location_production_line?.location_id);
+                        //         const location_current = Number(p.location?.id);
+                        //         return location_asigned !== location_current;
+                        //     }
+                        // );
 
 
-                        if (filter.length > 0) {
-                            const promises = filter.map(p => {
-                                const response = InventoryMovementModel.update(
-                                    {
-                                        location_id: p.location?.id,
-                                        location_name: p.location?.name
-                                    },
-                                    {
-                                        where: {
-                                            reference_id: p.purchase_order_product_id,
-                                            reference_type: "Order",
-                                            movement_type: "allocate"
-                                        },
-                                        transaction
-                                    });
-                                return response;
-                            });
+                        // if (filter.length > 0) {
+                        //     const promises = filter.map(p => {
+                        //         const response = InventoryMovementModel.update(
+                        //             {
+                        //                 location_id: p.location?.id,
+                        //                 location_name: p.location?.name
+                        //             },
+                        //             {
+                        //                 where: {
+                        //                     reference_id: p.purchase_order_product_id,
+                        //                     reference_type: "Order",
+                        //                     movement_type: "allocate"
+                        //                 },
+                        //                 transaction
+                        //             });
+                        //         return response;
+                        //     });
 
 
-                            const responseUpdateLocation = await Promise.all(promises);
+                        //     const responseUpdateLocation = await Promise.all(promises);
 
-                            if (responseUpdateLocation.some(r => r[0] === 0)) {
-                                await transaction.rollback();
-                                await deleteLoadEvidences(completeBody.load_evidence || []);
-                                res.status(500).json({
-                                    validation:
-                                        `The update of the location in the inventory movement `
-                                        + `could not be completed.`
-                                });
-                                return;
-                            }
-                        }
+                        //     if (responseUpdateLocation.some(r => r[0] === 0)) {
+                        //         await transaction.rollback();
+                        //         await deleteLoadEvidences(completeBody.load_evidence || []);
+                        //         res.status(500).json({
+                        //             validation:
+                        //                 `The update of the location in the inventory movement `
+                        //                 + `could not be completed.`
+                        //         });
+                        //         return;
+                        //     }
+                        // }
 
                         // ? **** VALIDAMOS QUE LOS POPS NO EXCEDAN LA CANTIDAD ORIGINAL ORDENADA **** */
 

@@ -485,69 +485,73 @@ CREATE TRIGGER trigger_create_shipping_orders_purchased_order_products
 AFTER INSERT ON shipping_orders_purchased_order_products
 FOR EACH ROW
 BEGIN
-	-- Variables para la orden de compra
-	DECLARE v_purchaed_order_id INT DEFAULT 0;
-	DECLARE v_purchaed_order_status VARCHAR(100) DEFAULT '';
-	-- Variables para la POP
+ 	 /* ───────── DECLARACIONES ───────── */
+	-- PO
+	DECLARE v_purchase_order_id INT DEFAULT 0;
+	DECLARE v_purchase_order_status VARCHAR(100) DEFAULT '';
+	-- POP
 	DECLARE v_pop_id INT DEFAULT 0;
 	DECLARE v_pop_product_id INT DEFAULT 0;
 	DECLARE v_pop_product_name VARCHAR(100) DEFAULT '';
 	DECLARE v_pop_location_id INT DEFAULT 0;
 	DECLARE v_pop_location_name VARCHAR(100) DEFAULT '';
-	DECLARE v_pop_qty_commited DECIMAL(14, 4) DEFAULT 0;
+	DECLARE v_pop_qty_committed DECIMAL(14,4) DEFAULT NULL;
 	DECLARE v_pop_shipping_summary JSON DEFAULT JSON_OBJECT();
-	DECLARE v_pop_shipping_qty DECIMAL(14, 4) DEFAULT 0;
-	
-	-- Obtenemos el id y el status de la orden de compra
-	SELECT 
-		po.id, po.status,
-		pop.id, pop.product_id, pop.product_name,
-		l.id, l.name
-	INTO 
-		v_purchaed_order_id, v_purchaed_order_status,
-		v_pop_id, v_pop_product_id, v_pop_product_name,
-		v_pop_location_id, v_pop_location_name
-	FROM purchased_orders AS po
-    JOIN purchased_orders_products AS pop
-    	ON po.id = pop.purchase_order_id
-	JOIN purchased_orders_products_locations_production_lines AS poplpl
-    	ON pop.id = poplpl.purchase_order_product_id
-	JOIN locations_production_lines AS lpl
-    	ON lpl.production_line_id = poplpl.production_line_id
-	JOIN locations AS l
-    	ON l.id = lpl.location_id
-    WHERE pop.id = NEW.purchase_order_product_id
-    LIMIT 1;
+	DECLARE v_pop_shipping_qty DECIMAL(14,4) DEFAULT 0;
+	-- Normalizado
+	DECLARE v_qty_new DECIMAL(14,4) DEFAULT 0;
 
-	-- Si tiene registros de compromiso de inventario(cero o positivo), o solo tiene produccion(null)
-	SELECT SUM(im.qty)
-	INTO v_pop_qty_commited
-	FROM inventory_movements AS im
-	WHERE im.reference_id = NEW.purchase_order_product_id
-	AND im.reference_type = 'Order'
-	AND im.movement_type = 'allocate';
+	/* ───────── Normalización ───────── */
+	SET v_qty_new = IFNULL(NEW.qty, 0);
 
-	IF NEW.qty > 0 	THEN
+	/* Si no hay cantidad, no hay nada que reflejar */
+	IF v_qty_new <> 0 THEN
+		/* ───────── Contexto PO/POP/Ubicación ───────── */
+		SELECT 
+			po.id, po.status,
+			pop.id, pop.product_id, pop.product_name,
+			l.id, l.name
+		INTO 
+			v_purchase_order_id, v_purchase_order_status,
+			v_pop_id, v_pop_product_id, v_pop_product_name,
+			v_pop_location_id, v_pop_location_name
+		FROM purchased_orders AS po
+		JOIN purchased_orders_products AS pop
+			ON po.id = pop.purchase_order_id
+		JOIN purchased_orders_products_locations_production_lines AS poplpl
+			ON pop.id = poplpl.purchase_order_product_id
+		JOIN locations_production_lines AS lpl
+			ON lpl.production_line_id = poplpl.production_line_id
+		JOIN locations AS l
+			ON l.id = lpl.location_id
+		WHERE pop.id = NEW.purchase_order_product_id
+		LIMIT 1;
 
-		-- Si tiene inventario comprometido en stock
-		IF v_pop_qty_commited IS NOT NULL THEN
+		/* ¿Existe historial/stock comprometido a nivel POP? (NULL si jamás hubo) */
+		SELECT SUM(im.qty)
+		INTO v_pop_qty_committed
+		FROM inventory_movements AS im
+		WHERE im.reference_id = NEW.purchase_order_product_id
+			AND im.reference_type = 'Order'
+			AND im.movement_type = 'allocate';
 
-			-- Ajustamos el movimiento de inventario para comprometer stock de la POP
+		/* ───────── POP espejo (si hay historial/saldo) ─────────
+		Consumir desde POP lo que va a tomar la SOP (sin deltas). */
+		IF v_pop_qty_committed IS NOT NULL AND v_pop_qty_committed <> 0 THEN
 			INSERT INTO inventory_movements(
-				location_id, location_name,
-				item_id, item_type, item_name, qty,
-				movement_type, reference_id, reference_type,
-				production_id, description, is_locked
+			location_id, location_name,
+			item_id, item_type, item_name, qty,
+			movement_type, reference_id, reference_type,
+			production_id, description, is_locked
 			) VALUES (
-				v_pop_location_id, v_pop_location_name,
-				v_pop_product_id, 'product', v_pop_product_name, -NEW.qty,
-				'allocate', v_pop_id, 'Order',
-				null, 'Adjust Inventory Allocation by Shipping Order', 1
+			v_pop_location_id, v_pop_location_name,
+			v_pop_product_id, 'product', v_pop_product_name, (0 - v_qty_new),
+			'allocate', v_pop_id, 'Order',
+			NULL, 'Adjust Inventory Allocation by Shipping', 1
 			);
-
 		END IF;
 
-		-- Creamos el movimiento de inventario para la SOPOP
+		/* ───────── SOP (Shipping row): aplicar lo nuevo ───────── */
 		INSERT INTO inventory_movements(
 			location_id, location_name,
 			item_id, item_type, item_name, qty,
@@ -555,39 +559,36 @@ BEGIN
 			production_id, description, is_locked
 		) VALUES (
 			NEW.location_id, NEW.location_name,
-			v_pop_product_id, 'product', v_pop_product_name, NEW.qty,
+			v_pop_product_id, 'product', v_pop_product_name, v_qty_new,
 			'allocate', NEW.id, 'Shipping',
-			null, 'Shipping Allocation', 1
+			NULL, 'Shipping Allocation', 1
 		);
 
-		-- Si la orden de compra es totalmente enviada
-		IF func_is_purchase_order_fully_shipped(v_purchaed_order_id) THEN
-			IF v_purchaed_order_status != "shipping" THEN
+		/* ───────── Recalcular estado de la PO ───────── */
+		IF func_is_purchase_order_fully_shipped(v_purchase_order_id) THEN
+			IF v_purchase_order_status <> 'shipping' THEN
 				UPDATE purchased_orders 
 				SET status = 'shipping'
-				WHERE id = v_purchaed_order_id;
+				WHERE id = v_purchase_order_id;
 			END IF;
 		ELSE
 			SET v_pop_shipping_summary = func_summary_shipping_on_client_order(v_pop_id);
 			SET v_pop_shipping_qty = JSON_UNQUOTE(JSON_EXTRACT(v_pop_shipping_summary, '$.shipping_qty'));
-			-- Si la POP tiene envio
+
 			IF v_pop_shipping_qty > 0 THEN
-				-- Entonces la orden de compra es parcialmente enviada
-				IF v_purchaed_order_status != "partially_shipping" THEN
+				IF v_purchase_order_status <> 'partially_shipping' THEN
 					UPDATE purchased_orders 
 					SET status = 'partially_shipping'
-					WHERE id = v_purchaed_order_id;
+					WHERE id = v_purchase_order_id;
 				END IF;
 			ELSE
-				-- Caso contrario la orden de compra es pendiente
-				IF v_purchaed_order_status != "pending" THEN
+				IF v_purchase_order_status <> 'pending' THEN
 					UPDATE purchased_orders 
 					SET status = 'pending'
-					WHERE id = v_purchaed_order_id;
+					WHERE id = v_purchase_order_id;
 				END IF;
 			END IF;
 		END IF;
-
 	END IF;
 END //
 DELIMITER ;
@@ -598,111 +599,114 @@ CREATE TRIGGER trigger_delete_shipping_orders_purchased_order_products
 BEFORE DELETE ON shipping_orders_purchased_order_products
 FOR EACH ROW
 BEGIN
-	-- Variables para la orden de compra
-	DECLARE v_purchaed_order_id INT DEFAULT 0;
-	DECLARE v_purchaed_order_status VARCHAR(100) DEFAULT '';
-	-- Variables para la POP
-	DECLARE v_pop_id INT DEFAULT 0;
-	DECLARE v_pop_product_id INT DEFAULT 0;
-	DECLARE v_pop_product_name VARCHAR(100) DEFAULT '';
-	DECLARE v_pop_location_id INT DEFAULT 0;
-	DECLARE v_pop_location_name VARCHAR(100) DEFAULT '';
-	DECLARE v_pop_qty_commited DECIMAL(14, 4) DEFAULT 0;
-	DECLARE v_pop_shipping_summary JSON DEFAULT JSON_OBJECT();
-	DECLARE v_pop_shipping_qty DECIMAL(14, 4) DEFAULT 0;
-	
-	-- Obtenemos el id y el status de la orden de compra
+  /* ───────── DECLARACIONES ───────── */
+  -- PO
+  DECLARE v_purchase_order_id INT DEFAULT 0;
+  DECLARE v_purchase_order_status VARCHAR(100) DEFAULT '';
+  -- POP
+  DECLARE v_pop_id INT DEFAULT 0;
+  DECLARE v_pop_product_id INT DEFAULT 0;
+  DECLARE v_pop_product_name VARCHAR(100) DEFAULT '';
+  DECLARE v_pop_location_id INT DEFAULT 0;
+  DECLARE v_pop_location_name VARCHAR(100) DEFAULT '';
+  DECLARE v_pop_qty_committed DECIMAL(14,4) DEFAULT NULL;
+  DECLARE v_pop_shipping_summary JSON DEFAULT JSON_OBJECT();
+  DECLARE v_pop_shipping_qty DECIMAL(14,4) DEFAULT 0;
+  -- Normalizado
+  DECLARE v_qty_old DECIMAL(14,4) DEFAULT 0;
+
+  /* ───────── Normalización ───────── */
+  SET v_qty_old = IFNULL(OLD.qty, 0);
+
+  /* Si no hay cantidad, no hay nada que revertir */
+  IF v_qty_old <> 0 THEN
+	/* ───────── Contexto PO/POP/Ubicación ───────── */
 	SELECT 
 		po.id, po.status,
 		pop.id, pop.product_id, pop.product_name,
 		l.id, l.name
 	INTO 
-		v_purchaed_order_id, v_purchaed_order_status,
+		v_purchase_order_id, v_purchase_order_status,
 		v_pop_id, v_pop_product_id, v_pop_product_name,
 		v_pop_location_id, v_pop_location_name
 	FROM purchased_orders AS po
-    JOIN purchased_orders_products AS pop
-    	ON po.id = pop.purchase_order_id
+	JOIN purchased_orders_products AS pop
+		ON po.id = pop.purchase_order_id
 	JOIN purchased_orders_products_locations_production_lines AS poplpl
-    	ON pop.id = poplpl.purchase_order_product_id
+		ON pop.id = poplpl.purchase_order_product_id
 	JOIN locations_production_lines AS lpl
-    	ON lpl.production_line_id = poplpl.production_line_id
+		ON lpl.production_line_id = poplpl.production_line_id
 	JOIN locations AS l
-    	ON l.id = lpl.location_id
-    WHERE pop.id = OLD.purchase_order_product_id
-    LIMIT 1;
+		ON l.id = lpl.location_id
+	WHERE pop.id = OLD.purchase_order_product_id
+	LIMIT 1;
 
-	-- Si tiene registros de compromiso de inventario(cero o positivo), o solo tiene produccion(null)
+	/* ¿Existe historial/stock comprometido a nivel POP? (NULL si jamás hubo) */
 	SELECT SUM(im.qty)
-	INTO v_pop_qty_commited
+	INTO v_pop_qty_committed
 	FROM inventory_movements AS im
 	WHERE im.reference_id = OLD.purchase_order_product_id
-	AND im.reference_type = 'Order'
-	AND im.movement_type = 'allocate';
+		AND im.reference_type = 'Order'
+		AND im.movement_type = 'allocate';
 
-	IF OLD.qty > 0 THEN
-
-		-- Si tiene registros de compromiso de inventario(cero o positivo)
-		IF v_pop_qty_commited IS NOT NULL THEN
-
-			-- Ajustamos el movimiento de inventario para comprometer stock de la POP
-			INSERT INTO inventory_movements(
-				location_id, location_name,
-				item_id, item_type, item_name, qty,
-				movement_type, reference_id, reference_type,
-				production_id, description, is_locked
-			) VALUES (
-				v_pop_location_id, v_pop_location_name,
-				v_pop_product_id, 'product', v_pop_product_name, OLD.qty,
-				'allocate', v_pop_id, 'Order',
-				null, 'Adjust Inventory Allocation by Shipping Order', 1
-			);
-		END IF;
-
-		-- Ajustamos el movimiento de inventario para La SOPOP
+	/* ───────── POP espejo (si hay historial) ─────────
+		Devolver a POP lo que tenía la SOP (sin deltas). */
+	IF v_pop_qty_committed IS NOT NULL AND v_pop_qty_committed <> 0 THEN
 		INSERT INTO inventory_movements(
-			location_id, location_name,
-			item_id, item_type, item_name, qty,
-			movement_type, reference_id, reference_type,
-			production_id, description, is_locked
+		location_id, location_name,
+		item_id, item_type, item_name, qty,
+		movement_type, reference_id, reference_type,
+		production_id, description, is_locked
 		) VALUES (
-			OLD.location_id, OLD.location_name,
-			v_pop_product_id, 'product', v_pop_product_name, -OLD.qty,
-			'allocate', OLD.id, 'Shipping',
-			null, 'Adjust Shipping Allocation', 1
+		v_pop_location_id, v_pop_location_name,
+		v_pop_product_id, 'product', v_pop_product_name, v_qty_old,
+		'allocate', v_pop_id, 'Order',
+		NULL, 'POP mirror: return SOP allocation (DELETE)', 1
 		);
-
-		-- Si la orden de compra es totalmente enviada
-		IF func_is_purchase_order_fully_shipped(v_purchaed_order_id) THEN
-			IF v_purchaed_order_status != "shipping" THEN
-				UPDATE purchased_orders 
-				SET status = 'shipping'
-				WHERE id = v_purchaed_order_id;
-			END IF;
-		ELSE
-			SET v_pop_shipping_summary = func_summary_shipping_on_client_order(v_pop_id);
-			SET v_pop_shipping_qty = JSON_UNQUOTE(JSON_EXTRACT(v_pop_shipping_summary, '$.shipping_qty'));
-			-- Si la POP tiene envio
-			IF v_pop_shipping_qty > 0 THEN
-				-- Entonces la orden de compra es parcialmente enviada
-				IF v_purchaed_order_status != "partially_shipping" THEN
-					UPDATE purchased_orders 
-					SET status = 'partially_shipping'
-					WHERE id = v_purchaed_order_id;
-				END IF;
-			ELSE
-				-- Caso contrario la orden de compra es pendiente
-				IF v_purchaed_order_status != "pending" THEN
-					UPDATE purchased_orders 
-					SET status = 'pending'
-					WHERE id = v_purchaed_order_id;
-				END IF;
-			END IF;
-		END IF;
-
 	END IF;
+
+	/* ───────── SOP (Shipping row): revertir lo viejo ───────── */
+	INSERT INTO inventory_movements(
+		location_id, location_name,
+		item_id, item_type, item_name, qty,
+		movement_type, reference_id, reference_type,
+		production_id, description, is_locked
+	) VALUES (
+		OLD.location_id, OLD.location_name,
+		v_pop_product_id, 'product', v_pop_product_name, (0 - v_qty_old),
+		'allocate', OLD.id, 'Shipping',
+		NULL, 'Revert Shipping Allocation (DELETE)', 1
+	);
+
+	/* ───────── Recalcular estado de la PO ───────── */
+	IF func_is_purchase_order_fully_shipped(v_purchase_order_id) THEN
+		IF v_purchase_order_status <> 'shipping' THEN
+		UPDATE purchased_orders 
+		SET status = 'shipping'
+		WHERE id = v_purchase_order_id;
+		END IF;
+	ELSE
+		SET v_pop_shipping_summary = func_summary_shipping_on_client_order(v_pop_id);
+		SET v_pop_shipping_qty = JSON_UNQUOTE(JSON_EXTRACT(v_pop_shipping_summary, '$.shipping_qty'));
+
+		IF v_pop_shipping_qty > 0 THEN
+		IF v_purchase_order_status <> 'partially_shipping' THEN
+			UPDATE purchased_orders 
+			SET status = 'partially_shipping'
+			WHERE id = v_purchase_order_id;
+		END IF;
+		ELSE
+		IF v_purchase_order_status <> 'pending' THEN
+			UPDATE purchased_orders 
+			SET status = 'pending'
+			WHERE id = v_purchase_order_id;
+		END IF;
+		END IF;
+	END IF;
+  END IF;
 END //
 DELIMITER ;
+
 
 DROP TRIGGER IF EXISTS trigger_update_shipping_orders_purchased_order_products;
 DELIMITER //
@@ -710,55 +714,100 @@ CREATE TRIGGER trigger_update_shipping_orders_purchased_order_products
 AFTER UPDATE ON shipping_orders_purchased_order_products
 FOR EACH ROW
 BEGIN
-	-- Variables para la orden de compra
-	DECLARE v_purchaed_order_id INT DEFAULT 0;
-	DECLARE v_purchaed_order_status VARCHAR(100) DEFAULT '';
-	-- Variables para la POP
+	/* ───────── DECLARACIONES ───────── */
+	-- PO
+	DECLARE v_purchase_order_id INT DEFAULT 0;
+	DECLARE v_purchase_order_status VARCHAR(100) DEFAULT '';
+	-- POP
 	DECLARE v_pop_id INT DEFAULT 0;
 	DECLARE v_pop_product_id INT DEFAULT 0;
 	DECLARE v_pop_product_name VARCHAR(100) DEFAULT '';
 	DECLARE v_pop_location_id INT DEFAULT 0;
 	DECLARE v_pop_location_name VARCHAR(100) DEFAULT '';
-	DECLARE v_pop_qty_commited DECIMAL(14, 4) DEFAULT 0;
+	DECLARE v_pop_qty_committed DECIMAL(14,4) DEFAULT NULL;
 	DECLARE v_pop_shipping_summary JSON DEFAULT JSON_OBJECT();
-	DECLARE v_pop_shipping_qty DECIMAL(14, 4) DEFAULT 0;
-	
-	-- Obtenemos el id y el status de la orden de compra
-	SELECT 
-		po.id, po.status,
-		pop.id, pop.product_id, pop.product_name,
-		l.id, l.name
-	INTO 
-		v_purchaed_order_id, v_purchaed_order_status,
-		v_pop_id, v_pop_product_id, v_pop_product_name,
-		v_pop_location_id, v_pop_location_name
-	FROM purchased_orders AS po
-    JOIN purchased_orders_products AS pop
-    	ON po.id = pop.purchase_order_id
-	JOIN purchased_orders_products_locations_production_lines AS poplpl
-    	ON pop.id = poplpl.purchase_order_product_id
-	JOIN locations_production_lines AS lpl
-    	ON lpl.production_line_id = poplpl.production_line_id
-	JOIN locations AS l
-    	ON l.id = lpl.location_id
-    WHERE pop.id = NEW.purchase_order_product_id
-    LIMIT 1;
+	DECLARE v_pop_shipping_qty DECIMAL(14,4) DEFAULT 0;
+	-- Normalizados
+	DECLARE v_qty_old DECIMAL(14,4) DEFAULT 0;
+	DECLARE v_qty_new DECIMAL(14,4) DEFAULT 0;
+	-- Flags de cambio
+	DECLARE v_qty_changed TINYINT(1) DEFAULT 0;
+	DECLARE v_loc_changed TINYINT(1) DEFAULT 0;
 
-	-- Si tiene registros de compromiso de inventario(cero o positivo), o solo tiene produccion(null)
-	SELECT SUM(im.qty)
-	INTO v_pop_qty_commited
-	FROM inventory_movements AS im
-	WHERE im.reference_id = NEW.purchase_order_product_id
-	AND im.reference_type = 'Order'
-	AND im.movement_type = 'allocate';
+	/* ───────── Normalización y detección de cambios ───────── */
+	SET v_qty_old = IFNULL(OLD.qty, 0);
+	SET v_qty_new = IFNULL(NEW.qty, 0);
+	SET v_qty_changed = (v_qty_old <> v_qty_new);
+	SET v_loc_changed = (NOT (NEW.location_id <=> OLD.location_id));
 
-	IF NEW.qty > 0 	THEN
+	/* Si no cambió ni cantidad ni ubicación, no hay nada que hacer */
+	IF (v_qty_changed = 1 OR v_loc_changed = 1) THEN
 
-		-- Si tiene registros de compromiso de inventario(cero o positivo)
-		IF v_pop_qty_commited IS NOT NULL THEN
+		/* ───────── Contexto PO/POP/Ubicación base ───────── */
+		SELECT 
+			po.id, po.status,
+			pop.id, pop.product_id, pop.product_name,
+			l.id, l.name
+		INTO 
+			v_purchase_order_id, v_purchase_order_status,
+			v_pop_id, v_pop_product_id, v_pop_product_name,
+			v_pop_location_id, v_pop_location_name
+		FROM purchased_orders AS po
+		JOIN purchased_orders_products AS pop
+			ON po.id = pop.purchase_order_id
+		JOIN purchased_orders_products_locations_production_lines AS poplpl
+			ON pop.id = poplpl.purchase_order_product_id
+		JOIN locations_production_lines AS lpl
+			ON lpl.production_line_id = poplpl.production_line_id
+		JOIN locations AS l
+			ON l.id = lpl.location_id
+		WHERE pop.id = NEW.purchase_order_product_id
+		LIMIT 1;
 
-			-- Ajustamos el movimiento de inventario para comprometer stock de la POP
-			-- Sumamos la cantidadad anterior, menos la nueva
+		/* ¿Existe historial/stock comprometido a nivel POP? (NULL si jamás hubo) */
+		SELECT SUM(im.qty)
+		INTO v_pop_qty_committed
+		FROM inventory_movements AS im
+		WHERE im.reference_id = NEW.purchase_order_product_id
+			AND im.reference_type = 'Order'
+			AND im.movement_type = 'allocate';
+
+		/* ───────── SOP (Shipping row): reset & apply SIN deltas ───────── */
+		-- 1) Revertir lo anterior en la ubicación OLD (solo si había algo)
+		IF v_qty_old <> 0 THEN
+			INSERT INTO inventory_movements(
+				location_id, location_name,
+				item_id, item_type, item_name, qty,
+				movement_type, reference_id, reference_type,
+				production_id, description, is_locked
+			) VALUES (
+				OLD.location_id, OLD.location_name,
+				v_pop_product_id, 'product', v_pop_product_name, (0 - v_qty_old),
+				'allocate', OLD.id, 'Shipping',
+				NULL, 'Reset prev Shipping Allocation', 1
+			);
+		END IF;
+
+		-- 2) Aplicar el nuevo en la ubicación NEW (solo si hay algo)
+		IF v_qty_new <> 0 THEN
+			INSERT INTO inventory_movements(
+				location_id, location_name,
+				item_id, item_type, item_name, qty,
+				movement_type, reference_id, reference_type,
+				production_id, description, is_locked
+			) VALUES (
+				NEW.location_id, NEW.location_name,
+				v_pop_product_id, 'product', v_pop_product_name, v_qty_new,
+				'allocate', OLD.id, 'Shipping',
+				NULL, 'Apply new Shipping Allocation', 1
+			);
+		END IF;
+
+		/* ───────── POP espejo (si hay historial) ─────────
+			Regla: devolver OLD.qty y consumir NEW.qty. SIN deltas. */
+		IF v_pop_qty_committed IS NOT NULL AND v_pop_qty_committed <> 0 THEN
+			-- Devolver a POP lo que la SOP tenía antes
+			IF v_qty_old <> 0 THEN
 			INSERT INTO inventory_movements(
 				location_id, location_name,
 				item_id, item_type, item_name, qty,
@@ -766,55 +815,53 @@ BEGIN
 				production_id, description, is_locked
 			) VALUES (
 				v_pop_location_id, v_pop_location_name,
-				v_pop_product_id, 'product', v_pop_product_name, (OLD.qty - NEW.qty),
+				v_pop_product_id, 'product', v_pop_product_name, v_qty_old,
 				'allocate', v_pop_id, 'Order',
-				null, 'Adjust Inventory Allocation by Shipping Order', 1
+				NULL, 'POP mirror: return previous SOP allocation', 1
 			);
+			END IF;
 
+			-- Consumir desde POP lo que ahora tiene la SOP
+			IF v_qty_new <> 0 THEN
+			INSERT INTO inventory_movements(
+				location_id, location_name,
+				item_id, item_type, item_name, qty,
+				movement_type, reference_id, reference_type,
+				production_id, description, is_locked
+			) VALUES (
+				v_pop_location_id, v_pop_location_name,
+				v_pop_product_id, 'product', v_pop_product_name, (0 - v_qty_new),
+				'allocate', v_pop_id, 'Order',
+				NULL, 'POP mirror: consume for new SOP allocation', 1
+			);
+			END IF;
 		END IF;
 
-		-- Ajustamos el movimiento de inventario para La SOPOP
-		-- Restamos la cantidadad anterior, mas la nueva
-		INSERT INTO inventory_movements(
-			location_id, location_name,
-			item_id, item_type, item_name, qty,
-			movement_type, reference_id, reference_type,
-			production_id, description, is_locked
-		) VALUES (
-			OLD.location_id, OLD.location_name,
-			v_pop_product_id, 'product', v_pop_product_name, (NEW.qty - OLD.qty),
-			'allocate', OLD.id, 'Shipping',
-			null, 'Adjust Shipping Allocation', 1
-		);
-
-		-- Si la orden de compra es totalmente enviada
-		IF func_is_purchase_order_fully_shipped(v_purchaed_order_id) THEN
-			IF v_purchaed_order_status != "shipping" THEN
+		/* ───────── Recalcular estado de la PO SIEMPRE ───────── */
+		IF func_is_purchase_order_fully_shipped(v_purchase_order_id) THEN
+			IF v_purchase_order_status <> 'shipping' THEN
 				UPDATE purchased_orders 
 				SET status = 'shipping'
-				WHERE id = v_purchaed_order_id;
+				WHERE id = v_purchase_order_id;
 			END IF;
 		ELSE
 			SET v_pop_shipping_summary = func_summary_shipping_on_client_order(v_pop_id);
 			SET v_pop_shipping_qty = JSON_UNQUOTE(JSON_EXTRACT(v_pop_shipping_summary, '$.shipping_qty'));
-			-- Si la POP tiene envio
+
 			IF v_pop_shipping_qty > 0 THEN
-				-- Entonces la orden de compra es parcialmente enviada
-				IF v_purchaed_order_status != "partially_shipping" THEN
-					UPDATE purchased_orders 
-					SET status = 'partially_shipping'
-					WHERE id = v_purchaed_order_id;
-				END IF;
+			IF v_purchase_order_status <> 'partially_shipping' THEN
+				UPDATE purchased_orders 
+				SET status = 'partially_shipping'
+				WHERE id = v_purchase_order_id;
+			END IF;
 			ELSE
-				-- Caso contrario la orden de compra es pendiente
-				IF v_purchaed_order_status != "pending" THEN
-					UPDATE purchased_orders 
-					SET status = 'pending'
-					WHERE id = v_purchaed_order_id;
-				END IF;
+			IF v_purchase_order_status <> 'pending' THEN
+				UPDATE purchased_orders 
+				SET status = 'pending'
+				WHERE id = v_purchase_order_id;
+			END IF;
 			END IF;
 		END IF;
-
 	END IF;
 END //
 DELIMITER ;

@@ -25,6 +25,7 @@ import LoadModal from "./modals/load/LoadModal";
 import EditWizardShippingOrder from "./wizards/edit/EditWizardShippingOrder";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTableDispatch, useTableState } from "../../../../comp/primitives/table/tableContext/tableHooks";
+import PreviewModal from "./modals/preview/PreviewModal";
 
 const ShippingOrderModel = () => {
 
@@ -52,7 +53,7 @@ const ShippingOrderModel = () => {
         useState<boolean>(false);
     const [isActiveLoadModal, setIsActiveLoadModal] =
         useState<boolean>(false);
-    const [isActiveFinishedModal, setIsActiveFinishedModal] =
+    const [isActivePreviewModal, setIsActivePreviewModal] =
         useState<boolean>(false);
 
     const [search, setSearch] = useState<string>("");
@@ -143,7 +144,6 @@ const ShippingOrderModel = () => {
                             (e) => { return { id: e.id } }
                         ) as PartialLoadEvidenceItem[] || [],
                 }
-                console.log(`new_shipping:`, new_shipping);
 
                 const response =
                     await loadCompleteShippingOrderInDB(
@@ -164,8 +164,6 @@ const ShippingOrderModel = () => {
 
     const handleUpdate = useCallback(async (original: IPartialShippingOrder, updated: IPartialShippingOrder) => {
         setLoading(true);
-        console.log(`original:`, original.shipping_order_purchase_order_product);
-        console.log(`updated:`, updated.shipping_order_purchase_order_product);
         try {
             const shipping_old = {
                 ...original,
@@ -200,8 +198,6 @@ const ShippingOrderModel = () => {
                 nullUndefEqual: true,
                 coerceNumberStrings: true,
             });
-
-            console.log(`diff_sopops:`, diff_sopops);
 
             const hasChangesSopops: boolean = [
                 diff_sopops.added,
@@ -258,7 +254,6 @@ const ShippingOrderModel = () => {
                     load_evidence_deleted: diff_evidences.deleted?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                     load_evidence_old: load_evidence_old?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                 }
-                console.log(`new_shipping:`, new_shipping);
                 const response =
                     await updateCompleteShippingOrderInDB(
                         shippingOrderRecord?.id || null,
@@ -271,7 +266,6 @@ const ShippingOrderModel = () => {
             }
             setServerError(null);
         } catch (error) {
-            console.log(`error:`, error);
             if (error instanceof Error) setServerError(error.message);
         } finally {
             setLoading(false);
@@ -318,8 +312,16 @@ const ShippingOrderModel = () => {
     const toggleisActiveEditModalSetup = useCallback((record: IShippingOrder) => {
         dispatch(clearAllErrors());
         setServerError(null);
-        setShippingOrderRecord(record);
-        setIsActiveEditModal(v => !v);
+        if (record.status === "pending") {
+            setIsActiveEditModal(v => !v);
+            setShippingOrderRecord(record);
+            return;
+        }
+        if (record.status === "finished" || record.status === "shipping") {
+            setIsActivePreviewModal(v => !v);
+            setShippingOrderRecord(record);
+            return;
+        }
     }, [dispatch]);
 
     const toggleIsActiveLoadModal = useCallback(() => {
@@ -333,10 +335,13 @@ const ShippingOrderModel = () => {
         setServerError(null);
         setShippingOrderRecord(record);
         setIsActiveLoadModal(v => !v);
+        if (isActiveEditModal) {
+            setIsActiveEditModal(v => !v);
+        }
     }, []);
 
-    const toggleIsActiveFinishedModal = useCallback(() => {
-        setIsActiveFinishedModal(v => !v);
+    const toggleIsActivePreviewModal = useCallback(() => {
+        setIsActivePreviewModal(v => !v);
     }, []);
 
     // * ******************** Funciones para control de acciones de la tabla ******************** 
@@ -364,9 +369,10 @@ const ShippingOrderModel = () => {
     const statusActions = useMemo((): StatusActionsProps[] => {
         return [
             { value: "released", onClick: toggleIsActiveLoadModalSetup },
-            { value: "finished", onClick: toggleIsActiveFinishedModal }
+            { value: "finished", onClick: toggleIsActivePreviewModal },
+            { value: "shipping", onClick: toggleIsActivePreviewModal }
         ]
-    }, [shippingOrders, toggleIsActiveLoadModalSetup, toggleIsActiveFinishedModal]);
+    }, [shippingOrders, toggleIsActiveLoadModalSetup, toggleIsActivePreviewModal]);
 
     const ExtraComponents = useCallback(() => {
         const state = useTableState();
@@ -465,6 +471,7 @@ const ShippingOrderModel = () => {
                         <EditWizardShippingOrder
                             onClose={toggleisActiveEditModal}
                             onUpdate={handleUpdate}
+                            onLoad={toggleIsActiveLoadModalSetup}
                         />
                     </ShippingOrderModuleProvider>
                 )
@@ -475,6 +482,14 @@ const ShippingOrderModel = () => {
                         onClose={toggleIsActiveLoadModal}
                         shippingOrder={shippingOrderRecord}
                         onUpdate={handleLoad}
+                    />
+                )
+            }
+            {
+                isActivePreviewModal && shippingOrderRecord && (
+                    <PreviewModal 
+                        onClose={toggleIsActivePreviewModal}
+                        record={shippingOrderRecord as IShippingOrder}
                     />
                 )
             }

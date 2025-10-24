@@ -47,6 +47,9 @@ const SelectPurchasedModal = ({
             purchase_order_products: p,
             purchase_order_product_id: p.id,
             qty: asignedMaxQty(p),
+            location_id: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.id,
+            location_name: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location?.name,
+            location: p.purchase_order_product_location_production_line?.production_line?.location_production_line?.location,
         }));
         onAdd(sopops);
         onClose();

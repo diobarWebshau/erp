@@ -16,9 +16,7 @@ import {
 } from "../../context/modalEditHooks"
 import {
     next_step,
-    reset_update_data,
     set_step,
-    update_purchase_order,
     update_update_data,
 } from "../../context/modalEditActions"
 import type {
@@ -49,7 +47,6 @@ const Step1 = ({
     const {
         clientById,
         loadingClientById,
-        refetchClientById
     } = useClientById(
         state.updated?.client_id ?? null
     );

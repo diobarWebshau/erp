@@ -22,10 +22,10 @@
 
 }
 
-.shipped {
-    background-color: var(--color-partial-liht);
-    color: var(--color-partial);
-    border: 1px solid var(--color-partial);
+.shipping {
+    background-color: var(--color-shipping-light);
+    color: var(--color-shipping);
+    border: 1px solid var(--color-shipping);
 }
 
 .finished {

@@ -15,15 +15,14 @@ import clsx from "clsx";
 import StyleModule from "./Step3.module.css";
 import ShippingIcon from "../../../../../../../../comp/icons/ShippingIcon";
 import { set_draft_shipping_order, set_step } from "../../../../context/shippingOrderActions";
+import type { IShippingOrder } from "interfaces/shippingOrder";
 
-interface IStep3 { onClose: () => void }
+interface IStep3 { onLoad: (data: IShippingOrder) => void }
 
-const Step3 = ({ }: IStep3) => {
+const Step3 = ({ onLoad }: IStep3) => {
 
     const dispatch = useShippingOrderDispatch();
     const state = useShippingOrderState();
-
-
 
     const columns: ColumnDef<IPartialShippingOrderPurchasedOrderProduct>[] = [
         {
@@ -75,6 +74,10 @@ const Step3 = ({ }: IStep3) => {
         const status = state.data?.status?.toLowerCase() || "";
         return status === "released" ? "Pendiente" : status === "shipping" ? "Enviado" : "Finalizado";
     }, [state.data?.status]);
+
+    const handleSendToLoading = useCallback(() => {
+        onLoad(state.data as IShippingOrder);
+    }, [dispatch, state.data, onLoad]);
 
     return (
         <div className={StyleModule.container}>
@@ -175,7 +178,7 @@ const Step3 = ({ }: IStep3) => {
                     icon={<Download />}
                 />
                 <MainActionButtonCustom
-                    onClick={() => console.log("Mandar a carga")}
+                    onClick={handleSendToLoading}
                     label="Mandar a carga"
                     icon={<ShippingIcon />}
                 />

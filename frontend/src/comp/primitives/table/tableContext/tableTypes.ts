@@ -228,8 +228,6 @@ const DEFAULT_TABLE_STATE: Readonly<TableState> = Object.freeze({
     columnVisibilityState: {},
 });
 
-
-
 /* 
     Ese helper “normaliza” el tipo Updater<S> de TanStack.
 

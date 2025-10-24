@@ -71,6 +71,18 @@
     background-color: var(--color-theme-background);
 }
 
+/* *************** Loading section *************** */
+
+.containerLoading {
+        /* dimension */
+    position: relative;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 /* *************** Content section *************** */
 
 .containerTable {
