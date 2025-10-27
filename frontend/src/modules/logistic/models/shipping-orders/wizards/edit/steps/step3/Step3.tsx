@@ -17,9 +17,9 @@ import ShippingIcon from "../../../../../../../../comp/icons/ShippingIcon";
 import { set_draft_shipping_order, set_step } from "../../../../context/shippingOrderActions";
 import type { IShippingOrder } from "interfaces/shippingOrder";
 
-interface IStep3 { onLoad: (data: IShippingOrder) => void }
+interface IStep3 { onLoad: (data: IShippingOrder) => void}
 
-const Step3 = ({ onLoad }: IStep3) => {
+const Step3 = ({ onLoad}: IStep3) => {
 
     const dispatch = useShippingOrderDispatch();
     const state = useShippingOrderState();
@@ -142,10 +142,13 @@ const Step3 = ({ onLoad }: IStep3) => {
                             <span>{`${purchasedOrder?.address} C.P. ${purchasedOrder?.zip_code}`}</span>
                         </div>
                         <div className={`nunito-semibold ${StyleModule.subContentItem}`}>
-                            <dl>
-                                <dt className={`nunito-bold ${StyleModule.boldPrimary}`}>Entrega estimada:</dt>
-                                <dd>{DateUtils.format(state.data?.shipping_date || new Date())}</dd>
-                            </dl>
+                            {
+                                state.data?.delivery_date &&
+                                <dl>
+                                    <dt className={`nunito-bold ${StyleModule.boldPrimary}`}>Entrega estimada:</dt>
+                                    <dd>{DateUtils.format(state.data?.delivery_date || new Date())}</dd>
+                                </dl>
+                            }
                             <span className={`nunito-bold ${StyleModule.boldText}`}>Direccion de envio</span>
                             <span>{`${purchasedOrder?.city}, ${purchasedOrder?.state}, ${purchasedOrder?.country}`}</span>
                             <span>{`${purchasedOrder?.shipping_address} C.P. ${purchasedOrder?.shipping_zip_code}`}</span>

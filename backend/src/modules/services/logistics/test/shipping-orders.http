@@ -2,7 +2,7 @@
 GET http://localhost:3003/logistics/shipping-orders HTTP/1.0
 
 ### get
-GET http://localhost:3003/logistics/shipping-orders/1 HTTP/1.0
+GET http://localhost:3003/logistics/shipping-orders/2 HTTP/1.0
 
 ### get
 GET http://localhost:3003/logistics/shipping-orders/details/1 HTTP/1.0

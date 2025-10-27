@@ -13,6 +13,7 @@ interface InputTextProps {
     classNameInput?: string;
     icon?: JSX.Element;
     withValidation?: boolean;
+    disabled?: boolean;
 }
 
 const InputTextCustom = memo(({
@@ -23,7 +24,8 @@ const InputTextCustom = memo(({
     icon,
     classNameInput,
     placeholder,
-    withValidation = true
+    withValidation = true,
+    disabled = false
 }: InputTextProps) => {
 
     const iconWithClass = icon && withClassName(icon, StyleModule.icon)
@@ -39,6 +41,7 @@ const InputTextCustom = memo(({
             classNameInput={clsx(`nunito-regular`, StyleModule.input, classNameInput)}
             classNameInputValid={StyleModule.inputValid}
             classNameInputInvalid={clsx(withValidation ? StyleModule.inputInvalid : undefined)}
+            disabled={disabled}
         />
     )
 })

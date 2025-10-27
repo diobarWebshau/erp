@@ -1755,3 +1755,17 @@ CALL sp_update_movement_inventory_pop_update_fix(
 	1, 1100, 1, 'Producto A' 
 );
 */
+
+			SELECT * FROM shipping_orders_purchased_order_products AS sopop 
+			JOIN shipping_orders AS so 
+			ON so.id = sopop.shipping_order_id
+			WHERE so.id = 3;
+			
+            SELECT * FROM inventory_movements AS im
+			JOIN shipping_orders_purchased_order_products AS sopop 
+			ON im.reference_id = sopop.id
+			JOIN shipping_orders AS so 
+			ON so.id = sopop.shipping_order_id
+			AND im.reference_type = 'Shipping'
+			AND im.movement_type = 'allocate'
+			WHERE so.id = 3;

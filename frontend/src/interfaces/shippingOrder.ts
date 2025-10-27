@@ -49,10 +49,10 @@ interface IShippingOrder {
     user_name?: string | null;
 
     /* fechas */
-    delivery_date?: Date | null;
-    scheduled_ship_date: Date | null;
-    shipping_date: Date | null;
-    finished_date?: Date | null;
+    delivery_date?: Date | string | null;
+    scheduled_ship_date: Date | string | null;
+    shipping_date: Date | string | null;
+    finished_date?: Date | string | null;
     created_at: Date;
     updated_at: Date;
 

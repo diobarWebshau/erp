@@ -10,7 +10,6 @@ import startsWithFilter from "../filters/string/startsWithFilter";
 import betweenDateFilter from "../filters/date/betweenDateFilter";
 import equalsDateFilter from "../filters/date/equalsDateFilter";
 import { useTableDispatch, useTableState } from "./tableHooks"
-import formatDateToDMY from "../utils/formatDateToDMY";
 import type { RowAction, TableAction, TableState } from "./tableTypes";
 import { Ellipsis } from "lucide-react";
 import stylesModules from "./TableBase.module.css"
@@ -128,12 +127,12 @@ const TableBase = <T,>({
             }
         });
 
-        // 3) Formateo de celdas de fecha
-        cols = cols.map(col => (
-            col.meta?.type === "date"
-                ? { ...col, cell: ({ getValue }) => formatDateToDMY(getValue() as string | Date) }
-                : col
-        ));
+        // // 3) Formateo de celdas de fecha
+        // cols = cols.map(col => (
+        //     col.meta?.type === "date"
+        //         ? { ...col, cell: ({ getValue }) => formatDateToDMY(getValue() as string | Date) }
+        //         : col
+        // ));
 
         // 4) Insertar selección y opciones si aplica
         const parts: ColumnDef<T>[] = [];

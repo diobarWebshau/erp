@@ -80,6 +80,7 @@ const Step3 = ({ onClose }: IStep3) => {
                             positionPopover="bottom-end"
                             classNameInput={StyleModule.inputDateInputMantine}
                             withValidate
+                            min={new Date()}
                         />
                         <ObjectSelectCustomMemo
                             options={carriers || []}

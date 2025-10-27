@@ -3,6 +3,7 @@
 .containerTextArea {
     /* dimension */
     gap: 0.5rem;
+    min-height: 44px;
     height: auto;
 }
 

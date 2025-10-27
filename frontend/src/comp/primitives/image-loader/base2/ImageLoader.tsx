@@ -5,6 +5,7 @@ import { Pencil, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import type { ReactNode } from "react";
+import ToastMantine from "../../../../comp/external/mantine/toast/base/ToastMantine";
 
 interface ImageLoaderProps {
     typeLoader: "multiple" | "single";
@@ -23,6 +24,7 @@ interface ImageLoaderProps {
     classNameEditButtonIcon?: string;
     triggerComponent?: (args: { onClick: () => void }) => ReactNode;
     isEditable?: boolean
+    maxFiles?: number
 }
 
 const ImageLoader = ({
@@ -41,7 +43,8 @@ const ImageLoader = ({
     classNameRemoveButtonIcon,
     classNameEditButtonIcon,
     triggerComponent,
-    isEditable = true
+    isEditable = true,
+    maxFiles
 }: ImageLoaderProps) => {
 
     // Referencia al <input type="file"> para invocarlo programáticamente (click())
@@ -80,6 +83,14 @@ const ImageLoader = ({
             // - Si multiple=true: concatena los nuevos
             // - Si multiple=false: reemplaza por completo (solo se puede tener 1)
             updatedFiles = typeLoader === "multiple" ? [...files, ...newFiles] : newFiles;
+            // Validación de cantidad máxima
+            if (maxFiles && updatedFiles.length > maxFiles) {
+                ToastMantine.feedBackForm({
+                    message: `Solo puedes seleccionar hasta ${maxFiles} imagen(es).`,
+                });
+                e.target.value = "";
+                return;
+            }
         }
 
         setFiles(updatedFiles);   // Actualiza el estado interno

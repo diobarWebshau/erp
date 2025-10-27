@@ -9,6 +9,7 @@ interface StandardTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaEleme
     onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
     maxLength?: number;
+    disabled?: boolean;
 }
 
 const StandarTextAreaCustom = ({
@@ -17,7 +18,8 @@ const StandarTextAreaCustom = ({
     value,
     onChange,
     placeholder = "comentarios (Opcional)",
-    maxLength
+    maxLength,
+    disabled=false
 }: StandardTextAreaProps) => {
 
     return (
@@ -29,6 +31,7 @@ const StandarTextAreaCustom = ({
             id="notes"
             placeholder={placeholder}
             maxLength={maxLength}
+            disabled={disabled}
         />
     )
 }

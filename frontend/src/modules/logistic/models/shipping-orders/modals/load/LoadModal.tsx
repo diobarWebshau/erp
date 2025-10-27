@@ -26,7 +26,9 @@ interface ILoadModal {
     onUpdate: (record: IPartialShippingOrder, shippingOrderDetail: IPartialShippingOrder) => void;
 }
 
-const LoadModal = ({ onClose, shippingOrder, onUpdate }: ILoadModal) => {
+const LoadModal = ({
+    onClose, shippingOrder, onUpdate
+}: ILoadModal) => {
 
     const { shippingOrderDetailById } = useShippingOrderDetailById(shippingOrder.id ?? null);
 
@@ -66,6 +68,7 @@ const LoadModal = ({ onClose, shippingOrder, onUpdate }: ILoadModal) => {
             shipping_date: new Date(),
             load_evidence: evidence,
         }
+
         onUpdate(updateRecord, shippingOrderDetailById);
         if (Object.keys(errorRedux).length > 0) {
             Object.entries(errorRedux).forEach(([_, value]) => {
@@ -137,6 +140,7 @@ const LoadModal = ({ onClose, shippingOrder, onUpdate }: ILoadModal) => {
                             value={evidence}
                             typeLoader="multiple"
                             onChange={(files) => setEvidence(files)}
+                            maxFiles={50}
                         />
                     </div>
                     <div className={StyleModule.footerSection}>

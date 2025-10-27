@@ -6,21 +6,6 @@
     "auditLog": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\.59f4ac58ef47e6c87ea052e98f554f1a90fac0ba-audit.json",
     "files": [
         {
-            "date": 1760082606439,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-10.log",
-            "hash": "16f5da84b15714e0c60cd8b3425d5fd976a0701322c7eaa76f2ac15f91ef69c3"
-        },
-        {
-            "date": 1760166667155,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-11.log",
-            "hash": "5a92c2d763a2834788b7d7b27c7d1c0eff8c316c2ee7429c8de101c4c17254db"
-        },
-        {
-            "date": 1760278962184,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-12.log",
-            "hash": "29267bfc8a3618eee59ef2140fc4b93b58de80bb8cd962bedf249eee8cbd312c"
-        },
-        {
             "date": 1760351506989,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-13.log",
             "hash": "7a8a55296bf66d40dd19e953bad2e58eeae0dd9c8302f08a676c67b82f5e0909"
@@ -59,6 +44,16 @@
             "date": 1761289423407,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-24.log",
             "hash": "4b4ec07a9ed08b725fb8e92c14470d668bfb2e1b7865d08106f55cca6862fd82"
+        },
+        {
+            "date": 1761525878730,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-26.log",
+            "hash": "67313a742b778dd5bf887900777ac73a62f73fe5f16f1295530016663cea100b"
+        },
+        {
+            "date": 1761548844028,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\generals\\app-2025-10-27.log",
+            "hash": "ed3f0bad82118add8e5add6ab5f4cbbcbae3fc9d4d5ce102810127aabb601684"
         }
     ],
     "hashType": "sha256"

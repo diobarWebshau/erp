@@ -596,7 +596,7 @@ DELIMITER ;
 DROP TRIGGER IF EXISTS trigger_delete_shipping_orders_purchased_order_products;
 DELIMITER //
 CREATE TRIGGER trigger_delete_shipping_orders_purchased_order_products
-BEFORE DELETE ON shipping_orders_purchased_order_products
+AFTER DELETE ON shipping_orders_purchased_order_products
 FOR EACH ROW
 BEGIN
   /* ───────── DECLARACIONES ───────── */
@@ -679,6 +679,7 @@ BEGIN
 	);
 
 	/* ───────── Recalcular estado de la PO ───────── */
+	INSERT INTO debug_log(message) VALUES (CONCAT('func_is_purchase_order_fully_shipped(v_purchase_order_id): ', func_is_purchase_order_fully_shipped(v_purchase_order_id), ' v_purchase_order_status: ', v_purchase_order_status));
 	IF func_is_purchase_order_fully_shipped(v_purchase_order_id) THEN
 		IF v_purchase_order_status <> 'shipping' THEN
 		UPDATE purchased_orders 
@@ -689,18 +690,20 @@ BEGIN
 		SET v_pop_shipping_summary = func_summary_shipping_on_client_order(v_pop_id);
 		SET v_pop_shipping_qty = JSON_UNQUOTE(JSON_EXTRACT(v_pop_shipping_summary, '$.shipping_qty'));
 
+		INSERT INTO debug_log(message) VALUES (CONCAT('v_pop_shipping_qty: ', v_pop_shipping_qty));
+
 		IF v_pop_shipping_qty > 0 THEN
-		IF v_purchase_order_status <> 'partially_shipping' THEN
-			UPDATE purchased_orders 
-			SET status = 'partially_shipping'
-			WHERE id = v_purchase_order_id;
-		END IF;
+			IF v_purchase_order_status <> 'partially_shipping' THEN
+				UPDATE purchased_orders 
+				SET status = 'partially_shipping'
+				WHERE id = v_purchase_order_id;
+			END IF;
 		ELSE
-		IF v_purchase_order_status <> 'pending' THEN
-			UPDATE purchased_orders 
-			SET status = 'pending'
-			WHERE id = v_purchase_order_id;
-		END IF;
+			IF v_purchase_order_status <> 'pending' THEN
+				UPDATE purchased_orders 
+				SET status = 'pending'
+				WHERE id = v_purchase_order_id;
+			END IF;
 		END IF;
 	END IF;
   END IF;
@@ -927,15 +930,31 @@ CREATE TRIGGER delete_shipping_order
 BEFORE DELETE ON shipping_orders
 FOR EACH ROW
 BEGIN
-	UPDATE
-        purchased_orders_products
-    SET status='completed'
-    WHERE id IN (
-        SELECT 
-            sopop.purchase_order_product_id
-        FROM shipping_orders_purchased_order_products AS sopop
-        WHERE sopop.shipping_order_id = OLD.id 
-    );
+	DELETE FROM shipping_orders_purchased_order_products 
+	WHERE shipping_order_id = OLD.id;
+END //
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS update_shipping_order;
+DELIMITER //
+CREATE TRIGGER update_shipping_order
+BEFORE UPDATE ON shipping_orders
+FOR EACH ROW
+BEGIN
+	IF NEW.status <> OLD.status THEN
+		IF NEW.status = 'shipping' AND OLD.status = 'pending' THEN
+			
+			SELECT * FROM inventory_movements AS im
+			JOIN shipping_orders_purchased_order_products AS sopop 
+			ON im.reference_id = sopop.id
+			JOIN shipping_orders AS so 
+			ON so.id = sopop.shipping_order_id
+			AND im.reference_type = 'Shipping'
+			AND im.movement_type = 'allocate'
+			WHERE so.id = NEW.id;
+
+		END IF;
+	END IF;
 END //
 DELIMITER ;
 

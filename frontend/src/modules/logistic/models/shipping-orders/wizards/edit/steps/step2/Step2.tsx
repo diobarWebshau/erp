@@ -29,10 +29,7 @@ const shippingTypeOptions = ["Internacional", "Nacional"];
 
 const Step2 = ({ onUpdate }: IStep2) => {
 
-    
-
     const state = useShippingOrderState();
-    console.log(`state:`, state);
     const { refetch } = useShippingOrderCommand();
     const errorRedux = useSelector((state: RootState) => state.error);
     const dispatch = useShippingOrderDispatch();
@@ -76,7 +73,7 @@ const Step2 = ({ onUpdate }: IStep2) => {
     }, [dispatch]);
 
     const onChangeDeliveryDate = useCallback((deliveryDate: Date | null) => {
-        dispatch(update_draft_shipping_order({ shipping_date: deliveryDate }));
+        dispatch(update_draft_shipping_order({ scheduled_ship_date: deliveryDate }));
     }, [dispatch]);
 
 
@@ -95,7 +92,7 @@ const Step2 = ({ onUpdate }: IStep2) => {
         const draft = state.draft;
         if (
             !draft?.carrier ||
-            !draft?.shipping_date ||
+            !draft?.scheduled_ship_date ||
             !draft?.transport_method ||
             !draft?.shipment_type ||
             cost <= 0 ||
@@ -154,9 +151,11 @@ const Step2 = ({ onUpdate }: IStep2) => {
                     <div className={StyleModule.leftContent}>
                         <DateInputMantine
                             onChange={onChangeDeliveryDate}
-                            value={state.draft?.shipping_date ? state.draft?.shipping_date : null}
+                            value={state.draft?.scheduled_ship_date ? state.draft?.scheduled_ship_date : null}
                             positionPopover="bottom-end"
                             classNameInput={StyleModule.inputDateInputMantine}
+                            min={state.draft?.created_at ? new Date() : undefined}
+                            withValidate
                         />
                         <ObjectSelectCustomMemo
                             options={carriers || []}

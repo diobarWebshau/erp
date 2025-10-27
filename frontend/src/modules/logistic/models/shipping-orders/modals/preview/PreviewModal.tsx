@@ -9,7 +9,7 @@ import type { IPartialShippingOrderPurchasedOrderProduct } from "interfaces/ship
 import GenericTableMemo from "../../../../../../comp/primitives/table/tableContext/GenericTable";
 import type { IShippingOrder } from "interfaces/shippingOrder";
 import useShippingOrderDetailById from "../../../../../../modelos/shipping_orders/hooks/useShippingOrderDetailById";
-import { ChevronLeft, Download} from "lucide-react";
+import { ChevronLeft, Download } from "lucide-react";
 import { Loader } from "@mantine/core";
 import ShippingIcon from "../../../../../../comp/icons/ShippingIcon";
 import FullContainerModal from "../../../../../../comp/primitives/modal/full-container/FullContainerModal";
@@ -165,10 +165,14 @@ const PreviewModal = ({ onClose, record }: IPreviewModal) => {
                                                 <span>{`${purchasedOrder?.address} C.P. ${purchasedOrder?.zip_code}`}</span>
                                             </div>
                                             <div className={`nunito-semibold ${StyleModule.subContentItem}`}>
-                                                <dl>
-                                                    <dt className={`nunito-bold ${StyleModule.boldPrimary}`}>Entrega estimada:</dt>
-                                                    <dd>{DateUtils.format(record.shipping_date, "DD/MM/YYYY")}</dd>
-                                                </dl>
+                                                {
+                                                    record.delivery_date && (
+                                                        <dl>
+                                                            <dt className={`nunito-bold ${StyleModule.boldPrimary}`}>Entrega estimada:</dt>
+                                                            <dd>{DateUtils.format(record.delivery_date, "DD/MM/YYYY")}</dd>
+                                                        </dl>
+                                                    )
+                                                }
                                                 <span className={`nunito-bold ${StyleModule.boldText}`}>Direccion de envio</span>
                                                 <span>{`${purchasedOrder?.city}, ${purchasedOrder?.state}, ${purchasedOrder?.country}`}</span>
                                                 <span>{`${purchasedOrder?.shipping_address} C.P. ${purchasedOrder?.shipping_zip_code}`}</span>
@@ -205,7 +209,7 @@ const PreviewModal = ({ onClose, record }: IPreviewModal) => {
             {
                 isActiveEvidenceModal && (
                     <EvidenceModal
-                        onClose={toggleIsActiveEvidenceModal} 
+                        onClose={toggleIsActiveEvidenceModal}
                         record={record}
 
                     />

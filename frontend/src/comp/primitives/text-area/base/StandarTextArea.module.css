@@ -9,14 +9,15 @@
 
     /* distribucion box */
     border-radius: 15px;
-    padding: 1rem;
-    
+    padding-left: 0.4rem;
+    padding-block: 0.7rem;
+
     /* estilos */
     border: 1px solid var(--color-theme-border-table);
     resize: none;
     field-sizing: content;
 }
 
-.textarea:focus{
+.textarea:focus {
     outline: none;
 }

@@ -180,12 +180,12 @@ const Step1 = () => {
             });
             return;
         }
-        if (!deliveryDate) {
-            toastMantine.feedBackForm({
-                message: "Debe seleccionar una fecha de envio valida."
-            });
-            return;
-        }
+        // if (!deliveryDate) {
+        //     toastMantine.feedBackForm({
+        //         message: "Debe seleccionar una fecha de envio valida."
+        //     });
+        //     return;
+        // }
         const diffObject = await diffObjectArrays(state.draft?.shipping_order_purchase_order_product ?? [], updateValues);
         if (diffObject.added.length > 0) {
             const added = diffObject.added;
@@ -202,7 +202,9 @@ const Step1 = () => {
                 dispatch(update_draft_shipping_order_purchased_order_products({ id: u.id, attributes: u.attributes }))
             });
         }
-        dispatch(update_draft_shipping_order({ delivery_date: deliveryDate }));
+        if (deliveryDate) {
+            dispatch(update_draft_shipping_order({ delivery_date: deliveryDate }));
+        }
         dispatch(next_step());
         return;
     }, [sopops, state.draft?.shipping_order_purchase_order_product_aux, state.draft?.shipping_order_purchase_order_product, deliveryDate, date, isExcededQtyOrder,]);

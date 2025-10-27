@@ -6,13 +6,15 @@ interface ImageLoaderCustomProps {
     value: File[];
     onChange: (files: File[]) => void;
     isEditable?: boolean
+    maxFiles?: number
 }
 
 const ImageLoaderCustom = ({
     typeLoader,
     value,
     onChange,
-    isEditable = true
+    isEditable = true,
+    maxFiles
 }: ImageLoaderCustomProps) => {
     return (
         <ImageLoader
@@ -31,6 +33,7 @@ const ImageLoaderCustom = ({
             classNameRemoveButtonIcon={StyleModule.removeButtonIcon}
             classNameEditButtonIcon={StyleModule.editButtonIcon}
             isEditable={isEditable}
+            maxFiles={maxFiles}
         />
     )
 }

@@ -53,8 +53,6 @@ function DateInputMantine({
     return abbr.charAt(0).toUpperCase(); // tomamos la primera letra y la ponemos en mayúscula
   };
 
-  console.log(`min`, min)
-
   return (
     <DateInput
       value={value} // Fecha actual seleccionada

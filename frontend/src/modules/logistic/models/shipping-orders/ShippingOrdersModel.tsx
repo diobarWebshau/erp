@@ -26,6 +26,9 @@ import EditWizardShippingOrder from "./wizards/edit/EditWizardShippingOrder";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTableDispatch, useTableState } from "../../../../comp/primitives/table/tableContext/tableHooks";
 import PreviewModal from "./modals/preview/PreviewModal";
+import DeleteModal from "./../../../../comp/primitives/modal/deleteModal/DeleteModal";
+import FinishedModal from "./modals/finish/FinishedModal";
+import ConfirmModal from "./modals/finish/ConfirmModal";
 
 const ShippingOrderModel = () => {
 
@@ -41,7 +44,10 @@ const ShippingOrderModel = () => {
 
     // ? Estados para los datos del modelo    
 
-    const [shippingOrderRecord, setShippingOrderRecord] = useState<IPartialShippingOrder | null>();
+    const [shippingOrderRecord, setShippingOrderRecord] =
+        useState<IPartialShippingOrder | null>();
+    const [shippingOrderRecordFinish, setShippingOrderRecordFinish] =
+        useState<IPartialShippingOrder | null>();
 
     // ? Estados para los modales 
 
@@ -55,10 +61,15 @@ const ShippingOrderModel = () => {
         useState<boolean>(false);
     const [isActivePreviewModal, setIsActivePreviewModal] =
         useState<boolean>(false);
+    const [isActiveFinishModal, setIsActiveFinishModal] =
+        useState<boolean>(false);
+    const [isActiveConfirmFinishModal, setIsActiveConfirmFinishModal] =
+        useState<boolean>(false);
 
     const [search, setSearch] = useState<string>("");
 
-    const { shippingOrders, loadingShippingOrders, refetchShippingOrders } = useShippingOrders({ like: search, debounce: 500 });
+    const { shippingOrders, loadingShippingOrders, refetchShippingOrders } =
+        useShippingOrders({ like: search, debounce: 500 });
 
     // * ******************** Funciones de operaciones CRUD ******************** 
 
@@ -67,7 +78,8 @@ const ShippingOrderModel = () => {
         try {
             const new_shipping = { ...shipping }
             delete new_shipping.load_evidence;
-            const responseCreate = await createCompleteShippingOrderInDB(new_shipping, dispatch);
+            const responseCreate =
+                await createCompleteShippingOrderInDB(new_shipping, dispatch);
             refetchShippingOrders();
             if (!responseCreate) return;
             setServerError(null);
@@ -83,8 +95,6 @@ const ShippingOrderModel = () => {
         try {
             const shipping_old = {
                 ...shippingOrderDetailById,
-                delivery_cost:
-                    Number(shippingOrderDetailById?.delivery_cost)
             };
 
             const shipping_new = shipping;
@@ -100,7 +110,8 @@ const ShippingOrderModel = () => {
             delete shipping_new.shipping_order_purchase_order_product;
 
             // Obtenemos las diferencias entre los archivos
-            const diff_evidences: LoadEvidenceManager = await diffObjectArrays(evidences_old, evidences_new);
+            const diff_evidences: LoadEvidenceManager =
+                await diffObjectArrays(evidences_old, evidences_new);
 
             /* Obtenemos si hay cambios en los archivos */
             const hasChangesEvidences: boolean = [
@@ -131,6 +142,9 @@ const ShippingOrderModel = () => {
                     ) as LoadEvidenceItem[];
 
                 const new_shipping: IPartialShippingOrder = {
+                    shipping_date: (shipping_new.shipping_date instanceof Date)
+                        ? shipping_new.shipping_date.toISOString()
+                        : shipping_new.shipping_date,
                     load_evidence:
                         diff_evidences.added.map(
                             (e) => e.path as File
@@ -209,9 +223,8 @@ const ShippingOrderModel = () => {
                     IPartialShippingOrderPurchasedOrderProduct)[]
                 ) => arr.length > 0);
 
-
-            const diff_evidences: LoadEvidenceManager = await diffObjectArrays(evidences_old, evidences_new);
-
+            const diff_evidences: LoadEvidenceManager =
+                await diffObjectArrays(evidences_old, evidences_new);
 
             const hasChangesEvidences: boolean = [
                 diff_evidences.added,
@@ -245,6 +258,24 @@ const ShippingOrderModel = () => {
 
                 const new_shipping: IPartialShippingOrder = {
                     ...diff_shipping,
+                    ...(
+                        diff_shipping.delivery_date
+                            ? {
+                                delivery_date: (diff_shipping.delivery_date instanceof Date)
+                                    ? diff_shipping.delivery_date.toISOString()
+                                    : diff_shipping.delivery_date
+                            }
+                            : {}
+                    ),
+                    ...(
+                        diff_shipping.scheduled_ship_date
+                            ? {
+                                scheduled_ship_date: (diff_shipping.scheduled_ship_date instanceof Date)
+                                    ? diff_shipping.scheduled_ship_date.toISOString()
+                                    : diff_shipping.scheduled_ship_date
+                            }
+                            : {}
+                    ),
                     shipping_order_purchase_order_product_manager: {
                         added: diff_sopops.added?.map(({ id, ...rest }) => rest) || [],
                         deleted: diff_sopops.deleted,
@@ -254,6 +285,9 @@ const ShippingOrderModel = () => {
                     load_evidence_deleted: diff_evidences.deleted?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                     load_evidence_old: load_evidence_old?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                 }
+
+                console.log("new_shipping", new_shipping);
+
                 const response =
                     await updateCompleteShippingOrderInDB(
                         shippingOrderRecord?.id || null,
@@ -263,6 +297,9 @@ const ShippingOrderModel = () => {
                 if (!response) {
                     return;
                 }
+                if(isActiveConfirmFinishModal){
+                    refetchShippingOrders();
+                }
             }
             setServerError(null);
         } catch (error) {
@@ -270,23 +307,28 @@ const ShippingOrderModel = () => {
         } finally {
             setLoading(false);
         }
-    }, [shippingOrderRecord]);
+    }, [shippingOrderRecord, isActiveConfirmFinishModal]);
 
     const handleDelete = useCallback(async () => {
         setLoading(true);
         try {
-            await deleteShippingOrderInDB(
+            const response = await deleteShippingOrderInDB(
                 shippingOrderRecord?.id || null,
                 dispatch
             );
+            if (!response) {
+                return;
+            }
             setServerError(null);
+            refetchShippingOrders();
+            setIsActiveDeleteModal(false);
         } catch (error) {
             if (error instanceof Error)
                 setServerError(error.message);
         } finally {
             setLoading(false);
         }
-    }, [shippingOrderRecord]);
+    }, [shippingOrderRecord, refetchShippingOrders]);
 
     // * ******************** Funciones para control de modales ******************** 
 
@@ -294,7 +336,32 @@ const ShippingOrderModel = () => {
         dispatch(clearAllErrors());
         setServerError(null);
         setShippingOrderRecord(record);
+        setIsActiveDeleteModal(v => !v);
     }, [dispatch]);
+
+    const toggleIsActiveFinishModal = useCallback(() => {
+        setIsActiveFinishModal(v => !v);
+    }, []);
+
+    const toggleIsActiveFinishModalSetup = useCallback((record: IShippingOrder) => {
+        dispatch(clearAllErrors());
+        setServerError(null);
+        setShippingOrderRecord(record);
+        setIsActiveFinishModal(v => !v);
+    }, [dispatch]);
+
+    const toggleIsActiveConfirmFinishModalSetup = useCallback((record: IShippingOrder) => {
+        dispatch(clearAllErrors());
+        setServerError(null);
+        setShippingOrderRecordFinish(record);
+        setIsActiveConfirmFinishModal(v => !v);
+        setIsActiveFinishModal(false);
+    }, [dispatch]);
+
+    const toggleIsActiveConfirmFinishModal = useCallback(() => {
+        setIsActiveConfirmFinishModal(v => !v);
+        setIsActiveFinishModal(false);
+    }, []);
 
     const toggleisActiveDeleteModal = useCallback(() => {
         setIsActiveDeleteModal(v => !v);
@@ -313,13 +380,11 @@ const ShippingOrderModel = () => {
         dispatch(clearAllErrors());
         setServerError(null);
         if (record.status === "released") {
-            console.log(record?.status);
             setIsActiveEditModal(v => !v);
             setShippingOrderRecord(record);
             return;
         }
         if (record.status === "finished" || record.status === "shipping") {
-            console.log(record?.status);
             setIsActivePreviewModal(v => !v);
             setShippingOrderRecord(record);
             return;
@@ -340,7 +405,7 @@ const ShippingOrderModel = () => {
         if (isActiveEditModal) {
             setIsActiveEditModal(v => !v);
         }
-    }, []);
+    }, [isActiveEditModal]);
 
     const toggleIsActivePreviewModal = useCallback(() => {
         setIsActivePreviewModal(v => !v);
@@ -357,7 +422,7 @@ const ShippingOrderModel = () => {
         },
         {
             label: "Eliminar",
-            onClick: (row: IShippingOrder) => { console.log(`Eliminar`, row) },
+            onClick: toggleisActiveDeleteModalSetup,
             icon: <Trash2 className={StyleModule.IconRowActions} />,
             condition: (row: IShippingOrder) => row.status === "released"
         },
@@ -371,10 +436,9 @@ const ShippingOrderModel = () => {
     const statusActions = useMemo((): StatusActionsProps[] => {
         return [
             { value: "released", onClick: toggleIsActiveLoadModalSetup },
-            { value: "finished", onClick: toggleIsActivePreviewModal },
-            { value: "shipping", onClick: toggleIsActivePreviewModal }
+            { value: "shipping", onClick: toggleIsActiveFinishModalSetup }
         ]
-    }, [shippingOrders, toggleIsActiveLoadModalSetup, toggleIsActivePreviewModal]);
+    }, [shippingOrders, toggleIsActiveLoadModalSetup, toggleIsActiveFinishModalSetup, toggleIsActivePreviewModal]);
 
     const ExtraComponents = useCallback(() => {
         const state = useTableState();
@@ -420,7 +484,9 @@ const ShippingOrderModel = () => {
     }, [search]);
 
 
-    const columnsMemo: ColumnDef<IShippingOrder>[] = useMemo(() => generateColumnsShippingOrders(statusActions), [statusActions]);
+    const columnsMemo: ColumnDef<IShippingOrder>[] = useMemo(
+        () => generateColumnsShippingOrders(statusActions), [statusActions]
+    );
 
     return (
         <div className={StyleModule.containerShippingOrdersModel}>
@@ -489,9 +555,38 @@ const ShippingOrderModel = () => {
             }
             {
                 isActivePreviewModal && shippingOrderRecord && (
-                    <PreviewModal 
+                    <PreviewModal
                         onClose={toggleIsActivePreviewModal}
                         record={shippingOrderRecord as IShippingOrder}
+                    />
+                )
+            }
+            {
+                isActiveDeleteModal && shippingOrderRecord && (
+                    <DeleteModal
+                        onDelete={handleDelete}
+                        onClose={toggleisActiveDeleteModal}
+                        title="¿Estas seguro de eliminar esta orden de envío?"
+                        message="Esta acción no se puede deshacer"
+                    />
+                )
+            }
+            {
+                isActiveFinishModal && shippingOrderRecord && (
+                    <FinishedModal
+                        onClose={toggleIsActiveFinishModal}
+                        shippingOrderRecord={shippingOrderRecord}
+                        onConfirm={toggleIsActiveConfirmFinishModalSetup}
+                    />
+                )
+            }
+            {
+                isActiveConfirmFinishModal && shippingOrderRecordFinish && (
+                    <ConfirmModal
+                        onClose={toggleIsActiveConfirmFinishModal}
+                        shippingOrderRecord={shippingOrderRecord as IShippingOrder}
+                        shippingOrderUpdate={shippingOrderRecordFinish as IShippingOrder}
+                        onUpdate={handleUpdate}
                     />
                 )
             }
@@ -513,7 +608,7 @@ const HeaderComponent = memo(({
             <div className={`nunito-medium ${StyleModule.headerSection}`}>
                 <h1 className="nunito-bold">Logistica</h1>
                 <MainActionButtonCustom
-                    label="Orden de envio1"
+                    label="Orden de envío"
                     onClick={toggleisActiveAddModal}
                     icon={<Plus />}
                 />
