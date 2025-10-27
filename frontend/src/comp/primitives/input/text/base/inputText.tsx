@@ -1,8 +1,9 @@
-import { memo, useState, type ChangeEvent, type JSX } from "react";
+import { memo, useState, useEffect, type ChangeEvent, type JSX } from "react";
 import StyleModule from "./InputText.module.css";
 import clsx from "clsx";
+
 interface InputTextProps {
-    value: string | undefined;
+    value?: string;
     onChange: (value: string) => void;
     id?: string;
     name?: string;
@@ -33,16 +34,18 @@ const InputText = memo(({
     classNameInputInvalid,
 }: InputTextProps) => {
 
-    const [isValid, setIsValid] = useState<boolean>((value!==undefined || value!==undefined) ? true : false);
+    const safeValue = value ?? ""; // <- clave: nunca undefined
+    const [isValid, setIsValid] = useState<boolean>(safeValue.trim().length > 0);
+
+    useEffect(() => {
+        setIsValid((value ?? "").trim().length > 0);
+    }, [value]);
 
     const handleOnChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        if (value === "") {
-            setIsValid(false)
-        }
-        if (!isValid) setIsValid(true);
-        onChange(value);
-    }
+        const v = e.target.value;
+        setIsValid(v.trim().length > 0);
+        onChange(v);
+    };
 
     const classNamesInput = clsx(
         StyleModule.input,
@@ -55,7 +58,7 @@ const InputText = memo(({
             <input
                 type="text"
                 placeholder={placeholder}
-                value={value}
+                value={safeValue}              // <- nunca undefined
                 onChange={handleOnChangeInput}
                 name={name}
                 disabled={disabled}
@@ -63,9 +66,9 @@ const InputText = memo(({
                 autoFocus={autoFocus}
                 className={classNamesInput}
             />
-            {icon && icon}
+            {icon}
         </div>
-    )
-})
+    );
+});
 
 export default InputText;

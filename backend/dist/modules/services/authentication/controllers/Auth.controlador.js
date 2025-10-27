@@ -27,7 +27,7 @@ class AuthController {
             }
             const payload = {
                 username: user.username,
-                id: user.id
+                id: user.id,
             };
             const token = generateToken(payload);
             res.cookie("accessToken", token, {

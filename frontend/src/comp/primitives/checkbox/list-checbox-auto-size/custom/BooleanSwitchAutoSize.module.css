@@ -1,0 +1,145 @@
+.groupOptions {
+    /* dimension */
+    width: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+
+    /* distribucion box */
+    border-radius: 15px;
+
+    /* estilos */
+    font-family: inherit;
+    font-size: 14px;
+    background-color: var(--color-theme-font-white);
+}
+
+.groupOptions>*:first-child {
+    /* distribucion box */
+    /* arriba izquierda, arriba derecha. abajo izquierda, abajo derecha */
+    border-radius: 15px 15px 0 0;
+}
+
+.groupOptions>*:last-child {
+    /* distribucion box */
+    /* arriba izquierda, arriba derecha. abajo izquierda, abajo derecha */
+    border-radius: 0 0 15px 15px;
+}
+
+/* ? ****  OPCIONES **** */
+
+.option {
+    /* distribucion box */
+    padding: 6px 10px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+
+    /* distribucion box */
+    border: 1px solid var(--color-theme-border-table);
+
+    /* interactividad */
+    cursor: pointer;
+
+    /* transiciones */
+    transition: background-color 0.5s ease;
+}
+
+.selected {
+    background-color: var(--color-theme-neutral-background);
+
+}
+
+/* ? ****  CHECKBOX OPTION **** */
+
+/* estilo base del checkbox */
+.inputCheckbox {
+
+    /* Google chrome y Edge */
+    -webkit-appearance: none;
+    /* Safari */
+    -moz-appearance: none;
+    /* Firefox */
+    appearance: none;
+
+    /* posicionamiento */
+    position: relative;
+
+    /* dimension */
+    width: 15px;
+    height: 15px;
+
+    /* distribucion box */
+    border: 2px solid var(--color-theme-primary);
+    /* border-radius: 5px; */
+
+    /* interactividad */
+    cursor: pointer;
+
+    /* estilos */
+    background-color: transparent;
+}
+
+/* Estilo de la caja del checkbox cuando esta seleccionado */
+.inputCheckbox:checked {
+    background-color: var(--color-theme-primary);
+}
+
+/* Siempre sera una palomita
+   estilo de la palomita del checkbox cuando esta seleccionado 
+   El after renderiza algo encima del checkbox, este seaplica solo si está marcado,
+   pero en este caso no cambia el fondo del input, sino que crea un dibujito 
+   encima (un pseudo-elemento).
+    
+   Ese dibujito se activa gracias a:
+
+    content: "";
+
+   Esto le dice al navegador:
+
+        “Crea un elemento ficticio dentro del input para que yo lo pueda estilizar”.
+
+    Y luego tú decides qué forma darle:
+
+        Con bordes y rotación → parece una palomita ✔
+
+        Con content: "✔"; → dibujas directamente el carácter ✔
+
+        Con background y border-radius → puede ser un círculo ●
+
+        Con otras formas → puede ser una ✖, ★, etc.
+
+*/
+.inputCheckbox:checked::after {
+    /* posicionamiento */
+    position: absolute;
+    top: 10%;
+    left: 40%;
+
+    /* dimension */
+    width: 4px;
+    height: 8px;
+
+    /* transformaciones */
+    transform: rotate(45deg);
+
+    /* distribucion box */
+    border: solid var(--color-theme-font-white);
+    border-width: 0 2px 2px 0;
+
+    /* estilos */
+    content: "";
+}
+
+.option:not(.selected):hover {
+    /* estilos */
+    background-color: var(--color-theme-background);
+    color: var(--color-theme-font-black);
+}

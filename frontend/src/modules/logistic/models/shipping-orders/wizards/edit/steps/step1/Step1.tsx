@@ -78,7 +78,7 @@ const Step1 = () => {
         return [purchase_orders, client_name, purchaseOrder];
     }, [state.draft?.shipping_order_purchase_order_product_aux]);
 
-    const [deliveryDate, setDeliveryDate] = useState<Date | null>(date);
+    const [deliveryDate, setDeliveryDate] = useState<Date | null>(date ? new Date(date) : null);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
     const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders({
         like: client_name,

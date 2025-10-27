@@ -151,7 +151,7 @@ const Step2 = ({ onUpdate }: IStep2) => {
                     <div className={StyleModule.leftContent}>
                         <DateInputMantine
                             onChange={onChangeDeliveryDate}
-                            value={state.draft?.scheduled_ship_date ? state.draft?.scheduled_ship_date : null}
+                            value={state.draft?.scheduled_ship_date ? new Date(state.draft?.scheduled_ship_date) : null}
                             positionPopover="bottom-end"
                             classNameInput={StyleModule.inputDateInputMantine}
                             min={state.draft?.created_at ? new Date() : undefined}

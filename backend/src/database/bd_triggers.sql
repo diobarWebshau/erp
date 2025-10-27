@@ -940,19 +940,10 @@ DELIMITER //
 CREATE TRIGGER update_shipping_order
 BEFORE UPDATE ON shipping_orders
 FOR EACH ROW
-BEGIN
+BEGIN	
 	IF NEW.status <> OLD.status THEN
-		IF NEW.status = 'shipping' AND OLD.status = 'pending' THEN
-			
-			SELECT * FROM inventory_movements AS im
-			JOIN shipping_orders_purchased_order_products AS sopop 
-			ON im.reference_id = sopop.id
-			JOIN shipping_orders AS so 
-			ON so.id = sopop.shipping_order_id
-			AND im.reference_type = 'Shipping'
-			AND im.movement_type = 'allocate'
-			WHERE so.id = NEW.id;
-
+		IF NEW.status = 'shipping' AND OLD.status = 'released' THEN
+			CALL sp_apply_shipping_inventory_movements(NEW.id);
 		END IF;
 	END IF;
 END //

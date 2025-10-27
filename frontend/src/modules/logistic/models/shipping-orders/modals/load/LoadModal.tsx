@@ -33,6 +33,7 @@ const LoadModal = ({
     const { shippingOrderDetailById } = useShippingOrderDetailById(shippingOrder.id ?? null);
 
     const errorRedux = useSelector((state: RootState) => state.error);
+    const userAuth = useSelector((state: RootState) => state.auth);
 
     const sopops = useMemo(() =>
         (shippingOrderDetailById?.shipping_order_purchase_order_product as IShippingOrderPurchasedOrderProduct[] | undefined) ?? [],
@@ -67,9 +68,13 @@ const LoadModal = ({
             ...shippingOrderDetailById,
             shipping_date: new Date(),
             load_evidence: evidence,
+            user_id: userAuth?.id,
+            user_name: userAuth?.username,
         }
 
-        onUpdate(updateRecord, shippingOrderDetailById);
+        console.log("updateRecord", updateRecord);
+
+        onUpdate(shippingOrderDetailById, updateRecord);
         if (Object.keys(errorRedux).length > 0) {
             Object.entries(errorRedux).forEach(([_, value]) => {
                 toastMantine.error({
@@ -112,7 +117,7 @@ const LoadModal = ({
                         <div className={clsx(`nunito-bold`, StyleModule.responsibleSection)}>
                             <dl className={StyleModule.dataList}>
                                 <dt>Responsable:</dt>
-                                <dd>{"Roberto Mireles"}</dd>
+                                <dd>{userAuth?.username}</dd>
                             </dl>
                         </div>
                     </div>

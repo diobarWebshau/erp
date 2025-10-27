@@ -139,7 +139,7 @@ interface ObjectDateFilter {
     to?: Date | undefined;
 }
 
-type BooleanFilter = string | undefined;
+type BooleanFilter = boolean | undefined;
 
 
 // type general para el filtro de columnas

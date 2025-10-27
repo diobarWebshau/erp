@@ -1,12 +1,52 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
-import { ProductionLineModel, ProductModel, ProductionLineProductModel, LocationsProductionLinesModel, LocationModel, ProductionLineQueueModel, ProductionOrderModel, ProductionModel, ProductProcessModel, ProcessModel } from "../../../associations.js";
+import { ProductionLineModel, ProductModel, ProductionLineProductModel, LocationsProductionLinesModel, LocationModel, ProductionLineQueueModel, ProductionOrderModel, ProductionModel, ProductProcessModel, ProcessModel, } from "../../../associations.js";
 import { Op, QueryTypes, Transaction } from "sequelize";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { formatImagesDeepRecursive } from "../../../../scripts/formatWithBase64.js";
 class ProductionLinesController {
     static getAll = async (req, res, next) => {
+        const { filter, ...rest } = req.query;
         try {
-            const response = await ProductionLineModel.findAll();
+            // 1️⃣ Condición base (para exclusiones)
+            const excludePerField = Object.fromEntries(Object.entries(rest)
+                .filter(([k, v]) => v !== undefined && k !== "name")
+                .map(([k, v]) => [
+                k,
+                Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v },
+            ]));
+            // 2️⃣ Filtro de búsqueda general
+            const filterConditions = [];
+            if (filter && filter.trim()) {
+                const f = `%${filter.trim()}%`; // busca en cualquier parte
+                filterConditions.push({ name: { [Op.like]: f } }, // name del shipping order
+                { "$location_production_line.location.name$": { [Op.like]: f } } // location
+                );
+            }
+            // 3️⃣ Construimos el WHERE principal
+            const where = {
+                ...excludePerField,
+                ...(filterConditions.length > 0 ? { [Op.or]: filterConditions } : {}),
+            };
+            const response = await ProductionLineModel.findAll({
+                where,
+                attributes: ProductionLineModel.getAllFields(),
+                include: [
+                    {
+                        model: LocationsProductionLinesModel,
+                        as: "location_production_line",
+                        required: false,
+                        attributes: LocationsProductionLinesModel.getAllFields(),
+                        include: [
+                            {
+                                model: LocationModel,
+                                as: "location",
+                                required: false,
+                                attributes: LocationModel.getAllFields(),
+                            }
+                        ]
+                    }
+                ]
+            });
             if (!(response.length > 0)) {
                 res.status(200).json({ validaton: "Production lines no found" });
                 return;

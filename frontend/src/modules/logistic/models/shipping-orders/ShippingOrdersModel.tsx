@@ -5,7 +5,7 @@ import { deleteShippingOrderInDB, createCompleteShippingOrderInDB, updateComplet
 import { useDispatch } from "react-redux";
 import { generateColumnsShippingOrders } from "./structure/columns";
 import type { RowAction } from "../../../../components/ui/table/types";
-import { Trash2, Download, Plus, Search, Eraser, PackageCheck, PackageSearch, TrendingDown, Ban } from "lucide-react";
+import { Trash2, Download, Plus, Search, Eraser, PackageCheck, PackageSearch, TrendingDown, Ban, Check } from "lucide-react";
 import { diffObjectArrays, diffObjects } from "../../../../utils/validation-on-update/ValidationOnUpdate2"
 import type { IPartialShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProduct, IShippingOrderPurchasedOrderProductManager } from "../../../../interfaces/shippingPurchasedProduct";
 import StyleModule from "./ShippingOrdersModel.module.css";
@@ -29,6 +29,7 @@ import PreviewModal from "./modals/preview/PreviewModal";
 import DeleteModal from "./../../../../comp/primitives/modal/deleteModal/DeleteModal";
 import FinishedModal from "./modals/finish/FinishedModal";
 import ConfirmModal from "./modals/finish/ConfirmModal";
+import FeedBackModal from "./../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal";
 
 const ShippingOrderModel = () => {
 
@@ -65,6 +66,10 @@ const ShippingOrderModel = () => {
         useState<boolean>(false);
     const [isActiveConfirmFinishModal, setIsActiveConfirmFinishModal] =
         useState<boolean>(false);
+    const [isActiveFeedBackModal, setIsActiveFeedBackModal] =
+        useState<boolean>(false);
+    const [messageReactNode, setMessageReactNode] =
+        useState<React.ReactNode | null>();
 
     const [search, setSearch] = useState<string>("");
 
@@ -94,10 +99,13 @@ const ShippingOrderModel = () => {
         setLoading(true);
         try {
             const shipping_old = {
-                ...shippingOrderDetailById,
+                ...shipping,
             };
 
-            const shipping_new = shipping;
+            const shipping_new = { ...shippingOrderDetailById };
+
+            console.log("shipping_old", shipping_old);
+            console.log("shipping_new", shipping_new);
 
             /* Nos quedamos unicamente con los archivos */
             const evidences_old = shipping_old.load_evidence || [];
@@ -108,6 +116,8 @@ const ShippingOrderModel = () => {
             const evidences_new = shipping_new.load_evidence || [];
             delete shipping_new.load_evidence;
             delete shipping_new.shipping_order_purchase_order_product;
+
+            const diff_shipping = await diffObjects(shipping_old, shipping_new);
 
             // Obtenemos las diferencias entre los archivos
             const diff_evidences: LoadEvidenceManager =
@@ -123,7 +133,7 @@ const ShippingOrderModel = () => {
                 PartialLoadEvidenceItem
             )[]) => arr.length > 0);
 
-            if (hasChangesEvidences) {
+            if (hasChangesEvidences || Object.keys(diff_shipping).length > 0) {
 
                 const excludedIds = new Set<string>(
                     [
@@ -142,6 +152,7 @@ const ShippingOrderModel = () => {
                     ) as LoadEvidenceItem[];
 
                 const new_shipping: IPartialShippingOrder = {
+                    ...diff_shipping,
                     shipping_date: (shipping_new.shipping_date instanceof Date)
                         ? shipping_new.shipping_date.toISOString()
                         : shipping_new.shipping_date,
@@ -286,8 +297,6 @@ const ShippingOrderModel = () => {
                     load_evidence_old: load_evidence_old?.map((e) => { return { id: e.id } }) as PartialLoadEvidenceItem[] || [],
                 }
 
-                console.log("new_shipping", new_shipping);
-
                 const response =
                     await updateCompleteShippingOrderInDB(
                         shippingOrderRecord?.id || null,
@@ -297,8 +306,17 @@ const ShippingOrderModel = () => {
                 if (!response) {
                     return;
                 }
-                if(isActiveConfirmFinishModal){
+                if (isActiveConfirmFinishModal) {
+                    console.log("entro")
                     refetchShippingOrders();
+                    setMessageReactNode(
+                        <span className={StyleModule.messageReactNode}>
+                            La orden de envío
+                            <span className={`nunito-bold ${StyleModule.code}`}>{` #${shippingOrderRecord?.code} `}</span>
+                            se ha finalizado correctamente
+                        </span>
+                    );
+                    console.log("seteo mensaje");
                 }
             }
             setServerError(null);
@@ -374,6 +392,10 @@ const ShippingOrderModel = () => {
 
     const toggleisActiveEditModal = useCallback(() => {
         setIsActiveEditModal(v => !v);
+    }, []);
+
+    const toggleIsActiveFeedBackModal = useCallback(() => {
+        setIsActiveFeedBackModal(v => !v);
     }, []);
 
     const toggleisActiveEditModalSetup = useCallback((record: IShippingOrder) => {
@@ -587,6 +609,16 @@ const ShippingOrderModel = () => {
                         shippingOrderRecord={shippingOrderRecord as IShippingOrder}
                         shippingOrderUpdate={shippingOrderRecordFinish as IShippingOrder}
                         onUpdate={handleUpdate}
+                        onFeedBack={toggleIsActiveFeedBackModal}
+                    />
+                )
+            }
+            {
+                isActiveFeedBackModal && (
+                    <FeedBackModal
+                        onClose={toggleIsActiveFeedBackModal}
+                        icon={<Check />}
+                        messageCustom={messageReactNode}
                     />
                 )
             }

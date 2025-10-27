@@ -866,15 +866,17 @@ class ShippingOrderController {
             const isEvidenceUpdate = completeBody.load_evidence_deleted && JSON.parse(completeBody.load_evidence_deleted).length > 0 ||
                 completeBody.load_evidence && JSON.parse(completeBody.load_evidence).length > 0;
             // actualizamos la orden de envio
-            const responseUpdate = await ShippingOrderModel.update({
-                ...update_values_process,
+            const update_final = {
+                ...update_values,
                 ...(isEvidenceUpdate && {
                     load_evidence: [
                         ...load_evidence_old,
                         ...load_evidence_new,
                     ]
                 })
-            }, {
+            };
+            console.log(update_final);
+            const responseUpdate = await ShippingOrderModel.update(update_final, {
                 where: { id: id },
                 transaction
             });

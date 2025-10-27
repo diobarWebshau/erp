@@ -17,6 +17,7 @@ import { useTableDispatch, useTableState } from "../../tableContext/tableHooks";
 import stylesModules from "./HeaderPopoverOptions.module.css"
 import { add_column_filter, add_sorting, remove_column_filter, remove_sorting } from "../../tableContext/tableActions";
 import { Divider } from "@mantine/core";
+import CheckBoxBooleanAutoSize from "../../../checkbox/list-checbox-auto-size/custom/BooleanSwitchAutoSize";
 
 const options: [Option, Option] = [
     { label: "Orden ascendente", icon: <ChevronUp /> },
@@ -29,6 +30,13 @@ interface PopoverComponentHeaderProps<T> {
     enableSorting: boolean;
     onClose: () => void;
 }
+
+// UI: 0=false, 1=true, null=sin selección
+const boolToIndex = (v: boolean | undefined): 0 | 1 | null =>
+    v === undefined ? null : (v ? 1 : 0);
+
+const indexToBool = (idx: 0 | 1 | null): boolean | undefined =>
+    idx === null ? undefined : (idx === 1);
 
 const PopoverComponentHeader = <T,>({
     column,
@@ -169,27 +177,13 @@ const PopoverComponentHeader = <T,>({
         onClose();
     };
 
-    // const convertEnumToArray = () => {
-
-    //     let array: string[] = [];
-
-    //     if (filteredValueLocal as EnumFilter){
-    //         const enumValue = getEnumLabel(column.columnDef, filteredValueLocal as EnumFilter);
-    //         if (enumValue !== undefined)
-    //             array.push(enumValue);
-    //     }
-    //     return array;
-    // }
-
     const convertEnumToArray = () => {
         const enumValue = getEnumLabel(column.columnDef, filteredValueLocal as EnumFilter);
         return [...enumValue];
     }
 
     const onChangeEnum = (value: string[]) => {
-        console.log(value);
         const enumValue = getEnumValue(column.columnDef, value);
-        console.log(enumValue);
         setFilteredValueLocal(enumValue);
     }
 
@@ -228,7 +222,7 @@ const PopoverComponentHeader = <T,>({
                             .rows.map((row) => row.getValue(columnId))
                             .filter((v): v is string => typeof v === "string")
                             .filter((v, i, arr) => arr.indexOf(v) === i)}
-                        value={filteredValueLocal}
+                        value={filteredValueLocal as string}
                         onChange={setFilteredValueLocal}
                         classNameInputSearch={stylesModules.inputSearch}
                     />
@@ -262,15 +256,16 @@ const PopoverComponentHeader = <T,>({
                         }
                     </div>
                 )}
-
                 {meta?.type === "boolean" && (
-                    <CheckBoxListAutoSize
-                        options={meta.booleanLabels ?? ["true", "false"]}
-                        value={filteredValueLocal as string[]}
-                        onChange={setFilteredValueLocal}
+                    <CheckBoxBooleanAutoSize
+                        options={(meta?.booleanLabels ?? ["False", "True"]) as [string, string]}
+                        value={boolToIndex(filteredValueLocal as boolean | undefined)}   // <- mapeo a índice
+                        onChange={(idx) => {
+                            const next = indexToBool(idx);                                 // <- índice a boolean/undefined
+                            setFilteredValueLocal(next);
+                        }}
                     />
                 )}
-
                 {meta?.type === "enum" && (
                     <CheckBoxListAutoSize
                         options={meta.enumOptions?.map((option) => option.label) ?? []}

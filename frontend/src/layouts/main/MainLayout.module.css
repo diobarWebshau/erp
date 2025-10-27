@@ -1012,6 +1012,6 @@ height: define el grosor del scrollbar horizontal.
     padding-bottom: 2rem;
 
     /* estilos */
-    background-color: var(--color-theme-white);
+    background-color: var(--color-theme-font-white);
 
 }

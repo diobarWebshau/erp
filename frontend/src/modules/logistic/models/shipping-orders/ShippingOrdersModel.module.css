@@ -210,3 +210,17 @@
     height: 16px;
     stroke: var(--color-alert);
 }
+
+/* *************** Message React Node *************** */
+
+.messageReactNode {
+    /* dimension */
+    font-size: 24px;
+    color: var(--color-theme-font-black);
+}
+
+.code {
+    /* dimension */
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}

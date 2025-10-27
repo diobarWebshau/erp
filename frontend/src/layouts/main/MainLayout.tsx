@@ -10,8 +10,9 @@ import { Divider } from "@mantine/core";
 import PopoverFloating from "../../comp/external/floating/pop-over/PopoverFloating";
 import { Indicator } from "@mantine/core";
 import ProfileIcon from "../../components/icons/ProfileIcon";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeAuth } from "../../store/indexActions";
+import type { RootState } from "store/store";
 
 interface MenuItem {
     label: string;
@@ -158,7 +159,7 @@ const menuItems: MenuItem[] = [
             {
                 label: "Linea de producción",
                 icon: <ProductionLineIcon />,
-                path: "/production_liness"
+                path: "/production-lines"
             },
             {
                 label: "Ubicación",
@@ -543,6 +544,8 @@ const ProfilePopoverComponent = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const userAuth = useSelector((state: RootState) => state.auth);
+
     const logOutApp = async () => {
 
         const response = await fetch("http://localhost:3003/authentication/auth/logout", {
@@ -569,7 +572,7 @@ const ProfilePopoverComponent = () => {
                 <div className={stylesModules.profileContainer}>
                     <div className={stylesModules.profileInfoContainer}>
                         <p className={`nunito-bold ${stylesModules.userName}`}>
-                            {`Hola, ${"Roberto Mireles"}`}
+                            {`Hola, ${userAuth.username}`}
                         </p>
                         <p className={`nunito-semibold ${stylesModules.userRole}`}>
                             {"Project Manager"}
@@ -585,7 +588,7 @@ const ProfilePopoverComponent = () => {
                     <div className={stylesModules.popoverProfileInfoContainer}>
                         <ProfileIcon className={stylesModules.avatarProfile} />
                         <p className={`nunito-bold ${stylesModules.userNameProfile}`}>
-                            {`Hola, ${"Roberto"}`}
+                            {`Hola, ${userAuth.username}`}
                         </p>
                         <p className={`nunito-semibold ${stylesModules.userRoleProfile}`}>
                             {"Project Manager"}
@@ -730,10 +733,7 @@ const MainLayout = () => {
                     </div>
                 </div>
             </aside>
-
-            <header
-                className={stylesModules.header}
-            >
+            <header className={stylesModules.header}>
                 <div className={stylesModules.headerFeatures}>
                     <NotificationComponent notifications={notifications} />
                     <Divider
@@ -743,11 +743,9 @@ const MainLayout = () => {
                     <ProfilePopoverComponent />
                 </div>
             </header>
-
             <main className={stylesModules.main}>
                 <Outlet />
             </main>
-
         </div>
     )
 };

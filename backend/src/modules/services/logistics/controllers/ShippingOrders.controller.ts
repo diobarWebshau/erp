@@ -1238,17 +1238,22 @@ class ShippingOrderController {
                 completeBody.load_evidence && JSON.parse(completeBody.load_evidence).length > 0;
 
             // actualizamos la orden de envio
+
+            const update_final = {
+                ...update_values,
+                ...(isEvidenceUpdate && {
+                    load_evidence: [
+                        ...load_evidence_old,
+                        ...load_evidence_new,
+                    ]
+                })
+            }
+
+            console.log(update_final);
+
             const responseUpdate =
                 await ShippingOrderModel.update(
-                    {
-                        ...update_values_process,
-                        ...(isEvidenceUpdate && {
-                            load_evidence: [
-                                ...load_evidence_old,
-                                ...load_evidence_new,
-                            ]
-                        })
-                    },
+                    update_final,
                     {
                         where: { id: id },
                         transaction

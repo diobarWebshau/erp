@@ -56,7 +56,7 @@ const LoadModal = ({ onClose, record }: ILoadModal) => {
                         <div className={clsx(`nunito-bold`, StyleModule.responsibleSection)}>
                             <dl className={StyleModule.dataList}>
                                 <dt>Responsable:</dt>
-                                <dd>{"Roberto Mireles"}</dd>
+                                <dd>{record?.user_name}</dd>
                             </dl>
                         </div>
                     </div>

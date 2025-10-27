@@ -1,7 +1,5 @@
 import AuthRoutes
     from "./auth/routes.tsx";
-import DashboardRoutes
-    from "./dashboard/routes.tsx";
 import InventoriesRoutes
     from "./inventories/InventoriesRoutes.tsx";
 import LogisticRoutes
@@ -18,10 +16,11 @@ import ClientRoutes
     from "./clients/ClientRoutes.tsx";
 import ProductionRoutes
     from "./production/ProductionRoutes.tsx";
+import ProductionLineRoutes
+    from "./production_lines/ProductionLineRoutes.tsx";
 
 const mainRoutes = [
     ...AuthRoutes,
-    // ...DashboardRoutes,
     ...InventoriesRoutes,
     ...LogisticRoutes,
     ...LocationsRoutes,
@@ -29,7 +28,8 @@ const mainRoutes = [
     ...ProductsRoutes,
     ...PurchasedOrdersRoutes,
     ...ProductionRoutes,
-    ...ClientRoutes
+    ...ClientRoutes,
+    ...ProductionLineRoutes
 ]
     
 export default mainRoutes;

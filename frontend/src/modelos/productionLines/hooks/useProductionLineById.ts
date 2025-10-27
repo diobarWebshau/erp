@@ -7,7 +7,7 @@ import {
 } from "react-redux";
 import {
     fetchProductionLineById
-} from "./../query/productionLines";
+} from "../query/productionLinesQueries";
 import type {
     AppDispatchRedux
 } from "../../../store/store";

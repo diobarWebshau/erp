@@ -13,14 +13,15 @@ import { useSelector } from "react-redux";
 import ToastMantine from "../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import type { IPartialShippingOrder } from "../../../../../../interfaces/shippingOrder";
 
-interface IFinishedModal {
+interface IConfirmModal {
     onClose: () => void;
     shippingOrderRecord: IPartialShippingOrder;
     shippingOrderUpdate: IPartialShippingOrder;
     onUpdate: (shippingOrderRecord: IPartialShippingOrder, shippingOrderUpdate: IPartialShippingOrder) => Promise<void>;
+    onFeedBack: () => void;
 }
 
-const FinishedModal = ({ onClose, shippingOrderRecord, shippingOrderUpdate, onUpdate }: IFinishedModal) => {
+const ConfirmModal = ({ onClose, shippingOrderRecord, shippingOrderUpdate, onUpdate, onFeedBack }: IConfirmModal) => {
 
     const errorRedux = useSelector((state: RootState) => state.error);
     const [comment, setComment] = useState<string>("");
@@ -33,6 +34,8 @@ const FinishedModal = ({ onClose, shippingOrderRecord, shippingOrderUpdate, onUp
     const handleOnClickConfirm = async () => {
         await onUpdate(shippingOrderRecord, shippingOrderUpdate);
         if (Object.keys(errorRedux).length > 0) {
+            console.log("entro")
+            console.log(errorRedux)
             const errors = Object.entries(errorRedux);
             errors.forEach(([_, value]) => {
                 ToastMantine.feedBackForm({
@@ -42,6 +45,7 @@ const FinishedModal = ({ onClose, shippingOrderRecord, shippingOrderUpdate, onUp
             return;
         }
         onClose();
+        onFeedBack();
     };
 
     return (
@@ -91,4 +95,4 @@ const FinishedModal = ({ onClose, shippingOrderRecord, shippingOrderUpdate, onUp
     );
 };
 
-export default FinishedModal;
+export default ConfirmModal;

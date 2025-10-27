@@ -1,12 +1,7 @@
 
-import type {
-    IPartialLocationProductionLine
-} from "./locationsProductionLines";
+import type { IPartialLocationProductionLine } from "./locationsProductionLines";
 import type { IPartialProductionLineQueue } from "./productionLineQueue";
-import type {
-    IPartialProductionLineProduct,
-    IProductionLineProductManager
-} from "./productionLinesProducts";
+import type { IPartialProductionLineProduct, IProductionLineProductManager } from "./productionLinesProducts";
 import type { IPartialProductionOrder } from "./productionOrder";
 
 interface IProductionLine {

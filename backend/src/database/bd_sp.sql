@@ -1759,7 +1759,7 @@ CALL sp_update_movement_inventory_pop_update_fix(
 			SELECT * FROM shipping_orders_purchased_order_products AS sopop 
 			JOIN shipping_orders AS so 
 			ON so.id = sopop.shipping_order_id
-			WHERE so.id = 3;
+			WHERE so.id = 2;
 			
             SELECT * FROM inventory_movements AS im
 			JOIN shipping_orders_purchased_order_products AS sopop 
@@ -1768,4 +1768,190 @@ CALL sp_update_movement_inventory_pop_update_fix(
 			ON so.id = sopop.shipping_order_id
 			AND im.reference_type = 'Shipping'
 			AND im.movement_type = 'allocate'
-			WHERE so.id = 3;
+			WHERE so.id = 2;
+       
+DROP PROCEDURE IF EXISTS sp_apply_shipping_inventory_movements;
+DELIMITER //
+CREATE PROCEDURE sp_apply_shipping_inventory_movements(
+	IN in_shipping_order_id INT
+)
+BEGIN
+
+  -- Variable para controlar el bucle, cuando no hay mas registros que recorrer en el cursor 
+  DECLARE done INT DEFAULT 0;
+
+  -- Variables para almacenar los valores de la consulta
+  DECLARE v_reference_id INT DEFAULT 0;
+  DECLARE v_reference_type VARCHAR(100) DEFAULT '';
+  DECLARE v_location_id INT DEFAULT 0;
+  DECLARE v_location_name VARCHAR(100) DEFAULT '';
+  DECLARE v_item_id INT DEFAULT 0;
+  DECLARE v_item_name VARCHAR(100) DEFAULT '';
+  DECLARE v_item_type VARCHAR(100) DEFAULT '';
+  DECLARE v_qty DECIMAL(10,4) DEFAULT 0;
+
+  -- Almacenamos la consulta en un cursor
+  DECLARE im_sopops_cursor CURSOR FOR (
+    WITH all_im_so AS ( -- Obtener todos los movimietnos de inventario asociados a la orden de envio
+      SELECT
+		im2.reference_id,
+        im2.reference_type,
+        im2.location_id,
+        im2.location_name,
+        im2.item_id,
+        im2.item_name,
+        im2.item_type,
+        im2.qty
+      FROM inventory_movements AS im2
+      JOIN shipping_orders_purchased_order_products AS sopop
+        ON sopop.id = im2.reference_id
+      JOIN shipping_orders AS so
+        ON so.id = sopop.shipping_order_id
+      WHERE im2.reference_type = 'Shipping'
+        AND im2.movement_type = 'allocate'
+        AND so.id = in_shipping_order_id
+    ),
+    sum_by_loc AS ( -- Suma de los registros por locacion y reference_id (1 registro por location, no se incluyen aquellas locaciones que no sean mayores que cero)
+      SELECT
+        reference_id,
+        item_id,
+        item_name,
+        item_type,
+        reference_type, -- Este campo, no es necesario agregarlo en el GROUP By porque en la colsulta anterior lo filtramos por shipping
+        location_id,
+        ANY_VALUE(location_name) AS location_name, -- ANY_VALUE, permite omitir agregar este campo a GROUP BY, si solo existe un valor unico de location_name para cada location_id
+        IFNULL(SUM(qty) ,0) AS qty
+      FROM all_im_so
+		GROUP BY reference_id, location_id, item_id, item_name, item_type
+      HAVING SUM(qty) > 0
+    )
+    SELECT 
+      reference_id,
+      reference_type,
+      location_id,
+      location_name,
+      qty,
+      item_id,
+      item_name,
+      item_type
+    FROM sum_by_loc -- Al final quedaria solo la locacion que no se igual a cero,
+  );
+
+  -- Handler para cuando no hay mas registros que recorrer en el cursor
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+  -- Abrimos el cursor
+  OPEN im_sopops_cursor;
+
+  -- Bucle para recorrer todos los registros del cursor
+  read_loop: LOOP
+
+    -- Obtenemos los valores de la consulta del cursor en el ciclo actual
+    FETCH im_sopops_cursor
+      INTO v_reference_id, v_reference_type, v_location_id, v_location_name,
+           v_qty, v_item_id, v_item_name, v_item_type;
+
+    IF done THEN -- Si no hay mas registros, salimos del bucle
+      LEAVE read_loop;
+    END IF;
+
+    IF v_qty > 0 THEN -- Si la cantidad es mayor a cero, procedemos a crear los movimientos
+
+      -- Insertamos el movimiento que descompromete el inventario
+      INSERT INTO inventory_movements (
+        location_id, location_name,
+        item_id, item_type, item_name,
+        qty, movement_type,
+        reference_id, reference_type, production_id,
+        description, is_locked
+      ) VALUES (
+        v_location_id, v_location_name,
+        v_item_id, v_item_type, v_item_name,
+        -v_qty, 'allocate', 
+        v_reference_id, v_reference_type, NULL,
+        'Shipping allocation released', 1
+      );
+
+      -- Creamos el movimiento de inventario que consumira el inventario en la location
+      INSERT INTO inventory_movements (
+        location_id, location_name,
+        item_id, item_type, item_name,
+        qty, movement_type,
+        reference_id, reference_type, production_id,
+        description, is_locked
+      ) VALUES (
+        v_location_id, v_location_name,
+        v_item_id, v_item_type, v_item_name,
+        v_qty, 'out', 
+        v_reference_id, v_reference_type, NULL,
+        'Shipping consumption', 0
+      );
+
+    END IF;
+
+  -- Cerramos el bucle
+  END LOOP read_loop;
+
+  -- Cerramos el cursor
+  CLOSE im_sopops_cursor;
+
+END //
+
+CALL sp_apply_shipping_inventory_movements(2);
+
+
+
+
+
+    WITH all_im_so AS ( -- Obtener todos los movimietnos de inventario asociados a la orden de envio
+      SELECT
+		im2.reference_id,
+        im2.reference_type,
+        im2.location_id,
+        im2.location_name,
+        im2.item_id,
+        im2.item_name,
+        im2.item_type,
+        im2.qty
+      FROM inventory_movements AS im2
+      JOIN shipping_orders_purchased_order_products AS sopop
+        ON sopop.id = im2.reference_id
+      JOIN shipping_orders AS so
+        ON so.id = sopop.shipping_order_id
+      WHERE im2.reference_type = 'Shipping'
+        AND im2.movement_type = 'allocate'
+        AND so.id = 2
+    ),
+    sum_by_loc AS ( -- Suma de los registros por locacion y reference_id (1 registro por location, no se incluyen aquellas locaciones que no sean mayores que cero)
+      SELECT
+        reference_id,
+        item_id,
+        item_name,
+        item_type,
+        reference_type, -- Este campo, no es necesario agregarlo en el GROUP By porque en la colsulta anterior lo filtramos por shipping
+        location_id,
+        ANY_VALUE(location_name) AS location_name, -- ANY_VALUE, permite omitir agregar este campo a GROUP BY, si solo existe un valor unico de location_name para cada location_id
+        IFNULL(SUM(qty) ,0) AS qty
+      FROM all_im_so
+		GROUP BY reference_id, location_id, item_id, item_name, item_type
+      HAVING SUM(qty) > 0
+    )
+    SELECT * FROM sum_by_loc; -- Al final quedaria solo la locacion que no se igual a cero,
+/*
+ranked AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY reference_id
+      ORDER BY allocated_qty DESC, location_id
+    ) AS rn
+  FROM sum_by_loc
+)
+SELECT * FROM ranked;
+
+SELECT reference_id, location_id, location_name, allocated_qty
+FROM ranked
+WHERE rn = 1
+ORDER BY reference_id;
+*/
+

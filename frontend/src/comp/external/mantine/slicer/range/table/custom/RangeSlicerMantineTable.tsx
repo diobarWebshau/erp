@@ -1,9 +1,9 @@
 import { Divider, Text } from "@mantine/core";
-import NumericInput from "../../../../../../primitives/input/numeric/base/NumericInput";
 import RangeSlicerMantine from "../base/RangeSlicerMantine"
 import style from "./RangeSlicerMantineTable.module.css"
 import { useEffect, useState } from "react";
 import type { ObjectNumericFilter } from "../../../../../../../interfaces/tableTypes";
+import NumericInputCustomMemo from "../../../../../../primitives/input/numeric/custom/NumericInputCustom";
 
 interface RangeSlicerMantineTableProps {
     min: number;
@@ -25,7 +25,7 @@ const RangeSlicerMantineTable = ({
     labelMark,
 }: RangeSlicerMantineTableProps) => {
 
-    const [values, setValues] = useState<[number, number]>([value.min ?? min, value.max ?? max]);
+    const [values, setValues] = useState<[number, number]>([value?.min ?? min, value?.max ?? max]);
 
     const handleOnChange = (values: [number, number]) => {
         setValues(values);
@@ -33,13 +33,13 @@ const RangeSlicerMantineTable = ({
     }
 
     useEffect(() => {
-        setValues([value.min ?? min, value.max ?? max]);
+        setValues([value?.min ?? min, value?.max ?? max]);
     }, [value]);
 
     return (
         <div
             style={{
-                width: "300px",
+                width: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -71,7 +71,7 @@ const RangeSlicerMantineTable = ({
                     }}
                 >
 
-                    <RangeSlicerMantine 
+                    <RangeSlicerMantine
                         min={min}
                         max={max}
                         value={values}
@@ -99,17 +99,16 @@ const RangeSlicerMantineTable = ({
                             gap: "0.5rem"
                         }}
                     >
-                        <NumericInput
+                        <NumericInputCustomMemo
                             value={values[0]}
                             onChange={(e) => setValues([Number(e), values[1]])}
-                            className={style.numericInput}
                             classNameInput={style.inputContainerNumericInput}
+
                         />
                         <Divider className={style.divider} size="xs" color="gray" />
-                        <NumericInput
+                        <NumericInputCustomMemo
                             value={values[1]}
                             onChange={(e) => setValues([values[0], Number(e)])}
-                            className={style.numericInput}
                             classNameInput={style.inputContainerNumericInput}
                         />
                     </div>

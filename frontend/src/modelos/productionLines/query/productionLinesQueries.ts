@@ -1,48 +1,67 @@
-import type {
-    IPartialProductionLine,
-    IProductionLine
-} from "../../../interfaces/productionLines";
-import {
-    setError,
-    clearError,
-} from "../../../store/slicer/errorSlicer";
-import type {
-    AppDispatchRedux
-} from "../../../store/store";
+import type { IPartialProductionLine, IProductionLine } from "../../../interfaces/productionLines";
+import { setError, clearError } from "../../../store/slicer/errorSlicer";
+import type { AppDispatchRedux } from "../../../store/store";
 
-const API_URL =
-    "http://localhost:3003/production/production-lines";
+const API_URL = "http://localhost:3003/production/production-lines";
 
-const fetchproductionLinesFromDB = async (
-    dispatch: AppDispatchRedux
-): Promise<IProductionLine[]> => {
+interface IFetchProductionLinesFromDB {
+    dispatch: AppDispatchRedux;
+    like?: string;
+    conditionsExclude?: IPartialProductionLine;
+    signal: AbortSignal;
+}
+
+const fetchproductionLinesFromDB = async ({
+    dispatch, like, conditionsExclude, signal
+}: IFetchProductionLinesFromDB): Promise<IProductionLine[]> => {
     try {
-        const response = await fetch(API_URL, {
+
+        // Creamos el objeto params
+        const params = new URLSearchParams();
+        if (like) params.set("filter", like);
+
+
+        // Agregamos los params de exclusion si se cumplen ciertas condiciones
+        if (conditionsExclude && Object.keys(conditionsExclude).length > 0) {
+            Object.entries(conditionsExclude).forEach(([key, value]) => {
+                if (Array.isArray(value) || typeof value === "object") {
+                    params.set(key, JSON.stringify(value));
+                } else {
+                    params.set(key, value.toString());
+                }
+            });
+        };
+
+        // Creamos el request
+        const request = new Request(`${API_URL}?${params.toString()}`, {
             method: "GET",
-            headers: { "Content-Type": "application/json" },
+            signal
         });
+
+        // Realizamos la peticion a la DB
+        const response = await fetch(request);
+
+        // Validamos la respuesta
         if (!response.ok) {
             const errorText = await response.json();
             if (response.status >= 500) {
-                throw new Error(
-                    `${errorText}`
-                );
+                throw new Error(`${errorText}`);
             }
-            dispatch(
-                setError({
-                    key: "productionLines",
-                    message: errorText
-                })
-            );
+            dispatch(setError({ key: "productionLines", message: errorText }));
             return [];
         }
-        dispatch(
-            clearError("productionLines")
-        );
-        const data: IProductionLine[] =
-            await response.json();
+        dispatch(clearError("productionLines"));
+
+        // Parseamos la respuesta
+        const data: IProductionLine[] = await response.json();
+
+        // Retornamos la data
         return data;
     } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+            console.log("abort query production lines");
+            return [];
+        }
         throw error;
     }
 };
@@ -317,5 +336,5 @@ export {
     fetchProductionLineDetails,
     fetchProductionLineById,
     updateCompleteproductionLineInDB
-    
+
 };

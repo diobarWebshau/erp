@@ -2,8 +2,8 @@ import { useEffect, useState, type ChangeEvent, useCallback } from "react";
 import styles from "./CheckBoxListAutoSize.module.css";
 
 interface CheckBoxListAutoSizeProps {
-  value: string[];
-  options: string[];
+  value?: string[];
+  options?: string[];
   onChange: (selected: string[]) => void;
   classNameContainer?: string;
   classNameGroupOptions?: string;
@@ -12,7 +12,7 @@ interface CheckBoxListAutoSizeProps {
   classNameInputOption?: string;
 }
 
-const sanitizeId = (str: string) => str.replace(/\s+/g, "_"); // Para HTML seguro
+const sanitizeId = (str: string) => str.replace(/\s+/g, "_");
 
 const CheckBoxListAutoSize = ({
   value,
@@ -24,27 +24,30 @@ const CheckBoxListAutoSize = ({
   classNameSelectedOption = "",
   classNameInputOption = "",
 }: CheckBoxListAutoSizeProps) => {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(value);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(() => value ?? []);
 
-  // Función para manejar toggle de checkboxes
+  // sincroniza si el padre cambia value
+  useEffect(() => {
+    setSelectedOptions(value ?? []);
+  }, [value]);
+
   const handleToggle = useCallback(
     (e: ChangeEvent<HTMLInputElement>, option: string) => {
       const checked = e.target.checked;
-      const updated = checked
-        ? [...selectedOptions, option]
-        : selectedOptions.filter((item) => item !== option);
-      console.log(`checked: ${checked}`);
-      console.log(`updated: ${updated}`);
-
-      setSelectedOptions(updated); // 🔑 actualizar estado interno
-      onChange?.(updated);
+      setSelectedOptions(prev => {
+        const next = checked ? [...prev, option] : prev.filter(item => item !== option);
+        onChange(next);
+        return next;
+      });
     },
-    [selectedOptions, onChange]
+    [onChange]
   );
+
+  const opts = options ?? [];
 
   return (
     <div className={`${styles.groupOptions} ${classNameContainer} ${classNameGroupOptions}`}>
-      {options.map((option) => {
+      {opts.map((option) => {
         const isSelected = selectedOptions.includes(option);
         const optionId = sanitizeId(option);
 
@@ -52,9 +55,8 @@ const CheckBoxListAutoSize = ({
           <label
             htmlFor={optionId}
             key={optionId}
-            className={`${styles.option} ${classNameOption} ${isSelected ? styles.selected : ""} ${
-              isSelected ? classNameSelectedOption : ""
-            }`}
+            className={`${styles.option} ${classNameOption} ${isSelected ? styles.selected : ""} ${isSelected ? classNameSelectedOption : ""
+              }`}
           >
             <input
               id={optionId}
