@@ -3,7 +3,7 @@ import { produce } from "immer";
 import type { ShippingOrderState, ShippingOrderAction } from "./shippingOrderTypes";
 import { shippingOrderActionsTypes } from "./shippingOrderTypes";
 
-const inventoriesReducer = produce((
+const shippingOrderReducer = produce((
     draft: Draft<ShippingOrderState>,
     action: ShippingOrderAction) => {
 
@@ -173,4 +173,4 @@ const inventoriesReducer = produce((
 
 });
 
-export default inventoriesReducer;
+export default shippingOrderReducer;

@@ -196,6 +196,8 @@ const PopoverComponentHeader = <T,>({
         setFilteredValueLocal(globalValue);
     }, [column.id, state.columnFiltersState]);
 
+    
+
     return (
         <div className={stylesModules.popoverContainer}>
             {enableSorting &&
@@ -230,10 +232,16 @@ const PopoverComponentHeader = <T,>({
 
                 {meta?.type === "number" && (
                     <RangeSlicerMantineTable
-                        max={1000}
-                        min={100}
+                        min={1}
+                        max={table
+                            .getPreFilteredRowModel()
+                            .rows.map((row) => row.getValue(columnId))
+                            .filter((v): v is number => typeof v === "number")
+                            .filter((v, i, arr) => arr.indexOf(v) === i)
+                            .reduce((a, b) => Math.max(a, b), 0)}
                         value={filteredValueLocal as ObjectNumericFilter}
                         onChange={setFilteredValueLocal}
+                        minRange={0}
                     />
                 )}
 

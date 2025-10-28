@@ -1,62 +1,107 @@
-.root {
-    width: 100%;
-    border: 1px solid var(--color-theme-primary) !important;
-    border-radius: 15px;
+/* ************ Container Main ************ */
+
+.containerMain {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+
+    /* distribucion box */
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
 }
 
-.track {
-    height: 100%;
-    background-color: var(--color-theme-neutral-background) !important;
+
+/* ************** Container Content ************** */
+
+.containerContent {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
 }
 
-.bar {
-    background-color: var(--color-theme-primary) !important;
+.labelTitle {
+    /* estilos */
+    color: var(--color-theme-primary);
+    text-align: center;
 }
 
-.trackContainer {
-    width: 100%;
-    height: 100%;
+/* ************** Container Range Slicer ************** */
+
+.containerRangeSlicer {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.markWrapper {
-    height: 100% !important;
-}
-
-.mark {
-    height: 100% !important;
-    border: 1px solid var(--color-theme-font-white) !important;
-    background-color: var(--color-theme-primary-light) !important;
-}
-
-.thumb {
-    border: 3px solid var(--color-theme-primary-light) !important;
-}
-
-.label {
-    color: var(--color-theme-font-white) !important;
-    background-color: var(--color-theme-primary-light) !important;
-    border-radius: 15px !important;
-}
-
-.labelText {
-    color: var(--color-theme-primary) !important;
-}
 
 .labelTextInput {
+    /* distribucion flex respecto al padre*/
     flex: 1;
+
+    /* estilos */
     color: var(--color-theme-primary) !important;
     text-align: center !important;
 
 }
 
-.numericInput {
+
+/* ************** containerLabelTextInput ************** */
+
+.containerLabelTextInput {
+    /* distribucion flex respecto al padre*/
     flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+
 }
+
+
+/* ************** containerInputNumericInput ************** */
+
+.containerInputNumericInput {
+    /* distribucion flex respecto al padre*/
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+
 
 .divider {
+    /* distribucion flex respecto al padre*/
     flex: 0 0 20px;
 }
-
 
 .inputContainerNumericInput {
     background-color: var(--color-theme-neutral-background);

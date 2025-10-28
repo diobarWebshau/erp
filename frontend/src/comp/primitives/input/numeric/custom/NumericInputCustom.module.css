@@ -44,7 +44,7 @@
 
 /* *************** Controls *************** */
 
-.controls > button:hover {
+.controls > span:hover {
     border: 1px solid var(--color-theme-primary);
 }
 

@@ -1,6 +1,8 @@
 /* ********** Container ********** */
 
 .productionLineModelContainer {
+    /* posicionamiento */
+    position: relative;
 
     /* distribucion flex respecto al padre */
     flex-grow: 1;
@@ -101,4 +103,16 @@
     /* estilos */
     background-color: var(--color-alert-light);
     color: var(--color-alert);
+}
+
+
+/* ********** Options Row ********** */
+
+.iconTrash {
+    /* interactividad */
+    cursor: pointer;
+    /* estilos svg */
+    stroke: var(--color-alert);
+    width: 16px;
+    height: 16px;
 }

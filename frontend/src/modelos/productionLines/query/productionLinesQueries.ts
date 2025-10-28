@@ -66,15 +66,22 @@ const fetchproductionLinesFromDB = async ({
     }
 };
 
-
-const fetchProductionLineById = async (
+interface IFetchProductionLineById {
     id: number | undefined,
-    dispatch: AppDispatchRedux
-): Promise<IProductionLine | null> => {
+    dispatch: AppDispatchRedux,
+    signal: AbortSignal
+}
+
+const fetchProductionLineById = async ({
+    id,
+    dispatch,
+    signal
+}: IFetchProductionLineById): Promise<IProductionLine | null> => {
     try {
         const response = await fetch(`${API_URL}/id/${id}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
+            signal
         });
         if (!response.ok) {
             const errorText = await response.json();

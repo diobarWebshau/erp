@@ -143,8 +143,6 @@ const columnFiltersSliceReducer = (initialState: ColumnFiltersState) => (
             // reemplazamos el estado directamente con return (No debemos reasignar la referencia del draft)
             return action.payload;
         case TableActionTypes.ADD_COLUMN_FILTER: {
-            console.log('filter')
-            console.log(action.payload);
             const index = draft.findIndex(
                 (item) => item.id === action.payload.id
             );

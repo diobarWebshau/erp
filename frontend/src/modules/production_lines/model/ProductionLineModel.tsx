@@ -3,7 +3,7 @@ import MainActionButtonCustom from '../../../comp/primitives/button/custom-butto
 import GenericTableMemo from '../../../comp/primitives/table/tableContext/GenericTable'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { IProductionLine } from 'interfaces/productionLines'
-import { PlusIcon } from 'lucide-react'
+import { PlusIcon, Trash2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import StyleModule from './ProductionLineModel.module.css'
 import { useTableDispatch, useTableState } from '../../../comp/primitives/table/tableContext/tableHooks'
@@ -13,12 +13,50 @@ import SecundaryActionButtonCustom from '../../../comp/primitives/button/custom-
 import { Search, Eraser, Download } from 'lucide-react'
 import useProductionLines from '../../../modelos/productionLines/hooks/useProductionLines'
 import Tag from '../../../comp/primitives/tag/Tag'
+import type { RowAction } from '../../../comp/primitives/table/types'
+import DeleteModal from '../../../comp/primitives/modal/deleteModal/DeleteModal'
+import { deleteproductionLineInDB } from '../../../modelos/productionLines/query/productionLinesQueries'
+import { useDispatch } from 'react-redux';
+import AddWizardProductionLine from './wizard/AddWizardProductionLine'
+import ProductionLineModuleProvider from '../context/productionLineModuleProvider'
 
 const ProductionLineModel = () => {
 
+    const dispatchRedux = useDispatch();
     const [search, setSearch] = useState<string>("");
+    const [isActiveDeleteModal, setIsActiveDeleteModal] = useState<boolean>(false);
+    const [isAcviveAddModal, setIsAcviveAddModal] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [serverError, setServerError] = useState<string | null>(null);
+    const [selectedProductionLineRecord, setSelectedProductionLineRecord] = useState<IProductionLine | null>(null);
+
+    const { productionLines, loadingProductionLines, refetchProductionLines } = useProductionLines({ like: search, debounce: 500 })
+
+    const handleDelete = useCallback(async () => {
+        if (!selectedProductionLineRecord?.id) {
+            return;
+        }
+        setLoading(true);
+        try {
+            const response = await deleteproductionLineInDB(selectedProductionLineRecord?.id,
+                dispatchRedux
+            );
+            if (!response) {
+                return;
+            }
+            setServerError(null);
+            refetchProductionLines();
+            setIsActiveDeleteModal(false);
+        } catch (error) {
+            if (error instanceof Error)
+                setServerError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedProductionLineRecord, refetchProductionLines, dispatchRedux]);
 
     const getRowId = useMemo(() => (row: IProductionLine) => row.id.toString(), []);
+
     const columns: ColumnDef<IProductionLine>[] = useMemo(() => [
         {
             accessorKey: "id",
@@ -76,7 +114,28 @@ const ProductionLineModel = () => {
         }
     ], []);
 
-    const { productionLines, loadingProductionLines } = useProductionLines({ like: search, debounce: 500 })
+    const toggleIsActiveDeleteModal = useCallback(() => {
+        setIsActiveDeleteModal(v => !v);
+    }, []);
+
+    const toggleIsActiveDeleteModalSetup = useCallback((value: IProductionLine | null) => {
+        setSelectedProductionLineRecord(value);
+        setIsActiveDeleteModal(v => !v);
+    }, []);
+
+    const toggleIsActiveAddModal = useCallback(() => {
+        setIsAcviveAddModal(v => !v);
+    }, []);
+
+    const actionsRow: RowAction<IProductionLine>[] = useMemo(() => [
+        {
+            id: "edit",
+            label: "Editar",
+            onClick: toggleIsActiveDeleteModalSetup,
+            icon: <Trash2 className={StyleModule.iconTrash} />
+        }
+    ], []);
+
 
     const ExtraComponents = useCallback(() => {
         const state = useTableState();
@@ -128,7 +187,7 @@ const ProductionLineModel = () => {
                 <MainActionButtonCustom
                     icon={<PlusIcon />}
                     label="Línea de producción"
-                    onClick={() => { }}
+                    onClick={toggleIsActiveAddModal}
                 />
             </div>
             <GenericTableMemo
@@ -145,6 +204,11 @@ const ProductionLineModel = () => {
                 enablePagination
                 enableFilters
                 enableSorting
+                enableOptionsColumn
+                typeRowActions='icon'
+
+                /* acciones de filas */
+                rowActions={actionsRow}
 
                 /* extra components */
                 extraComponents={ExtraComponents}
@@ -152,6 +216,23 @@ const ProductionLineModel = () => {
                 /* estilos */
                 classNameGenericTableContainer={StyleModule.genericTableContainer}
             />
+            {
+                isActiveDeleteModal && (
+                    <DeleteModal
+                        title="¿Estás seguro de eliminar esta línea de producción?"
+                        message="Esta acción no se puede deshacer."
+                        onClose={toggleIsActiveDeleteModal}
+                        onDelete={handleDelete}
+                    />
+                )
+            }
+            {
+                isAcviveAddModal && (
+                    <ProductionLineModuleProvider initialStep={1} totalSteps={3}>
+                        <AddWizardProductionLine onClose={toggleIsActiveAddModal} />
+                    </ProductionLineModuleProvider>
+                )
+            }
         </div>
     )
 }

@@ -123,9 +123,11 @@ const NumericInput = memo(({
     // ? useEffect que sincroniza el valor del input con el valor del prop value
     useEffect(() => {
         const synced = value?.toString() ?? "";
+        console.log(`synced`, synced);
         setInputValue(synced);
         setIsValid(computeIsValid(synced));
     }, [value, min, max]);
+
 
     return (
         <div className={clsx(classNamesContainer)}>
@@ -142,12 +144,12 @@ const NumericInput = memo(({
                 min={min}
             />
             <div className={clsx(classNameControls, styleModule.controls)}>
-                <button onClick={handleOnClickUp}>
+                <span onClick={handleOnClickUp}>
                     <ChevronUp className={clsx(styleModule.iconControl, classNameControlsIcon)} />
-                </button>
-                <button onClick={handleOnClickDown}>
+                </span>
+                <span onClick={handleOnClickDown}>
                     <ChevronDown className={clsx(styleModule.iconControl, classNameControlsIcon)} />
-                </button>
+                </span>
             </div>
         </div>
     );

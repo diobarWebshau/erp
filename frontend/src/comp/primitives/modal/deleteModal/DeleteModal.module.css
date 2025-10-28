@@ -1,7 +1,7 @@
 .container {
     /* dimension */
-    width: 30%;
-    height: 25%;
+    width: 680px;
+    height: 270px;
 
 }
 
@@ -19,9 +19,13 @@
     top: 0.3rem;
     right: 0.3rem;
 
-    /* estilos */
-    cursor: pointer;
+    /* distribucion box */
     border: none;
+
+    /* interactividad */
+    cursor: pointer;
+
+    /* estilos */
     background-color: transparent;
 }
 
@@ -41,16 +45,9 @@
 
 .title {
     /* estilos */
+    text-align: center;
     font-size: 24px;
     color: var(--color-theme-font-black);
-}
-
-.error {
-    /* distribucion flex */
-    display: flex;
-    flex-direction: column;
-    /* estilos */
-    color: red;
 }
 
 
@@ -71,75 +68,12 @@
     font-size: 14px;
 }
 
-.containerButtons>* {
-    /* dimension */
-    width: 200px;
-    height: 45px;
-
-    /* distribucion box */
-    background-color: var(--color-theme-font-white);
-    border-radius: 10px;
-
-    /* estilos */
-    font-family: inherit;
-    font-size: inherit;
+.buttonDelete.buttonDelete{
+    background: var(--color-alert);
 }
 
-.deleteButtonSpan,
-.cancelButtonSpan {
-    /* distribucion flex */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.iconCancel,
-.iconDelete {
-    /* dimension */
-    width: 15px;
-    height: 15px;
-}
-
-.deleteButtonLabel {
-    /* estilos */
-    color: var(--color-theme-font-white);
-}
-
-.cancelButtonLabel {
-    /* estilos */
-    color: var(--color-theme-neutral-primary);
-}
-
-.iconDelete {
-    /* estilos */
-    color: var(--color-theme-font-white);
-}
-
-.iconCancel {
-    /* estilos */
-    color: var(--color-theme-neutral-primary);
-}
-
-
-.cancelButton:hover {
-    /* estilos */
-    border: 1px solid var(--color-theme-border-table);
-}
-
-.cancelButton:hover .cancelButtonLabel,
-.cancelButton:hover .iconCancel {
-    /* estilos */
-    color: var(--color-alert);
-}
-
-.deleteButton {
-    background-color: var(--color-alert);
-}
-
-.deleteButton:hover {
-    /* estilos */
-    background-color: var(--color-alert-2);
+.buttonDelete.buttonDelete:hover{
+    background: var(--color-alert-2);
 }
 
 
@@ -153,9 +87,5 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.warningIcon {
-    /* estilos */
-    color: var(--color-theme-primary);
+    color: var(--color-alert);
 }

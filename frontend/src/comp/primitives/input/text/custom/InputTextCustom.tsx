@@ -24,7 +24,7 @@ const InputTextCustom = memo(({
     icon,
     classNameInput,
     placeholder,
-    withValidation = true,
+    withValidation = false,
     disabled = false
 }: InputTextProps) => {
 

@@ -23,8 +23,6 @@ const CheckBoxBooleanAutoSize = ({
     classNameInputOption = "",
 }: BooleanByIndexAutoSizeProps) => {
 
-    console.log(options);
-
     const [selectedIndex, setSelectedIndex] = useState<0 | 1 | null>(() => value ?? null);
 
     useEffect(() => {

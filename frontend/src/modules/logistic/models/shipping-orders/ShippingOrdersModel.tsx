@@ -104,9 +104,6 @@ const ShippingOrderModel = () => {
 
             const shipping_new = { ...shippingOrderDetailById };
 
-            console.log("shipping_old", shipping_old);
-            console.log("shipping_new", shipping_new);
-
             /* Nos quedamos unicamente con los archivos */
             const evidences_old = shipping_old.load_evidence || [];
             delete shipping_old.load_evidence;
@@ -307,7 +304,6 @@ const ShippingOrderModel = () => {
                     return;
                 }
                 if (isActiveConfirmFinishModal) {
-                    console.log("entro")
                     refetchShippingOrders();
                     setMessageReactNode(
                         <span className={StyleModule.messageReactNode}>
@@ -316,7 +312,6 @@ const ShippingOrderModel = () => {
                             se ha finalizado correctamente
                         </span>
                     );
-                    console.log("seteo mensaje");
                 }
             }
             setServerError(null);

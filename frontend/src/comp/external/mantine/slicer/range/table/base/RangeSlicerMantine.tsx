@@ -1,7 +1,6 @@
-
 import { RangeSlider, Text } from "@mantine/core";
 import style from "./RangeSlicerMantine.module.css";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 interface RangeSlicerMantineProps {
     min: number;
@@ -11,16 +10,18 @@ interface RangeSlicerMantineProps {
     radius?: "xs" | "sm" | "md" | "lg" | "xl";
     onChange: (value: [number, number]) => void;
     labelMark?: boolean;
+    minRange?: number;
 }
 
 const RangeSlicerMantine = memo(({
     min,
     max,
     value,
-    size = "xl",
-    radius = "xl",
+    size = "md",
+    radius = "md",
     onChange,
     labelMark,
+    minRange = 0,
 }: RangeSlicerMantineProps) => {
 
     const [values, setValues] = useState<[number, number]>(value);
@@ -29,25 +30,20 @@ const RangeSlicerMantine = memo(({
         const span = max - min;
         if (span <= 0) return 1;
 
-        // paso "crudo" ideal para ~targetTicks
         const raw = span / targetTicks;
         const pow10 = Math.pow(10, Math.floor(Math.log10(Math.abs(raw))));
         const m = raw / pow10;
-
-        // “redondeo bonito” del paso a 1, 2 o 5 × 10^n
         const factor = m >= 5 ? 5 : m >= 2 ? 2 : 1;
         return factor * pow10;
     }
 
     function decimalsOfStep(step: number) {
-        // cuántos decimales necesitamos para representar step (p. ej. 0.1 -> 1, 0.005 -> 3)
         const s = step.toString();
-        if (s.includes('e')) {
-            // notación científica
-            const [, exp] = s.split('e');
+        if (s.includes("e")) {
+            const [, exp] = s.split("e");
             return Math.max(0, -Number(exp));
         }
-        const parts = s.split('.');
+        const parts = s.split(".");
         return parts[1]?.length ?? 0;
     }
 
@@ -59,8 +55,6 @@ const RangeSlicerMantine = memo(({
     function buildMarks(min: number, max: number, targetTicks = 6) {
         const step = niceStep(min, max, targetTicks);
         const decs = decimalsOfStep(step);
-
-        // primer múltiplo de step ≥ min (alineación)
         const first = roundTo(Math.ceil(min / step) * step, decs);
 
         const marks: { value: number; label?: string }[] = [];
@@ -71,7 +65,6 @@ const RangeSlicerMantine = memo(({
             marks.push(mark);
         }
 
-        // si por algún motivo quedó vacío, caemos a min y max
         if (marks.length === 0) {
             marks.push({ value: min, label: String(min) }, { value: max, label: String(max) });
         }
@@ -79,13 +72,20 @@ const RangeSlicerMantine = memo(({
         return marks;
     }
 
-    const handleOnChange = (values: [number, number]) => {
-        setValues(values);
-        onChange(values);
-    }
+    // Memoiza marcas para estabilidad durante el drag
+    const marks = useMemo(() => buildMarks(min, max, 6), [min, max, labelMark]);
 
-    console.log(buildMarks(min, max));
+    // Durante el drag: solo actualiza estado local
+    const handleOnChange = (vals: [number, number]) => {
+        setValues(vals);
+    };
 
+    // Al soltar: emite al padre
+    const handleOnChangeEnd = (vals: [number, number]) => {
+        onChange(vals);
+    };
+
+    // Sincroniza valor externo -> interno
     useEffect(() => {
         setValues(value);
     }, [value]);
@@ -93,42 +93,42 @@ const RangeSlicerMantine = memo(({
     return (
         <RangeSlider
             value={values}
-            size={size}          // controla la altura base del track
-            radius={radius}        // bordes más redondeados
+            size={size}
+            radius={radius}
             onChange={handleOnChange}
+            onChangeEnd={(v) => handleOnChangeEnd(v as [number, number])}
             labelAlwaysOn
             label={(val) => (
                 <Text size="sm" className="nunito-semibold">
                     {val}
                 </Text>
             )}
-            marks={buildMarks(min, max)}
-            // thumbProps={(index) => ({
-            //     className: index === 0 ? style.thumbFrom : style.thumbTo,
-            // })}
+            minRange={minRange}
+            marks={marks}
             classNames={{
                 // CONTENEDORES
-                root: style.root, // contenedor principal que encapsula todo el componente
-                trackContainer: style.trackContainer, // contenedor que contiene la barra mostrada desde el valor minimo hasta el valor maximo(pista base) y sus nodos hijos(marcadores, barra seleccionada)
+                root: style.root,
+                trackContainer: style.trackContainer,
 
                 // BARRAS
-                track: style.track, // barra mostrada desde el valor minimo hasta el valor maximo(pista base)
-                bar: style.bar, // rango de la barra seleccionada
+                track: style.track,
+                bar: style.bar,
 
                 // MARCADORES
-                markWrapper: style.markWrapper, // contenedor que contiene el marcador y su texto
-                mark: style.mark, // punto en la pista que indica un separador
-                markLabel: style.markLabel, // texto que acompaña al marcador
+                markWrapper: style.markWrapper,
+                mark: style.mark,
+                markLabel: style.markLabel,
 
                 // MANEJADORES
-                thumb: style.thumb, // Manejadores que arrastrar para definir el rango
-                label: `nunito-semibold ${style.label}`, // texto que acompaña al rango
+                thumb: style.thumb,
+                label: `nunito-semibold ${style.label}`,
             }}
             min={min}
             max={max}
+        // Opcional: alinear el paso del thumb a tus marcas (si lo deseas)
+        // step={niceStep(min, max)}
         />
     );
 });
-
 
 export default RangeSlicerMantine;

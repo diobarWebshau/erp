@@ -1,0 +1,29 @@
+.root {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.content {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+
+}
+
+.steps {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+}
