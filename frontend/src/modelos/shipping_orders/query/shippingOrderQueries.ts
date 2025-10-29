@@ -67,7 +67,6 @@ const fetchShippingOrdersFromDB = async ({
 
         return data;
     } catch (error: unknown) {
-        console.log(error);
         // Ignoramos abortError, solo lanzamos otros errores
         if (error instanceof DOMException && error.name === "AbortError") {
             console.log("abort");

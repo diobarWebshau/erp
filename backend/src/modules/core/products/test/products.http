@@ -8,6 +8,9 @@ GET http://localhost:3003/products/products/id/2 HTTP/1.0
 GET http://localhost:3003/products/products/filter/P HTTP/1.0
 
 ### get
+GET  http://localhost:3003/products/products/exclude?excludeIds=1&excludeIds=2 HTTP/1.0
+
+### get
 GET http://localhost:3003/products/products/name/Producto E HTTP/1.0
 
 ### get

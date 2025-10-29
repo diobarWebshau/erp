@@ -10,8 +10,12 @@ import {
 import type {
     AppDispatchRedux
 } from "../../../store/store";
-const API_URL =
-    "http://localhost:3003/products/products";
+
+
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+const RELATIVE_PATH = "products/products/";
+const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
+
 
 const fetchProductsFromDB = async (
     dispatch: AppDispatchRedux
@@ -125,7 +129,6 @@ const fetchProductLike = async (
         });
         if (!response.ok) {
             const errorText = await response.json();
-            console.log(errorText)
             if (response.status >= 500) {
                 throw new Error(
                     `${errorText}`
@@ -149,40 +152,64 @@ const fetchProductLike = async (
     }
 }
 
-// const createCompleteProductInDB = async (
-//     data: IPartialProduct,
-//     dispatch: AppDispatchRedux
-// ): Promise<any> => {
-//     try {
-//         const response = await fetch(`${API_URL}/create-complete`, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify(data),
-//         });
+const getProductsByIdsExclude = async (
+    dispatch: AppDispatchRedux,
+    excludeIds: number | number[],
+    signal?: AbortSignal
+): Promise<IProduct[] | []> => {
+    try {
 
-//         if (!response.ok) {
-//             const errorText = await response.json();
-//             console.log(errorText)
-//             dispatch(
-//                 setError({
-//                     key: "createCompleteProduct",
-//                     message: errorText
-//                 })
-//             );
-//             throw new Error(
-//                 `${errorText}`
-//             );
-//         }
-//         dispatch(
-//             clearError("createCompleteProduct")
-//         );
-//         const result = await response.json();
-//         return result;
-//     } catch (error: unknown) {
-//         throw error;
-//     }
-// };
+        // Generamos los params busqueda para la URL
+        const params = new URLSearchParams();
 
+        // Generamos los valores de id
+        if (Array.isArray(excludeIds)) {
+            excludeIds.forEach((v) => params.append("excludeIds", v.toString()));
+        } else {
+            params.append("excludeIds", excludeIds.toString());
+        }
+
+        /* Generamos la URL */
+        const url = new URL(`exclude/`, API_URL.toString()); // respeta tu uso de '/ids'
+        url.search = params.toString(); // Esto genera la URL con los params, por ejemplo: /excludeIds?excludeIds=1&excludeIds=2
+
+        // Generamos el request
+        const request = new Request(url.toString(), {
+            method: "GET",
+            signal,
+        });
+
+        const response = await fetch(request);
+
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(
+                    `${errorText}`
+                );
+            }
+            dispatch(
+                setError({
+                    key: "likeWithExludeToProducts",
+                    message: errorText
+                })
+            );
+            return [];
+        }
+        dispatch(
+            clearError("likeWithExludeToProducts")
+        );
+        const data: IProduct[] = await response.json();
+        return data;
+    } catch (error: unknown) {
+        // Ignoramos abortError, solo lanzamos otros errores
+        if (error instanceof DOMException && error.name === "AbortError") {
+            console.log("abort");
+            return []; // fetch cancelado, retornamos vacío
+        }
+        throw error;
+    }
+}
 
 const createCompleteProductInDB = async (
     product: IPartialProduct,
@@ -369,5 +396,6 @@ export {
     deleteProductInDB,
     createCompleteProductInDB,
     updateCompleteProductInDB,
-    fetchProductLike
+    fetchProductLike,
+    getProductsByIdsExclude
 };

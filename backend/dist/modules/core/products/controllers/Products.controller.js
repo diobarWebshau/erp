@@ -143,6 +143,31 @@ class ProductController {
             }
         }
     };
+    static getProductsByExcludeIds = async (req, res, next) => {
+        const raw = req.query.excludeIds;
+        const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+        const ids = arr.map(Number).filter(Number.isFinite);
+        try {
+            const results = await ProductModel.findAll({
+                where: { id: { [Op.notIn]: ids } },
+                attributes: ProductModel.getAllFields()
+            });
+            if (!(results.length > 0)) {
+                res.status(200).json([]);
+                return;
+            }
+            const products = results.map((p) => p.toJSON());
+            res.status(200).json(products);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            }
+            else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    };
     static getByName = async (req, res, next) => {
         const { name } = req.params;
         try {

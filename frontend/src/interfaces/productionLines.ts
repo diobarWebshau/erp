@@ -6,6 +6,7 @@ import type { IPartialProductionOrder } from "./productionOrder";
 
 interface IProductionLine {
     id: number,
+    customId: string,
     name: string,
     is_active: boolean,
     created_at: string,
@@ -23,6 +24,7 @@ type IPartialProductionLine =
 const defaultValueProductionLine:
     IProductionLine = {
     id: 0,
+    customId: "",
     name: "",
     is_active: true,
     created_at: "",

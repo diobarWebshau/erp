@@ -1,0 +1,30 @@
+.root[data-size="lg"] {
+    --switch-height: 45px !important;
+    /* ajusta a gusto */
+    --switch-width: 45px !important;
+    /* ajusta a gusto */
+    --switch-thumb-size: 37px !important;
+    /* ajusta a gusto */
+    --switch-padding: 2px !important;
+    /* opcional */
+    --switch-border-width: 2px !important;
+    /* opcional */
+    --switch-label-font-size: 14px !important;
+}
+
+.track {
+    padding-inline: 0.5rem;
+    border: 2px solid var(--color-theme-border-table);
+
+}
+
+.iconActive {
+    width: 16px;
+    height: 16px;
+}
+
+.iconInactive {
+    stroke: var(--color-theme-neutral-primary);
+    width: 16px;
+    height: 16px;
+}

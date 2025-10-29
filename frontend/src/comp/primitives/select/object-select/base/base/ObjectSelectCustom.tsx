@@ -13,6 +13,7 @@ interface IObjectSelectCustom<T> {
     maxHeightToggle?: string,
     classNameInput?: string,
     classNameOption?: string,
+    withValidation?: boolean,
 }
 
 const ObjectSelectCustom = <T,>({
@@ -32,15 +33,15 @@ const ObjectSelectCustom = <T,>({
             options={options || []}
             value={value || null}
             onChange={onChange}
-            {...(maxHeightToggle && {maxHeightToggle: maxHeightToggle})}
+            {...(maxHeightToggle && { maxHeightToggle: maxHeightToggle })}
             classNameTrigger={`${classNameInput}  ${styles.trigger} nunito-semibold`}
             classNameToggle={styles.toggle}
             classNameOption={`${classNameOption} ${styles.option} nunito-semibold`}
             classNameIcon={styles.icon}
             classNameOptionSelected={styles.optionSelected}
             classNamePopoverFloating={styles.popoverFloating}
-            classNameTriggerInvalid = {styles.triggerInvalid}
-            classNameTriggerValidate = {styles.triggerValidate}
+            classNameTriggerInvalid={styles.triggerInvalid}
+            classNameTriggerValidate={styles.triggerValidate}
         />
     )
 }

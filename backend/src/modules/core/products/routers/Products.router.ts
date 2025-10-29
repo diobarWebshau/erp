@@ -16,6 +16,8 @@ const createProductsRouter = (): Router => {
         ProductController.getByLike);
     productRouter.post("/filter-exclude/:filter",
         ProductController.getByLikeExcludeIds);
+    productRouter.get("/exclude",
+        ProductController.getProductsByExcludeIds);
     productRouter.get("/name/:name",
         ProductController.getByName);
     productRouter.post("/",

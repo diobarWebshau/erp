@@ -8,6 +8,7 @@ const createProductsRouter = () => {
     productRouter.get("/id/:id", ProductController.getById);
     productRouter.get("/filter/:filter", ProductController.getByLike);
     productRouter.post("/filter-exclude/:filter", ProductController.getByLikeExcludeIds);
+    productRouter.get("/exclude", ProductController.getProductsByExcludeIds);
     productRouter.get("/name/:name", ProductController.getByName);
     productRouter.post("/", uploadImageMiddleware, validateProductMiddleware, ProductController.create);
     productRouter.patch("/:id", uploadImageMiddleware, validateProductMiddleware, ProductController.update);

@@ -17,7 +17,7 @@ import type { RowAction } from '../../../comp/primitives/table/types'
 import DeleteModal from '../../../comp/primitives/modal/deleteModal/DeleteModal'
 import { deleteproductionLineInDB } from '../../../modelos/productionLines/query/productionLinesQueries'
 import { useDispatch } from 'react-redux';
-import AddWizardProductionLine from './wizard/AddWizardProductionLine'
+import AddWizardProductionLine from './wizard/add/AddWizardProductionLine'
 import ProductionLineModuleProvider from '../context/productionLineModuleProvider'
 
 const ProductionLineModel = () => {
@@ -228,7 +228,7 @@ const ProductionLineModel = () => {
             }
             {
                 isAcviveAddModal && (
-                    <ProductionLineModuleProvider initialStep={1} totalSteps={3}>
+                    <ProductionLineModuleProvider initialStep={0} totalSteps={3}>
                         <AddWizardProductionLine onClose={toggleIsActiveAddModal} />
                     </ProductionLineModuleProvider>
                 )

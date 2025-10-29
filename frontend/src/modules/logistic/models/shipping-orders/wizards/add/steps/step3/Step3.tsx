@@ -27,7 +27,7 @@ const Step3 = ({ onClose }: IStep3) => {
     const state = useShippingOrderState();
     const dispatch = useShippingOrderDispatch();
 
-    const [deliveryDate, setDeliveryDate] = useState<Date | null>(state.data?.shipping_date || null);
+    const [deliveryDate, setDeliveryDate] = useState<Date | null>(state.data?.scheduled_ship_date ? new Date(state.data.scheduled_ship_date) : null);
     const [carrier, setCarrier] = useState<IPartialCarrier | null>(state.data?.carrier || null);
     const [transportMethod, setTransportMethod] = useState<string | null>(state.data?.transport_method || null);
     const [shippingType, setShippingType] = useState<string | null>(state.data?.shipment_type || null);

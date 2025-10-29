@@ -60,7 +60,6 @@ const fetchPurchasedOrdersFromDB = async ({
 
         return data;
     } catch (error: unknown) {
-        console.log(error);
         // Ignoramos abortError, solo lanzamos otros errores
         if (error instanceof DOMException && error.name === "AbortError") {
             console.log("abort");
@@ -126,7 +125,6 @@ const getPurchasedOrderByIdsInDB = async (
         /* Generamos el request */
         const request = new Request(url.toString(), {
             method: "GET",
-            headers: { Accept: "application/json" }, // GET no necesita Content-Type
             signal,
         });
 
