@@ -15,9 +15,15 @@ type ProductionLineCommands = {
 
 const initialProductionLineState: ProductionLineState = {
     total_steps: 2,
-    current_step: 1,
-    data: { production_lines_products: [] },
-    draft: { production_lines_products: [] },
+    current_step: 0,
+    data: {
+        production_lines_products: [],
+        is_active: true
+    },
+    draft: { 
+        production_lines_products: [],
+        is_active: true 
+    },
 }
 
 const productionLineActionsTypes = {
@@ -71,7 +77,7 @@ type ProductionLineAction =
     | { type: typeof productionLineActionsTypes.BACK_STEP }
     | { type: typeof productionLineActionsTypes.NEXT_STEP }
     // Acciones de limpieza
-    | { type: typeof productionLineActionsTypes.CLEAR }; 
+    | { type: typeof productionLineActionsTypes.CLEAR };
 
 export type {
     ProductionLineState,

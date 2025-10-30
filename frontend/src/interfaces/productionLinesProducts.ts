@@ -3,7 +3,7 @@ import type {
 } from "./product";
 
 interface IProductionLineProduct {
-    id: number;
+    id: number | string;
     product_id: number;
     production_line_id: number;
     products?: IProduct;

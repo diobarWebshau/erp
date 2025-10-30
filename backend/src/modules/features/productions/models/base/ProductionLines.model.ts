@@ -16,6 +16,7 @@ import {
 
 interface ProductionLineAttributes {
     id: number,
+    custom_id: string,
     name: string,
     is_active: boolean,
     created_at: Date,
@@ -36,11 +37,11 @@ class ProductionLineModel extends
     Model<ProductionLineAttributes,
         ProductionLineCreationAttributes> {
     static getEditableFields(): string[] {
-        return ['name', "is_active"];
+        return ['name', "is_active", "custom_id"];
     }
     static getAllFields(): string[] {
         return [
-            "id", "name", "is_active",
+            "id", "custom_id", "name", "is_active",
             "created_at", "updated_at"
         ];
     }
@@ -52,6 +53,11 @@ ProductionLineModel.init(
             type: DataTypes.STRING,
             primaryKey: true,
             autoIncrement: true,
+        },
+        custom_id: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+            unique: true,
         },
         name: {
             type: DataTypes.STRING(100),

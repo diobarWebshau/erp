@@ -14,6 +14,11 @@
 .containerContent {
     /* distirbucion flex respecto al padre*/
     flex: 1;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
 }
 
 .containerButtons {
@@ -68,11 +73,14 @@
 
 .iconTrash {
     stroke: var(--color-alert);
+    width: 16px;
+    height: 16px;
 }
 
 /* ? ************* Container Switch ************* */
 
 .containerSwitch {
+    /* distribucion flex respecto al padre*/
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: auto;
@@ -95,7 +103,12 @@
     gap: 0.5rem;
 }
 
-.labelSwitch{
+.labelSwitch {
+    /* estilos */
     font-size: 14px;
+}
 
+.emptyMessage {
+    /* estilos */
+    font-size: 14px;
 }

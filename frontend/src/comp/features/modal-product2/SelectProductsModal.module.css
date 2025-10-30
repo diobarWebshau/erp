@@ -8,15 +8,15 @@
 }
 
 .containerDialogModalCustomContainer {
+    /* distribucion box*/
     padding: 1rem;
 }
 
 /* *************** Container *************** */
 
 .container {
-    /* dimension */
-    width: 100%;
-    height: 100%;
+    /* distribucion flex respecto al padre */
+    flex: 1;
 
     /* distribucion flex */
     display: flex;
@@ -29,12 +29,9 @@
 
 .bodySection,
 .footerSection {
-    /* dimension */
-    width: 100%;
-
-    /* distribucion flex */
-    display: flex;
-
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
 }
 
 /* *************** Body *************** */

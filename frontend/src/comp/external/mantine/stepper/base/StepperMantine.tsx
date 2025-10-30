@@ -14,6 +14,9 @@ interface IStepperStepMantine {
     props?: {
         loading?: boolean; // válido en Mantine Stepper.Step
     };
+    /* apariencia */
+    mainColor?: string;
+    completedIcon?: ReactNode;
 }
 
 interface IStepperMantine {
@@ -31,6 +34,7 @@ interface IStepperMantine {
     autoContrast?: boolean; // prop válida en Mantine (antes autoLoading)
     classNames?: StepperProps["classNames"];
     className?: StepperProps["className"];
+    mainColor?: string;
 }
 
 const StepperMantine = ({
@@ -44,12 +48,14 @@ const StepperMantine = ({
     autoContrast,
     classNames,
     className,
+    mainColor
 }: IStepperMantine) => {
     const processContent = (content: IStepperStepMantine["content"]) =>
         typeof content === "function" ? content() : content;
 
     return (
         <Stepper
+            {...(mainColor && { color: mainColor })}
             active={initialStep}
             onStepClick={onStepClick}
             allowNextStepsSelect={allowNextStepsSelect}
@@ -83,10 +89,11 @@ const StepperMantine = ({
                 steps.map((step, index) => (
                     <Stepper.Step
                         key={index}
-                        {...(step.title && { label: step.title })}
-                        {...(step.description && { description: step.description })}
-                        {...(step.icon && { icon: step.icon })}
-                        {...(step.props && { ...step.props })}
+                        {...(step.title ? { label: step.title } : {})}
+                        {...(step.description ? { description: step.description } : {})}
+                        {...(step.icon ? { icon: step.icon } : {})}
+                        {...(step.icon ? { completedIcon: step.icon } : {})}
+                        {...(step.props ? { ...step.props } : {})}
                     >
                         {processContent(step.content)}
                     </Stepper.Step>

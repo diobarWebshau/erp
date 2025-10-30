@@ -19,7 +19,7 @@ const createProductionLineRouter = (): Router => {
     productionLineRouter.post("/",
         validateProductionLinesMiddleware,
         ProductionLinesController.create);
-    productionLineRouter.post("/create-complete",
+    productionLineRouter.post("/complete",
         validateProductionLinesMiddleware,
         ProductionLinesController.createComplete);
     productionLineRouter.patch("/:id",

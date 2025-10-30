@@ -279,7 +279,7 @@ class ProductionLinesController {
         }
     }
     static create = async (req: Request, res: Response, next: NextFunction) => {
-        const { name } = req.body;
+        const { name, custom_id } = req.body;
         try {
             const validation_name =
                 await ProductionLineModel.findOne({ where: { name: name } });
@@ -289,7 +289,7 @@ class ProductionLinesController {
                 });
                 return;
             }
-            const response = await ProductionLineModel.create({ name });
+            const response = await ProductionLineModel.create({ name, custom_id });
             if (!response) {
                 res.status(200).json({
                     message: "The production line could not be created"
@@ -316,10 +316,12 @@ class ProductionLinesController {
     ) => {
 
         const {
-            name, is_active,
+            name, custom_id, is_active,
             location_production_line,
             production_lines_products
         } = req.body;
+
+        console.log(req.body);
 
         const transaction =
             await sequelize.transaction({
@@ -331,11 +333,9 @@ class ProductionLinesController {
 
         try {
 
-            const validation_name =
-                await ProductionLineModel.findOne({
-                    where: { name: name }
-                });
-
+            const validation_name = await ProductionLineModel.findOne({
+                where: { name: name, custom_id: custom_id }
+            });
 
             if (validation_name) {
                 await transaction.rollback();
@@ -347,24 +347,21 @@ class ProductionLinesController {
                 return;
             }
 
-            const response =
-                await ProductionLineModel.create({
-                    name,
-                    is_active
-                });
+            const response = await ProductionLineModel.create({
+                name,
+                custom_id,
+                is_active
+            }, { transaction });
 
             if (!response) {
                 await transaction.rollback();
                 res.status(400).json({
-                    message:
-                        "The production line could not be created"
+                    message: "The production line could not be created"
                 });
                 return;
             }
 
-            const productionLine =
-                await response.toJSON();
-
+            const productionLine = await response.toJSON();
 
             if (location_production_line) {
 
@@ -389,7 +386,6 @@ class ProductionLinesController {
                     return;
                 }
             }
-
 
             if (production_lines_products.length > 0) {
                 const productsIds: number[] =
@@ -431,7 +427,6 @@ class ProductionLinesController {
                             { transaction }
                         );
 
-
                 if (responseProductionLineProducts.length
                     !== producctionLineProductsCreate.length) {
                     await transaction.rollback();
@@ -441,7 +436,6 @@ class ProductionLinesController {
                     });
                     return;
                 }
-
             }
 
             await transaction.commit();

@@ -2,7 +2,7 @@
 import MainActionButtonCustom from '../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom'
 import GenericTableMemo from '../../../comp/primitives/table/tableContext/GenericTable'
 import type { ColumnDef } from '@tanstack/react-table'
-import type { IProductionLine } from 'interfaces/productionLines'
+import type { IPartialProductionLine, IProductionLine } from 'interfaces/productionLines'
 import { PlusIcon, Trash2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import StyleModule from './ProductionLineModel.module.css'
@@ -15,7 +15,7 @@ import useProductionLines from '../../../modelos/productionLines/hooks/useProduc
 import Tag from '../../../comp/primitives/tag/Tag'
 import type { RowAction } from '../../../comp/primitives/table/types'
 import DeleteModal from '../../../comp/primitives/modal/deleteModal/DeleteModal'
-import { deleteproductionLineInDB } from '../../../modelos/productionLines/query/productionLinesQueries'
+import { createCompleteproductionLineInDB, deleteproductionLineInDB } from '../../../modelos/productionLines/query/productionLinesQueries'
 import { useDispatch } from 'react-redux';
 import AddWizardProductionLine from './wizard/add/AddWizardProductionLine'
 import ProductionLineModuleProvider from '../context/productionLineModuleProvider'
@@ -54,6 +54,26 @@ const ProductionLineModel = () => {
             setLoading(false);
         }
     }, [selectedProductionLineRecord, refetchProductionLines, dispatchRedux]);
+
+    const handleCreate = useCallback(async (data: IPartialProductionLine) => {
+        setLoading(true);
+        try {
+            console.log(data);
+            const response = await createCompleteproductionLineInDB(data,
+                dispatchRedux
+            );
+            if (!response) {
+                return;
+            }
+            setServerError(null);
+            refetchProductionLines();
+        } catch (error) {
+            if (error instanceof Error)
+                setServerError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [dispatchRedux, refetchProductionLines]);
 
     const getRowId = useMemo(() => (row: IProductionLine) => row.id.toString(), []);
 
@@ -129,8 +149,8 @@ const ProductionLineModel = () => {
 
     const actionsRow: RowAction<IProductionLine>[] = useMemo(() => [
         {
-            id: "edit",
-            label: "Editar",
+            id: "delete",
+            label: "Eliminar",
             onClick: toggleIsActiveDeleteModalSetup,
             icon: <Trash2 className={StyleModule.iconTrash} />
         }
@@ -229,7 +249,7 @@ const ProductionLineModel = () => {
             {
                 isAcviveAddModal && (
                     <ProductionLineModuleProvider initialStep={0} totalSteps={3}>
-                        <AddWizardProductionLine onClose={toggleIsActiveAddModal} />
+                        <AddWizardProductionLine onClose={toggleIsActiveAddModal} onCreate={handleCreate} />
                     </ProductionLineModuleProvider>
                 )
             }

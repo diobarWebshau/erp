@@ -1,11 +1,11 @@
 import CriticalActionButton from "../../primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../primitives/button/custom-button/main-action/MainActionButtonCustom";
 import DialogModal from "../../primitives/modal2/dialog-modal/base/DialogModal";
-import MultiSelectSearchCheckCustom from "../../primitives/select/multi-select/custom2/MultiSelectSearchCheckCustom";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Plus } from "lucide-react";
 import type { StrictStringKeys } from "../../../interfaces/globalTypes";
 import styleModule from "./SelectProductsModal.module.css"
+import MultiSelectCheckSearchCustomMemo from "../select-check-search/multiple/custom/MultiSelectCheckSearchCustom";
 
 interface SelectObjectsModalProps<T> {
     onClose: () => void,
@@ -16,7 +16,8 @@ interface SelectObjectsModalProps<T> {
     // ? MultiSelectSearchCheckCustom
     emptyMessage: string,
     attribute: StrictStringKeys<T>,
-    loadOptions?: (query: string) => Promise<T[]>
+    placeholder: string,
+    loadOptions?: (query: string | number) => Promise<T[]>
     options?: T[]
 }
 
@@ -27,22 +28,14 @@ const SelectObjectsModal = <T,>({
     headerTitle,
     emptyMessage,
     attribute,
-    options,
-    loadOptions
+    placeholder,
+    loadOptions,
+    options
 }: SelectObjectsModalProps<T>) => {
 
-    console.log("Me renderizo");
+    const [selectedObject, setSelectedObject] = useState<T[]>([]);
 
-    const [selectedObject, setSelectedObject] =
-        useState<T[]>([]);
-    const [searchMulti, setSearchMulti] =
-        useState<string>("");
-    const [openMulti, setOpenMulti] =
-        useState<boolean>(false);
-
-    const handlerOnClickButton = () => {
-        onClick(selectedObject);
-    }
+    const handlerOnClickButton = useCallback(() => onClick(selectedObject), [onClick, selectedObject]);
 
     return (
         <DialogModal
@@ -55,16 +48,18 @@ const SelectObjectsModal = <T,>({
                     <h2 className={`nunito-semibold ${styleModule.bodySectionH2}`}>
                         {headerTitle}
                     </h2>
-                    <MultiSelectSearchCheckCustom<T>
-                        emptyMessage={emptyMessage}
-                        attribute={attribute}
-                        search={searchMulti}
-                        open={openMulti}
+                    <MultiSelectCheckSearchCustomMemo
+                        rowId={attribute}
+                        {...(loadOptions
+                            ? { loadOptions }
+                            : { options }
+                        )}
                         selected={selectedObject}
                         setSelected={setSelectedObject}
-                        setSearch={setSearchMulti}
-                        setOpen={setOpenMulti}
-                        {...(options ? { options } : { loadOptions })}
+                        colorMain="var(--color-theme-primary)"
+                        initialOpen={true}
+                        emptyMessage={emptyMessage}
+                        placeholder={placeholder}
                     />
                 </section>
                 <section className={styleModule.footerSection}>

@@ -1,12 +1,12 @@
 import fetch from 'node-fetch';
 
 const productionLines = [
-  { name: "Líne A" },  
-  { name: "Líne B" },  
-  { name: "Líne C" },   
-  { name: "Líne D" },    
-  { name: "Líne E" },    
-  { name: "Líne F" }   
+  { name: "Líne A" , custom_id: "PL-1"},  
+  { name: "Líne B" , custom_id: "PL-2"},  
+  { name: "Líne C" , custom_id: "PL-3"},   
+  { name: "Líne D" , custom_id: "PL-4"},    
+  { name: "Líne E" , custom_id: "PL-5"},    
+  { name: "Líne F" , custom_id: "PL-6"}   
 ];
 
 const sendProductionLine = async (productionLine) => {

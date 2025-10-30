@@ -233,7 +233,7 @@ class ProductionLinesController {
         }
     };
     static create = async (req, res, next) => {
-        const { name } = req.body;
+        const { name, custom_id } = req.body;
         try {
             const validation_name = await ProductionLineModel.findOne({ where: { name: name } });
             if (validation_name) {
@@ -242,7 +242,7 @@ class ProductionLinesController {
                 });
                 return;
             }
-            const response = await ProductionLineModel.create({ name });
+            const response = await ProductionLineModel.create({ name, custom_id });
             if (!response) {
                 res.status(200).json({
                     message: "The production line could not be created"
@@ -263,15 +263,17 @@ class ProductionLinesController {
         }
     };
     static createComplete = async (req, res, next) => {
-        const { name, is_active, location_production_line, production_lines_products } = req.body;
+        const { name, custom_id, is_active, location_production_line, production_lines_products } = req.body;
+        console.log(req.body);
         const transaction = await sequelize.transaction({
             isolationLevel: Transaction
                 .ISOLATION_LEVELS
                 .REPEATABLE_READ
         });
         try {
+            console.log("custom_id", custom_id);
             const validation_name = await ProductionLineModel.findOne({
-                where: { name: name }
+                where: { name: name, custom_id: custom_id }
             });
             if (validation_name) {
                 await transaction.rollback();
@@ -283,8 +285,9 @@ class ProductionLinesController {
             }
             const response = await ProductionLineModel.create({
                 name,
+                custom_id,
                 is_active
-            });
+            }, { transaction });
             if (!response) {
                 await transaction.rollback();
                 res.status(400).json({

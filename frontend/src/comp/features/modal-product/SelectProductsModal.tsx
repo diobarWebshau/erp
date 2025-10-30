@@ -1,11 +1,11 @@
 import CriticalActionButton from "../../primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../primitives/button/custom-button/main-action/MainActionButtonCustom";
 import DialogModal from "../../primitives/modal2/dialog-modal/base/DialogModal";
-import MultiSelectSearchCheckCustom from "../../primitives/select/multi-select/custom/MultiSelectSearchCheckCustom";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import type { StrictStringKeys } from "../../../interfaces/globalTypes";
 import styleModule from "./SelectProductsModal.module.css"
+import MultiSelectCheckSearchCustomMemo from "../select-check-search/multiple/custom/MultiSelectCheckSearchCustom";
 
 interface SelectObjectsModalProps<T> {
     onClose: () => void,
@@ -16,7 +16,7 @@ interface SelectObjectsModalProps<T> {
     // ? MultiSelectSearchCheckCustom
     emptyMessage: string,
     attribute: StrictStringKeys<T>,
-    loadOptions: (query: string) => Promise<T[]>
+    loadOptions: (query: string | number) => Promise<T[]>
 }
 
 const SelectObjectsModal = <T,>({
@@ -31,10 +31,6 @@ const SelectObjectsModal = <T,>({
 
     const [selectedObject, setSelectedObject] =
         useState<T[]>([]);
-    const [searchMulti, setSearchMulti] =
-        useState<string>("");
-    const [openMulti, setOpenMulti] =
-        useState<boolean>(false);
 
     const handlerOnClickButton = () => {
         onClick(selectedObject);
@@ -51,16 +47,14 @@ const SelectObjectsModal = <T,>({
                     <h2 className={`nunito-semibold ${styleModule.bodySectionH2}`}>
                         {headerTitle}
                     </h2>
-                    <MultiSelectSearchCheckCustom<T>
-                        emptyMessage={emptyMessage}
-                        attribute={attribute}
-                        search={searchMulti}
-                        open={openMulti}
+                    <MultiSelectCheckSearchCustomMemo
+                        rowId={attribute}
                         loadOptions={loadOptions}
                         selected={selectedObject}
                         setSelected={setSelectedObject}
-                        setSearch={setSearchMulti}
-                        setOpen={setOpenMulti}
+                        colorMain="var(--color-theme-primary)"
+                        initialOpen={true}
+                        emptyMessage={<span className={`nunito-regular ${styleModule.emptyMessage}`}>{emptyMessage}</span>}
                     />
                 </section>
                 <section className={styleModule.footerSection}>

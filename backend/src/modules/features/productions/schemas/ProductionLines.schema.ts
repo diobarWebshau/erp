@@ -3,6 +3,7 @@ import zod from "zod";
 const productionLineSchema = zod.object({
     name: zod.string().min(1, "Name is required"),
     is_active: zod.boolean().optional(),
+    custom_id: zod.string().optional(),
 });
 
 const validateSafeParse = (input: object) => {

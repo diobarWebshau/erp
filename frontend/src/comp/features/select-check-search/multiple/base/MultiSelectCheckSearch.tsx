@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState, type KeyboardEvent, type KeyboardEventHandler, type MouseEvent, type MouseEventHandler } from "react";
+import { memo, useCallback, useEffect, useMemo, useState, type KeyboardEvent, type KeyboardEventHandler, type MouseEvent, type MouseEventHandler, type ReactNode } from "react";
 import PopoverFloating from "../../../../external/floating/pop-over/PopoverFloating"
 import InputTextCustom from "./../../../../../comp/primitives/input/text/custom/InputTextCustom";
 import { Loader, Search } from "lucide-react";
@@ -13,7 +13,7 @@ interface MultiSelectCheckSearchProps<T> {
 
     // props de retroalimentacion
     placeholder?: string;
-    emptyMessage?: string;
+    emptyMessage?: ReactNode;
 
     // props para la fuente de datos(Solo se puede habilitar una a la vez)
     options?: T[]
@@ -23,7 +23,19 @@ interface MultiSelectCheckSearchProps<T> {
     // props para el estado de seleccion
     selected: T[];
     setSelected: (selected: T[]) => void;
+    colorMain?: string;
 
+    classNameFieldSearch?: string;
+    classNameContainerPopover?: string;
+    classNameContainerCheckBoxesMain?: string;
+    classNameContainerCheckBoxesSelected?: string;
+    classNameContainerCheckBoxesNoSelected?: string;
+    classNameContainerCheckBoxesItems?: string;
+    classNameContainerEmptyMessage?: string;
+    classNameCheckBoxItem?: string;
+    classNameCheckBoxItemSelected?: string;
+    classNameLabel?: string;
+    classNameCheckBox?: string;
 }
 
 const MultiSelectCheckSearch = <T,>({
@@ -32,7 +44,19 @@ const MultiSelectCheckSearch = <T,>({
     options,
     loadOptions,
     rowId,
-    selected, setSelected
+    selected, setSelected,
+    colorMain = "black",
+    classNameFieldSearch,
+    classNameContainerPopover,
+    classNameContainerCheckBoxesMain,
+    classNameContainerCheckBoxesSelected,
+    classNameContainerCheckBoxesNoSelected,
+    classNameContainerCheckBoxesItems,
+    classNameContainerEmptyMessage,
+    classNameCheckBoxItem,
+    classNameCheckBoxItemSelected,
+    classNameLabel,
+    classNameCheckBox,
 }: MultiSelectCheckSearchProps<T>) => {
 
     // variable para el manejo del search
@@ -85,7 +109,7 @@ const MultiSelectCheckSearch = <T,>({
         // Si no hay seleccionados, se coloca la lista de datos
         if (!selected || selected.length === 0) return list;
         // Se crea un set de los ids de los seleccionados
-        const selectedIds = new Set(selected.map((s) => String(s[rowId])));
+        // const selectedIds = new Set(selected.map((s) => String(s[rowId])));
         // Se filtra la lista de datos( los que no esten seleccionados)
         const missingSelected = selected.filter((s) => !list.some((i) => String(i[rowId]) === String(s[rowId])));
         // Coloca seleccionados primero (útil en UIs densas); si prefieres al final, cambia el spread
@@ -120,6 +144,7 @@ const MultiSelectCheckSearch = <T,>({
                 value={search}
                 onChange={setSearch}
                 placeholder={placeholder}
+                classNameFieldSearch={classNameFieldSearch}
             />
         }
         childrenFloating={
@@ -131,9 +156,19 @@ const MultiSelectCheckSearch = <T,>({
                 toggleItem={toggleItem}
                 isLoading={isLoading}
                 EmptyMessage={emptyMessage}
+                colorMain={colorMain}
+                classNameContainerCheckBoxesMain={classNameContainerCheckBoxesMain}
+                classNameContainerCheckBoxesSelected={classNameContainerCheckBoxesSelected}
+                classNameContainerCheckBoxesNoSelected={classNameContainerCheckBoxesNoSelected}
+                classNameContainerCheckBoxesItems={classNameContainerCheckBoxesItems}
+                classNameContainerEmptyMessage={classNameContainerEmptyMessage}
+                classNameCheckBoxItem={classNameCheckBoxItem}
+                classNameCheckBoxItemSelected={classNameCheckBoxItemSelected}
+                classNameLabel={classNameLabel}
+                classNameCheckBox={classNameCheckBox}
             />
         }
-        classNamePopoverFloating={StyleModule.popoverFloating}
+        classNamePopoverFloating={`${StyleModule.popoverFloating} ${classNameContainerPopover}`}
     />
 }
 
@@ -147,12 +182,14 @@ interface InputDivProps {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
+    classNameFieldSearch?: string;
 }
 
 const InputDiv = ({
     placeholder,
     value,
     onChange,
+    classNameFieldSearch,
 }: InputDivProps) => {
 
     const handleOnKeyDownCapture = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -165,6 +202,7 @@ const InputDiv = ({
 
     return <div
         onKeyDownCapture={handleOnKeyDownCapture}
+        className={`${StyleModule.containerFieldSearch} ${classNameFieldSearch}`}
     >
         <InputTextCustom
             placeholder={placeholder}
@@ -187,6 +225,16 @@ interface IPopoverSelectProps<T> {
     toggleItem: (item: T) => void;
     isLoading?: boolean;
     EmptyMessage?: React.ReactNode;
+    colorMain?: string;
+    classNameContainerCheckBoxesMain?: string;
+    classNameContainerCheckBoxesSelected?: string;
+    classNameContainerCheckBoxesNoSelected?: string;
+    classNameContainerCheckBoxesItems?: string;
+    classNameCheckBoxItem?: string;
+    classNameCheckBoxItemSelected?: string;
+    classNameLabel?: string;
+    classNameContainerEmptyMessage?: string;
+    classNameCheckBox?: string;
 }
 
 const PopoverSelect = <T,>({
@@ -196,14 +244,24 @@ const PopoverSelect = <T,>({
     rowId,
     toggleItem,
     isLoading,
-    EmptyMessage
+    EmptyMessage,
+    colorMain,
+    classNameContainerCheckBoxesMain,
+    classNameContainerCheckBoxesSelected,
+    classNameContainerCheckBoxesNoSelected,
+    classNameContainerCheckBoxesItems,
+    classNameCheckBoxItem,
+    classNameCheckBoxItemSelected,
+    classNameLabel,
+    classNameContainerEmptyMessage,
+    classNameCheckBox,
 }: IPopoverSelectProps<T>) => {
     return (
-        <div>
-            <div>
+        <div className={`${StyleModule.containerCheckBoxesMain} ${classNameContainerCheckBoxesMain}`}>
+            <div className={`${StyleModule.containerCheckBoxesSelected} ${classNameContainerCheckBoxesSelected}`}>
                 {
                     selected.length > 0 && (
-                        <div>
+                        <div className={`${StyleModule.containerCheckBoxesSelectedItems} ${classNameContainerCheckBoxesItems}`}>
                             {
                                 selected.map((item) => {
                                     return <CheckBoxItemMemo
@@ -211,6 +269,10 @@ const PopoverSelect = <T,>({
                                         item={item}
                                         isSelected
                                         toggleItem={toggleItem}
+                                        classNameCheckBoxItem={classNameCheckBoxItem}
+                                        classNameCheckBoxItemSelected={classNameCheckBoxItemSelected}
+                                        classNameLabel={classNameLabel}
+                                        classNameCheckBox={classNameCheckBox}
                                     />
                                 })
                             }
@@ -220,30 +282,34 @@ const PopoverSelect = <T,>({
             </div>
             {
                 (selected.length > 0 && filteredItems.length > 0) && (
-                    <Divider orientation="horizontal" color="var(--color-theme-primary)" />
+                    <Divider orientation="horizontal" color={colorMain} />
                 )
             }
-            <div>
+            <div className={`${StyleModule.containerCheckBoxesNoSelected} ${classNameContainerCheckBoxesNoSelected}`}>
                 {
                     (filteredItems.length === 0 || finalList.length === 0)
                         ? (
-                            <div>
+                            <div className={`${StyleModule.containerEmptyMessage} ${classNameContainerEmptyMessage}`}>
                                 {EmptyMessage}
                             </div>
                         )
                         : (
                             isLoading ? (
                                 <div>
-                                    <Loader type='dots' />
+                                    <Loader type='oval' />
                                 </div>
                             ) : (
-                                <div>
+                                <div className={`${StyleModule.containerCheckBoxesNoSelectedItems} ${classNameContainerCheckBoxesItems}`}>
                                     {
                                         filteredItems.map((item) => {
                                             return <CheckBoxItemMemo
                                                 rowId={rowId}
                                                 item={item}
                                                 toggleItem={toggleItem}
+                                                classNameCheckBoxItem={classNameCheckBoxItem}
+                                                classNameCheckBoxItemSelected={classNameCheckBoxItemSelected}
+                                                classNameLabel={classNameLabel}
+                                                classNameCheckBox={classNameCheckBox}
                                             />
                                         })
                                     }
@@ -266,13 +332,21 @@ interface ICheckBoxItemProps<T> {
     item: T;
     isSelected?: boolean;
     toggleItem: (item: T) => void;
+    classNameCheckBoxItem?: string;
+    classNameLabel?: string;
+    classNameCheckBoxItemSelected?: string;
+    classNameCheckBox?: string;
 }
 
 const CheckBoxItem = <T,>({
     rowId,
     item,
     isSelected = false,
-    toggleItem
+    toggleItem,
+    classNameCheckBoxItem,
+    classNameLabel,
+    classNameCheckBoxItemSelected,
+    classNameCheckBox,
 }: ICheckBoxItemProps<T>) => {
 
     const value = useMemo(() => String(item[rowId] ?? ""), [item, rowId]);
@@ -300,6 +374,7 @@ const CheckBoxItem = <T,>({
             onKeyDown={handleOnKeyDown}
             onMouseDown={handleMouseDown}
             tabIndex={0}
+            className={`${StyleModule.checkBoxItem} ${isSelected ? classNameCheckBoxItemSelected : classNameCheckBoxItem}`}
         >
             <input
                 id={`id-${value}`}
@@ -308,8 +383,10 @@ const CheckBoxItem = <T,>({
                 checked={isSelected}
                 onChange={() => toggleItem(item)}
                 readOnly
+                tabIndex={-1}
+                className={classNameCheckBox}
             />
-            <label htmlFor={`id-${value}`}>{value}</label>
+            <label className={`nunito-regular ${StyleModule.label} ${classNameLabel}`} htmlFor={`id-${value}`}>{value}</label>
         </div>
     );
 }

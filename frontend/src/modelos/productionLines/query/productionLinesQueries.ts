@@ -2,7 +2,10 @@ import type { IPartialProductionLine, IProductionLine } from "../../../interface
 import { setError, clearError } from "../../../store/slicer/errorSlicer";
 import type { AppDispatchRedux } from "../../../store/store";
 
-const API_URL = "http://localhost:3003/production/production-lines";
+
+const BASE_URL = import.meta.env.VITE_API_URL;
+const relativePath = "production/production-lines";
+const API_URL = new URL(relativePath, BASE_URL);
 
 interface IFetchProductionLinesFromDB {
     dispatch: AppDispatchRedux;
@@ -187,7 +190,8 @@ const createCompleteproductionLineInDB = async (
     dispatch: AppDispatchRedux
 ): Promise<any> => {
     try {
-        const response = await fetch(`${API_URL}/create-complete`, {
+        console.log(`DENTRO`,data);
+        const response = await fetch(`${API_URL}/complete`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
@@ -214,7 +218,7 @@ const createCompleteproductionLineInDB = async (
             await response.json();
         return result;
     } catch (error: unknown) {
-        throw error;
+        console.log(error);
     }
 };
 

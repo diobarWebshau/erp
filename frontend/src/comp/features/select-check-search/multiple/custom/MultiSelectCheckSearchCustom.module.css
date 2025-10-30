@@ -1,0 +1,93 @@
+/* ******** CONTAINER POPOVER ******** */
+
+.containerPopover {
+    /* distribucion box */
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 15px;
+
+    /* scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-theme-primary) transparent;
+}
+
+
+/* ******** CONTAINER CHECKBOXES ******** */
+
+.containerCheckBoxesMain {
+    border: 1px solid var(--color-theme-border-table);
+}
+
+/* ******** CHECKBOXITEM ******** */
+
+.checkBoxItemSelected {
+    background-color: var(--color-theme-neutral-background);
+}
+
+.checkBoxItem {
+    border: 1px solid var(--color-theme-border-table);
+}
+
+.checkBoxItem:not(.checkBoxItemSelected):hover {
+    background-color: var(--color-theme-background);
+}
+
+/* ******** CHECKBOX ******** */
+
+/* checkbox nativo estilizado */
+.checkBox[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+
+    /* base box */
+    border: 2px solid var(--color-theme-primary);
+    border-radius: 3px;
+    /* opcional */
+    background: transparent;
+    transition: background-color 120ms, border-color 120ms, box-shadow 120ms;
+}
+
+/* estado checked: color de fondo y borde */
+.checkBox[type="checkbox"]:checked {
+    background-color: var(--color-theme-primary);
+    border-color: var(--color-theme-primary-light);
+}
+
+/* foco accesible */
+.checkBox[type="checkbox"]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-theme-primary) 35%, transparent);
+}
+
+/* checkmark */
+.checkBox[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    inset: 2px 4px 2px 4px;
+    /* espacio interno para dibujar el “tick” */
+    width: 4px;
+    height: 8px;
+    border-right: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    transform: rotate(45deg);
+    transform-origin: center;
+    transition: border-color 120ms;
+}
+
+/* al estar marcado, pinta el “tick” */
+.checkBox[type="checkbox"]:checked::before {
+    border-right-color: var(--color-theme-font-white);
+    border-bottom-color: var(--color-theme-font-white);
+}
+
+
+.containerEmptyMessage {
+    /* estilos */
+    font-size: 14px;
+}

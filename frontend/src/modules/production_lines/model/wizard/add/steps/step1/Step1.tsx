@@ -14,19 +14,19 @@ import StyleModule from "./Step1.module.css";
 import type { ProductionLineAction, ProductionLineState, } from "../../../../../context/productionLineTypes";
 
 interface IStep3 {
-    onClose: () => void;
     state: ProductionLineState,
     dispatch: Dispatch<ProductionLineAction>
+    onCancel: () => void;
 }
 
 const Step3 = memo(({
-    onClose,
     state,
-    dispatch
+    dispatch,
+    onCancel
 }: IStep3) => {
 
     const [name, setName] = useState<string>(state.data?.name || "");
-    const [customId, setCustomId] = useState<string>(state.data?.customId || "");
+    const [customId, setCustomId] = useState<string>(state.data?.custom_id || "");
 
     const handleOnChangeLocation = useCallback((location: ILocation | null) => {
         if (!location) return;
@@ -49,7 +49,7 @@ const Step3 = memo(({
         }
         dispatch(update_production_line({
             name: name,
-            customId: customId,
+            custom_id: customId,
         }));
         dispatch(set_step(1));
     }, [state, name, customId, dispatch, ToastMantine]);
@@ -82,7 +82,7 @@ const Step3 = memo(({
         </div>
         <div className={StyleModule.containerButtons}>
             <CriticalActionButton
-                onClick={onClose}
+                onClick={onCancel}
                 label="Cancelar"
             />
             <TertiaryActionButtonCustom

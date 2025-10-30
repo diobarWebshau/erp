@@ -186,12 +186,26 @@ class ProductController {
         next: NextFunction
     ) => {
         const raw = req.query.excludeIds;
+        const filter = req.query.filter;
         const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
         const ids = arr.map(Number).filter(Number.isFinite);
+        const where: any = {};
+
+        if (filter !== "" && filter !== undefined) {
+            where[Op.or] = [
+                { name: { [Op.like]: `${filter}%` } },
+                { description: { [Op.like]: `${filter}%` } },
+                { sku: { [Op.like]: `${filter}%` } },
+            ];
+        }
+
+        if (ids.length > 0) {
+            where.id = { [Op.notIn]: ids };
+        }
 
         try {
             const results = await ProductModel.findAll({
-                where: { id: { [Op.notIn]: ids } },
+                where: where,
                 attributes: ProductModel.getAllFields()
             });
 

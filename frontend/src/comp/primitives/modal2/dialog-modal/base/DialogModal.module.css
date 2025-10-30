@@ -21,10 +21,8 @@
 }
 
 .container {
-    /* dimension */
-    /* todo: se configura desde el padre */
-    /* width: 670px;
-    height: 250px; */
+    /* distribucion flex respecto al padre */
+    flex: 1;
 
     /* posicionamiento */
     position: fixed;
@@ -41,8 +39,8 @@
     /* distribucion flex */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: stretch;
     gap: 1rem;
 
     /* estilos */
@@ -71,12 +69,14 @@
 /*?  Container children */
 
 .customContainer {
-    /* dimension */
-    width: 100%;
-    height: 100%;
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 100%;
 
     /* distribucion flex */
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
 }
-

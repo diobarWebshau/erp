@@ -1,0 +1,160 @@
+/* *************** Container *************** */
+
+.containerStep {
+    /* distirbucion flex respecto al padre*/
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+
+.containerContent {
+    /* distirbucion flex respecto al padre*/
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.containerButtons {
+    /* distirbucion flex respecto al padre*/
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+}
+
+/* ************** Container Content ******************* */
+
+.containerContent {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.containerContent>* {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.secondBlock>* {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+}
+
+.dl,
+.dlStatus {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dl dt {
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+
+.dlStatus dt {
+    /* estilos */
+    color: var(--color-theme-font-black);
+}
+
+.subTitle {
+    /* estilos */
+    color: var(--color-theme-primary);
+    font-size: 24px;
+}
+
+.label {
+    /* estilos */
+    font-size: 16px;
+}
+
+.statusBlock {
+    /* distribucion flex */
+    display: flex;
+    justify-content: flex-end;
+}
+
+.tagActive {
+    /* distribucion box */
+    border: 1px solid var(--color-success);
+    /* estilos */
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.tagInactive {
+    /* distribucion box */
+    border: 1px solid var(--color-alert);
+    /* estilos */
+    background: var(--color-alert-light);
+    color: var(--color-alert);
+}
+
+/* ***************** Container buttons ******************* */
+
+.containerButtons {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+/* **************** Container custom message node ******************* */
+
+.containerCustomMessageNode {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0.1rem;
+}
+
+.titleCustomMessageNode {
+    /* estilos */
+    color: var(--color-theme-font-black);
+    font-size: 24px;
+}
+
+.titleCustomMessageNode span {
+    /* estilos */
+    color: var(--color-theme-primary);
+    font-size: 24px;
+}
+
+.messageCustomMessageNode {
+    /* estilos */
+    color: var(--color-theme-font-black);
+    font-size: 16px;
+}
