@@ -34,7 +34,6 @@ const Step2 = memo(({
     const getRowId = useMemo(() => (row: IPartialProductionLineProduct) => row.id?.toString()!, []);
     const [isActiveModalAddProduct, setIsActiveModalAddProduct] = useState<boolean>(false);
 
-
     const [selectedProducts, setSelectedProducts] = useState<IProduct[]>([]);
 
 
@@ -133,12 +132,11 @@ const Step2 = memo(({
             </div>
             <Divider color="var(--color-theme-primary-light)" />
             <MultiSelectCheckSearch
-                rowId={"id"}
+                rowId={"name"}
                 options={productsByExcludeIds}
                 selected={selectedProducts}
                 setSelected={setSelectedProducts}
-                open={false}
-                setOpen={() => { }}
+                initialOpen
             />
         </div>
         <div className={StyleModule.containerButtons}>

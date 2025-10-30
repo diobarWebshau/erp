@@ -14,6 +14,7 @@ interface InputTextProps {
     icon?: JSX.Element;
     withValidation?: boolean;
     disabled?: boolean;
+    onFocus?: () => void;
 }
 
 const InputTextCustom = memo(({
@@ -25,7 +26,8 @@ const InputTextCustom = memo(({
     classNameInput,
     placeholder,
     withValidation = false,
-    disabled = false
+    disabled = false,
+    onFocus
 }: InputTextProps) => {
 
     const iconWithClass = icon && withClassName(icon, StyleModule.icon)
@@ -42,6 +44,7 @@ const InputTextCustom = memo(({
             classNameInputValid={StyleModule.inputValid}
             classNameInputInvalid={clsx(withValidation ? StyleModule.inputInvalid : undefined)}
             disabled={disabled}
+            onFocus={onFocus}
         />
     )
 })

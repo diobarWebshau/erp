@@ -10,13 +10,14 @@ interface InputTextProps {
     placeholder?: string;
     disabled?: boolean;
     required?: boolean;
-    autoFocus?: boolean;
+    // autoFocus?: boolean;
     classNameContainer?: string;
     classNameInput?: string;
     classNameInputValid?: string;
     classNameInputInvalid?: string;
     classNameIcon?: string;
     icon?: JSX.Element;
+    onFocus?: () => void;
 }
 
 const InputText = memo(({
@@ -26,12 +27,13 @@ const InputText = memo(({
     name,
     disabled,
     required,
-    autoFocus,
+    // autoFocus,
     classNameContainer,
     icon,
     classNameInput,
     classNameInputValid,
     classNameInputInvalid,
+    onFocus,
 }: InputTextProps) => {
 
     const safeValue = value ?? ""; // <- clave: nunca undefined
@@ -63,8 +65,9 @@ const InputText = memo(({
                 name={name}
                 disabled={disabled}
                 required={required}
-                autoFocus={autoFocus}
+                // autoFocus={autoFocus}
                 className={classNamesInput}
+                onFocus={onFocus}
             />
             {icon}
         </div>
