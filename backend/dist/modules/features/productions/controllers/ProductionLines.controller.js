@@ -271,7 +271,6 @@ class ProductionLinesController {
                 .REPEATABLE_READ
         });
         try {
-            console.log("custom_id", custom_id);
             const validation_name = await ProductionLineModel.findOne({
                 where: { name: name, custom_id: custom_id }
             });
@@ -413,17 +412,14 @@ class ProductionLinesController {
                     return;
                 }
             }
-            if (Object.keys(completeBody?.location_production_line).length > 0) {
-                console.log("entro a location production line");
-                const locationProductionLineUpdated = completeBody.location_production_line;
+            if (Object.keys(completeBody?.location_production_line ?? {}).length > 0) {
+                const locationProductionLineUpdated = completeBody?.location_production_line;
                 const responsePendingProductionSummary = await sequelize.query(`SELECT func_line_pending_production_summary(${id})`
                     + ` AS summary_production;`, { type: QueryTypes.SELECT });
                 const pendingProductionSummary = responsePendingProductionSummary
                     .shift();
                 const summary = pendingProductionSummary
                     .summary_production;
-                console.log(summary);
-                console.log(locationProductionLineUpdated);
                 if (Number(summary.internal_production) > 0) {
                     await transaction.rollback();
                     res.status(400).json({
@@ -484,7 +480,6 @@ class ProductionLinesController {
                         const existingProducts = await ProductionLineProductModel.findAll({
                             where: { id: { [Op.in]: deletesFiltered.map(d => d.id) } },
                             transaction,
-                            lock: transaction.LOCK.SHARE,
                         });
                         if (existingProducts.length !== deletesFiltered.length) {
                             await transaction.rollback();
@@ -567,6 +562,7 @@ class ProductionLinesController {
         catch (error) {
             await transaction.rollback();
             if (error instanceof Error) {
+                console.error(error);
                 next(error);
             }
             else {

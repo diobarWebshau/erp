@@ -494,7 +494,6 @@ class ProductionLinesController {
             const update_values =
                 collectorUpdateFields(editableFields, completeBody);
 
-
             if (Object.keys(update_values).length > 0) {
                 if (update_values?.name) {
                     const validateName =
@@ -541,11 +540,10 @@ class ProductionLinesController {
                 }
             }
 
-            if (Object.keys(completeBody?.location_production_line).length > 0) {
-                console.log("entro a location production line");
+            if (Object.keys(completeBody?.location_production_line ?? {}).length > 0) {
                 const locationProductionLineUpdated:
                     LocationsProductionLinesCreateAttributes =
-                    completeBody.location_production_line
+                    completeBody?.location_production_line
 
                 const responsePendingProductionSummary =
                     await sequelize.query(
@@ -561,9 +559,6 @@ class ProductionLinesController {
                 const summary =
                     pendingProductionSummary
                         .summary_production as PendingProductionSummary;
-
-                console.log(summary);
-                console.log(locationProductionLineUpdated);
 
                 if (Number(summary.internal_production) > 0) {
                     await transaction.rollback();
@@ -651,7 +646,6 @@ class ProductionLinesController {
                         const existingProducts = await ProductionLineProductModel.findAll({
                             where: { id: { [Op.in]: deletesFiltered.map(d => d.id) } },
                             transaction,
-                            lock: transaction.LOCK.SHARE,
                         });
 
                         if (existingProducts.length !== deletesFiltered.length) {
@@ -751,7 +745,7 @@ class ProductionLinesController {
                         }
                     }
                 }
-            }
+            }   
 
             await transaction.commit();
 
@@ -762,13 +756,13 @@ class ProductionLinesController {
         } catch (error) {
             await transaction.rollback();
             if (error instanceof Error) {
+                console.error(error);
                 next(error)
             } else {
                 console.error(
                     `An unexpected error occurred: ${error}`);
             }
         }
-
     }
 
     static update = async (req: Request, res: Response, next: NextFunction) => {

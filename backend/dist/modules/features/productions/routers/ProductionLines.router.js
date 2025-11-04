@@ -10,7 +10,7 @@ const createProductionLineRouter = () => {
     productionLineRouter.post("/", validateProductionLinesMiddleware, ProductionLinesController.create);
     productionLineRouter.post("/complete", validateProductionLinesMiddleware, ProductionLinesController.createComplete);
     productionLineRouter.patch("/:id", validateProductionLinesMiddleware, ProductionLinesController.update);
-    productionLineRouter.patch("/update-complete/:id", validateProductionLinesMiddleware, ProductionLinesController.updateComplete);
+    productionLineRouter.patch("/complete/:id", validateProductionLinesMiddleware, ProductionLinesController.updateComplete);
     productionLineRouter.delete("/:id", ProductionLinesController.delete);
     productionLineRouter.get("/:id/products", ProductionLinesController
         .getProductsOnProductionLine);

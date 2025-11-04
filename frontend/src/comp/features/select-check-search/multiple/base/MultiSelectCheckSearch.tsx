@@ -361,7 +361,6 @@ const CheckBoxItem = <T,>({
         }
     }, [item]);
 
-
     const handleMouseDown: MouseEventHandler<HTMLDivElement> = useCallback((e: MouseEvent<HTMLDivElement>) => {
         e.preventDefault();   // mantiene el foco en el input de búsqueda
         e.stopPropagation();  // no burbujea al trigger del popover
@@ -370,7 +369,7 @@ const CheckBoxItem = <T,>({
 
     return (
         <div
-            key={`item-${value}`}
+            key={String(item[rowId])}
             onKeyDown={handleOnKeyDown}
             onMouseDown={handleMouseDown}
             tabIndex={0}

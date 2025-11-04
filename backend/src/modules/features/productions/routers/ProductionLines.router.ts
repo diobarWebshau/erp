@@ -25,7 +25,7 @@ const createProductionLineRouter = (): Router => {
     productionLineRouter.patch("/:id",
         validateProductionLinesMiddleware,
         ProductionLinesController.update);
-    productionLineRouter.patch("/update-complete/:id",
+    productionLineRouter.patch("/complete/:id",
         validateProductionLinesMiddleware,
         ProductionLinesController.updateComplete);
     productionLineRouter.delete("/:id",

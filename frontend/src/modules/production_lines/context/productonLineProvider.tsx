@@ -29,7 +29,7 @@ const init = (arg: {
     current_step: arg.currentStep,
     total_steps: arg.totalSteps,
     data: { ...initialProductionLineState.data, ...(arg.baseData ?? {}) },
-    draft: { ...initialProductionLineState.draft, ...(arg.baseData ?? {}) },
+    draft: { ...initialProductionLineState.draft},
 });
 
 
@@ -41,9 +41,9 @@ const ProductionLineProvider = ({
     totalSteps,
 }: IProductionLineModuleProvider) => {
 
+    const { productionLineById, refetchProductionLineById } =
+        useProductionLineById(id ?? null);
     const dispatchRedux: AppDispatchRedux = useDispatch();
-
-    const { productionLineById, refetchProductionLineById } = useProductionLineById(id ?? null);
 
     const initialArg = useMemo(
         () => ({
@@ -56,11 +56,6 @@ const ProductionLineProvider = ({
 
     const [state, dispatch] = useReducer(productionLineReducer, initialArg, init);
 
-    useEffect(() => {
-        if (!id) return;
-        refetchProductionLineById();
-    }, [id, refetchProductionLineById]);
-
     const refetch = useCallback(async () => {
         if (!id) return;
         await refetchProductionLineById();
@@ -70,7 +65,6 @@ const ProductionLineProvider = ({
         const base = productionLineById ?? initialData ?? {};
         dispatch(set_production_line(base));
     }, [productionLineById, initialData, dispatch]);
-
 
     const commands = useMemo(() => ({ refetch, reset }), [refetch, reset]);
 
@@ -102,7 +96,6 @@ const ProductionLineProvider = ({
             cancelled = true;
         };
     }, [id, productionLineById, dispatch]);
-
 
     return (
         <ProductionLineDispatchContext.Provider value={dispatch}>

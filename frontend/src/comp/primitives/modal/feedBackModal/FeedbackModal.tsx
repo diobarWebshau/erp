@@ -31,7 +31,6 @@ const FeedbackModal = (
         className: [stylesModules.icon, icon.props.className].filter(Boolean).join(" ")
     });
 
-
     return (
         <div className={stylesModules.overlay}>
             <div className={stylesModules.container}>
@@ -41,7 +40,6 @@ const FeedbackModal = (
                 >
                     <X className={stylesModules.icon} />
                 </button>
- 
             </div>
         </div>
     );
