@@ -5,14 +5,39 @@ import sequelize from "../../../../mysql/configSequelize.js";
 import { ProductDiscountClientModel } from "../../../../modules/associations.js";
 class ClientController {
     static getAll = async (req, res, next) => {
+        const { filter, ...rest } = req.query;
         try {
+            // 1️⃣ Condición base (para exclusiones)
+            const excludePerField = Object.fromEntries(Object.entries(rest)
+                .filter(([k, v]) => v !== undefined && k !== "name")
+                .map(([k, v]) => [
+                k,
+                Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v },
+            ]));
+            // 2️⃣ Filtro de búsqueda general
+            const filterConditions = [];
+            if (filter && filter.trim()) {
+                const f = `%${filter.trim()}%`; // busca en cualquier parte
+                filterConditions.push({ company_name: { [Op.like]: f } }, { cfdi: { [Op.like]: f } }, { phone: { [Op.like]: f } }, { email: { [Op.like]: f } }, { address: { [Op.like]: f } }, { payment_terms: { [Op.like]: f } });
+            }
+            // 3️⃣ Construimos el WHERE principal
+            const where = {
+                ...excludePerField,
+                ...(filterConditions.length > 0 ? { [Op.or]: filterConditions } : {}),
+            };
             const response = await ClientModel.findAll({
+                where,
                 attributes: ClientModel.getAllFields(),
                 include: [
                     {
                         model: ClientAddressesModel,
                         as: "addresses",
                         attributes: ClientAddressesModel.getAllFields()
+                    },
+                    {
+                        model: ProductDiscountClientModel,
+                        as: "pruduct_discounts_client",
+                        attributes: ProductDiscountClientModel.getAllFields()
                     }
                 ]
             });

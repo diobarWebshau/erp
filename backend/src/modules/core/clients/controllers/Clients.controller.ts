@@ -1,60 +1,84 @@
-import collectorUpdateFields
-    from "../../../../scripts/collectorUpdateField.js";
-import {
-    ClientModel,
-    ClientAddressesModel
-} from "../../associations.js";
-import {
-    Request,
-    Response,
-    NextFunction
-} from "express";
-import {
-    Op,
-    QueryTypes,
-    Transaction
-} from "sequelize";
-import {
-    ClientCreateAttributes,
-    ClientAddressesManager,
-    ClientAddressesCreateAttributes,
-    ClientAddressesAttributes
-} from "../types.js";
-import sequelize
-    from "../../../../mysql/configSequelize.js";
+import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
+import { ClientModel, ClientAddressesModel } from "../../associations.js";
+import { Request, Response, NextFunction } from "express";
+import { Op, QueryTypes, Transaction } from "sequelize";
+import { ClientCreateAttributes, ClientAddressesManager, ClientAddressesCreateAttributes, ClientAddressesAttributes } from "../types.js";
+import sequelize from "../../../../mysql/configSequelize.js";
 import { ProductDiscountClientModel } from "../../../../modules/associations.js";
 
 class ClientController {
-    static getAll =
-        async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                const response =
-                    await ClientModel.findAll({
-                        attributes:
-                            ClientModel.getAllFields(),
-                        include: [
-                            {
-                                model: ClientAddressesModel,
-                                as: "addresses",
-                                attributes:
-                                    ClientAddressesModel.getAllFields()
-                            }
-                        ]
-                    });
-                if (!(response.length > 0)) {
-                    res.status(200).json({ validation: "Clients no found" });
-                    return;
-                }
-                const clients = response.map(c => c.toJSON());
-                res.status(200).json(clients);
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    next(error);
-                } else {
-                    console.error(`An unexpected error occurred: ${error}`);
-                }
+    static getAll = async (req: Request, res: Response, next: NextFunction) => {
+
+        const { filter, ...rest } = req.query as {
+            filter?: string;
+        } & Partial<ClientCreateAttributes>;
+
+        try {
+
+            // 1️⃣ Condición base (para exclusiones)
+            const excludePerField = Object.fromEntries(
+                Object.entries(rest)
+                    .filter(([k, v]) => v !== undefined && k !== "name")
+                    .map(([k, v]) => [
+                        k,
+                        Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v },
+                    ])
+            );
+
+            // 2️⃣ Filtro de búsqueda general
+            const filterConditions: any[] = [];
+            if (filter && filter.trim()) {
+                const f = `%${filter.trim()}%`; // busca en cualquier parte
+                filterConditions.push(
+                    { company_name: { [Op.like]: f } },
+                    { cfdi: { [Op.like]: f } },
+                    { phone: { [Op.like]: f } },
+                    { email: { [Op.like]: f } },
+                    { address: { [Op.like]: f } },
+                    { payment_terms: { [Op.like]: f } },
+                );
+            }
+
+            // 3️⃣ Construimos el WHERE principal
+            const where: any = {
+                ...excludePerField,
+                ...(filterConditions.length > 0 ? { [Op.or]: filterConditions } : {}),
+            };
+
+            const response =
+                await ClientModel.findAll({
+                    where,
+                    attributes:
+                        ClientModel.getAllFields(),
+                    include: [
+                        {
+                            model: ClientAddressesModel,
+                            as: "addresses",
+                            attributes:
+                                ClientAddressesModel.getAllFields()
+                        },
+                        {
+                            model: ProductDiscountClientModel,
+                            as: "pruduct_discounts_client",
+                            attributes:
+                                ProductDiscountClientModel.getAllFields()
+                        }
+                    ]
+                });
+            if (!(response.length > 0)) {
+                res.status(200).json({ validation: "Clients no found" });
+                return;
+            }
+            const clients = response.map(c => c.toJSON());
+            res.status(200).json(clients);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error occurred: ${error}`);
             }
         }
+    }
     static getById =
         async (req: Request, res: Response, next: NextFunction) => {
             const { id } = req.params;

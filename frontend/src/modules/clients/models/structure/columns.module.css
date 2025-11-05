@@ -1,0 +1,13 @@
+
+
+.tagActive{
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.tagInactive{
+    background-color: var(--color-alert-light);
+    color: var(--color-alert);
+    border-color: var(--color-alert);
+}

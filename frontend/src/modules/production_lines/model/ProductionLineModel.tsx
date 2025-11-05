@@ -15,10 +15,7 @@ import useProductionLines from '../../../modelos/productionLines/hooks/useProduc
 import Tag from '../../../comp/primitives/tag/Tag'
 import type { RowAction } from '../../../comp/primitives/table/types'
 import DeleteModal from '../../../comp/primitives/modal/deleteModal/DeleteModal'
-import {
-    createCompleteproductionLineInDB, deleteproductionLineInDB,
-    updateCompleteproductionLineInDB
-} from '../../../modelos/productionLines/query/productionLinesQueries'
+import { createCompleteproductionLineInDB, deleteproductionLineInDB, updateCompleteproductionLineInDB } from '../../../modelos/productionLines/query/productionLinesQueries'
 import { useDispatch } from 'react-redux';
 import AddWizardProductionLine from './wizard/add/AddWizardProductionLine'
 import EditWizardProductionLine from './wizard/edit/EditWizardProductionLine'

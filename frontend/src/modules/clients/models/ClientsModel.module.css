@@ -1,0 +1,115 @@
+/* ********** Container ********** */
+
+.clientsModelContainer {
+    /* posicionamiento */
+    position: relative;
+
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+
+/* ********** Header ********** */
+
+.clientsModelHeader {
+    /* distribucion flex respecto al padre*/
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.clientsModelHeader h1 {
+    /* estilos */
+    font-size: 36px;
+    color: var(--color-theme-primary);
+}
+
+/* ********** Generic Table ********** */
+
+.genericTableContainer {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+}
+
+/* ********** Extra Components ********** */
+
+.containerExtraComponents {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.containerExtraComponents>* {
+    /* distribucion flex respecto al padre */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+}
+
+.containerButtons {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+/* ********** Input Search ********** */
+
+.containerInputSearch {
+    /* dimension */
+    width: 300px;
+}
+
+.inputTextCustom {
+    /* estilos */
+    background-color: var(--color-theme-background);
+}
+
+
+/* ********** Tag ********** */
+
+.tagActive {
+    /* estilos */
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.tagInactive {
+    /* estilos */
+    background-color: var(--color-alert-light);
+    color: var(--color-alert);
+}
+
+
+/* ********** Options Row ********** */
+
+.iconRowDeleteAction {
+    stroke: var(--color-alert);
+    width: 16px;
+    height: 16px;
+}

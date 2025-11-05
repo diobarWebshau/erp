@@ -2,9 +2,7 @@ import validateProductionLinesMiddleware
     from "../middleware/production-lines/validationMiddleware.js";
 import ProductionLinesController
     from "../controllers/ProductionLines.controller.js";
-import {
-    Router
-} from "express";
+import { Router } from "express";
 
 const createProductionLineRouter = (): Router => {
     const productionLineRouter = Router();

@@ -55,10 +55,7 @@ CREATE TABLE clients(
     payment_terms VARCHAR(100) NOT NULL,
     credit_limit DECIMAL(14, 4) NOT NULL,
     zip_code VARCHAR(100) NOT NULL,
-    tax_regimen
-    
-    
-    VARCHAR(100) NOT NULL,
+    tax_regimen VARCHAR(100) NOT NULL,
     cfdi VARCHAR(100) NOT NULL,
     payment_method VARCHAR(100) NOT NULL,
     is_active TINYINT NOT NULL DEFAULT 1,

@@ -9,39 +9,63 @@ import type {
     AppDispatchRedux
 } from "../../../store/store";
 
-const API_URL =
-    "http://localhost:3003/clients/clients";
+const BASE_URL = import.meta.env.VITE_API_URL;
+const relative_path = "clients/clients";
+const API_URL = new URL(relative_path, BASE_URL);
 
-const fetchClientsFromDB = async (
-    dispatch: AppDispatchRedux
-): Promise<IClient[]> => {
+interface IFetchClientsFromDB {
+    dispatch: AppDispatchRedux;
+    like?: string;
+    conditionsExclude?: IPartialClient;
+    signal: AbortSignal;
+}
+
+const fetchClientsFromDB = async ({
+    dispatch,
+    like,
+    conditionsExclude,
+    signal
+}: IFetchClientsFromDB): Promise<IClient[]> => {
     try {
-        const response = await fetch(API_URL, {
+
+        const params = new URLSearchParams();
+        if (like) params.set("filter", like);
+
+        if (conditionsExclude && Object.keys(conditionsExclude).length > 0) {
+            Object.entries(conditionsExclude).forEach(([key, value]) => {
+                if (Array.isArray(value) || typeof value === "object") {
+                    params.set(key, JSON.stringify(value));
+                } else {
+                    params.set(key, value.toString());
+                }
+            });
+        };
+
+        const request = new Request(`${API_URL}?${params.toString()}`, {
             method: "GET",
-            headers: { "Content-Type": "application/json" },
+            signal
         });
+
+        const response = await fetch(request);
+
         if (!response.ok) {
             const errorText = await response.json();
-            console.log(errorText)
             if (response.status >= 500) {
                 throw new Error(
                     `${errorText}`
                 );
             }
-            dispatch(
-                setError({
-                    key: "Clients",
-                    message: errorText
-                })
-            );
+            dispatch(setError({ key: "Clients", message: errorText }));
             return [];
         }
-        dispatch(
-            clearError("Clients")
-        );
+        dispatch(clearError("Clients"));
         const data: IClient[] = await response.json();
         return data;
     } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+            console.log("abort query clients");
+            return [];
+        }
         throw error;
     }
 };

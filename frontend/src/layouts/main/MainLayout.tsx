@@ -169,7 +169,7 @@ const menuItems: MenuItem[] = [
             {
                 label: "Cliente",
                 icon: <UserPen />,
-                path: "/clientss"
+                path: "/clients"
             }
         ]
     }
