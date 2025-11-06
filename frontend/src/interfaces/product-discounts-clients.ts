@@ -1,7 +1,12 @@
+import type { IClient } from "./clients";
+import type { IProduct } from "./product";
+
 interface IProductDiscountClient {
-    id: number;
+    id: number | string;
     product_id: number;
     client_id: number;
+    product: IProduct;
+    client: IClient;
     discount_percentage: number;
     created_at: string;
     updated_at: string;

@@ -1,0 +1,58 @@
+.containerModal {
+    /* dimension */
+    width: 1200px;
+    height: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 3rem;
+}
+
+.customConainerModal {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.taxAddressContainer {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.taxAddressContainer h2 {
+    /* estilos */
+    color: var(--color-theme-primary);
+    font-size: 24px;
+}
+
+.fieldBlock {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.fieldBlock>* {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+}
+
+.containerButtons {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}

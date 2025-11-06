@@ -10,7 +10,6 @@ interface IObjectSelectCustom<T> {
     placeholder?: string;
     disabled?: boolean;
     initialOpen?: boolean;
-    mainColor: string;
     withValidation?: boolean;
 }
 
@@ -20,9 +19,8 @@ const ObjectSelectCustom = <T,>({
     labelKey,
     onChange,
     placeholder = "Selecciona una opción",
-    disabled,
+    disabled = false,
     initialOpen,
-    mainColor,
     withValidation = false,
 }: IObjectSelectCustom<T>) => {
     return (
@@ -33,7 +31,7 @@ const ObjectSelectCustom = <T,>({
             onChange={onChange}
             placeholder={placeholder}
             disabled={disabled}
-            mainColor={mainColor}
+            mainColor={disabled ? "var(--color-theme-neutral-primary)" : "var(--color-theme-primary)"}
             initialOpen={initialOpen}
             withValidation={withValidation}
             classNameOption={StyleModule.option}
@@ -41,7 +39,7 @@ const ObjectSelectCustom = <T,>({
             classNamePopoverFloating={StyleModule.popoverFloating}
             classNameTrigger={StyleModule.trigger}
             classNameTriggerInvalid={StyleModule.triggerInvalid}
-
+            classNameTriggerDisabled={StyleModule.disabled}
         />
     )
 }

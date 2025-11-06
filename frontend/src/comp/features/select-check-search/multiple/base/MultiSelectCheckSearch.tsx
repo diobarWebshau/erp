@@ -36,6 +36,7 @@ interface MultiSelectCheckSearchProps<T> {
     classNameCheckBoxItemSelected?: string;
     classNameLabel?: string;
     classNameCheckBox?: string;
+    maxHeight?: string;
 }
 
 const MultiSelectCheckSearch = <T,>({
@@ -57,6 +58,7 @@ const MultiSelectCheckSearch = <T,>({
     classNameCheckBoxItemSelected,
     classNameLabel,
     classNameCheckBox,
+    maxHeight,
 }: MultiSelectCheckSearchProps<T>) => {
 
     // variable para el manejo del search
@@ -139,6 +141,7 @@ const MultiSelectCheckSearch = <T,>({
         open={open}
         initialOpen={initialOpen}
         setOpen={setOpen}
+        {...(maxHeight && { maxHeight })}
         childrenTrigger={
             <InputDivMemo
                 value={search}

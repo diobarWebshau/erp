@@ -35,7 +35,7 @@ const AddWizardClients = ({ onClose, onCreate }: IAddWizardClients) => {
         },
         {
             title: "Dirección y datos comerciales",
-            content: <Step2  state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
+            content: <Step2 state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
             icon: <MapPinned />
         },
         {
@@ -43,7 +43,7 @@ const AddWizardClients = ({ onClose, onCreate }: IAddWizardClients) => {
             content: <Step3 />,
             icon: <FileCheck />
         }
-    ], []);
+    ], [state, dispatch, toggleWarningModal]);
 
     return (
         <FullContainerModal>

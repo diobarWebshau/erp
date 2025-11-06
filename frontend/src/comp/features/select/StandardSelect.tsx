@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState} from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import PopoverFloating from "../../../comp/external/floating/pop-over/PopoverFloating";
 import styles from "./StandardSelect.module.css";
 import withClassName from "../../../utils/withClassName";
@@ -15,11 +15,12 @@ interface IStandardSelect<T extends string> {
     mainColor: string;
     classNamePopoverFloating?: string;
     classNameTrigger?: string;
+    classNameTriggerDisabled?: string;
     classNameTriggerInvalid?: string;
     classNameOption?: string;
     classNameOptionSelected?: string;
     withValidation?: boolean;
-
+    maxHeight?: string;
 }
 
 const StandardSelect = <T extends string>({
@@ -28,14 +29,16 @@ const StandardSelect = <T extends string>({
     options,
     onChange,
     placeholder = "Selecciona una opción",
-    // disabled,
+    disabled = false,
     mainColor,
     classNamePopoverFloating,
     classNameTrigger,
+    classNameTriggerDisabled,
     classNameTriggerInvalid,
     classNameOption,
     classNameOptionSelected,
     withValidation = false,
+    maxHeight,
 }: IStandardSelect<T>) => {
 
     const [open, setOpen] = useState<boolean>(initialOpen);
@@ -61,16 +64,20 @@ const StandardSelect = <T extends string>({
     return (
         <PopoverFloating
             open={open}
+            disabled={disabled}
             setOpen={setOpen}
+            {...(maxHeight && { maxHeight })}
             childrenTrigger={
                 <SelectTriggerMemo
-                    value={value}
                     selectedLabel={selectedLabel}
                     toggleOpen={toggleOpen}
                     mainColor={mainColor}
                     classNameTrigger={classNameTrigger}
                     classNameTriggerInvalid={classNameTriggerInvalid}
+                    classNameTriggerDisabled={classNameTriggerDisabled}
                     withValidation={withValidation}
+                    disabled={disabled}
+                    placeholder={placeholder}
                 />
             }
             childrenFloating={
@@ -95,25 +102,29 @@ export default StandardSelectMemo;
 
 // * ************ SELECT TRIGGER ************ 
 
-interface ISelectTrigger<T extends string> {
-    value: T | null,
+interface ISelectTrigger {
     selectedLabel: string,
     toggleOpen: () => void
     mainColor: string;
     classNameTrigger?: string;
     classNameTriggerInvalid?: string;
+    classNameTriggerDisabled?: string;
     withValidation?: boolean;
+    disabled?: boolean;
+    placeholder?: string;
 }
 
-const SelectTrigger = <T extends string>({
-    value,
+const SelectTrigger = ({
     selectedLabel,
     toggleOpen,
     mainColor,
     classNameTrigger,
     classNameTriggerInvalid,
-    withValidation
-}: ISelectTrigger<T>) => {
+    classNameTriggerDisabled,
+    withValidation,
+    disabled = false,
+    placeholder = "Selecciona una opción"
+}: ISelectTrigger) => {
 
     const iconWithClass = useMemo(
         () => withClassName(
@@ -129,20 +140,20 @@ const SelectTrigger = <T extends string>({
 
     const className = useMemo(() => {
         return clsx(
-            styles.fieldSelectContainer,
-            classNameTrigger,
-            withValidation ? (
-                (value && value === selectedLabel)
+            `${styles.fieldSelectContainer} ${classNameTrigger}`,
+            disabled ? classNameTriggerDisabled : "",
+            (!disabled && withValidation) ? (
+                (selectedLabel === placeholder)
                     ? `${styles.invalidValue} ${classNameTriggerInvalid}`
                     : ""
             ) : "",
         );
-    }, [value, selectedLabel]);
+    }, [selectedLabel, disabled, withValidation, classNameTriggerInvalid, classNameTrigger, placeholder, classNameTriggerDisabled]);
 
     return (
         <div
             onClick={handleOnClick}
-            tabIndex={0}
+            tabIndex={disabled ? -1 : 0}
             className={className}
         >
             {selectedLabel}

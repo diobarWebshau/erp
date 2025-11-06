@@ -1,7 +1,10 @@
 interface IClientAddress {
-    id: number;
+    id: number | string;
     client_id: number;
     address: string;
+    street: string;
+    street_number: string;
+    neighborhood: string;
     city: string;
     state: string;
     country: string;
@@ -24,6 +27,9 @@ const defaultValueClientAddress:
     id: 0,
     client_id: 0,
     address: '',
+    street: '',
+    street_number: '',
+    neighborhood: '',
     city: '',
     state: '',
     country: '',
@@ -36,6 +42,9 @@ const defaultValuePartialClientAddress:
     IPartialClientAddress = {
     client_id: 0,
     address: '',
+    street: '',
+    street_number: '',
+    neighborhood: '',
     city: '',
     state: '',
     country: '',

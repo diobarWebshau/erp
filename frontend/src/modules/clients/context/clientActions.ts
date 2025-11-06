@@ -1,7 +1,7 @@
 import { clientActionsTypes } from "./../context/clientTypes";
 import type { ClientAction } from "./../context/clientTypes";
 import type { IPartialClient } from "../../../interfaces/clients";
-import type { IClientAddress } from "../../../interfaces/clientAddress";
+import type { IClientAddress, IPartialClientAddress } from "../../../interfaces/clientAddress";
 import type { IPartialProductDiscountClient } from "../../../interfaces/product-discounts-clients";
 
 // DATA
@@ -21,7 +21,7 @@ const set_from_server = (payload: IPartialClient): ClientAction => ({
     payload
 });
 
-const add_client_addresses = (payload: IClientAddress[]): ClientAction => ({
+const add_client_addresses = (payload: IPartialClientAddress[]): ClientAction => ({
     type: clientActionsTypes.ADD_CLIENT_ADDRESSES,
     payload
 });

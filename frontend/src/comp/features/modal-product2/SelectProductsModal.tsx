@@ -19,6 +19,7 @@ interface SelectObjectsModalProps<T> {
     placeholder: string,
     loadOptions?: (query: string | number) => Promise<T[]>
     options?: T[]
+    maxHeight?: string
 }
 
 const SelectObjectsModal = <T,>({
@@ -30,7 +31,8 @@ const SelectObjectsModal = <T,>({
     attribute,
     placeholder,
     loadOptions,
-    options
+    options,
+    maxHeight
 }: SelectObjectsModalProps<T>) => {
 
     const [selectedObject, setSelectedObject] = useState<T[]>([]);
@@ -60,6 +62,7 @@ const SelectObjectsModal = <T,>({
                         initialOpen={true}
                         emptyMessage={emptyMessage}
                         placeholder={placeholder}
+                        maxHeight={maxHeight}
                     />
                 </section>
                 <section className={styleModule.footerSection}>

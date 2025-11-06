@@ -1,0 +1,136 @@
+/* *************** Container *************** */
+
+.containerStep {
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+
+    /* distirbucion flex respecto al padre*/
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.containerContent {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+}
+
+.containerButtons {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+}
+
+/* *************** Container Content *************** */
+
+.containerContent {
+
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+    max-height: 100%;
+    max-width: 100%;
+
+    /* abordamiento */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-theme-primary) transparent;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.containerContent>* {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+}
+
+.subTitle {
+    /* estilos */
+    color: var(--color-theme-font-black);
+    font-size: 16px;
+}
+
+.containerExtraComponents {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* ? ********* taxAddressContainer ********* */
+
+.taxAddressContainer {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.fieldBlock {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.fieldBlock>* {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+}
+
+/* ? ********* addressesContainer ********* */
+
+.addressesContainer {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+/* ? ********* discountsContainer ********* */
+
+.discountsContainer {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+/* *************** Container Buttons *************** */
+
+.containerButtons {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconRowDeleteAction{
+    stroke: var(--color-alert);
+    width: 16px;
+}

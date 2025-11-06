@@ -9,8 +9,8 @@ interface IStandardSelectCustom<T extends string> {
     placeholder?: string;
     disabled?: boolean;
     initialOpen?: boolean;
-    mainColor: string;
     withValidation?: boolean;
+    maxHeight?: string;
 }
 
 const StandardSelectCustom = <T extends string>({
@@ -18,10 +18,10 @@ const StandardSelectCustom = <T extends string>({
     options,
     onChange,
     placeholder = "Selecciona una opción",
-    disabled,
+    disabled = false,
     initialOpen,
-    mainColor,
     withValidation = false,
+    maxHeight,
 }: IStandardSelectCustom<T>) => {
     return (
         <StandardSelectMemo
@@ -30,15 +30,16 @@ const StandardSelectCustom = <T extends string>({
             onChange={onChange}
             placeholder={placeholder}
             disabled={disabled}
-            mainColor={mainColor}
+            mainColor={disabled ? "var(--color-theme-neutral-primary)" : "var(--color-theme-primary)"}
             initialOpen={initialOpen}
             withValidation={withValidation}
-            classNameOption={StyleModule.option}
+            classNameOption={`nunito-regular ${StyleModule.option}`}
             classNameOptionSelected={StyleModule.selected}
             classNamePopoverFloating={StyleModule.popoverFloating}
             classNameTrigger={StyleModule.trigger}
             classNameTriggerInvalid={StyleModule.triggerInvalid}
-
+            classNameTriggerDisabled={StyleModule.disabled}
+            maxHeight={maxHeight}
         />
     )
 }

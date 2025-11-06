@@ -1,4 +1,11 @@
+            
 .root {
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+    max-height: 100%;
+    max-width: 100%;
+
     /* distribucion flex respecto al padre */
     flex: 1;
 
@@ -10,8 +17,15 @@
 }
 
 .content {
+    /* dimension */
+    min-height: 0;
+    min-width: 0;
+    max-height: 100%;
+    max-width: 100%;
+
     /* distribucion flex respecto al padre */
     flex: 1;
+
 
     /* distribucion flex */
     display: flex;

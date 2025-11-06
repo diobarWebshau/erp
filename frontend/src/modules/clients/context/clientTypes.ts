@@ -1,5 +1,5 @@
 import type { IPartialClient } from "../../../interfaces/clients";
-import type { IClientAddress } from "../../../interfaces/clientAddress";
+import type { IPartialClientAddress } from "../../../interfaces/clientAddress";
 import type { IPartialProductDiscountClient } from "../../../interfaces/product-discounts-clients";
 
 interface ClientState {
@@ -63,18 +63,18 @@ type ClientAction =
     | { type: typeof clientActionsTypes.SET_CLIENT, payload: IPartialClient }
     | { type: typeof clientActionsTypes.UPDATE_CLIENT, payload: IPartialClient }
     | { type: typeof clientActionsTypes.SET_FROM_SERVER, payload: IPartialClient }
-    | { type: typeof clientActionsTypes.ADD_CLIENT_ADDRESSES, payload: IClientAddress[] }
+    | { type: typeof clientActionsTypes.ADD_CLIENT_ADDRESSES, payload: IPartialClientAddress[] }
     | { type: typeof clientActionsTypes.REMOVE_CLIENT_ADDRESSES, payload: (number | string)[] }
-    | { type: typeof clientActionsTypes.UPDATE_CLIENT_ADDRESSES, payload: { id: number | string, attributes: IClientAddress } }
+    | { type: typeof clientActionsTypes.UPDATE_CLIENT_ADDRESSES, payload: { id: number | string, attributes: IPartialClientAddress } }
     | { type: typeof clientActionsTypes.ADD_CLIENT_PRODUCT_DISCOUNTS, payload: IPartialProductDiscountClient[] }
     | { type: typeof clientActionsTypes.REMOVE_CLIENT_PRODUCT_DISCOUNTS, payload: (number | string)[] }
     | { type: typeof clientActionsTypes.UPDATE_CLIENT_PRODUCT_DISCOUNTS, payload: { id: number | string, attributes: IPartialProductDiscountClient } }
     // DRAFT
     | { type: typeof clientActionsTypes.SET_DRAFT_CLIENT, payload: IPartialClient }
     | { type: typeof clientActionsTypes.UPDATE_DRAFT_CLIENT, payload: IPartialClient }
-    | { type: typeof clientActionsTypes.ADD_DRAFT_CLIENT_ADDRESSES, payload: IClientAddress[] }
+    | { type: typeof clientActionsTypes.ADD_DRAFT_CLIENT_ADDRESSES, payload: IPartialClientAddress[] }
     | { type: typeof clientActionsTypes.REMOVE_DRAFT_CLIENT_ADDRESSES, payload: (number | string)[] }
-    | { type: typeof clientActionsTypes.UPDATE_DRAFT_CLIENT_ADDRESSES, payload: { id: number | string, attributes: IClientAddress } }
+    | { type: typeof clientActionsTypes.UPDATE_DRAFT_CLIENT_ADDRESSES, payload: { id: number | string, attributes: IPartialClientAddress } }
     | { type: typeof clientActionsTypes.ADD_DRAFT_CLIENT_PRODUCT_DISCOUNTS, payload: IPartialProductDiscountClient[] }
     | { type: typeof clientActionsTypes.REMOVE_DRAFT_CLIENT_PRODUCT_DISCOUNTS, payload: (number | string)[] }
     | { type: typeof clientActionsTypes.UPDATE_DRAFT_CLIENT_PRODUCT_DISCOUNTS, payload: { id: number | string, attributes: IPartialProductDiscountClient } }

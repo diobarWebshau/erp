@@ -1,7 +1,4 @@
-import type {
-    IClientAddressesManager,
-    IPartialClientAddress
-} from "./clientAddress";
+import type { IClientAddressesManager, IPartialClientAddress } from "./clientAddress";
 import type { IPartialProductDiscountClient } from "./product-discounts-clients";
 
 interface IClient {
@@ -20,6 +17,9 @@ interface IClient {
     tax_regimen: string;
     cfdi: string;
     payment_method: string;
+    street: string;
+    street_number: string;
+    neighborhood: string;
     is_active: boolean;
     created_at: string;
     updated_at: string;
@@ -28,8 +28,7 @@ interface IClient {
     pruduct_discounts_client?: IPartialProductDiscountClient[]
 }
 
-type IPartialClient =
-    Partial<IClient>;
+type IPartialClient = Partial<IClient>;
 
 const defaultValueClient: IClient = {
     id: 0,
@@ -38,6 +37,9 @@ const defaultValueClient: IClient = {
     email: '',
     phone: '',
     city: '',
+    street: '',
+    street_number: '',
+    neighborhood: '',
     state: '',
     country: '',
     address: '',
@@ -52,13 +54,16 @@ const defaultValueClient: IClient = {
     updated_at: '',
 };
 
-const defaultValuePartialClient:        
+const defaultValuePartialClient:
     IPartialClient = {
     company_name: '',
     tax_id: '',
     email: '',
     phone: '',
     city: '',
+    street: '',
+    street_number: '',
+    neighborhood: '',
     state: '',
     country: '',
     address: '',

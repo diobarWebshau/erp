@@ -172,6 +172,7 @@ interface PopoverFloatingProps {
   minHeight?: number | string;          // Altura mínima visual opcional (p.ej. 100 o "8rem")
   maxHeight?: number | string;          // Altura máxima antes de scroll (p.ej. 250 o "20rem")
   classNamePopoverFloating?: string;
+  disabled?: boolean;
 }
 
 const PopoverFloating = ({
@@ -186,6 +187,7 @@ const PopoverFloating = ({
   minHeight,
   maxHeight,            // 🔴 NUEVO: controla el punto a partir del cual aparece scroll
   classNamePopoverFloating,
+  disabled = false,
 }: PopoverFloatingProps) => {
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -207,6 +209,12 @@ const PopoverFloating = ({
 
   // Helpers para normalizar valores numéricos/string a CSS
   const toCss = (v?: number | string) => (typeof v === 'number' ? `${v}px` : v);
+
+
+  const handleOpenChange = (next: boolean) => {
+    if (disabled && next) return;   // no permitir abrir si está disabled
+    setActualOpen(next);
+  };
 
   // * Configuración de Floating UI
   const {
@@ -308,7 +316,7 @@ const PopoverFloating = ({
   // ? Añade atributos de accesibilidad (ARIA) al floating.
   //    En este caso le dice a lectores de pantalla qué tipo de patrón es (listbox, menu, dialog, etc.).
 
-  const click = useClick(context, { event: "click" });
+  const click = useClick(context, { event: "click", enabled: !disabled });
   // ? Controla la apertura/cierre del floating con click (click).
   //    - Usar "click" (en vez de "mousedown") evita carreras con outsidePress que también dispara en mousedown.
 
@@ -352,7 +360,7 @@ const PopoverFloating = ({
         {childrenTrigger}
       </div>
       {
-        actualOpen && (
+        (actualOpen && !disabled) && (
           <FloatingPortal>
             <FloatingFocusManager
               context={context}

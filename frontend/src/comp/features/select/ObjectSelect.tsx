@@ -20,7 +20,7 @@ interface IObjectSelect<T> {
     classNameOption?: string;
     classNameOptionSelected?: string;
     withValidation?: boolean;
-
+    classNameTriggerDisabled?: string;
 }
 
 const ObjectSelect = <T,>({
@@ -30,7 +30,7 @@ const ObjectSelect = <T,>({
     labelKey,
     onChange,
     placeholder = "Selecciona una opción",
-    // disabled,
+    disabled = false,
     mainColor,
     classNamePopoverFloating,
     classNameTrigger,
@@ -38,6 +38,7 @@ const ObjectSelect = <T,>({
     classNameOption,
     classNameOptionSelected,
     withValidation = false,
+    classNameTriggerDisabled,
 }: IObjectSelect<T>) => {
 
     const [open, setOpen] = useState<boolean>(initialOpen);
@@ -64,16 +65,18 @@ const ObjectSelect = <T,>({
         <PopoverFloating
             open={open}
             setOpen={setOpen}
+            disabled={disabled}
             childrenTrigger={
                 <SelectTriggerMemo
-                    value={value}
                     selectedLabel={selectedLabel}
-                    labelKey={labelKey}
+                    disabled={disabled}
+                    placeholder={placeholder}
                     toggleOpen={toggleOpen}
                     mainColor={mainColor}
                     classNameTrigger={classNameTrigger}
                     classNameTriggerInvalid={classNameTriggerInvalid}
                     withValidation={withValidation}
+                    classNameTriggerDisabled={classNameTriggerDisabled}
                 />
             }
             childrenFloating={
@@ -99,27 +102,29 @@ export default ObjectSelectMemo;
 
 // * ************ SELECT TRIGGER ************ 
 
-interface ISelectTrigger<T> {
-    value: T | null,
-    labelKey: keyof T,
+interface ISelectTrigger {
+    placeholder: string,
     selectedLabel: string,
     toggleOpen: () => void
     mainColor: string;
     classNameTrigger?: string;
     classNameTriggerInvalid?: string;
     withValidation?: boolean;
+    disabled?: boolean;
+    classNameTriggerDisabled?: string;
 }
 
-const SelectTrigger = <T,>({
-    value,
+const SelectTrigger = ({
+    placeholder,
     selectedLabel,
-    labelKey,
     toggleOpen,
     mainColor,
     classNameTrigger,
     classNameTriggerInvalid,
-    withValidation
-}: ISelectTrigger<T>) => {
+    withValidation,
+    disabled = false,
+    classNameTriggerDisabled
+}: ISelectTrigger) => {
 
     const iconWithClass = useMemo(
         () => withClassName(
@@ -133,22 +138,24 @@ const SelectTrigger = <T,>({
         toggleOpen();
     }, [toggleOpen]);
 
+    console.log("disabled", disabled);
+
     const className = useMemo(() => {
         return clsx(
-            styles.fieldSelectContainer,
-            classNameTrigger,
-            withValidation ? (
-                (value && value?.[labelKey] === selectedLabel)
+            `${styles.fieldSelectContainer} ${classNameTrigger}`,
+            disabled ? classNameTriggerDisabled : "",
+            (!disabled && withValidation) ? (
+                (placeholder === selectedLabel)
                     ? `${styles.invalidValue} ${classNameTriggerInvalid}`
                     : ""
             ) : "",
         );
-    }, [value, selectedLabel]);
+    }, [selectedLabel, placeholder, classNameTriggerInvalid, classNameTrigger, withValidation, disabled, classNameTriggerDisabled]);
 
     return (
         <div
             onClick={handleOnClick}
-            tabIndex={0}
+            tabIndex={disabled ? -1 : 0}
             className={className}
         >
             {selectedLabel}

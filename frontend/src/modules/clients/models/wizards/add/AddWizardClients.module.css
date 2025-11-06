@@ -24,14 +24,12 @@
 
     /* distribucion grid respecto al padre */
     grid-area: header;
-
 }
 
 .mainContent {
 
     /* distribucion grid respecto al padre */
     grid-area: main;
-
 }
 
 /* *************** Header *************** */
@@ -77,69 +75,4 @@
     /* estilos */
     background: var(--color-theme-background);
 
-}
-
-/* *************** Steps *************** */
-
-.containerStep {
-    /* distirbucion flex respecto al padre*/
-    flex: 1;
-
-    /* distribucion flex */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-}
-
-.containerContent {
-    /* distirbucion flex respecto al padre*/
-    flex: 1;
-}
-
-
-.containerButtons {
-    /* distirbucion flex respecto al padre*/
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: auto;
-
-    /* distribucion flex */
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* ************** Container Content ******************* */
-
-.containerContent {
-    /* distribucion flex */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    gap: 0.5rem;
-}
-
-.inputContainer.inputContainer {
-    /* dimension */
-    height: 44px;
-    /* estilos */
-    background-color: var(--color-theme-font-white);
-}
-
-.secondBlock {
-    /* distribucion flex */
-    display: flex;
-    flex-direction: row;
-    justify-content: start;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.secondBlock>* {
-    /* distribucion flex respecto al padre */
-    flex: 1;
 }

@@ -11,6 +11,7 @@ interface MultiSelectCheckSearchCustomProps<T> {
     colorMain?: string;
     initialOpen?: boolean;
     placeholder?: string;
+    maxHeight?: string;
     emptyMessage?: ReactNode;
     loadOptions?: (query: string | number) => Promise<T[]>;
 }
@@ -23,6 +24,7 @@ const MultiSelectCheckSearchCustom = <T,>({
     colorMain,
     initialOpen = false,
     placeholder,
+    maxHeight,
     emptyMessage,
     loadOptions,
 }: MultiSelectCheckSearchCustomProps<T>) => {
@@ -43,6 +45,7 @@ const MultiSelectCheckSearchCustom = <T,>({
         classNameContainerEmptyMessage={`nunito-regular ${StyleModule.containerEmptyMessage}`}
         classNameCheckBox={StyleModule.checkBox}
         placeholder={placeholder}
+        maxHeight={maxHeight}
     />
 };
 
