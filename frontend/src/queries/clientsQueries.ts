@@ -166,21 +166,14 @@ const createCompleteClientInDB = async (
         if (!response.ok) {
             const errorText = await response.json();
             console.log(errorText);
-            if (response.status >= 500) {
-                throw new Error(errorText);
-            }
-            dispatch(
-                setError({
-                    key: "createCompleteClient",
-                    message: errorText
-                })
-            );
+            if (response.status >= 500) throw new Error(errorText);
+            dispatch(setError({ key: "createCompleteClient", message: errorText }));
             return null;
         }
-        dispatch(
-            clearError("createCompleteClient")
-        );
+
+        dispatch(clearError("createCompleteClient"));
         const result = await response.json();
+
         return result;
     } catch (error: unknown) {
         throw error;

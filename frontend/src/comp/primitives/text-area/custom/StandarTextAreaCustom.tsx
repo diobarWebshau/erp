@@ -19,7 +19,7 @@ const StandarTextAreaCustom = ({
     onChange,
     placeholder = "comentarios (Opcional)",
     maxLength,
-    disabled=false
+    disabled = false
 }: StandardTextAreaProps) => {
 
     return (

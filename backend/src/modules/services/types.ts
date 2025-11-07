@@ -45,6 +45,7 @@ import {
     AppliedProductDiscountRangeCreateAttributes,
     ProductDiscountClientAttributes,
     ProductDiscountClientCreateAttributes,
+    ProductDiscountClientManager,
     PurchasedOrderAttributes,
     PurchasedOrderCreateAttributes,
 } from "./sales/types.js"
@@ -79,6 +80,7 @@ export type {
     AppliedProductDiscountRangeCreateAttributes,
     ProductDiscountClientAttributes,
     ProductDiscountClientCreateAttributes,
+    ProductDiscountClientManager,
     PurchasedOrderAttributes,
     PurchasedOrderCreateAttributes,
     ScrapAttributes,

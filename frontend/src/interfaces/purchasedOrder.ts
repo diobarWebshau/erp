@@ -1,14 +1,6 @@
-import type {
-  IPartialPurchasedOrderProduct,
-  IPurchasedOrderProduct,
-  IPurchasedOrderProductManager
-} from "./purchasedOrdersProducts";
-import type {
-  IClient, IPartialClient
-} from "./clients";
-import type {
-  IClientAddress, IPartialClientAddress
-} from "./clientAddress";
+import type { IPartialPurchasedOrderProduct, IPurchasedOrderProductManager } from "./purchasedOrdersProducts";
+import type { IPartialClient } from "./clients";
+import type { IPartialClientAddress } from "./clientAddress";
 
 interface IPurchasedOrder {
   id: number;
@@ -23,14 +15,18 @@ interface IPurchasedOrder {
   city: string;
   state: string;
   country: string;
-  address: string;
-  payment_terms: string;
+  street: string;
+  street_number: string;
+  neighborhood: string;
   zip_code: string;
   tax_regimen: string;
   cfdi: string;
   payment_method: string;
   client_address_id: number | null;
-  shipping_address: string;
+  shipping_street: string;
+  shipping_street_number: string;
+  payment_terms: string;
+  shipping_neighborhood: string;
   shipping_city: string;
   shipping_state: string;
   shipping_country: string;
@@ -60,14 +56,18 @@ const defaultValuePurchasedOrder: IPurchasedOrder = {
   city: "",
   state: "",
   country: "",
-  address: "",
-  payment_terms: "",
+  street: "",
+  street_number: "",
+  neighborhood: "",
   zip_code: "",
   tax_regimen: "",
   cfdi: "",
   payment_method: "",
   client_address_id: null,
-  shipping_address: "",
+  shipping_street: "",
+  shipping_street_number: "",
+  payment_terms: "",
+  shipping_neighborhood: "",
   shipping_city: "",
   shipping_state: "",
   shipping_country: "",
@@ -90,14 +90,18 @@ const defaultValuePartialPurchasedOrder: Partial<IPurchasedOrder> = {
   city: "",
   state: "",
   country: "",
-  address: "",
-  payment_terms: "",
+  street: "",
+  street_number: "",
+  neighborhood: "",
   zip_code: "",
   tax_regimen: "",
   cfdi: "",
   payment_method: "",
   client_address_id: null,
-  shipping_address: "",
+  shipping_street: "",
+  shipping_street_number: "",
+  payment_terms: "",
+  shipping_neighborhood: "",
   shipping_city: "",
   shipping_state: "",
   shipping_country: "",

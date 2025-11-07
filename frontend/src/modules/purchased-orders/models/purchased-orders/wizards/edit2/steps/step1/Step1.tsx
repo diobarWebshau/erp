@@ -1,37 +1,13 @@
-import {
-    ChevronRight,
-    CircleX,
-    Plus,
-    Search
-} from "lucide-react"
-import FadeButton
-    from "../../../../../../../../components/ui/table/components/gui/button/fade-button/FadeButton"
-import type {
-    IClient
-} from "../../../../../../../../interfaces/clients"
-
-import {
-    useModalEditState,
-    useModalEditDispatch
-} from "../../context/modalEditHooks"
-import {
-    next_step,
-    set_step,
-    update_update_data,
-} from "../../context/modalEditActions"
-import type {
-    IPartialPurchasedOrder
-} from "../../../../../../../../interfaces/purchasedOrder"
-import SingleSelectSearchCheck
-    from "../../../../../../../../components/ui/table/components/gui/diobar/prueba/SingleSelectSearchCheck";
-import useClientById
-    from "./../../../../../../../../modelos/clients/react-hooks/useClientById"
-import StyleModule
-    from "./Step1.module.css"
-import {
-    useEffect,
-    useState
-} from "react"
+import { ChevronRight, CircleX, Plus, Search } from "lucide-react"
+import FadeButton from "../../../../../../../../components/ui/table/components/gui/button/fade-button/FadeButton"
+import type { IClient } from "../../../../../../../../interfaces/clients"
+import { useModalEditState, useModalEditDispatch } from "../../context/modalEditHooks"
+import { next_step, set_step, update_update_data } from "../../context/modalEditActions"
+import type { IPartialPurchasedOrder } from "../../../../../../../../interfaces/purchasedOrder"
+import SingleSelectSearchCheck from "../../../../../../../../components/ui/table/components/gui/diobar/prueba/SingleSelectSearchCheck";
+import useClientById from "./../../../../../../../../modelos/clients/react-hooks/useClientById"
+import { useEffect, useState } from "react"
+import StyleModule from "./Step1.module.css"
 
 interface Step1Props {
 }
@@ -81,7 +57,9 @@ const Step1 = ({
                     city: selectedSingle.city,
                     state: selectedSingle.state,
                     country: selectedSingle.country,
-                    address: selectedSingle.address,
+                    street: selectedSingle.street,
+                    street_number: selectedSingle.street_number,
+                    neighborhood: selectedSingle.neighborhood,
                     payment_terms: selectedSingle.payment_terms,
                     zip_code: selectedSingle.zip_code,
                     tax_regimen: selectedSingle.tax_regimen,

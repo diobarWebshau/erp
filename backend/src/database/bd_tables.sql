@@ -13,7 +13,6 @@ CREATE TABLE location_types(
     PRIMARY KEY(id)
 );
 
-
 CREATE TABLE locations(
     id INT AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -51,13 +50,15 @@ CREATE TABLE clients(
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
-    address TEXT NOT NULL,
-    payment_terms VARCHAR(100) NOT NULL,
-    credit_limit DECIMAL(14, 4) NOT NULL,
+    street VARCHAR(100) NOT NULL,
+    street_number VARCHAR(100) NOT NULL,
+    neighborhood VARCHAR(100) NOT NULL,
+    payment_terms VARCHAR(100) NULL,
+    credit_limit DECIMAL(14, 4) NULL,
     zip_code VARCHAR(100) NOT NULL,
-    tax_regimen VARCHAR(100) NOT NULL,
+    tax_regimen VARCHAR(100) NULL,
     cfdi VARCHAR(100) NOT NULL,
-    payment_method VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(100) NULL,
     is_active TINYINT NOT NULL DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -67,18 +68,20 @@ CREATE TABLE clients(
 CREATE TABLE clients_addresses(
     id INT AUTO_INCREMENT,
     client_id INT,
-    address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
+    street VARCHAR(100) NOT NULL,
+    street_number VARCHAR(100) NOT NULL,
+    neighborhood VARCHAR(100) NOT NULL,
     zip_code VARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
     FOREIGN KEY(client_id) REFERENCES clients(id) ON DELETE CASCADE,
-    INDEX idx_clients_addresses_client_id (client_id),
-    INDEX idx_clients_addresses_address(address(255))
+    INDEX idx_clients_addresses_client_id (client_id)
 );
+
 -- PRODUCTS
 CREATE TABLE products(
     id INT AUTO_INCREMENT,
@@ -204,6 +207,7 @@ CREATE TABLE carriers(
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id)
 );
+
 CREATE TABLE shipping_orders(
     id INT AUTO_INCREMENT,
     code VARCHAR(100),
@@ -289,21 +293,26 @@ create table purchased_orders(
     -- client fields
     client_id INT,
     company_name VARCHAR(100) NOT NULL,
-    tax_id VARCHAR(100) NOT NULL,
+    tax_id VARCHAR(100) NULL,
     email VARCHAR(100) NOT NULL,
     phone VARCHAR(100) NOT NULL,
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
-    address TEXT NOT NULL,
-    payment_terms VARCHAR(100) NOT NULL,
+    street VARCHAR(100) NOT NULL,
+    street_number VARCHAR(100) NOT NULL,
+    neighborhood VARCHAR(100) NOT NULL,
+    payment_terms VARCHAR(100) NULL,
     zip_code VARCHAR(100) NOT NULL,
-    tax_regimen VARCHAR(100) NOT NULL,
+    tax_regimen VARCHAR(100) NULL,
     cfdi VARCHAR(100) NOT NULL,
-    payment_method VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(100) NULL,
     -- shipping fields (client address)
     client_address_id INT,
-    shipping_address TEXT NOT NULL,
+    shipping_street VARCHAR(100) NOT NULL,
+    shipping_street_number VARCHAR(100) NOT NULL,
+    shipping_neighborhood VARCHAR(100) NOT NULL,
+
     shipping_city VARCHAR(100) NOT NULL,
     shipping_state VARCHAR(100) NOT NULL,
     shipping_country VARCHAR(100) NOT NULL,

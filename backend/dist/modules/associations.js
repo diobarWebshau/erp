@@ -211,7 +211,7 @@ ProductDiscountClientModel.belongsTo(ProductModel, {
 });
 ClientModel.hasMany(ProductDiscountClientModel, {
     foreignKey: "client_id",
-    as: "pruduct_discounts_client",
+    as: "product_discounts_client",
 });
 ProductDiscountClientModel.belongsTo(ClientModel, {
     foreignKey: "client_id",

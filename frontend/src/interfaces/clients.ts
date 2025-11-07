@@ -10,7 +10,6 @@ interface IClient {
     city: string;
     state: string;
     country: string;
-    address: string;
     payment_terms: string;
     credit_limit: number;
     zip_code: string;
@@ -25,7 +24,7 @@ interface IClient {
     updated_at: string;
     addresses?: IPartialClientAddress[]
     addresses_update?: IClientAddressesManager,
-    pruduct_discounts_client?: IPartialProductDiscountClient[]
+    product_discounts_client?: IPartialProductDiscountClient[]
 }
 
 type IPartialClient = Partial<IClient>;
@@ -42,7 +41,6 @@ const defaultValueClient: IClient = {
     neighborhood: '',
     state: '',
     country: '',
-    address: '',
     payment_terms: '',
     credit_limit: 0,
     zip_code: '',
@@ -66,7 +64,6 @@ const defaultValuePartialClient:
     neighborhood: '',
     state: '',
     country: '',
-    address: '',
     payment_terms: '',
     credit_limit: 0,
     zip_code: '',

@@ -123,7 +123,6 @@ const NumericInput = memo(({
     // ? useEffect que sincroniza el valor del input con el valor del prop value
     useEffect(() => {
         const synced = value?.toString() ?? "";
-        console.log(`synced`, synced);
         setInputValue(synced);
         setIsValid(computeIsValid(synced));
     }, [value, min, max]);

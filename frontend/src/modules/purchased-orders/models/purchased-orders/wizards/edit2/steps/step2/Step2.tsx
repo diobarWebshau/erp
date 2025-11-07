@@ -1,33 +1,12 @@
-import {
-    useEffect, useState,
-    type FormEvent, type MouseEvent
-} from "react";
-import type {
-    IClientAddress
-} from "../../../../../../../../interfaces/clientAddress";
-import styleModule
-    from "./Step2.module.css"
-import {
-    useModalEditDispatch,
-    useModalEditState
-} from "../../context/modalEditHooks";
+import SingleSelectSearchCheck from "../../../../../../../../components/ui/table/components/gui/diobar/prueba/SingleSelectSearchCheck";
 import FadeButton from "../../../../../../../../components/ui/table/components/gui/button/fade-button/FadeButton";
-import {
-    Bookmark,
-    ChevronLeft, CircleX,
-    Plus, Search
-} from "lucide-react";
-import type {
-    IPartialPurchasedOrder
-} from "../../../../../../../../interfaces/purchasedOrder";
-import {
-    next_step,
-    back_step,
-    set_step,
-    update_update_data,
-} from "../../context/modalEditActions";
-import SingleSelectSearchCheck
-    from "../../../../../../../../components/ui/table/components/gui/diobar/prueba/SingleSelectSearchCheck";
+import { next_step, back_step, set_step, update_update_data } from "../../context/modalEditActions";
+import type { IPartialPurchasedOrder } from "../../../../../../../../interfaces/purchasedOrder";
+import type { IClientAddress } from "../../../../../../../../interfaces/clientAddress";
+import { useModalEditDispatch, useModalEditState } from "../../context/modalEditHooks";
+import { useEffect, useState, type FormEvent, type MouseEvent } from "react";
+import styleModule from "./Step2.module.css"
+import { Bookmark, ChevronLeft, CircleX, Plus, Search } from "lucide-react";
 // import useClientAddresses
 //     from "../../../../hooks/client-addresses/useClientAddresses";
 
@@ -76,13 +55,15 @@ const Step2 = ({
                 selectedAddress
             ) {
                 const purchasedOrder: IPartialPurchasedOrder = {
-                    client_address_id: selectedAddress.id,
-                    shipping_address: selectedAddress.address,
+                    client_address_id: Number(selectedAddress.id),
+                    shipping_street: selectedAddress.street,
+                    shipping_street_number: selectedAddress.street_number,
+                    shipping_neighborhood: selectedAddress.neighborhood,
                     shipping_city: selectedAddress.city,
                     shipping_state: selectedAddress.state,
                     shipping_country: selectedAddress.country,
                     shipping_zip_code: selectedAddress.zip_code,
-                    client_address: selectedAddress,
+
                 }
                 dispatch(update_update_data(purchasedOrder));
                 dispatch(next_step());
@@ -154,7 +135,9 @@ const Step2 = ({
                 addresses.find(
                     (address) =>
                         address.client_id === state.data.client_id &&
-                        address.address === state.data.shipping_address
+                        address.street === state.data.shipping_street &&
+                        address.street_number === state.data.shipping_street_number &&
+                        address.neighborhood === state.data.shipping_neighborhood
                 )
                 || null
             );
@@ -182,32 +165,32 @@ const Step2 = ({
                     <section className={styleModule.bodySection}>
                         {/* !loadingAddresses &&  */}
                         {
-                                <SingleSelectSearchCheck<IClientAddress>
-                                    rowId="address"
-                                    search={searchSingle}
-                                    setSearch={setSearchSingle}
-                                    open={openSingle}
-                                    setOpen={setOpenSingle}
-                                    emptyMessage="No hay direcciones"
-                                    icon={<Search size={16} />}
-                                    placeholder="Buscar direcciones..."
-                                    options={addresses}
-                                    classNameDropDownSelectItemInput={styleModule.selectSearchMultiCheckDropDownSelectItemInput}
-                                    classNameContainer={styleModule.selectSearchMultiCheckContainer}
-                                    classNameInputContainer={styleModule.selectSearchMultiCheckInputContainer}
-                                    classNameDropDown={styleModule.selectSearchMultiCheckDropDown}
-                                    classNameDropDownSelect={styleModule.selectSearchMultiCheckDropDownSelect}
-                                    classNameButtonInput={styleModule.selectSearchMultiCheckButtonInput}
-                                    classNameInput={`nunito-semibold ${styleModule.selectSearchMultiCheckInput}`}
-                                    classNameDropDownSelectItemSelected={`nunito-semibold ${styleModule.selectSearchMultiCheckDropDownSelectItemSelected}`}
-                                    classNameDropDownSearch={styleModule.selectSearchMultiCheckDropDownSearch}
-                                    classNameDropDownSearchItem={`nunito-semibold ${styleModule.selectSearchMultiCheckDropDownSearchItem}`}
-                                    classNameSeparator={styleModule.selectSearchMultiCheckSeparator}
-                                    classNameDropDownHeader={`nunito-bold ${styleModule.selectSearchMultiCheckDropDownHeader}`}
-                                    classNameEmptyMessage={`nunito-semibold ${styleModule.selectSearchMultiCheckEmptyMessage}`}
-                                    selected={selectedAddress}
-                                    setSelected={setSelectedAddress}
-                                />
+                            <SingleSelectSearchCheck<IClientAddress>
+                                rowId="address"
+                                search={searchSingle}
+                                setSearch={setSearchSingle}
+                                open={openSingle}
+                                setOpen={setOpenSingle}
+                                emptyMessage="No hay direcciones"
+                                icon={<Search size={16} />}
+                                placeholder="Buscar direcciones..."
+                                options={addresses}
+                                classNameDropDownSelectItemInput={styleModule.selectSearchMultiCheckDropDownSelectItemInput}
+                                classNameContainer={styleModule.selectSearchMultiCheckContainer}
+                                classNameInputContainer={styleModule.selectSearchMultiCheckInputContainer}
+                                classNameDropDown={styleModule.selectSearchMultiCheckDropDown}
+                                classNameDropDownSelect={styleModule.selectSearchMultiCheckDropDownSelect}
+                                classNameButtonInput={styleModule.selectSearchMultiCheckButtonInput}
+                                classNameInput={`nunito-semibold ${styleModule.selectSearchMultiCheckInput}`}
+                                classNameDropDownSelectItemSelected={`nunito-semibold ${styleModule.selectSearchMultiCheckDropDownSelectItemSelected}`}
+                                classNameDropDownSearch={styleModule.selectSearchMultiCheckDropDownSearch}
+                                classNameDropDownSearchItem={`nunito-semibold ${styleModule.selectSearchMultiCheckDropDownSearchItem}`}
+                                classNameSeparator={styleModule.selectSearchMultiCheckSeparator}
+                                classNameDropDownHeader={`nunito-bold ${styleModule.selectSearchMultiCheckDropDownHeader}`}
+                                classNameEmptyMessage={`nunito-semibold ${styleModule.selectSearchMultiCheckEmptyMessage}`}
+                                selected={selectedAddress}
+                                setSelected={setSelectedAddress}
+                            />
                         }
                         {
                             validation && (

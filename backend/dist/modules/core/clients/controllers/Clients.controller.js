@@ -1,5 +1,5 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
-import { ClientModel, ClientAddressesModel } from "../../associations.js";
+import { ClientModel, ClientAddressesModel, ProductModel } from "../../associations.js";
 import { Op, QueryTypes, Transaction } from "sequelize";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { ProductDiscountClientModel } from "../../../../modules/associations.js";
@@ -36,9 +36,16 @@ class ClientController {
                     },
                     {
                         model: ProductDiscountClientModel,
-                        as: "pruduct_discounts_client",
-                        attributes: ProductDiscountClientModel.getAllFields()
-                    }
+                        as: "product_discounts_client",
+                        attributes: ProductDiscountClientModel.getAllFields(),
+                        include: [
+                            {
+                                model: ProductModel,
+                                as: "product",
+                                attributes: ProductModel.getAllFields()
+                            }
+                        ]
+                    },
                 ]
             });
             if (!(response.length > 0)) {
@@ -116,7 +123,7 @@ class ClientController {
                 include: [
                     {
                         model: ProductDiscountClientModel,
-                        as: "pruduct_discounts_client",
+                        as: "product_discounts_client",
                         attributes: ProductDiscountClientModel.getAllFields()
                     },
                     {
@@ -143,7 +150,7 @@ class ClientController {
         }
     };
     static create = async (req, res, next) => {
-        const { company_name, tax_id, email, phone, city, state, country, address, payment_terms, credit_limit, zip_code, tax_regimen, cfdi, payment_method } = req.body;
+        const { company_name, tax_id, email, phone, city, state, country, street, street_number, neighborhood, payment_terms, credit_limit, zip_code, tax_regimen, cfdi, payment_method } = req.body;
         try {
             const validateCompanyName = await ClientModel.findOne({
                 where: { company_name: company_name }
@@ -166,7 +173,8 @@ class ClientController {
             const response = await ClientModel.create({
                 company_name, tax_id, email,
                 phone, city, state, country,
-                address, payment_terms, credit_limit,
+                street, street_number, neighborhood,
+                payment_terms, credit_limit,
                 zip_code, tax_regimen, cfdi, payment_method
             });
             if (!response) {
@@ -190,7 +198,7 @@ class ClientController {
                 .ISOLATION_LEVELS
                 .REPEATABLE_READ
         });
-        const { company_name, tax_id, email, phone, city, state, country, address, payment_terms, credit_limit, zip_code, tax_regimen, cfdi, payment_method, is_active, addresses } = req.body;
+        const { company_name, tax_id, email, phone, city, state, country, street, street_number, neighborhood, payment_terms, credit_limit, zip_code, tax_regimen, cfdi, payment_method, is_active, addresses, product_discounts_client } = req.body;
         try {
             const validateName = await ClientModel.findOne({
                 where: { company_name: company_name }
@@ -217,7 +225,8 @@ class ClientController {
             const responseClient = await ClientModel.create({
                 company_name, tax_id, email,
                 phone, city, state, country,
-                address, payment_terms, credit_limit,
+                street, street_number, neighborhood,
+                payment_terms, credit_limit,
                 zip_code, tax_regimen, cfdi, payment_method,
                 is_active: Number(is_active) || 1,
             }, { transaction });
@@ -229,7 +238,7 @@ class ClientController {
                 return;
             }
             const client_id = responseClient.toJSON().id;
-            if (addresses) {
+            if (addresses && addresses.length > 0) {
                 const newAddress = addresses.map((a) => {
                     const { id: _, ...rest } = a;
                     return { ...rest, client_id: client_id };
@@ -241,6 +250,22 @@ class ClientController {
                     await transaction.rollback();
                     res.status(409).json({
                         validation: `Some addresses could not be created`
+                    });
+                    return;
+                }
+            }
+            if (product_discounts_client && product_discounts_client?.length > 0) {
+                const discountsClients = product_discounts_client.map((p) => {
+                    const { id: _, ...rest } = p;
+                    return { ...rest, client_id: client_id };
+                });
+                const discountsClientsCreated = await ProductDiscountClientModel
+                    .bulkCreate(discountsClients, { transaction });
+                if (discountsClientsCreated.length
+                    !== product_discounts_client.length) {
+                    await transaction.rollback();
+                    res.status(409).json({
+                        validation: `Some discounts could not be created`
                     });
                     return;
                 }
@@ -431,6 +456,86 @@ class ClientController {
                     }
                 }
             }
+            if (completeBody?.product_discounts_client_manager) {
+                const discountsClientsManager = completeBody.product_discounts_client_manager;
+                const flagDiscountsClientsUpdate = [
+                    discountsClientsManager.added,
+                    discountsClientsManager.deleted,
+                    discountsClientsManager.modified
+                ].some((p) => p.length > 0);
+                if (flagDiscountsClientsUpdate) {
+                    const added = discountsClientsManager.added;
+                    const deleted = discountsClientsManager.deleted;
+                    const modified = discountsClientsManager.modified;
+                    if (added.length > 0) {
+                        const newDiscountsClients = added.map((p) => {
+                            const { id: _, ...rest } = p;
+                            return { ...rest, client_id: Number(id) };
+                        });
+                        const discountsClientsCreated = await ProductDiscountClientModel
+                            .bulkCreate(newDiscountsClients, { transaction });
+                        if (discountsClientsCreated.length
+                            !== added.length) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: `Some discounts could not be created`
+                            });
+                            return;
+                        }
+                    }
+                    if (deleted.length > 0) {
+                        const discountsClientsDeleted = await ProductDiscountClientModel
+                            .destroy({
+                            where: { id: { [Op.in]: deleted.map(d => d.id) } },
+                            transaction
+                        });
+                        if (!discountsClientsDeleted) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: `Some discounts could not be deleted`
+                            });
+                            return;
+                        }
+                    }
+                    if (modified.length > 0) {
+                        const modifiedFiltered = modified.filter(p => p.id !== undefined)
+                            .map(p => p.id);
+                        const validateDiscountsClients = await ProductDiscountClientModel.findAll({
+                            where: { id: { [Op.in]: modifiedFiltered } },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
+                        if (validateDiscountsClients.length
+                            !== modifiedFiltered.length) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: `Some discounts could not be updated`
+                            });
+                            return;
+                        }
+                        const results = [];
+                        for (const p of modified) {
+                            const discountClientId = p.id;
+                            const { id: _, ...rest } = p;
+                            const result = await ProductDiscountClientModel
+                                .update(rest, {
+                                where: { id: discountClientId },
+                                transaction,
+                            });
+                            results.push(result);
+                        }
+                        const allUpdated = results.every(([affectedCount]) => affectedCount > 0);
+                        if (!allUpdated) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: `The discounts could not be `
+                                    + `modified for the client`
+                            });
+                            return;
+                        }
+                    }
+                }
+            }
             await transaction.commit();
             res.status(200).json({
                 message: "Client updated successfully"
@@ -534,7 +639,6 @@ class ClientController {
             });
             const hasPosActive = purchasedOrdersActiveResponse
                 .shift();
-            console.log(hasPosActive);
             if (hasPosActive.has_pos_active > 0) {
                 res.status(400).json({
                     validation: `The client can't be deleted because `
@@ -546,7 +650,6 @@ class ClientController {
                 where: { id: id },
                 individualHooks: true
             });
-            console.log(response);
             if (!(response > 0)) {
                 res.status(404).json({
                     validation: "Client not found for deleted"

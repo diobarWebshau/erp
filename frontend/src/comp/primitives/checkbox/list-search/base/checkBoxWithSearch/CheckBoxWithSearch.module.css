@@ -133,7 +133,11 @@ height: define el grosor del scrollbar horizontal.
 /* estilo base del checkbox */
 .inputCheckbox {
 
-    /* Google chrome y Edge */ 
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    /* Google chrome y Edge */
     -webkit-appearance: none;
     /* Safari */
     -moz-appearance: none;
@@ -146,10 +150,9 @@ height: define el grosor del scrollbar horizontal.
     /* dimension */
     width: 15px;
     height: 15px;
-    
+
     /* distribucion box */
     border: 2px solid var(--color-theme-primary);
-    border-radius: 5px;
 
     /* interactividad */
     cursor: pointer;
@@ -193,18 +196,18 @@ height: define el grosor del scrollbar horizontal.
     position: absolute;
     top: 10%;
     left: 40%;
-    
+
     /* dimension */
     width: 4px;
     height: 8px;
-    
+
     /* transformaciones */
     transform: rotate(45deg);
-    
+
     /* distribucion box */
     border: solid var(--color-theme-font-white);
     border-width: 0 2px 2px 0;
-    
+
     /* estilos */
     content: "";
 }

@@ -381,7 +381,9 @@ const Step3 = ({
     const [selectedAddress, setSelectedAddress] =
         useState<IPartialClientAddress | null>(
             {
-                address: state.updated.shipping_address ?? "",
+                street: state.updated.shipping_street ?? "",
+                street_number: state.updated.shipping_street_number ?? "",
+                neighborhood: state.updated.shipping_neighborhood ?? "",
                 city: state.updated.shipping_city ?? "",
                 state: state.updated.shipping_state ?? "",
                 zip_code: state.updated.shipping_zip_code ?? "",
@@ -699,7 +701,7 @@ const Step3 = ({
                                     + `${state.updated.country}.`
                                 }
                             </p>
-                            <p>{state.updated.address}</p>
+                            <p>{`${state.updated.street}, ` + `${state.updated.street_number}, ` + `${state.updated.neighborhood}`}</p>
                         </section>
                     </section>
                 </section>
@@ -766,7 +768,7 @@ const Step3 = ({
                                 + `${state.updated.shipping_country}.`
                             }
                         </p>
-                        <p>{state.updated.shipping_address}</p>
+                        <p>{`${state.updated.shipping_street}, ` + `${state.updated.shipping_street_number}, ` + `${state.updated.shipping_neighborhood}`}</p>
                     </section>
                 </section>
                 <section className={styleModule.thirdBlock}>

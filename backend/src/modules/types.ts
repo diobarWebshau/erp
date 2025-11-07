@@ -51,6 +51,7 @@ import {
     ScrapCreateAttributes,
     PurchaseOrderProductAttributes,
     PurchaseOrderProductCreateAttributes,
+    ProductDiscountClientManager
 } from "./services/types.js";
 
 import {
@@ -107,6 +108,7 @@ export type {
     ProductDiscountRangeAttributes,
     ProductDiscountRangeCreateAttributes,
     ProductDiscountRangeManager,
+    ProductDiscountClientManager,
     PermissionAttributes,
     PermissionCreationAttributes,
     RoleAttributes,

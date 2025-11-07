@@ -604,7 +604,7 @@ const Step3 = ({
                                     + `${state.data.country}.`
                                 }
                             </p>
-                            <p>{state.data.address}</p>
+                            <p>{`${state.data.shipping_street}, ${state.data.shipping_street_number}, ${state.data.shipping_neighborhood}`}</p>
                         </section>
                     </section>
                 </section>
@@ -671,7 +671,7 @@ const Step3 = ({
                                 + `${state.data.shipping_country}.`
                             }
                         </p>
-                        <p className="nunito-semibold">{state.data.shipping_address}</p>
+                        <p className="nunito-semibold">{`${state.data.shipping_street}, ${state.data.shipping_street_number}, ${state.data.shipping_neighborhood}`}</p>
                     </section>
                 </section>
                 <section className={`nunito-bold ${styleModule.thirdBlock}`}>

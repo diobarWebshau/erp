@@ -1,12 +1,12 @@
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import { DataTypes, Model, Optional }
-    from "sequelize";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model, Optional } from "sequelize";
 
 interface ClientAddressesAttributes {
     id: number,
     client_id: number,
-    address: string,
+    street: string,
+    street_number: string,
+    neighborhood: string,
     city: string,
     state: string,
     country: string,
@@ -31,14 +31,16 @@ class ClientAddressesModel extends
         ClientAddressesCreateAttributes> {
     static getEditableFields = (): string[] => {
         return [
-            "client_id", "address", "city",
-            "state", "country", "zip_code",
+            "client_id", "street", "street_number",
+            "neighborhood", "city", "state", "country",
+            "zip_code",
         ];
     }
     static getAllFields(): string[] {
         return [
-            "id", "client_id", "address", "city",
-            "state", "country", "zip_code",
+            "id", "client_id", "street", "street_number",
+            "neighborhood", "city", "state", "country",
+            "zip_code",
             "created_at", "updated_at"
         ];
     }
@@ -58,7 +60,15 @@ ClientAddressesModel.init({
             key: "id"
         },
     },
-    address: {
+    street: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    street_number: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    neighborhood: {
         type: DataTypes.TEXT,
         allowNull: false
     },

@@ -56,21 +56,21 @@ const clientReducer = produce((
         }
         case clientActionsTypes.ADD_CLIENT_PRODUCT_DISCOUNTS:{
             for (const item of action.payload) {
-                if (draft.data?.pruduct_discounts_client?.length === 0) {
-                    const isDuplicate = draft.data?.pruduct_discounts_client?.some(
+                if (draft.data?.product_discounts_client?.length === 0) {
+                    const isDuplicate = draft.data?.product_discounts_client?.some(
                         it => it.id === item.id
                     );
                     if (isDuplicate) return;
                 }
-                draft.data.pruduct_discounts_client?.push(item);
+                draft.data.product_discounts_client?.push(item);
             }
             break;
         }
         case clientActionsTypes.REMOVE_CLIENT_PRODUCT_DISCOUNTS:{
-            if (!draft.data?.pruduct_discounts_client) return;
+            if (!draft.data?.product_discounts_client) return;
             const idsToRemove = new Set<string | number>(action.payload); // Convertir payload a Set para mejor rendimiento y no se repitan los ids
-            draft.data.pruduct_discounts_client =
-                draft.data.pruduct_discounts_client.filter(it => {
+            draft.data.product_discounts_client =
+                draft.data.product_discounts_client.filter(it => {
                     const id = it?.id;
                     // Conserva los que no tienen id; elimina solo si el id está en payload
                     return id == null ? true : !idsToRemove.has(id);
@@ -78,8 +78,8 @@ const clientReducer = produce((
             break;
         }
         case clientActionsTypes.UPDATE_CLIENT_PRODUCT_DISCOUNTS:{
-            if (!draft.data?.pruduct_discounts_client) break;
-            const target = draft.data.pruduct_discounts_client.find(
+            if (!draft.data?.product_discounts_client) break;
+            const target = draft.data.product_discounts_client.find(
                 it => it.id === action.payload.id
             );
             if (target) {
@@ -109,10 +109,10 @@ const clientReducer = produce((
             break;
         }
         case clientActionsTypes.REMOVE_DRAFT_CLIENT_PRODUCT_DISCOUNTS: {
-            if (!draft.draft?.pruduct_discounts_client) return;
+            if (!draft.draft?.product_discounts_client) return;
             const idsToRemove = new Set<string | number>(action.payload); // Convertir payload a Set para mejor rendimiento y no se repitan los ids
-            draft.draft.pruduct_discounts_client =
-                draft.draft.pruduct_discounts_client.filter(it => {
+            draft.draft.product_discounts_client =
+                draft.draft.product_discounts_client.filter(it => {
                     const id = it?.id;
                     // Conserva los que no tienen id; elimina solo si el id está en payload
                     return id == null ? true : !idsToRemove.has(id);
@@ -120,8 +120,8 @@ const clientReducer = produce((
             break;
         }
         case clientActionsTypes.UPDATE_DRAFT_CLIENT_PRODUCT_DISCOUNTS: {
-            if (!draft.draft?.pruduct_discounts_client) break;
-            const target = draft.draft.pruduct_discounts_client.find(
+            if (!draft.draft?.product_discounts_client) break;
+            const target = draft.draft.product_discounts_client.find(
                 it => it.id === action.payload.id
             );
             if (target) {
@@ -131,13 +131,13 @@ const clientReducer = produce((
         }
         case clientActionsTypes.ADD_DRAFT_CLIENT_PRODUCT_DISCOUNTS: {
             for (const item of action.payload) {
-                if (draft.draft?.pruduct_discounts_client?.length === 0) {
-                    const isDuplicate = draft.draft?.pruduct_discounts_client?.some(
+                if (draft.draft?.product_discounts_client?.length === 0) {
+                    const isDuplicate = draft.draft?.product_discounts_client?.some(
                         it => it.id === item.id
                     );
                     if (isDuplicate) return;
                 }
-                draft.draft.pruduct_discounts_client?.push(item);
+                draft.draft.product_discounts_client?.push(item);
             }
             break;
         }

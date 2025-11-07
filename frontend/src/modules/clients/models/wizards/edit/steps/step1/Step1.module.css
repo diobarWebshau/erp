@@ -1,0 +1,65 @@
+/* *************** Container *************** */
+
+.containerStep {
+    /* distirbucion flex respecto al padre*/
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.containerContent {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+}
+
+.containerButtons {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+}
+
+/* *************** Container Content *************** */
+
+.containerContent {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+}
+
+.blockContact {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.blockContact>* {
+    flex: 1;
+}
+
+.subTitle {
+    /* estilos */
+    color: var(--color-theme-font-black);
+    font-size: 16px;
+}
+
+
+/* *************** Container Buttons *************** */
+
+.containerButtons {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}

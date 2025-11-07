@@ -53,7 +53,6 @@ const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
             zip_code: zipCode,
         };
         onAdd(address);
-        onClose();
     };
 
     return (

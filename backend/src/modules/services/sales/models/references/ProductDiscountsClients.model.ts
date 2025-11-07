@@ -1,7 +1,6 @@
-import { DataTypes, Model, Optional }
-    from "sequelize";
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { ProductAttributes } from "../../../../types.js";
+import { DataTypes, Model } from "sequelize";
 
 interface ProductDiscountClientAttributes {
     id: number,
@@ -10,11 +9,16 @@ interface ProductDiscountClientAttributes {
     discount_percentage: number,
     created_at: Date,
     updated_at: Date
+    product?: ProductAttributes
 }
 
-interface ProductDiscountClientCreateAttributes
-    extends Optional<ProductDiscountClientAttributes,
-        "id" | "created_at" | "updated_at"> { }
+interface ProductDiscountClientManager {
+    added: ProductDiscountClientAttributes[],
+    deleted: ProductDiscountClientAttributes[]
+    modified: ProductDiscountClientCreateAttributes[]
+}
+
+type ProductDiscountClientCreateAttributes = Partial<ProductDiscountClientAttributes>;
 
 class ProductDiscountClientModel
     extends Model<ProductDiscountClientAttributes,
@@ -81,7 +85,8 @@ ProductDiscountClientModel.init({
 
 export type {
     ProductDiscountClientAttributes,
-    ProductDiscountClientCreateAttributes
+    ProductDiscountClientCreateAttributes,
+    ProductDiscountClientManager
 }
 
 export default ProductDiscountClientModel;

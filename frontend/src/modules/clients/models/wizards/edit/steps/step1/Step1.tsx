@@ -5,7 +5,7 @@ import MainActionButtonCustom from "../../../../../../../comp/primitives/button/
 import { Bookmark, MailIcon, Phone, Text } from "lucide-react";
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import InputTextCustom from "../../../../../../../comp/primitives/input/text/custom/InputTextCustom";
-import { update_client } from "../../../../../context/clientActions";
+import { update_draft_client } from "../../../../../context/clientActions";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import StyleModule from "./Step1.module.css";
 import { next_step } from "../../../../../context/clientActions";
@@ -13,20 +13,20 @@ import { next_step } from "../../../../../context/clientActions";
 interface IStep1 {
     state: ClientState;
     dispatch: Dispatch<ClientAction>;
-    onCancel: () => void;
+    onDiscard: () => void;
 }
 
 const Step1 = ({
     state,
     dispatch,
-    onCancel
+    onDiscard
 }: IStep1) => {
 
-    const [company_name, setCompanyName] = useState<string>(state.data?.company_name ?? "");
-    const [cfdi, setCfdi] = useState<string>(state.data?.cfdi ?? "");
-    const [phone, setPhone] = useState<string>(state.data?.phone ?? "");
-    const [email, setEmail] = useState<string>(state.data?.email ?? "");
-    const [taxId, setTaxId] = useState<string>(state.data?.tax_id ?? "");
+    const [company_name, setCompanyName] = useState<string>(state.draft?.company_name ?? "");
+    const [cfdi, setCfdi] = useState<string>(state.draft?.cfdi ?? "");
+    const [phone, setPhone] = useState<string>(state.draft?.phone ?? "");
+    const [email, setEmail] = useState<string>(state.draft?.email ?? "");
+    const [taxId, setTaxId] = useState<string>(state.draft?.tax_id ?? "");
 
     const handleOnClickNext = useCallback(() => {
         if (company_name === "" || phone === "" || email === "" || cfdi === "" || taxId === "") {
@@ -35,7 +35,7 @@ const Step1 = ({
             });
             return;
         }
-        dispatch(update_client({
+        dispatch(update_draft_client({
             company_name: company_name,
             cfdi: cfdi,
             phone: phone,
@@ -100,7 +100,7 @@ const Step1 = ({
             <div className={StyleModule.containerButtons}>
                 <CriticalActionButton
                     label="Cancelar"
-                    onClick={onCancel}
+                    onClick={onDiscard}
                 />
                 <TertiaryActionButtonCustom
                     label="Guardar y salir"

@@ -143,7 +143,7 @@ const modalEditReducer = produce(
                         // }
 
                         const client_discounts: WritableDraft<IPartialProductDiscountClient>[] =
-                            draft.updated.client?.pruduct_discounts_client ?? [];
+                            draft.updated.client?.product_discounts_client ?? [];
 
                         const discountClientApply:
                             WritableDraft<IPartialProductDiscountClient> | undefined =
@@ -216,7 +216,7 @@ const modalEditReducer = produce(
                         );
 
                         const client_discounts: WritableDraft<IPartialProductDiscountClient>[] =
-                            draft.updated.client?.pruduct_discounts_client ?? [];
+                            draft.updated.client?.product_discounts_client ?? [];
 
                         const discountClientApply:
                             WritableDraft<IPartialProductDiscountClient> | undefined =

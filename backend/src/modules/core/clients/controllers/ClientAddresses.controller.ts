@@ -15,14 +15,12 @@ class ClientsAddressesController {
     static getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const addresses = await ClientAddressesModel.findAll();
-
             if (addresses.length === 0) {
                 res.status(200).json({
                     validation: "Client addresses no found"
                 });
                 return;
             }
-
             res.status(200).json(addresses.map(address => address.toJSON()));
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -94,7 +92,9 @@ class ClientsAddressesController {
                 where: {
                     client_id,
                     [Op.or]: [
-                        { address: { [Op.like]: `${filter}%` } },
+                        { street: { [Op.like]: `${filter}%` } },
+                        { street_number: { [Op.like]: `${filter}%` } },
+                        { neighborhood: { [Op.like]: `${filter}%` } },
                         { city: { [Op.like]: `${filter}%` } },
                         { state: { [Op.like]: `${filter}%` } },
                         { country: { [Op.like]: `${filter}%` } },
@@ -121,8 +121,9 @@ class ClientsAddressesController {
 
     static create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const {
-            client_id, address, city,
-            state, country, zip_code
+            client_id, street, street_number,
+            neighborhood, city, state, country,
+            zip_code
         } = req.body;
 
         try {
@@ -135,8 +136,9 @@ class ClientsAddressesController {
             }
 
             const newAddress = await ClientAddressesModel.create({
-                client_id, address, city,
-                state, country, zip_code
+                client_id, street, street_number,
+                neighborhood, city, state, country,
+                zip_code
             });
 
             res.status(201).json({

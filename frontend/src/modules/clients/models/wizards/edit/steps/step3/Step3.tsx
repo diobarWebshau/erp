@@ -1,37 +1,27 @@
 import StyleModule from "./Step3.module.css";
 import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
 import { useCallback, useMemo, type Dispatch } from "react";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
-import { Bookmark, ChevronLeft } from "lucide-react";
+import { Pencil } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
 import { formatCurrency, formatPercentage1_100 } from "../../../../../../../helpers/formttersNumeric";
 import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import { back_step } from "../../../../../context/clientActions";
-import type { IPartialClient } from "../../../../../../../interfaces/clients";
-import type { RootState } from "../../../../../../../store/store";
-import { useSelector } from "react-redux";
-import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import { set_draft_client, set_step } from "../../../../../context/clientActions";
 
 interface IStep3 {
     state: ClientState;
     dispatch: Dispatch<ClientAction>;
-    onCancel: () => void;
-    onCreate: (record: IPartialClient) => Promise<void>;
     onClose: () => void;
 }
 const Step3 = ({
     state,
     dispatch,
-    onCancel,
-    onCreate,
-    onClose
+    onClose,
 }: IStep3) => {
 
-    const errorRedux = useSelector((state: RootState) => state.error);
 
     // * *********** Funciones memoizadas para las tablas ************ 
 
@@ -138,22 +128,10 @@ const Step3 = ({
         },
     ], []);
 
-    const handleOnClickBackStep = useCallback(() => {
-        dispatch(back_step());
-    }, [dispatch]);
-
-    const handleOnClickCreate = useCallback(() => {
-        onCreate(state?.data ?? {});
-        if (Object.keys(errorRedux).length > 0) {
-            Object.entries(errorRedux).forEach(([_, value]) => {
-                ToastMantine.error({
-                    message: value,
-                });
-            })
-            return;
-        }
-        onClose();
-    }, [onCreate, state.data, errorRedux, ToastMantine, onClose]);
+    const handleOnClickEdit = useCallback(() => {
+        dispatch(set_draft_client(state?.data ?? {}));
+        dispatch(set_step(0));
+    }, [dispatch, state.data]);
 
     return (
         <div className={StyleModule.containerStep}>
@@ -247,18 +225,13 @@ const Step3 = ({
             </div>
             <div className={StyleModule.containerButtons}>
                 <CriticalActionButton
-                    onClick={onCancel}
+                    onClick={onClose}
                     label="Cancelar"
                 />
-                <TertiaryActionButtonCustom
-                    label="Regresar"
-                    icon={<ChevronLeft />}
-                    onClick={handleOnClickBackStep}
-                />
                 <MainActionButtonCustom
-                    onClick={handleOnClickCreate}
-                    label="Guardar y continuar"
-                    icon={<Bookmark />}
+                    onClick={handleOnClickEdit}
+                    label="Editar"
+                    icon={<Pencil />}
                 />
             </div>
         </div>

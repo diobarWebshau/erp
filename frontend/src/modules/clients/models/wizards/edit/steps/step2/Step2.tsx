@@ -14,8 +14,8 @@ import type { IPartialClientAddress } from "../../../../../../../interfaces/clie
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
 import AddressModal from "../../../../modals/address/AddressModal";
 import {
-    add_client_addresses, remove_client_addresses, add_client_product_discounts, next_step,
-    remove_client_product_discounts, update_client_product_discounts, update_client,
+    add_draft_client_addresses, remove_draft_client_addresses, add_draft_client_product_discounts, next_step,
+    remove_draft_client_product_discounts, update_draft_client_product_discounts, update_draft_client,
     back_step
 } from "./../../../../../context/clientActions"
 import type { RowAction } from "interfaces/tableTypes";
@@ -29,6 +29,7 @@ import { clearError, setError } from "../../../../../../../store/slicer/errorSli
 import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
+import type { IClient, IPartialClient } from "../../../../../../../interfaces/clients";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -37,14 +38,18 @@ const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
 interface IStep2 {
     state: ClientState;
     dispatch: Dispatch<ClientAction>;
-    onCancel: () => void;
+    onDiscard: () => void;
+    onUpdate: ({ original, updated }: { original: IClient, updated: IPartialClient }) => Promise<void>
 }
 
 const Step2 = ({
     state,
     dispatch,
-    onCancel
+    onDiscard,
+    onUpdate
 }: IStep2) => {
+
+    console.log(`state`, state);
 
     // * *********** Estados globales ************ 
 
@@ -52,14 +57,14 @@ const Step2 = ({
 
     // * *********** Estados logicos locales ************ 
 
-    const [countryName, setCountryName] = useState<string>(state?.data?.country ?? "México");
-    const [stateName, setStateName] = useState<string>(state?.data?.state ?? "Baja California");
-    const [cityName, setCityName] = useState<string>(state.data?.city ?? "Mexicali");
-    const [zipCode, setZipCode] = useState<string>(state.data?.zip_code ?? "");
-    const [street, setStreet] = useState<string>(state.data?.street ?? "");
-    const [streetNumber, setStreetNumber] = useState<string>(state.data?.street_number ?? "");
-    const [neighborhood, setNeighborhood] = useState<string>(state.data?.neighborhood ?? "");
-    const [paymentTerms, setPaymentTerms] = useState<string>(state.data?.payment_terms ?? "");
+    const [countryName, setCountryName] = useState<string>(state?.draft?.country ?? "México");
+    const [stateName, setStateName] = useState<string>(state?.draft?.state ?? "Baja California");
+    const [cityName, setCityName] = useState<string>(state?.draft?.city ?? "Mexicali");
+    const [zipCode, setZipCode] = useState<string>(state?.draft?.zip_code ?? "");
+    const [street, setStreet] = useState<string>(state?.draft?.street ?? "");
+    const [streetNumber, setStreetNumber] = useState<string>(state?.draft?.street_number ?? "");
+    const [neighborhood, setNeighborhood] = useState<string>(state?.draft?.neighborhood ?? "");
+    const [paymentTerms, setPaymentTerms] = useState<string>(state?.draft?.payment_terms ?? "");
 
     // * *********** Estados gui locales ************ 
 
@@ -83,7 +88,7 @@ const Step2 = ({
     const handleDeleteAddress = useCallback((address: IPartialClientAddress) => {
         const id = address.id;
         if (!id) return;
-        dispatch(remove_client_addresses([id]));
+        dispatch(remove_draft_client_addresses([id]));
     }, [dispatch, state]);
 
     const handleAddDiscount = useCallback((products: IProduct[]) => {
@@ -93,14 +98,14 @@ const Step2 = ({
             product: p,
             discount_percentage: 0,
         }));
-        dispatch(add_client_product_discounts(newDiscount));
+        dispatch(add_draft_client_product_discounts(newDiscount));
         toggleIsActiveDiscountModal();
     }, [dispatch, toggleIsActiveDiscountModal]);
 
     const handleDeleteDiscount = useCallback((discount: IPartialProductDiscountClient) => {
         const id = discount.id;
         if (!id) return;
-        dispatch(remove_client_product_discounts([id]));
+        dispatch(remove_draft_client_product_discounts([id]));
     }, [dispatch, state]);
 
     const handleAddAddress = useCallback((address: IPartialClientAddress) => {
@@ -108,16 +113,16 @@ const Step2 = ({
             id: generateRandomIds(),
             ...address,
         };
-        dispatch(add_client_addresses([newAddress]));
+        dispatch(add_draft_client_addresses([newAddress]));
         toggleIsActiveAddressModal();
     }, [dispatch, toggleIsActiveAddressModal]);
 
     const excludeIds = useMemo<number[]>(
         () =>
-            state.data?.product_discounts_client
+            state.draft?.product_discounts_client
                 ?.map(p => p.product_id)
                 .filter((id): id is number => id != null) ?? [],
-        [state.data?.product_discounts_client]
+        [state.draft?.product_discounts_client]
     );
 
     const fetchLoadProducts = useCallback(async (query: string | number): Promise<IProduct[]> => {
@@ -156,7 +161,7 @@ const Step2 = ({
             console.error("Error fetching products:", error);
             return [];
         }
-    }, [state.data?.product_discounts_client, dispatchRedux, excludeIds]);
+    }, [state.draft?.product_discounts_client, dispatchRedux, excludeIds]);
 
     // * *********** Funciones memoizadas para las tablas ************ 
 
@@ -164,7 +169,7 @@ const Step2 = ({
     const getRowIdDiscounts = useMemo(() => (row: IPartialProductDiscountClient, index: number) => row.id?.toString() ?? index.toString(), []);
 
     const handleChangeDiscount = useCallback((id: string, value: number) => {
-        dispatch(update_client_product_discounts({
+        dispatch(update_draft_client_product_discounts({
             id,
             attributes: {
                 discount_percentage: value,
@@ -339,8 +344,8 @@ const Step2 = ({
             return;
         }
 
-        console.log(state.data?.product_discounts_client);
-        const isDiscountsValid = (state.data?.product_discounts_client?.length || 0) > 0 && state.data?.product_discounts_client?.every((discount) => discount?.discount_percentage !== undefined && discount?.discount_percentage > 0 && discount?.discount_percentage < 100);
+        console.log(state.draft?.product_discounts_client);
+        const isDiscountsValid = (state.draft?.product_discounts_client?.length || 0) > 0 && state.draft?.product_discounts_client?.every((discount) => discount?.discount_percentage !== undefined && discount?.discount_percentage > 0 && discount?.discount_percentage < 100);
 
         if (!isDiscountsValid) {
             ToastMantine.feedBackForm({
@@ -349,7 +354,7 @@ const Step2 = ({
             return;
         }
 
-        dispatch(update_client({
+        dispatch(update_draft_client({
             street,
             street_number: streetNumber,
             neighborhood,
@@ -362,7 +367,7 @@ const Step2 = ({
 
         dispatch(next_step());
 
-    }, [street, streetNumber, neighborhood, countryName, stateName, cityName, zipCode, dispatch, paymentTerms, state.data?.product_discounts_client]);
+    }, [street, streetNumber, neighborhood, countryName, stateName, cityName, zipCode, dispatch, paymentTerms, state.draft?.product_discounts_client]);
 
     const handleOnChangePaymentTerms = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => (() => setPaymentTerms(e.target.value))(), []);
 
@@ -441,7 +446,7 @@ const Step2 = ({
                         modelName="clientAddress"
                         getRowId={getRowIdAddresses}
                         columns={columnsAddresses}
-                        data={state.data?.addresses ?? []}
+                        data={state.draft?.addresses ?? []}
                         extraComponents={ExtraComponentAddresses}
                         rowActions={rowActionsAddresses}
                         typeRowActions="icon"
@@ -454,7 +459,7 @@ const Step2 = ({
                         modelName="clientDiscount"
                         getRowId={getRowIdDiscounts}
                         columns={columnsDiscounts}
-                        data={state.data?.product_discounts_client ?? []}
+                        data={state.draft?.product_discounts_client ?? []}
                         extraComponents={ExtraComponentDiscountsFunc}
                         rowActions={rowActionsDiscounts}
                         typeRowActions="icon"
@@ -475,7 +480,7 @@ const Step2 = ({
             <div className={StyleModule.containerButtons}>
                 <CriticalActionButton
                     label="Cancelar"
-                    onClick={onCancel}
+                    onClick={onDiscard}
                 />
                 <TertiaryActionButtonCustom
                     label="Regresar"

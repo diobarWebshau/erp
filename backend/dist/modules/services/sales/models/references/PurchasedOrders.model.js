@@ -6,10 +6,10 @@ class PurchasedOrderModel extends Model {
             "order_code", "delivery_date",
             "status", "client_id", "company_name",
             "tax_id", "email", "phone", "city",
-            "state", "country", "address",
+            "state", "country", "street", "street_number", "neighborhood",
             "payment_terms", "zip_code", "tax_regimen",
             "cfdi", "payment_method", "client_address_id",
-            "shipping_address", "shipping_city",
+            "shipping_street", "shipping_street_number", "shipping_neighborhood", "shipping_city",
             "shipping_state", "shipping_country",
             "shipping_zip_code", "total_price", "created_at"
         ];
@@ -19,10 +19,10 @@ class PurchasedOrderModel extends Model {
             "id", "order_code", "delivery_date",
             "status", "client_id", "company_name",
             "tax_id", "email", "phone", "city",
-            "state", "country", "address",
+            "state", "country", "street", "street_number", "neighborhood",
             "payment_terms", "zip_code", "tax_regimen",
             "cfdi", "payment_method", "client_address_id",
-            "shipping_address", "shipping_city",
+            "shipping_street", "shipping_street_number", "shipping_neighborhood", "shipping_city",
             "shipping_state", "shipping_country",
             "shipping_zip_code", "total_price",
             "created_at", "updated_at"
@@ -84,8 +84,16 @@ PurchasedOrderModel.init({
         type: DataTypes.STRING(100),
         allowNull: false
     },
-    address: {
-        type: DataTypes.TEXT,
+    street: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    street_number: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    neighborhood: {
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     payment_terms: {
@@ -116,8 +124,16 @@ PurchasedOrderModel.init({
             key: "id"
         },
     },
-    shipping_address: {
-        type: DataTypes.TEXT,
+    shipping_street: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    shipping_street_number: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    shipping_neighborhood: {
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     shipping_city: {

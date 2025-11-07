@@ -1,6 +1,5 @@
 import { useClientDispatch, useClientState } from "../../../../clients/context/clientHooks";
-import type { IPartialClient } from "../../../../../interfaces/clients";
-import StyleModule from "./AddWizardClients.module.css";
+import StyleModule from "./EditWizardClients.module.css";
 import { useMemo, useState } from "react";
 import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
@@ -10,47 +9,57 @@ import FullContainerModal from "../../../../../comp/primitives/modal/full-contai
 import StepperMantineCustom from "../../../../../comp/external/mantine/stepper/custom/StepperMantineCustom";
 import TransparentButtonCustom from "../../../../../comp/primitives/button/custom-button/transparent/TransparentButtonCustom";
 import WarningModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/warning/WarningModal";
+import type { IClient, IPartialClient } from "../../../../../interfaces/clients";
+import DiscardModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/discard/DiscardModal";
+import { set_step } from "../../../context/clientActions";
 
-interface IAddWizardClients {
+interface IEditWizardClients {
     onClose: () => void;
-    onCreate: (record: IPartialClient) => Promise<void>;
+    onUpdate: ({ original, updated }: { original: IClient, updated: IPartialClient }) => Promise<void>;
 }
 
-const AddWizardClients = ({ onClose, onCreate }: IAddWizardClients) => {
+const EditWizardClients = ({ onClose, onUpdate }: IEditWizardClients) => {
 
     const state = useClientState();
     const dispatch = useClientDispatch();
     const [showWarningModal, setShowWarningModal] = useState(false);
+    const [isActiveDiscardModal, setIsActiveDiscardModal] = useState(false);
     const toggleWarningModal = useMemo(() => () => setShowWarningModal(prev => !prev), []);
+    const toggleDiscardModal = useMemo(() => () => setIsActiveDiscardModal(prev => !prev), []);
 
     const steps = useMemo(() => [
         {
             title: "Información Básica",
-            content: <Step1 state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
+            content: <Step1 state={state} dispatch={dispatch} onDiscard={toggleDiscardModal} />,
             icon: <UserPen />
         },
         {
             title: "Dirección y datos comerciales",
-            content: <Step2 state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
+            content: <Step2 state={state} dispatch={dispatch} onDiscard={toggleDiscardModal} onUpdate={onUpdate} />,
             icon: <MapPinned />
         },
         {
             title: "Resumen y finalización",
-            content: <Step3 state={state} dispatch={dispatch} onCancel={toggleWarningModal} onCreate={onCreate} onClose={onClose} />,
+            content: <Step3 state={state} dispatch={dispatch} onClose={onClose} />,
             icon: <FileCheck />
         }
-    ], [state, dispatch, toggleWarningModal, onClose, onCreate]);
+    ], [state, dispatch, toggleWarningModal, onClose]);
+
+    const handleDiscard = useMemo(() => () => {
+        dispatch(set_step(2));
+        toggleDiscardModal();
+    }, [dispatch, toggleDiscardModal]);
 
     return (
         <FullContainerModal>
-            <div className={StyleModule.containerAddWizardClients}>
+            <div className={StyleModule.containerEditWizardClients}>
                 <div className={StyleModule.headerSection}>
                     <TransparentButtonCustom
                         onClick={toggleWarningModal}
                         icon={<ChevronLeft className={StyleModule.backButtonIcon} />}
                         label="Regresar"
                     />
-                    <h1 className={`nunito-bold ${StyleModule.title}`}>Agregar cliente</h1>
+                    <h1 className={`nunito-bold ${StyleModule.title}`}>Editar cliente</h1>
                 </div>
                 <div className={StyleModule.mainContent}>
                     <StepperMantineCustom
@@ -62,8 +71,14 @@ const AddWizardClients = ({ onClose, onCreate }: IAddWizardClients) => {
                 </div>
             </div>
             {showWarningModal && (<WarningModal onClose={toggleWarningModal} onLeave={onClose} />)}
+            {isActiveDiscardModal && (
+                <DiscardModal
+                    onClose={toggleDiscardModal} onDiscard={handleDiscard}
+                    title="¿Estas seguro de descartar los cambios?"
+                />
+            )}
         </FullContainerModal>
     );
 };
 
-export default AddWizardClients;
+export default EditWizardClients;

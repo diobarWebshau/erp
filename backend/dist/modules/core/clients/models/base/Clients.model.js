@@ -5,7 +5,8 @@ class ClientModel extends Model {
         return [
             "company_name", "tax_id", "email",
             "phone", "city", "state", "country",
-            "address", "payment_terms", "credit_limit",
+            "street", "street_number", "neighborhood",
+            "payment_terms", "credit_limit",
             "zip_code", "tax_regimen", "cfdi",
             "payment_method", "is_active"
         ];
@@ -14,7 +15,8 @@ class ClientModel extends Model {
         return [
             "id", "company_name", "tax_id", "email",
             "phone", "city", "state", "country",
-            "address", "payment_terms", "credit_limit",
+            "street", "street_number", "neighborhood",
+            "payment_terms", "credit_limit",
             "zip_code", "tax_regimen", "cfdi",
             "payment_method", "is_active",
             "created_at", "updated_at"
@@ -56,17 +58,25 @@ ClientModel.init({
         type: DataTypes.STRING(100),
         allowNull: false
     },
-    address: {
-        type: DataTypes.TEXT,
+    street: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    street_number: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    neighborhood: {
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     payment_terms: {
         type: DataTypes.STRING(100),
-        allowNull: false
+        allowNull: true
     },
     credit_limit: {
         type: DataTypes.DECIMAL(14, 4),
-        allowNull: false
+        allowNull: true
     },
     zip_code: {
         type: DataTypes.STRING(100),
@@ -74,7 +84,7 @@ ClientModel.init({
     },
     tax_regimen: {
         type: DataTypes.STRING(100),
-        allowNull: false
+        allowNull: true
     },
     cfdi: {
         type: DataTypes.STRING(100),
@@ -82,7 +92,7 @@ ClientModel.init({
     },
     payment_method: {
         type: DataTypes.STRING(100),
-        allowNull: false
+        allowNull: true
     },
     is_active: {
         type: DataTypes.TINYINT,

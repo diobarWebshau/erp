@@ -1,7 +1,7 @@
 import { clientActionsTypes } from "./../context/clientTypes";
 import type { ClientAction } from "./../context/clientTypes";
 import type { IPartialClient } from "../../../interfaces/clients";
-import type { IClientAddress, IPartialClientAddress } from "../../../interfaces/clientAddress";
+import type { IPartialClientAddress } from "../../../interfaces/clientAddress";
 import type { IPartialProductDiscountClient } from "../../../interfaces/product-discounts-clients";
 
 // DATA
@@ -31,7 +31,7 @@ const remove_client_addresses = (payload: (number | string)[]): ClientAction => 
     payload
 });
 
-const update_client_addresses = (payload: { id: number | string; attributes: IClientAddress }): ClientAction => ({
+const update_client_addresses = (payload: { id: number | string; attributes: IPartialClientAddress }): ClientAction => ({
     type: clientActionsTypes.UPDATE_CLIENT_ADDRESSES,
     payload
 });
@@ -63,7 +63,7 @@ const update_draft_client = (payload: IPartialClient): ClientAction => ({
     payload
 });
 
-const add_draft_client_addresses = (payload: IClientAddress[]): ClientAction => ({
+const add_draft_client_addresses = (payload: IPartialClientAddress[]): ClientAction => ({
     type: clientActionsTypes.ADD_DRAFT_CLIENT_ADDRESSES,
     payload
 });
@@ -73,7 +73,7 @@ const remove_draft_client_addresses = (payload: (number | string)[]): ClientActi
     payload
 });
 
-const update_draft_client_addresses = (payload: { id: number | string; attributes: IClientAddress }): ClientAction => ({
+const update_draft_client_addresses = (payload: { id: number | string; attributes: IPartialClientAddress }): ClientAction => ({
     type: clientActionsTypes.UPDATE_DRAFT_CLIENT_ADDRESSES,
     payload
 });

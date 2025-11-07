@@ -1,5 +1,5 @@
-import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model } from "sequelize";
 class ProductDiscountClientModel extends Model {
     static getEditableFields = () => {
         return [

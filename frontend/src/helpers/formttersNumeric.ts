@@ -62,7 +62,7 @@ export const formatCurrency = (
  * Formatea un número como porcentaje.
  * Ej: 0.25 => "25%" | 0.253 => "25.3%"
  */
-export const formatPercentage = (
+export const formatPercentage0_1 = (
     value: number,
     options?: {
         minimumFractionDigits?: number;
@@ -82,6 +82,27 @@ export const formatPercentage = (
         maximumFractionDigits,
     }).format(value);
 };
+
+export const formatPercentage1_100 = (
+    value: number,
+    options?: {
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+        locale?: string;
+    }
+): string => {
+    const {
+        minimumFractionDigits = Number.isInteger(value) ? 0 : 2,
+        maximumFractionDigits = 6,
+        locale = 'es-MX',
+    } = options || {};
+
+    return new Intl.NumberFormat(locale, {
+        minimumFractionDigits,
+        maximumFractionDigits,
+    }).format(value) + '%';
+};
+
 
 /**
  * Formatea un número de forma compacta.

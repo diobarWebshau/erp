@@ -16,7 +16,7 @@ class ClientVProductionController extends ClientsControllers.ClientController {
                 include: [{
                         where: { client_id: client_id },
                         model: ProductDiscountClientModel,
-                        as: "pruduct_discounts_client",
+                        as: "product_discounts_client",
                         attributes: ProductDiscountClientModel.getAllFields(),
                         include: [{
                                 model: ProductModel,

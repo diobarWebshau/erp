@@ -12,7 +12,8 @@ import {
 } from "./models/references/AppliedProductDiscountsRanges.model.js";
 import {
     ProductDiscountClientAttributes,
-    ProductDiscountClientCreateAttributes
+    ProductDiscountClientCreateAttributes,
+    ProductDiscountClientManager
 } from "./models/references/ProductDiscountsClients.model.js";
 import {
     PurchasedOrderAttributes,
@@ -29,6 +30,7 @@ export type {
     AppliedProductDiscountRangeCreateAttributes,
     ProductDiscountClientAttributes,
     ProductDiscountClientCreateAttributes,
+    ProductDiscountClientManager,
     PurchasedOrderAttributes,
     PurchasedOrderCreateAttributes,
 }

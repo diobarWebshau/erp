@@ -68,8 +68,10 @@ const Step2 = ({
                 selectedAddress
             ) {
                 const purchasedOrder: IPartialPurchasedOrder = {
-                    client_address_id: selectedAddress.id,
-                    shipping_address: selectedAddress.address,
+                    client_address_id: Number(selectedAddress.id),
+                    shipping_street: selectedAddress.street,
+                    shipping_street_number: selectedAddress.street_number,
+                    shipping_neighborhood: selectedAddress.neighborhood,
                     shipping_city: selectedAddress.city,
                     shipping_state: selectedAddress.state,
                     shipping_country: selectedAddress.country,
@@ -161,7 +163,7 @@ const Step2 = ({
                     <section className={styleModule.bodySection}>
                         {/* { !loadingAddresses && ( } */}
                         <SingleSelectSearchCheck<IClientAddress>
-                            rowId="address"
+                            rowId="neighborhood"
                             search={searchSingle}
                             setSearch={setSearchSingle}
                             options={addresses}

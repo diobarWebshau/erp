@@ -18,12 +18,12 @@ const initialClientState: ClientState = {
     total_steps: 2,
     current_step: 0,
     data: {
-        pruduct_discounts_client: [],
+        product_discounts_client: [],
         addresses: []
     },
     draft: {
         addresses: [],
-        pruduct_discounts_client: []
+        product_discounts_client: []
     },
 }
 

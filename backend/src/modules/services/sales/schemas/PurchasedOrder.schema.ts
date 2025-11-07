@@ -21,12 +21,20 @@ const PurchasedOrderSchema = zod.object({
     // payment_method: zod.string().min(1, "Payment method is required"),
     // shipping fields(client address)
     client_address_id: zod.number().min(1, "Client address id is required"),
-    // shipping_address: zod.string().min(1, "Shipping address is required"),
-    // shipping_city: zod.string().min(1, "Shipping city is required"),
-    // shipping_state: zod.string().min(1, "Shipping state is required"),
-    // shipping_country: zod.string().min(1, "Shipping country is required"),
-    // shipping_zip_code: zod.string().min(1, "Shipping zip code is required"),
-    //
+    street: zod.string().min(1, "Street is required"),
+    street_number: zod.string().min(1, "Street number is required"),
+    neighborhood: zod.string().min(1, "Neighborhood is required"),
+    city: zod.string().min(1, "City is required"),
+    state: zod.string().min(1, "State is required"),
+    country: zod.string().min(1, "Country is required"),
+    zip_code: zod.string().min(1, "Zip code is required"),
+    shipping_street: zod.string().min(1, "Shipping street is required"),
+    shipping_street_number: zod.string().min(1, "Shipping street number is required"),
+    shipping_neighborhood: zod.string().min(1, "Shipping neighborhood is required"),
+    shipping_city: zod.string().min(1, "Shipping city is required"),
+    shipping_state: zod.string().min(1, "Shipping state is required"),
+    shipping_country: zod.string().min(1, "Shipping country is required"),
+    shipping_zip_code: zod.string().min(1, "Shipping zip code is required"),
     total_price: zod.number().min(0, "Total price is required"),
     purchase_order_products: zod.any()
 });

@@ -335,7 +335,7 @@ const Step4 = ({
                                     + `${state.data.country}.`
                                 }
                             </p>
-                            <p>{state.data.address}</p>
+                            <p>{`${state.data.street}, ` + `${state.data.street_number}, ` + `${state.data.neighborhood}`}</p>
                         </section>
                     </section>
                 </section>
@@ -361,7 +361,7 @@ const Step4 = ({
                                 + `${state.data.shipping_country}.`
                             }
                         </p>
-                        <p>{state.data.shipping_address}</p>
+                        <p>{`${state.data.shipping_street}, ` + `${state.data.shipping_street_number}, ` + `${state.data.shipping_neighborhood}`}</p>
                     </section>
                 </section>
                 <section className={styleModule.thirdBlock}>

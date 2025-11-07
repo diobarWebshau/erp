@@ -73,7 +73,9 @@ class ClientsAddressesController {
                 where: {
                     client_id,
                     [Op.or]: [
-                        { address: { [Op.like]: `${filter}%` } },
+                        { street: { [Op.like]: `${filter}%` } },
+                        { street_number: { [Op.like]: `${filter}%` } },
+                        { neighborhood: { [Op.like]: `${filter}%` } },
                         { city: { [Op.like]: `${filter}%` } },
                         { state: { [Op.like]: `${filter}%` } },
                         { country: { [Op.like]: `${filter}%` } },
@@ -99,7 +101,7 @@ class ClientsAddressesController {
         }
     };
     static create = async (req, res, next) => {
-        const { client_id, address, city, state, country, zip_code } = req.body;
+        const { client_id, street, street_number, neighborhood, city, state, country, zip_code } = req.body;
         try {
             const client = await ClientModel.findByPk(client_id);
             if (!client) {
@@ -109,8 +111,9 @@ class ClientsAddressesController {
                 return;
             }
             const newAddress = await ClientAddressesModel.create({
-                client_id, address, city,
-                state, country, zip_code
+                client_id, street, street_number,
+                neighborhood, city, state, country,
+                zip_code
             });
             res.status(201).json({
                 message: "Client address created successfully",

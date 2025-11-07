@@ -165,7 +165,7 @@ class PurchasedOrderController {
                                 ClientModel.getAllFields(),
                             include: [{
                                 model: ProductDiscountClientModel,
-                                as: "pruduct_discounts_client",
+                                as: "product_discounts_client",
                                 attributes: ProductDiscountClientModel.getAllFields()
                             }, {
                                 model: ClientAddressesModel,
@@ -323,7 +323,7 @@ class PurchasedOrderController {
                             ClientModel.getAllFields(),
                         include: [{
                             model: ProductDiscountClientModel,
-                            as: "pruduct_discounts_client",
+                            as: "product_discounts_client",
                             attributes: ProductDiscountClientModel.getAllFields()
                         }, {
                             model: ClientAddressesModel,
@@ -483,7 +483,7 @@ class PurchasedOrderController {
                             ClientModel.getAllFields(),
                         include: [{
                             model: ProductDiscountClientModel,
-                            as: "pruduct_discounts_client",
+                            as: "product_discounts_client",
                             attributes: ProductDiscountClientModel.getAllFields()
                         }, {
                             model: ClientAddressesModel,
@@ -634,7 +634,9 @@ class PurchasedOrderController {
                 city: client.city,
                 state: client.state,
                 country: client.country,
-                address: client.address,
+                street: client.street,
+                street_number: client.street_number,
+                neighborhood: client.neighborhood,
                 payment_terms: client.payment_terms,
                 zip_code: client.zip_code,
                 tax_regimen: client.tax_regimen,
@@ -642,7 +644,9 @@ class PurchasedOrderController {
                 payment_method: client.payment_method,
                 // shipping fields
                 client_address_id: clientAddress.id,
-                shipping_address: clientAddress.address,
+                shipping_street: clientAddress.street,
+                shipping_street_number: clientAddress.street_number,
+                shipping_neighborhood: clientAddress.neighborhood,
                 shipping_city: clientAddress.city,
                 shipping_state: clientAddress.state,
                 shipping_country: clientAddress.country,
@@ -753,7 +757,9 @@ class PurchasedOrderController {
                     city: updatedClientData.city,
                     state: updatedClientData.state,
                     country: updatedClientData.country,
-                    address: updatedClientData.address,
+                    street: updatedClientData.street,
+                    street_number: updatedClientData.street_number,
+                    neighborhood: updatedClientData.neighborhood,
                     payment_terms: updatedClientData.payment_terms,
                     zip_code: updatedClientData.zip_code,
                     tax_regimen: updatedClientData.tax_regimen,
@@ -764,10 +770,12 @@ class PurchasedOrderController {
 
             if (updatedClientAddressData) {
                 Object.assign(update_values, {
-                    shipping_address: updatedClientAddressData.address,
                     shipping_city: updatedClientAddressData.city,
                     shipping_state: updatedClientAddressData.state,
                     shipping_country: updatedClientAddressData.country,
+                    shipping_street: updatedClientAddressData.street,
+                    shipping_street_number: updatedClientAddressData.street_number,
+                    shipping_neighborhood: updatedClientAddressData.neighborhood,
                     shipping_zip_code: updatedClientAddressData.zip_code,
                 });
             }
