@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useReducer, type ReactNode } from "rea
 import { useDispatch } from "react-redux";
 import type { AppDispatchRedux } from "../../../store/store";
 import { setError } from "../../../store/slicer/errorSlicer";
-import useClientById from "../../../modelos/clients/react-hooks/useClientById";
+import useClientById from "../../../modelos/clients/hooks/useClientsById";
 import clientReducer from "./clientReducer";
 import { initialClientState } from "./clientTypes";
 import type { ClientState } from "./clientTypes";

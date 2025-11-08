@@ -5,12 +5,12 @@ interface ClientAddressesAttributes {
     id: number,
     client_id: number,
     street: string,
-    street_number: string,
+    street_number: number,
     neighborhood: string,
     city: string,
     state: string,
     country: string,
-    zip_code: string,
+    zip_code: number,
     created_at: Date,
     updated_at: Date,
 }
@@ -61,15 +61,15 @@ ClientAddressesModel.init({
         },
     },
     street: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     street_number: {
-        type: DataTypes.TEXT,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     neighborhood: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     city: {
@@ -85,7 +85,7 @@ ClientAddressesModel.init({
         allowNull: false
     },
     zip_code: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     created_at: {

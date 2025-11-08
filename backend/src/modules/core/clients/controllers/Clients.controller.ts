@@ -11,7 +11,7 @@ class ClientController {
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
 
         const { filter, ...rest } = req.query as {
-            filter?: string;
+            filter?: string;    
         } & Partial<ClientCreateAttributes>;
 
         try {
@@ -35,7 +35,13 @@ class ClientController {
                     { cfdi: { [Op.like]: f } },
                     { phone: { [Op.like]: f } },
                     { email: { [Op.like]: f } },
-                    { address: { [Op.like]: f } },
+                    { street: { [Op.like]: f } },
+                    { city: { [Op.like]: f } },
+                    { state: { [Op.like]: f } },
+                    { country: { [Op.like]: f } },
+                    { tax_id: { [Op.like]: f } },
+                    { neighborhood: { [Op.like]: f } },
+                    { tax_regimen: { [Op.like]: f } },
                     { payment_terms: { [Op.like]: f } },
                 );
             }
@@ -86,28 +92,50 @@ class ClientController {
             }
         }
     }
-    static getById =
-        async (req: Request, res: Response, next: NextFunction) => {
-            const { id } = req.params;
-            try {
-                const response = await ClientModel.findByPk(id);
-                if (!response) {
-                    res.status(200).json({
-                        validation: "Client no found"
-                    });
-                    return;
-                }
-                const client = response.toJSON();
-                res.status(200).json(client);
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    next(error);
-                } else {
-                    console.error(
-                        `An unexpected error occurred: ${error}`);
-                }
+    static getById = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+        try {
+            const response = await ClientModel.findByPk(id, {
+                attributes:
+                    ClientModel.getAllFields(),
+                include: [
+                    {
+                        model: ClientAddressesModel,
+                        as: "addresses",
+                        attributes:
+                            ClientAddressesModel.getAllFields()
+                    },
+                    {
+                        model: ProductDiscountClientModel,
+                        as: "product_discounts_client",
+                        attributes: ProductDiscountClientModel.getAllFields(),
+                        include: [
+                            {
+                                model: ProductModel,
+                                as: "product",
+                                attributes: ProductModel.getAllFields()
+                            }
+                        ]
+                    },
+                ]
+            });
+            if (!response) {
+                res.status(200).json({
+                    validation: "Client no found"
+                });
+                return;
+            }
+            const client = response.toJSON();
+            res.status(200).json(client);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(
+                    `An unexpected error occurred: ${error}`);
             }
         }
+    }
     static getByCompanyName =
         async (req: Request, res: Response, next: NextFunction) => {
             const { company_name } = req.params;

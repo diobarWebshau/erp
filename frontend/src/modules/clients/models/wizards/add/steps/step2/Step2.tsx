@@ -55,12 +55,11 @@ const Step2 = ({
     const [countryName, setCountryName] = useState<string>(state?.data?.country ?? "México");
     const [stateName, setStateName] = useState<string>(state?.data?.state ?? "Baja California");
     const [cityName, setCityName] = useState<string>(state.data?.city ?? "Mexicali");
-    const [zipCode, setZipCode] = useState<string>(state.data?.zip_code ?? "");
+    const [zipCode, setZipCode] = useState<number | null>(state.data?.zip_code ?? null);
     const [street, setStreet] = useState<string>(state.data?.street ?? "");
-    const [streetNumber, setStreetNumber] = useState<string>(state.data?.street_number ?? "");
+    const [streetNumber, setStreetNumber] = useState<number | null>(state.data?.street_number ?? null);
     const [neighborhood, setNeighborhood] = useState<string>(state.data?.neighborhood ?? "");
     const [paymentTerms, setPaymentTerms] = useState<string>(state.data?.payment_terms ?? "");
-
     // * *********** Estados gui locales ************ 
 
     const [isActiveAddressModal, setIsActiveAddressModal] = useState<boolean>(false);
@@ -276,7 +275,7 @@ const Step2 = ({
                 const onChange = useCallback((value: number) => handleChangeDiscount(row.original.id?.toString() ?? "", value), [handleChangeDiscount, row]);
 
                 return <NumericInputCustom
-                    value={row.original.discount_percentage}
+                    value={row.original.discount_percentage ?? null}
                     onChange={onChange}
                     min={1}
                     max={100}
@@ -330,21 +329,27 @@ const Step2 = ({
     const handleOnClickSaveContinue = useCallback(() => {
 
         if (
-            street === '' || streetNumber === '' ||
+            street === '' || streetNumber === null ||
             neighborhood === '' || countryName === '' ||
-            stateName === '' || cityName === '' || zipCode === '') {
+            stateName === '' || cityName === '' || zipCode === null) {
             ToastMantine.feedBackForm({
                 message: "Debe completar todos los campos",
             });
             return;
         }
 
-        console.log(state.data?.product_discounts_client);
-        const isDiscountsValid = (state.data?.product_discounts_client?.length || 0) > 0 && state.data?.product_discounts_client?.every((discount) => discount?.discount_percentage !== undefined && discount?.discount_percentage > 0 && discount?.discount_percentage < 100);
+        const isDiscountsValid = (state.data?.product_discounts_client?.length || 0) > 0 ? state.data?.product_discounts_client?.every((discount) => discount?.discount_percentage !== undefined && discount?.discount_percentage > 0 && discount?.discount_percentage < 100) : true;
 
         if (!isDiscountsValid) {
             ToastMantine.feedBackForm({
                 message: "Los porcentajes de descuento deben ser mayores a 0 y menores a 100",
+            });
+            return;
+        }
+
+        if ((state.data?.addresses?.length || 0) === 0) {
+            ToastMantine.feedBackForm({
+                message: "Debe agregar al menos una direccion",
             });
             return;
         }
@@ -384,12 +389,10 @@ const Step2 = ({
                             withValidation
                             icon={<Text />}
                         />
-                        <InputTextCustom
+                        <NumericInputCustom
                             value={streetNumber}
                             onChange={setStreetNumber}
                             placeholder="Numero"
-                            withValidation
-                            icon={<Text />}
                         />
                         <InputTextCustom
                             value={neighborhood}
@@ -427,12 +430,10 @@ const Step2 = ({
                             disabled={csc.cityNames.length === 0}
                             maxHeight="200px"
                         />
-                        <InputTextCustom
+                        <NumericInputCustom
                             value={zipCode}
                             onChange={setZipCode}
                             placeholder="Codigo postal"
-                            withValidation
-                            icon={<Text />}
                         />
                     </div>
                 </div>

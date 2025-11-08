@@ -1,4 +1,4 @@
-import { useClientDispatch, useClientState } from "../../../../clients/context/clientHooks";
+import { useClientCommand, useClientDispatch, useClientState } from "../../../../clients/context/clientHooks";
 import StyleModule from "./EditWizardClients.module.css";
 import { useMemo, useState } from "react";
 import Step1 from "./steps/step1/Step1";
@@ -9,19 +9,21 @@ import FullContainerModal from "../../../../../comp/primitives/modal/full-contai
 import StepperMantineCustom from "../../../../../comp/external/mantine/stepper/custom/StepperMantineCustom";
 import TransparentButtonCustom from "../../../../../comp/primitives/button/custom-button/transparent/TransparentButtonCustom";
 import WarningModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/warning/WarningModal";
-import type { IClient, IPartialClient } from "../../../../../interfaces/clients";
+import type { IPartialClient } from "../../../../../interfaces/clients";
 import DiscardModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/discard/DiscardModal";
 import { set_step } from "../../../context/clientActions";
 
 interface IEditWizardClients {
     onClose: () => void;
-    onUpdate: ({ original, updated }: { original: IClient, updated: IPartialClient }) => Promise<void>;
+    onUpdate: ({ original, updated }: { original: IPartialClient, updated: IPartialClient }) => Promise<void>;
 }
 
 const EditWizardClients = ({ onClose, onUpdate }: IEditWizardClients) => {
 
     const state = useClientState();
     const dispatch = useClientDispatch();
+    const { refetch } = useClientCommand();
+    
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [isActiveDiscardModal, setIsActiveDiscardModal] = useState(false);
     const toggleWarningModal = useMemo(() => () => setShowWarningModal(prev => !prev), []);
@@ -35,7 +37,7 @@ const EditWizardClients = ({ onClose, onUpdate }: IEditWizardClients) => {
         },
         {
             title: "Dirección y datos comerciales",
-            content: <Step2 state={state} dispatch={dispatch} onDiscard={toggleDiscardModal} onUpdate={onUpdate} />,
+            content: <Step2 state={state} dispatch={dispatch} onDiscard={toggleDiscardModal} onUpdate={onUpdate} refetch={refetch} />,
             icon: <MapPinned />
         },
         {
@@ -43,7 +45,7 @@ const EditWizardClients = ({ onClose, onUpdate }: IEditWizardClients) => {
             content: <Step3 state={state} dispatch={dispatch} onClose={onClose} />,
             icon: <FileCheck />
         }
-    ], [state, dispatch, toggleWarningModal, onClose]);
+    ], [state, dispatch, toggleWarningModal, toggleDiscardModal, onClose, onUpdate, refetch]);
 
     const handleDiscard = useMemo(() => () => {
         dispatch(set_step(2));

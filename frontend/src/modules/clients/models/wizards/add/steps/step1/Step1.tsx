@@ -9,6 +9,7 @@ import { update_client } from "../../../../../context/clientActions";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import StyleModule from "./Step1.module.css";
 import { next_step } from "../../../../../context/clientActions";
+import MailInput from "../../../../../../../comp/primitives/input/mail/base/MailInput";
 
 interface IStep1 {
     state: ClientState;
@@ -27,6 +28,8 @@ const Step1 = ({
     const [phone, setPhone] = useState<string>(state.data?.phone ?? "");
     const [email, setEmail] = useState<string>(state.data?.email ?? "");
     const [taxId, setTaxId] = useState<string>(state.data?.tax_id ?? "");
+    const [test, setTest] = useState<string>("");
+
 
     const handleOnClickNext = useCallback(() => {
         if (company_name === "" || phone === "" || email === "" || cfdi === "" || taxId === "") {
@@ -75,6 +78,11 @@ const Step1 = ({
                     classNameContainer={StyleModule.containerInputText}
                     withValidation
                 />
+                {/* <MailInput
+                    value={test}
+                    onChange={setTest}
+                    label="Correo electrónico"
+                /> */}
                 <span className={`nunito-bold ${StyleModule.subTitle}`}>Contacto principal</span>
                 <div className={StyleModule.blockContact}>
                     <InputTextCustom

@@ -180,12 +180,12 @@ const Step2 = ({ onUpdate }: IStep2) => {
                         />
                         <NumericInputCustomMemo
                             onChange={onChangeCost}
-                            value={state.draft?.delivery_cost || undefined}
+                            value={state.draft?.delivery_cost || null}
                             placeholder="Costo"
                             min={0}
                         />
                         <InputTextCustom
-                            value={state.draft?.tracking_number || undefined}
+                            value={state.draft?.tracking_number || ""}
                             onChange={onChangeCode}
                             placeholder="Numero de guia"
                             icon={<Type />}
@@ -198,7 +198,7 @@ const Step2 = ({ onUpdate }: IStep2) => {
                         <span className="nunito-bold">(Opcional)</span>
                     </span>
                     <StandarTextAreaCustom
-                        value={state.draft?.comments || undefined}
+                        value={state.draft?.comments || ""}
                         onChange={onChangeComment}
                         placeholder="Comentarios"
                         maxLength={600}

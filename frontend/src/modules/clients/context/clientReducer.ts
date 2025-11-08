@@ -1,4 +1,4 @@
-import { produce, type Draft } from "immer";
+import { produce, type Draft, current } from "immer";
 import { clientActionsTypes } from "./clientTypes";
 import type { ClientAction, ClientState } from "./clientTypes";
 
@@ -7,25 +7,25 @@ const clientReducer = produce((
     action: ClientAction
 ) => {
 
-    switch(action.type){
+    switch (action.type) {
         // * DATA
         case clientActionsTypes.SET_CLIENT: {
             Object.assign(draft.data, action.payload);
             break;
         }
-        case clientActionsTypes.UPDATE_CLIENT:{
+        case clientActionsTypes.UPDATE_CLIENT: {
             Object.assign(draft.data, action.payload);
             break;
         }
-        case clientActionsTypes.SET_FROM_SERVER:{
+        case clientActionsTypes.SET_FROM_SERVER: {
             Object.assign(draft.data, action.payload);
             break;
         }
-        case clientActionsTypes.ADD_CLIENT_ADDRESSES:{
+        case clientActionsTypes.ADD_CLIENT_ADDRESSES: {
             for (const item of action.payload) {
                 if (draft.data?.addresses?.length === 0) {
                     const isDuplicate = draft.data?.addresses?.some(
-                        it => it.id === item.id
+                        it => String(it.id) === String(item.id)
                     );
                     if (isDuplicate) return;
                 }
@@ -33,7 +33,7 @@ const clientReducer = produce((
             }
             break;
         }
-        case clientActionsTypes.REMOVE_CLIENT_ADDRESSES:{
+        case clientActionsTypes.REMOVE_CLIENT_ADDRESSES: {
             if (!draft.data?.addresses) return;
             const idsToRemove = new Set<string | number>(action.payload); // Convertir payload a Set para mejor rendimiento y no se repitan los ids
             draft.data.addresses =
@@ -44,21 +44,21 @@ const clientReducer = produce((
                 });
             break;
         }
-        case clientActionsTypes.UPDATE_CLIENT_ADDRESSES:{
+        case clientActionsTypes.UPDATE_CLIENT_ADDRESSES: {
             if (!draft.data?.addresses) break;
             const target = draft.data.addresses.find(
-                it => it.id === action.payload.id
+                it => String(it.id) === String(action.payload.id)
             );
             if (target) {
                 Object.assign(target, action.payload.attributes);
             }
             break;
         }
-        case clientActionsTypes.ADD_CLIENT_PRODUCT_DISCOUNTS:{
+        case clientActionsTypes.ADD_CLIENT_PRODUCT_DISCOUNTS: {
             for (const item of action.payload) {
                 if (draft.data?.product_discounts_client?.length === 0) {
                     const isDuplicate = draft.data?.product_discounts_client?.some(
-                        it => it.id === item.id
+                        it => String(it.id) === String(item.id)
                     );
                     if (isDuplicate) return;
                 }
@@ -66,7 +66,7 @@ const clientReducer = produce((
             }
             break;
         }
-        case clientActionsTypes.REMOVE_CLIENT_PRODUCT_DISCOUNTS:{
+        case clientActionsTypes.REMOVE_CLIENT_PRODUCT_DISCOUNTS: {
             if (!draft.data?.product_discounts_client) return;
             const idsToRemove = new Set<string | number>(action.payload); // Convertir payload a Set para mejor rendimiento y no se repitan los ids
             draft.data.product_discounts_client =
@@ -77,10 +77,10 @@ const clientReducer = produce((
                 });
             break;
         }
-        case clientActionsTypes.UPDATE_CLIENT_PRODUCT_DISCOUNTS:{
+        case clientActionsTypes.UPDATE_CLIENT_PRODUCT_DISCOUNTS: {
             if (!draft.data?.product_discounts_client) break;
             const target = draft.data.product_discounts_client.find(
-                it => it.id === action.payload.id
+                it => String(it.id) === String(action.payload.id)
             );
             if (target) {
                 Object.assign(target, action.payload.attributes);
@@ -100,7 +100,7 @@ const clientReducer = produce((
             for (const item of action.payload) {
                 if (draft.draft?.addresses?.length === 0) {
                     const isDuplicate = draft.draft?.addresses?.some(
-                        it => it.id === item.id
+                        it => String(it.id) === String(item.id)
                     );
                     if (isDuplicate) return;
                 }
@@ -120,9 +120,10 @@ const clientReducer = produce((
             break;
         }
         case clientActionsTypes.UPDATE_DRAFT_CLIENT_PRODUCT_DISCOUNTS: {
+            console.log(`entro`);
             if (!draft.draft?.product_discounts_client) break;
             const target = draft.draft.product_discounts_client.find(
-                it => it.id === action.payload.id
+                it => String(it.id) === String(action.payload.id)
             );
             if (target) {
                 Object.assign(target, action.payload.attributes);
@@ -133,7 +134,7 @@ const clientReducer = produce((
             for (const item of action.payload) {
                 if (draft.draft?.product_discounts_client?.length === 0) {
                     const isDuplicate = draft.draft?.product_discounts_client?.some(
-                        it => it.id === item.id
+                        it => String(it.id) === String(item.id)
                     );
                     if (isDuplicate) return;
                 }
@@ -155,7 +156,7 @@ const clientReducer = produce((
         case clientActionsTypes.UPDATE_DRAFT_CLIENT_ADDRESSES: {
             if (!draft.draft?.addresses) break;
             const target = draft.draft.addresses.find(
-                it => it.id === action.payload.id
+                it => String(it.id) === String(action.payload.id)
             );
             if (target) {
                 Object.assign(target, action.payload.attributes);

@@ -62,7 +62,7 @@ const Step2 = ({ onClose }: IStep2) => {
         return [purchase_orders, client_name, purchaseOrder];
     }, [state.data?.shipping_order_purchase_order_product_aux]);
 
-    const [deliveryDate, setDeliveryDate] = useState<Date | null>(state.data?.delivery_date || null);
+    const [deliveryDate, setDeliveryDate] = useState<Date | null>(state.data?.delivery_date ? new Date(state.data?.delivery_date) : null);
     const [isActiveAddNewOrderModal, setIsActiveAddNewOrderModal] = useState<boolean>(false);
     const { purchasedOrders, loadingPurchasedOrders } = usePurchasedOrders({
         like: client_name,
@@ -336,7 +336,7 @@ const Step2 = ({ onClose }: IStep2) => {
                     <p className="nunito-semibold">{purchaseOrder?.client?.email}</p>
                     <p className="nunito-semibold">{`Tel. ${purchaseOrder?.client?.phone}`}</p>
                     <p className="nunito-semibold">{`${purchaseOrder?.client?.city}, ${purchaseOrder?.client?.state}, ${purchaseOrder?.client?.country}`}</p>
-                    <p className="nunito-semibold">{purchaseOrder?.client?.address}</p>
+                    <p className="nunito-semibold">{`${purchaseOrder?.client?.street}, ${purchaseOrder?.client?.city}, ${purchaseOrder?.client?.state}, ${purchaseOrder?.client?.country}`}</p>
                 </div>
                 <div className={StyleModule.subHeaderRight}>
                     <div>
@@ -351,7 +351,7 @@ const Step2 = ({ onClose }: IStep2) => {
                     <div>
                         <span className="nunito-bold">Dirección de envío</span>
                         <p>{`${purchaseOrder?.shipping_city}, ${purchaseOrder?.shipping_state}, ${purchaseOrder?.shipping_country}`}</p>
-                        <p>{purchaseOrder?.shipping_address}</p>
+                        <p>{`${purchaseOrder?.street}, ${purchaseOrder?.city}, ${purchaseOrder?.state}, ${purchaseOrder?.country}`}</p>
                     </div>
                 </div>
             </div>

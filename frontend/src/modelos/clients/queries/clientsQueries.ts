@@ -106,6 +106,50 @@ const fetchClientById = async (
     }
 }
 
+interface IFetchClientById {
+    id: number | undefined,
+    dispatch: AppDispatchRedux,
+    signal: AbortSignal
+}
+
+const fetchClientById2 = async ({
+    id,
+    dispatch,
+    signal
+}: IFetchClientById): Promise<IClient | null> => {
+    try {
+        const response = await fetch(`${API_URL}/id/${id}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            signal
+        });
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(
+                    `${errorText}`
+                );
+            }
+            dispatch(
+                setError({
+                    key: "clientById",
+                    message: errorText
+                })
+            );
+            return null;
+        }
+        dispatch(
+            clearError("clientById")
+        );
+        const data: IClient =
+            await response.json();
+        return data;
+    } catch (error: unknown) {
+        throw error;
+    }
+};
+
+
 const fetchClientLike = async (
     like: string,
     dispatch: AppDispatchRedux,
@@ -369,5 +413,6 @@ export {
     updateCompleteClientInDB,
     createCompleteClientInDB,
     fetchClientLike,
+    fetchClientById2,
     fetchClientById
 };

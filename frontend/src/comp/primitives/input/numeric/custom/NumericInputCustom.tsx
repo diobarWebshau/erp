@@ -3,7 +3,7 @@ import NumericInput from "../base/NumericInput";
 import styleModule from "./NumericInputCustom.module.css";
 
 interface NumericInputCustomProps {
-    value: number | undefined;
+    value: number | null;
     onChange: (value: number) => void;
     placeholder?: string;
     min?: number;

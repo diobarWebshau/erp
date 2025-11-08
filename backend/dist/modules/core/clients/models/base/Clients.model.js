@@ -63,7 +63,7 @@ ClientModel.init({
         allowNull: false
     },
     street_number: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     neighborhood: {
@@ -79,7 +79,7 @@ ClientModel.init({
         allowNull: true
     },
     zip_code: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     tax_regimen: {

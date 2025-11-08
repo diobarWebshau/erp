@@ -93,12 +93,10 @@ class ClientsAddressesController {
                     client_id,
                     [Op.or]: [
                         { street: { [Op.like]: `${filter}%` } },
-                        { street_number: { [Op.like]: `${filter}%` } },
                         { neighborhood: { [Op.like]: `${filter}%` } },
                         { city: { [Op.like]: `${filter}%` } },
                         { state: { [Op.like]: `${filter}%` } },
                         { country: { [Op.like]: `${filter}%` } },
-                        { zip_code: { [Op.like]: `${filter}%` } },
                     ],
                 },
                 attributes: ClientAddressesModel.getAllFields(),

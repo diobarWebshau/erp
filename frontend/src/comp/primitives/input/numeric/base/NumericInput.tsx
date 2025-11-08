@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface NumericInputProps {
-    value: number | undefined;
+    value: number | null;
     onChange: (value: number) => void;
     min?: number;
     max?: number;

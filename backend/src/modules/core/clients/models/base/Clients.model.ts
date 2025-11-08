@@ -13,11 +13,11 @@ interface ClientAttributes {
     state: string,
     country: string,
     street: string,
-    street_number: string,
+    street_number: number,
     neighborhood: string,
     payment_terms: string,
     credit_limit: number,
-    zip_code: string,
+    zip_code: number,
     tax_regimen: string,
     cfdi: string,
     payment_method: string,
@@ -99,7 +99,7 @@ ClientModel.init({
         allowNull: false
     },
     street_number: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     neighborhood: {
@@ -115,7 +115,7 @@ ClientModel.init({
         allowNull: true
     },
     zip_code: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     tax_regimen: {

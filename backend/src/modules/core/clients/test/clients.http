@@ -2,7 +2,7 @@
 GET http://localhost:3003/clients/clients HTTP/1.0
 
 ### GET
-GET http://localhost:3003/clients/clients/id/1 HTTP/1.0
+GET http://localhost:3003/clients/clients/id/4 HTTP/1.0
 
 ### GET
 GET http://localhost:3003/clients/clients/filter/ HTTP/1.0

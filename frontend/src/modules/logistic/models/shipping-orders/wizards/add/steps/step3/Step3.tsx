@@ -31,15 +31,15 @@ const Step3 = ({ onClose }: IStep3) => {
     const [carrier, setCarrier] = useState<IPartialCarrier | null>(state.data?.carrier || null);
     const [transportMethod, setTransportMethod] = useState<string | null>(state.data?.transport_method || null);
     const [shippingType, setShippingType] = useState<string | null>(state.data?.shipment_type || null);
-    const [cost, setCost] = useState<number | undefined>(state.data?.delivery_cost || undefined);
-    const [code, setCode] = useState<string | undefined>(state.data?.tracking_number || undefined);
-    const [comment, setComment] = useState<string | undefined>(state.data?.comments || undefined);
+    const [cost, setCost] = useState<number | null>(state.data?.delivery_cost || null);
+    const [code, setCode] = useState<string>(state.data?.tracking_number || '');
+    const [comment, setComment] = useState<string | null>(state.data?.comments || null);
     const { carriers } = useCarriers();
 
     const handleOnClickNextStep = useCallback(() => {
 
         if (!carrier || !deliveryDate || !transportMethod ||
-            !shippingType || cost === undefined ||
+            !shippingType || cost === null ||
             cost === null || cost === 0 || !code) {
             toastMantine.feedBackForm({ message: 'Debes completar todos los campos requeridos.' });
             return;
@@ -56,7 +56,7 @@ const Step3 = ({ onClose }: IStep3) => {
             tracking_number: code,
             comments: comment,
         }
-        
+
         dispatch(update_shipping_order(updateShippingOrder));
         dispatch(next_step());
 
@@ -123,7 +123,7 @@ const Step3 = ({ onClose }: IStep3) => {
                         <span className="nunito-bold">(Opcional)</span>
                     </span>
                     <StandarTextAreaCustom
-                        value={comment}
+                        value={comment ?? ""}
                         onChange={handleOnChangeComment}
                         placeholder="Comentarios"
                         maxLength={600}

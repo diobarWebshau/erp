@@ -18,7 +18,7 @@ class ClientController {
             const filterConditions = [];
             if (filter && filter.trim()) {
                 const f = `%${filter.trim()}%`; // busca en cualquier parte
-                filterConditions.push({ company_name: { [Op.like]: f } }, { cfdi: { [Op.like]: f } }, { phone: { [Op.like]: f } }, { email: { [Op.like]: f } }, { address: { [Op.like]: f } }, { payment_terms: { [Op.like]: f } });
+                filterConditions.push({ company_name: { [Op.like]: f } }, { cfdi: { [Op.like]: f } }, { phone: { [Op.like]: f } }, { email: { [Op.like]: f } }, { street: { [Op.like]: f } }, { city: { [Op.like]: f } }, { state: { [Op.like]: f } }, { country: { [Op.like]: f } }, { tax_id: { [Op.like]: f } }, { neighborhood: { [Op.like]: f } }, { tax_regimen: { [Op.like]: f } }, { payment_terms: { [Op.like]: f } });
             }
             // 3️⃣ Construimos el WHERE principal
             const where = {
@@ -67,7 +67,28 @@ class ClientController {
     static getById = async (req, res, next) => {
         const { id } = req.params;
         try {
-            const response = await ClientModel.findByPk(id);
+            const response = await ClientModel.findByPk(id, {
+                attributes: ClientModel.getAllFields(),
+                include: [
+                    {
+                        model: ClientAddressesModel,
+                        as: "addresses",
+                        attributes: ClientAddressesModel.getAllFields()
+                    },
+                    {
+                        model: ProductDiscountClientModel,
+                        as: "product_discounts_client",
+                        attributes: ProductDiscountClientModel.getAllFields(),
+                        include: [
+                            {
+                                model: ProductModel,
+                                as: "product",
+                                attributes: ProductModel.getAllFields()
+                            }
+                        ]
+                    },
+                ]
+            });
             if (!response) {
                 res.status(200).json({
                     validation: "Client no found"

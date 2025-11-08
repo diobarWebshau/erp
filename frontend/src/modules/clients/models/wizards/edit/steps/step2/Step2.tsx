@@ -15,21 +15,20 @@ import type { IPartialProductDiscountClient } from "../../../../../../../interfa
 import AddressModal from "../../../../modals/address/AddressModal";
 import {
     add_draft_client_addresses, remove_draft_client_addresses, add_draft_client_product_discounts, next_step,
-    remove_draft_client_product_discounts, update_draft_client_product_discounts, update_draft_client,
-    back_step
+    remove_draft_client_product_discounts, update_draft_client_product_discounts, back_step
 } from "./../../../../../context/clientActions"
 import type { RowAction } from "interfaces/tableTypes";
 import { generateRandomIds } from "./../../../../../../../helpers/nanoId";
 import { formatCurrency } from "./../../../../../../../helpers/formttersNumeric";
 import SelectProductsModal from "./../../../../../../../comp/features/modal-product2/SelectProductsModal"
 import type { IProduct } from "interfaces/product";
-import type { AppDispatchRedux } from "store/store";
-import { useDispatch } from "react-redux";
+import type { AppDispatchRedux, RootState } from "store/store";
+import { useDispatch, useSelector } from "react-redux";
 import { clearError, setError } from "../../../../../../../store/slicer/errorSlicer";
 import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
-import type { IClient, IPartialClient } from "../../../../../../../interfaces/clients";
+import type { IPartialClient } from "../../../../../../../interfaces/clients";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -39,30 +38,29 @@ interface IStep2 {
     state: ClientState;
     dispatch: Dispatch<ClientAction>;
     onDiscard: () => void;
-    onUpdate: ({ original, updated }: { original: IClient, updated: IPartialClient }) => Promise<void>
+    onUpdate: ({ original, updated }: { original: IPartialClient, updated: IPartialClient }) => Promise<void>
+    refetch: () => void;
 }
 
-const Step2 = ({
-    state,
-    dispatch,
-    onDiscard,
-    onUpdate
-}: IStep2) => {
+const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
 
-    console.log(`state`, state);
 
     // * *********** Estados globales ************ 
 
     const dispatchRedux: AppDispatchRedux = useDispatch<AppDispatchRedux>();
+    const errorRedux = useSelector((state: RootState) => state.error);
+
+    // * *********** Estado contextual del cliente ************ 
+
 
     // * *********** Estados logicos locales ************ 
 
     const [countryName, setCountryName] = useState<string>(state?.draft?.country ?? "México");
     const [stateName, setStateName] = useState<string>(state?.draft?.state ?? "Baja California");
     const [cityName, setCityName] = useState<string>(state?.draft?.city ?? "Mexicali");
-    const [zipCode, setZipCode] = useState<string>(state?.draft?.zip_code ?? "");
+    const [zipCode, setZipCode] = useState<number>(state?.draft?.zip_code ?? 0);
     const [street, setStreet] = useState<string>(state?.draft?.street ?? "");
-    const [streetNumber, setStreetNumber] = useState<string>(state?.draft?.street_number ?? "");
+    const [streetNumber, setStreetNumber] = useState<number>(state?.draft?.street_number ?? 0);
     const [neighborhood, setNeighborhood] = useState<string>(state?.draft?.neighborhood ?? "");
     const [paymentTerms, setPaymentTerms] = useState<string>(state?.draft?.payment_terms ?? "");
 
@@ -115,7 +113,7 @@ const Step2 = ({
         };
         dispatch(add_draft_client_addresses([newAddress]));
         toggleIsActiveAddressModal();
-    }, [dispatch, toggleIsActiveAddressModal]);
+    }, [dispatch, toggleIsActiveAddressModal, generateRandomIds]);
 
     const excludeIds = useMemo<number[]>(
         () =>
@@ -156,7 +154,6 @@ const Step2 = ({
             dispatchRedux(clearError("likeWithExludeToProducts"));
             const data: IProduct[] = await response.json();
             return data;
-
         } catch (error) {
             console.error("Error fetching products:", error);
             return [];
@@ -169,14 +166,8 @@ const Step2 = ({
     const getRowIdDiscounts = useMemo(() => (row: IPartialProductDiscountClient, index: number) => row.id?.toString() ?? index.toString(), []);
 
     const handleChangeDiscount = useCallback((id: string, value: number) => {
-        dispatch(update_draft_client_product_discounts({
-            id,
-            attributes: {
-                discount_percentage: value,
-            }
-        }));
-    }, [dispatch, state]);
-
+        dispatch(update_draft_client_product_discounts({ id: id, attributes: { discount_percentage: value } }));
+    }, [dispatch]);
 
     const columnsAddresses: ColumnDef<IPartialClientAddress>[] = useMemo(() => [
         {
@@ -278,10 +269,12 @@ const Step2 = ({
             },
             cell: ({ row }) => {
 
+                const value = Number(row.original.discount_percentage) ?? 0;
+
                 const onChange = useCallback((value: number) => handleChangeDiscount(row.original.id?.toString() ?? "", value), [handleChangeDiscount, row]);
 
                 return <NumericInputCustom
-                    value={row.original.discount_percentage}
+                    value={value}
                     onChange={onChange}
                     min={1}
                     max={100}
@@ -332,20 +325,20 @@ const Step2 = ({
     }, [fetchLoadProducts, toggleIsActiveDiscountModal]);
 
 
-    const handleOnClickSaveContinue = useCallback(() => {
-
+    const handleOnClickSaveContinue = useCallback(async () => {
         if (
-            street === '' || streetNumber === '' ||
+            street === '' || streetNumber === 0 ||
             neighborhood === '' || countryName === '' ||
-            stateName === '' || cityName === '' || zipCode === '') {
-            ToastMantine.feedBackForm({
-                message: "Debe completar todos los campos",
-            });
+            stateName === '' || cityName === '' || zipCode === 0
+        ) {
+            ToastMantine.feedBackForm({ message: "Debe completar todos los campos" });
             return;
         }
 
-        console.log(state.draft?.product_discounts_client);
-        const isDiscountsValid = (state.draft?.product_discounts_client?.length || 0) > 0 && state.draft?.product_discounts_client?.every((discount) => discount?.discount_percentage !== undefined && discount?.discount_percentage > 0 && discount?.discount_percentage < 100);
+        const isDiscountsValid = (state.draft?.product_discounts_client?.length || 0) > 0 ?
+            state.draft?.product_discounts_client?.every(
+                (d) => d?.discount_percentage !== undefined && d.discount_percentage > 0 && d.discount_percentage < 100
+            ) : true;
 
         if (!isDiscountsValid) {
             ToastMantine.feedBackForm({
@@ -354,7 +347,15 @@ const Step2 = ({
             return;
         }
 
-        dispatch(update_draft_client({
+        if ((state.draft?.addresses?.length || 0) === 0) {
+            ToastMantine.feedBackForm({
+                message: "Debe agregar al menos una direccion",
+            });
+            return;
+        }
+
+        const updatedData = {
+            ...state.draft,
             street,
             street_number: streetNumber,
             neighborhood,
@@ -362,15 +363,37 @@ const Step2 = ({
             state: stateName,
             city: cityName,
             zip_code: zipCode,
-            ...{ ...(paymentTerms !== "" ? { payment_terms: paymentTerms } : {}) }
-        }));
+            ...(paymentTerms !== "" ? { payment_terms: paymentTerms } : {})
+        };
 
-        dispatch(next_step());
+        try {
+            // 1) Persistir
+            await onUpdate({ original: state.data, updated: updatedData });
 
-    }, [street, streetNumber, neighborhood, countryName, stateName, cityName, zipCode, dispatch, paymentTerms, state.draft?.product_discounts_client]);
+            // ⚠️ Nota: leer errorRedux aquí puede no reflejar el último dispatch.
+            if (Object.keys(errorRedux).length > 0) {
+                Object.entries(errorRedux).forEach(([_, value]) => {
+                    ToastMantine.feedBackForm({ message: value as string });
+                });
+                return;
+            }
+
+            // 2) Refrescar y esperar a que el contexto quede actualizado por el Provider
+            await refetch();
+
+            // 3) Avanzar con datos ya refrescados
+            dispatch(next_step());
+        } catch (e: any) {
+            ToastMantine.feedBackForm({ message: e?.message ?? "No se pudo guardar los cambios" });
+            return;
+        }
+    }, [
+        street, streetNumber, neighborhood, countryName, stateName, cityName, zipCode,
+        paymentTerms, state, onUpdate, refetch, dispatch, errorRedux
+    ]);
+
 
     const handleOnChangePaymentTerms = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => (() => setPaymentTerms(e.target.value))(), []);
-
 
     const handleOnClickBackStep = useCallback(() => {
         dispatch(back_step());
@@ -389,12 +412,10 @@ const Step2 = ({
                             withValidation
                             icon={<Text />}
                         />
-                        <InputTextCustom
+                        <NumericInputCustom
                             value={streetNumber}
                             onChange={setStreetNumber}
                             placeholder="Numero"
-                            withValidation
-                            icon={<Text />}
                         />
                         <InputTextCustom
                             value={neighborhood}
@@ -432,12 +453,10 @@ const Step2 = ({
                             disabled={csc.cityNames.length === 0}
                             maxHeight="200px"
                         />
-                        <InputTextCustom
+                        <NumericInputCustom
                             value={zipCode}
                             onChange={setZipCode}
                             placeholder="Codigo postal"
-                            withValidation
-                            icon={<Text />}
                         />
                     </div>
                 </div>
@@ -487,13 +506,8 @@ const Step2 = ({
                     icon={<ChevronLeft />}
                     onClick={handleOnClickBackStep}
                 />
-                <TertiaryActionButtonCustom
-                    label="Guardar y salir"
-                    onClick={() => console.log("guardar y salir")}
-                    icon={<Bookmark />}
-                />
                 <MainActionButtonCustom
-                    label="Guardar y continuar"
+                    label="Guardar"
                     onClick={handleOnClickSaveContinue}
                     icon={<Bookmark />}
                 />

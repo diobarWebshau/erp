@@ -24,8 +24,8 @@ interface IConfirmModal {
 const ConfirmModal = ({ onClose, shippingOrderRecord, shippingOrderUpdate, onUpdate, onFeedBack }: IConfirmModal) => {
 
     const errorRedux = useSelector((state: RootState) => state.error);
-    const [comment, setComment] = useState<string>("");
-    const [receivedBy, setReceivedBy] = useState<string>("");
+    const [comment, setComment] = useState<string>(shippingOrderUpdate.comments ?? "");
+    const [receivedBy, setReceivedBy] = useState<string>(shippingOrderUpdate.received_by ?? "");
 
     const handleOnChangeComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setComment(e.target.value);

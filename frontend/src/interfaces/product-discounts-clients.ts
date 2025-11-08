@@ -12,10 +12,17 @@ interface IProductDiscountClient {
     updated_at: string;
 }
 
+interface IProductDiscountClientManager {
+    added: IPartialProductDiscountClient[];
+    deleted: IPartialProductDiscountClient[];
+    modified: IPartialProductDiscountClient[];
+}
+
 type IPartialProductDiscountClient =
     Partial<IProductDiscountClient>
 
 export type {
     IProductDiscountClient,
-    IPartialProductDiscountClient
+    IPartialProductDiscountClient,
+    IProductDiscountClientManager
 }

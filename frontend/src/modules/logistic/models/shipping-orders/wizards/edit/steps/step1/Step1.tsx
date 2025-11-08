@@ -363,7 +363,7 @@ const Step1 = () => {
                     <p className="nunito-semibold">{purchaseOrder?.client?.email}</p>
                     <p className="nunito-semibold">{`Tel. ${purchaseOrder?.client?.phone}`}</p>
                     <p className="nunito-semibold">{`${purchaseOrder?.client?.city}, ${purchaseOrder?.client?.state}, ${purchaseOrder?.client?.country}`}</p>
-                    <p className="nunito-semibold">{purchaseOrder?.client?.address}</p>
+                    <p className="nunito-semibold">{`${purchaseOrder?.client?.street}, ${purchaseOrder?.client?.street_number}, ${purchaseOrder?.client?.street_number}, ${purchaseOrder?.client?.neighborhood},  C.P. ${purchaseOrder?.client?.zip_code}`}</p>
                 </div>
                 <div className={StyleModule.subHeaderRight}>
                     <div>
@@ -378,7 +378,7 @@ const Step1 = () => {
                     <div>
                         <span className="nunito-bold">Dirección de envío</span>
                         <p>{`${purchaseOrder?.shipping_city}, ${purchaseOrder?.shipping_state}, ${purchaseOrder?.shipping_country}`}</p>
-                        <p>{purchaseOrder?.shipping_address}</p>
+                        <p>{`${purchaseOrder?.shipping_street}, ${purchaseOrder?.shipping_street_number}, ${purchaseOrder?.shipping_street_number}, ${purchaseOrder?.shipping_neighborhood},  C.P. ${purchaseOrder?.shipping_zip_code}`}</p>
                     </div>
                 </div>
             </div>

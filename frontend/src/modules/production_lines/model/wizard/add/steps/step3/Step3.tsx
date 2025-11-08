@@ -2,7 +2,7 @@ import CriticalActionButton from "../../../../../../../comp/primitives/button/cu
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import { Bookmark, ChevronLeft, CircleCheck } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import StyleModule from "./Step3.module.css"
 import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
 import type { Dispatch } from "react";

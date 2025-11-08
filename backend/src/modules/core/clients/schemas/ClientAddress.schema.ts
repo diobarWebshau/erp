@@ -4,12 +4,12 @@ const ClientAddressSchema = zod.object({
 
     client_id: zod.number().int().min(1),
     street: zod.string().min(1),
-    street_number: zod.string().min(1),
+    street_number: zod.number().int(),
     neighborhood: zod.string().min(1),
     city: zod.string().min(1),
     state: zod.string().min(1),
     country: zod.string().min(1),
-    zip_code: zod.string().min(1),
+    zip_code: zod.number().int(),
 
 });
 

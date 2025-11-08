@@ -130,7 +130,7 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
                             <span>{purchasedOrder?.email}</span>
                             <span>{`Tel. ${purchasedOrder?.phone}`}</span>
                             <span>{`${purchasedOrder?.city}, ${purchasedOrder?.state}, ${purchasedOrder?.country}`}</span>
-                            <span>{`${purchasedOrder?.address} C.P. ${purchasedOrder?.zip_code}`}</span>
+                            <span>{`${purchasedOrder?.street}, ${purchasedOrder?.street_number}, ${purchasedOrder?.street_number}, ${purchasedOrder?.neighborhood},  C.P. ${purchasedOrder?.zip_code}`}</span>
                         </div>
                         <div className={`nunito-semibold ${StyleModule.subContentItem}`}>
                             <dl>
@@ -139,7 +139,7 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
                             </dl>
                             <span className={`nunito-bold ${StyleModule.boldText}`}>Direccion de envio</span>
                             <span>{`${purchasedOrder?.city}, ${purchasedOrder?.state}, ${purchasedOrder?.country}`}</span>
-                            <span>{`${purchasedOrder?.shipping_address} C.P. ${purchasedOrder?.shipping_zip_code}`}</span>
+                            <span>{`${purchasedOrder?.shipping_street}, ${purchasedOrder?.shipping_street_number}, ${purchasedOrder?.shipping_street_number}, ${purchasedOrder?.shipping_neighborhood},  C.P. ${purchasedOrder?.shipping_zip_code}`}</span>
                         </div>
                     </div>
                 </div>

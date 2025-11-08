@@ -22,7 +22,6 @@ const Step3 = ({
     onClose,
 }: IStep3) => {
 
-
     // * *********** Funciones memoizadas para las tablas ************ 
 
     const getRowIdAddresses = useMemo(() => (row: IPartialClientAddress, index: number) => row.id?.toString() ?? index.toString(), []);
@@ -124,7 +123,7 @@ const Step3 = ({
                 type: "number",
                 mode: "range",
             },
-            cell: ({ row }) => formatPercentage1_100(row.original.discount_percentage ?? 0)
+            cell: ({ row }) => formatPercentage1_100(Number(row.original.discount_percentage) ?? 0)
         },
     ], []);
 

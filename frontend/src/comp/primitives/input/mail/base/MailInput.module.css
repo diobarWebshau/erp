@@ -1,0 +1,121 @@
+/* ===== Base Layout ===== */
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 44px;
+
+    /* visual */
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 15px;
+    transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+/* resalta el contenedor cuando el input tiene foco */
+.container:focus-within {
+    border-color: var(--color-theme-primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-theme-primary) 3%, transparent);
+}
+
+/* ===== Label flotante ===== */
+.label {
+    position: absolute;
+    left: 5px;
+    top: 0;
+    transform: translateY(13px);
+    /* “placeholder” */
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1;
+    transition: transform .18s ease, font-size .18s ease, color .18s ease;
+    pointer-events: none;
+    /* que el click pase al input */
+}
+
+/* Cuando hay foco o valor, “flota” arriba */
+.floating {
+    transform: translateY(-4px);
+    font-size: 12px;
+    color: var(--color-theme-primary);
+    background-color: white;
+    padding-inline: 0.2rem;
+    border-radius: 15px;
+}
+
+/* 🔴 Etiqueta roja cuando inválido */
+.labelError {
+    color: #dc2626 !important;
+    /* prioridad sobre .floating */
+}
+
+/* ===== Input ===== */
+.input {
+    height: 100%;
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+
+    padding-left: 0.5rem;
+    padding-right: 1rem;
+    /* espacio para el icono */
+    color: var(--color-theme-font-black);
+    border-radius: 15px;
+    /* coincide con el contenedor */
+}
+
+/* ===== Icono ===== */
+.icon {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 18px;
+    height: 18px;
+    color: #9ca3af;
+}
+
+/* ...tu CSS existente... */
+
+/* 🔴 Etiqueta roja cuando inválido */
+.labelError {
+    color: #dc2626 !important;
+}
+
+/* 🔴 Borde/ring del contenedor ya lo tienes con .error */
+.error {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 4px color-mix(in srgb, #dc2626 12%, transparent);
+}
+
+/* 🔴 Input con feedback de error coherente */
+.inputError {
+    /* sin outline para no romper el ring del contenedor */
+    caret-color: #dc2626;
+    /* si quieres un color de texto de error, actívalo; si no, comenta: */
+    /* color: #b91c1c; */
+}
+
+/* Mensaje de error */
+.errorText {
+    position: absolute;
+    bottom: -18px;
+    left: 0.5rem;
+    font-size: 12px;
+    line-height: 1;
+    color: #dc2626;
+}
+
+
+
+/* Si quisieras usar el pseudo nativo:
+.input:invalid { outline: 2px solid #dc2626; } */
+
+/* Opcional: estilo de error/ok si los agregas después
+.container.error { border-color: #dc2626; box-shadow: 0 0 0 4px color-mix(in srgb, #dc2626 18%, transparent); }
+.container.ok    { border-color: #10b981; box-shadow: 0 0 0 4px color-mix(in srgb, #10b981 18%, transparent); }
+*/

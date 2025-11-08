@@ -89,7 +89,7 @@ PurchasedOrderModel.init({
         allowNull: false
     },
     street_number: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     neighborhood: {
@@ -101,7 +101,7 @@ PurchasedOrderModel.init({
         allowNull: false
     },
     zip_code: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     tax_regimen: {
@@ -129,7 +129,7 @@ PurchasedOrderModel.init({
         allowNull: false
     },
     shipping_street_number: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     shipping_neighborhood: {
@@ -149,7 +149,7 @@ PurchasedOrderModel.init({
         allowNull: false
     },
     shipping_zip_code: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     //

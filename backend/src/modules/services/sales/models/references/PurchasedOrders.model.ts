@@ -28,22 +28,22 @@ interface PurchasedOrderAttributes {
     state: string,
     country: string,
     street: string,
-    street_number: string,
+    street_number: number,
     neighborhood: string,
     payment_terms: string,
-    zip_code: string,
+    zip_code: number,
     tax_regimen: string,
     cfdi: string,
     payment_method: string,
     // shipping fields(client address)
     client_address_id: number,
     shipping_street: string,
-    shipping_street_number: string,
+    shipping_street_number: number,
     shipping_neighborhood: string,
     shipping_city: string,
     shipping_state: string,
     shipping_country: string,
-    shipping_zip_code: string,
+    shipping_zip_code: number,
     //
     total_price: number,
     updated_at: Date
@@ -151,7 +151,7 @@ PurchasedOrderModel.init(
             allowNull: false
         },
         street_number: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         neighborhood: {
@@ -163,7 +163,7 @@ PurchasedOrderModel.init(
             allowNull: false
         },
         zip_code: {
-            type: DataTypes.STRING(20),
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         tax_regimen: {
@@ -191,7 +191,7 @@ PurchasedOrderModel.init(
             allowNull: false
         },
         shipping_street_number: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         shipping_neighborhood: {
@@ -211,7 +211,7 @@ PurchasedOrderModel.init(
             allowNull: false
         },
         shipping_zip_code: {
-            type: DataTypes.STRING(20),
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         //
