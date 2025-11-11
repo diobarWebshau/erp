@@ -1,14 +1,15 @@
-import InputTextCustom from "../../../../../comp/primitives/input/text/custom/InputTextCustom";
 import DialogModal from "../../../../../comp/primitives/modal2/dialog-modal/base/DialogModal";
 import StyleModule from "./AddressModal.module.css";
 import StandardSelectCustomMemo from "../../../../../comp/features/select/StandardSelectCustom";
-import { Plus, Text } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useCountryStateCitySeparated } from "../../../../../hooks/useCountryStateCity";
 import TertiaryActionButtonCustom from "../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import MainActionButtonCustom from "../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import type { IPartialClientAddress } from "interfaces/clientAddress";
 import ToastMantine from "../../../../../comp/external/mantine/toast/base/ToastMantine";
+import UnderlineLabelInputText from "../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
+import UnderlineLabelInputNumeric from "../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
 
 interface IAddressModal {
     onClose: () => void,
@@ -18,12 +19,12 @@ interface IAddressModal {
 const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
 
     const [street, setStreet] = useState<string>('');
-    const [streetNumber, setStreetNumber] = useState<string>('');
+    const [streetNumber, setStreetNumber] = useState<number | null>(null);
     const [neighborhood, setNeighborhood] = useState<string>('');
     const [countryName, setCountryName] = useState<string>('México');
     const [stateName, setStateName] = useState<string>('Baja California');
     const [cityName, setCityName] = useState<string>('Mexicali');
-    const [zipCode, setZipCode] = useState<string>('');
+    const [zipCode, setZipCode] = useState<number | null>(null);
 
     const csc = useCountryStateCitySeparated({
         countryName, onCountryNameChange: setCountryName,
@@ -35,15 +36,15 @@ const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
 
     const handleAddAddress = () => {
         if (
-            street === '' || streetNumber === '' ||
+            street === '' || streetNumber === null ||
             neighborhood === '' || countryName === '' ||
-            stateName === '' || cityName === '' || zipCode === '') {
+            stateName === '' || cityName === '' || zipCode === null) {
             ToastMantine.feedBackForm({
                 message: "Debe completar todos los campos",
             });
             return;
         }
-        const address = {
+        const address: IPartialClientAddress = {
             street_number: streetNumber,
             street: street,
             neighborhood: neighborhood,
@@ -64,26 +65,22 @@ const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
             <div className={StyleModule.taxAddressContainer}>
                 <h2 className="nunito-semibold">Dirección de envío</h2>
                 <div className={StyleModule.fieldBlock}>
-                    <InputTextCustom
+                    <UnderlineLabelInputText
                         value={street}
                         onChange={setStreet}
-                        placeholder="Calle"
                         withValidation
-                        icon={<Text />}
+                        label="Calle"
                     />
-                    <InputTextCustom
+                    <UnderlineLabelInputNumeric
                         value={streetNumber}
                         onChange={setStreetNumber}
-                        placeholder="Numero"
-                        withValidation
-                        icon={<Text />}
+                        label="Numero exterior"
                     />
-                    <InputTextCustom
+                    <UnderlineLabelInputText
                         value={neighborhood}
                         onChange={setNeighborhood}
-                        placeholder="Colonia"
+                        label="Colonia"
                         withValidation
-                        icon={<Text />}
                     />
                 </div>
                 <div className={StyleModule.fieldBlock}>
@@ -114,12 +111,11 @@ const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
                         disabled={csc.cityNames.length === 0}
                         maxHeight="200px"
                     />
-                    <InputTextCustom
+                    <UnderlineLabelInputNumeric
                         value={zipCode}
                         onChange={setZipCode}
-                        placeholder="Codigo postal"
+                        label="Codigo postal"
                         withValidation
-                        icon={<Text />}
                     />
                 </div>
             </div>

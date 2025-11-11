@@ -109,16 +109,15 @@ class ClientController {
     };
     static getByCompanyName = async (req, res, next) => {
         const { company_name } = req.params;
+        let isValid = false;
         try {
             const response = await ClientModel.findOne({
                 where: { company_name: company_name }
             });
             if (!response) {
-                res.status(200).json({ validation: "Client no found" });
-                return;
+                isValid = true;
             }
-            const client = response.toJSON();
-            res.status(200).json(client);
+            res.status(200).json(isValid);
         }
         catch (error) {
             if (error instanceof Error) {

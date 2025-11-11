@@ -149,6 +149,41 @@ const fetchClientById2 = async ({
     }
 };
 
+const validateCompanyName = async (
+    companyName: string,
+    dispatch: AppDispatchRedux
+): Promise<boolean> => {
+    try {
+        const response = await fetch(`${API_URL}/company_name/${companyName}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+            const errorText = await response.json();
+            console.log(errorText)
+            if (response.status >= 500) {
+                throw new Error(
+                    `${errorText}`
+                );
+            }
+            dispatch(
+                setError({
+                    key: "Clients",
+                    message: errorText
+                })
+            );
+            return false;
+        }
+        dispatch(
+            clearError("Clients")
+        );
+        const data: boolean = await response.json();
+        return data;
+    } catch (error: unknown) {
+        throw error;
+    }
+}
+
 
 const fetchClientLike = async (
     like: string,
@@ -414,5 +449,6 @@ export {
     createCompleteClientInDB,
     fetchClientLike,
     fetchClientById2,
-    fetchClientById
+    fetchClientById,
+    validateCompanyName,
 };

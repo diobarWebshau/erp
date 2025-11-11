@@ -1,0 +1,203 @@
+/* *************** Container *************** */
+
+.container {
+    /* posicionamiento */
+    position: relative;
+
+    /* dimension */
+    height: 44px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    /* distribucion flex */
+    background-color: var(--color-theme-font-white);
+    border: 1px solid var(--color-theme-border-table);
+    border-radius: 15px;
+
+    /* animaciones */
+    transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+.errorContainer {
+    /* distribucion box */
+    border: 2px solid var(--color-alert);
+    /* estilos */
+    /* box-shadow: 0 0 0 4px color-mix(in srgb, #dc2626 12%, transparent); */
+}
+
+.disabledContainer {
+    /* estilos */
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.disabledContainer>* {
+    cursor: not-allowed;
+}
+
+/* *************** Label *************** */
+
+.label {
+    /* posicionamientos */
+    position: absolute;
+    left: 5px;
+    top: 0;
+    transform: translateY(13px);
+
+    /* animaciones */
+    transition:
+        transform .18s ease, font-size .18s ease,
+        color .18s ease, background-color .18s ease;
+
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+    font-size: 14px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Cuando hay foco o valor, “flota” arriba */
+.labelFloating {
+
+    /* distribucion box */
+    padding-inline: 0.2rem;
+    border-radius: 15px;
+
+    /* estilos */
+    transform: translateY(-4px);
+    font-size: 12px;
+    color: var(--color-theme-primary);
+    background-color: var(--color-theme-font-white);
+}
+
+/* === Label rojo en , también cuando está flotando === */
+.labelError {
+    color: var(--color-alert);
+}
+
+
+/* *************** Input *************** */
+
+.input {
+    /* dimension */
+    height: 100%;
+    width: 100%;
+
+    /* distribucion box */
+    border: none;
+    padding-left: 0.5rem;
+    padding-right: 1.5rem;
+    border-radius: 15px;
+
+    /* estilos */
+    color: var(--color-theme-font-black);
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+}
+
+.inputError {
+    /* estilos */
+    caret-color: var(--color-alert);
+}
+
+/* ============================
+   OCULTAR CONTROLES (FLECHAS)
+   EN <input type="number">
+   ============================ */
+
+/* --- Chrome / Edge / Safari (Blink / WebKit) --- */
+/* Selecciona los pseudo-elementos de las flechas del input numérico */
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    /* Quita la UI nativa de las flechas (no se renderizan) */
+    margin: 0;
+    /* Evita espacios residuales que pudieran dejar */
+}
+
+/* --- Firefox (Gecko) + fallback estándar --- */
+/* Aplica solo a <input type="number"> con la clase .input */
+.input[type="number"] {
+    -moz-appearance: textfield;
+    /* En Firefox: renderiza como campo de texto (sin flechas) */
+    appearance: textfield;
+    /* Estándar: ayuda en navegadores modernos (incl. Safari reciente) */
+}
+
+
+/* *************** Controls *************** */
+
+.controls {
+    /* posicionamiento */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.6rem;
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.controls span {
+    /* dimension */
+    width: 1rem;
+    height: 0.7rem;
+
+    /* distribucion flex */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* interactividad */
+    cursor: pointer;
+
+    /* distribucion box */
+    border: none;
+
+    /* estilos */
+    background-color: transparent;
+}
+
+/* .controls button:hover .iconControl {
+    stroke: var(--color-theme-secondary-light);
+} */
+
+.controls>*:first-child:hover {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.controls>*:last-child:hover {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.iconControl {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* estilos svg */
+    stroke-width: 4px;
+    stroke: var(--color-theme-primary);
+}
+
+.disabledIconControl,
+.disabledIconControl>* {
+    cursor: not-allowed;
+}
+
+.controls>span:not(.disabledIconControl):hover {
+    border: 1px solid var(--color-theme-primary);
+    stroke: var(--color-theme-primary-light);
+}
+
+.iconError {
+    stroke: var(--color-alert);
+}

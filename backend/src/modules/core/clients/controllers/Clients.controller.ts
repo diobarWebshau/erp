@@ -11,7 +11,7 @@ class ClientController {
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
 
         const { filter, ...rest } = req.query as {
-            filter?: string;    
+            filter?: string;
         } & Partial<ClientCreateAttributes>;
 
         try {
@@ -139,16 +139,15 @@ class ClientController {
     static getByCompanyName =
         async (req: Request, res: Response, next: NextFunction) => {
             const { company_name } = req.params;
+            let isDuplicate = false;
             try {
                 const response = await ClientModel.findOne({
                     where: { company_name: company_name }
                 });
                 if (!response) {
-                    res.status(200).json({ validation: "Client no found" });
-                    return;
+                    isDuplicate = true;
                 }
-                const client = response.toJSON();
-                res.status(200).json(client);
+                res.status(200).json(isDuplicate);
             } catch (error: unknown) {
                 if (error instanceof Error) {
                     next(error);

@@ -1,37 +1,38 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import withClassName from "../../../../../utils/withClassName";
+import withClassName from "../../../../../../utils/withClassName";
 import type { ChangeEvent, MouseEvent } from "react"
-import StyleModule from "./MailInput.module.css";
-import { MailIcon } from "lucide-react";
+import StyleModule from "./UnderlineLabelInputPhone.module.css";
+import { Phone } from "lucide-react";
+import { isPhone } from "../../../../../../helpers/validations";
 import clsx from "clsx";
 
-interface MailInputProps {
+interface UnderlineLabelInputPhoneProps {
     value: string;
     onChange: (value: string) => void;
     label: string;
     required?: boolean;
+    withValidation?: boolean;
 }
 
-const MailInput = ({
+const UnderlineLabelInputPhone = ({
     value,
     onChange,
     label,
-    required = false
-}: MailInputProps) => {
+    required = false,
+    withValidation = false
+}: UnderlineLabelInputPhoneProps) => {
 
     // ************** Manejo de estados **************
 
     const id = useId();
     const refInput = useRef<HTMLInputElement>(null);
     const [focused, setFocused] = useState(false);
-    const [touched, setTouched] = useState(false);
     const [isValid, setIsValid] = useState<boolean | null>(null);
-    // Única verdad para el error: solo tras blur y si es inválido
-    const errorActive = useMemo(() => touched && isValid === false, [touched, isValid]);
+    const errorActive = useMemo(() => isValid === false, [isValid]);
 
     // ************** Manejo de estilos **************
 
-    const iconWithClass = useMemo(() => withClassName(<MailIcon />, clsx(
+    const iconWithClass = useMemo(() => withClassName(<Phone />, clsx(
         StyleModule.icon,
         errorActive ? StyleModule.iconError : StyleModule.iconValid
     )), [errorActive]);
@@ -42,14 +43,13 @@ const MailInput = ({
             "nunito-semibold",
             (focused || value.length > 0) && StyleModule.floating,
             // errorActive ? StyleModule.labelError : StyleModule.labelValid
-            errorActive && StyleModule.labelError
+            (errorActive && focused) && StyleModule.labelError
         );
         const inputC = clsx(
             StyleModule.input,
             "nunito-regular",
             errorActive && StyleModule.inputError,
             // errorActive ? StyleModule.inputError : StyleModule.inputValid
-
         );
         const containerC = clsx(
             StyleModule.container,
@@ -71,21 +71,12 @@ const MailInput = ({
     const handleOnChangeInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const v = e.target.value;
         onChange(v);
-        // Solo revalidamos mientras se escribe si ya estuvo "touched"
-        if (touched) {
-            setIsValid(v.length === 0 ? null : e.target.validity.valid);
-        }
-    }, [onChange, touched]);
+    }, [onChange]);
 
     const handleOnBlur = useCallback(() => {
         setFocused(false);
-        setTouched(true); // primer blur: desde ahora sí mostramos errores
         const v = refInput.current?.value ?? "";
-        setIsValid(
-            v.length === 0
-                ? null
-                : (refInput.current?.checkValidity() ?? null)
-        );
+        setIsValid(withValidation ? isPhone(v) : null);
     }, []);
 
     const handleOnFocus = useCallback(() => {
@@ -98,13 +89,8 @@ const MailInput = ({
     useEffect(() => {
         const v = value ?? "";
         if (!refInput.current) return;
-
-        if (!touched) {
-            setIsValid(null); // neutral hasta que ocurra el primer blur
-            return;
-        }
-        setIsValid(v.length === 0 ? null : refInput.current.checkValidity());
-    }, [value, touched]);
+        setIsValid(withValidation ? isPhone(v) : null);
+    }, [value]);
 
     return (
         <div className={classNameContainer} onClick={handleOnClickContainer}>
@@ -115,13 +101,13 @@ const MailInput = ({
                 id={id}
                 ref={refInput}
                 className={classNameInput}
-                type="email"
+                type="tel"
                 value={value}
                 onChange={handleOnChangeInput}
                 onFocus={handleOnFocus}
                 onBlur={handleOnBlur}
-                autoComplete="email"
-                inputMode="email"
+                autoComplete="tel"
+                inputMode="tel"
                 {...(required && { required })}
             />
             {iconWithClass}
@@ -129,4 +115,4 @@ const MailInput = ({
     );
 };
 
-export default MailInput;
+export default UnderlineLabelInputPhone;

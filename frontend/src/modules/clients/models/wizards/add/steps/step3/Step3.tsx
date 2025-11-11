@@ -1,20 +1,20 @@
-import StyleModule from "./Step3.module.css";
-import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
-import { useCallback, useMemo, type Dispatch } from "react";
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
-import { Bookmark, ChevronLeft } from "lucide-react";
-import type { ColumnDef } from "@tanstack/react-table";
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
 import { formatCurrency, formatPercentage1_100 } from "../../../../../../../helpers/formttersNumeric";
-import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import { back_step } from "../../../../../context/clientActions";
+import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
+import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
 import type { IPartialClient } from "../../../../../../../interfaces/clients";
 import type { RootState } from "../../../../../../../store/store";
+import { back_step } from "../../../../../context/clientActions";
+import { useCallback, useMemo, type Dispatch } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Bookmark, ChevronLeft } from "lucide-react";
+import StyleModule from "./Step3.module.css";
 import { useSelector } from "react-redux";
-import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 
 interface IStep3 {
     state: ClientState;

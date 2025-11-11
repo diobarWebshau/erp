@@ -1,6 +1,5 @@
-/* Puedes setear este token a nivel global o en el contenedor padre */
+/* ****************** Container ****************** */
 
-/* ===== Base Layout ===== */
 .container {
     /* posicionamiento */
     position: relative;
@@ -39,7 +38,8 @@
     /* box-shadow: 0 0 0 4px color-mix(in srgb, #dc2626 12%, transparent); */
 }
 
-/* ===== Label flotante ===== */
+/* ****************** Label ****************** */
+
 .label {
     /* posicionamientos */
     position: absolute;
@@ -74,13 +74,14 @@
     background-color: var(--color-theme-font-white);
 }
 
-/* === Label rojo en error, también cuando está flotando === */
-.labelError,
-.floating.labelError {
+/* === Label rojo en , también cuando está flotando === */
+.labelError {
     color: var(--color-alert);
 }
 
-/* ===== Input ===== */
+
+/* ****************** Input ****************** */
+
 .input {
     /* dimension */
     height: 100%;
@@ -104,11 +105,8 @@
     caret-color: var(--color-alert);
 }
 
-.iconError {
-    stroke: var(--color-alert);
-}
+/* ****************** Icono ****************** */
 
-/* ===== Icono ===== */
 .icon {
     /* posicionamiento */
     position: absolute;
@@ -128,6 +126,10 @@
     stroke: var(--color-theme-primary);
 }
 
+.iconError {
+    stroke: var(--color-alert);
+}
+
 /* .labelValid {
     color: #10b981;
 }
@@ -135,3 +137,16 @@
 .inputValid{
     caret-color: #10b981;
 } */
+
+.iconChecking {
+  opacity: 0.8;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.container[aria-busy="true"] {
+  cursor: progress;
+}

@@ -1,34 +1,35 @@
-import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
-import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
+import UnderlineLabelInputNumeric from "../../../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
+import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { Bookmark, ChevronLeft, Plus, Text, Trash2 } from "lucide-react";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import StyleModule from "./Step2.module.css";
-import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
-import StandardSelectCustomMemo from "./../../../../../../../comp/features/select/StandardSelectCustom";
-import InputTextCustom from "../../../../../../../comp/primitives/input/text/custom/InputTextCustom";
-import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
+import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
+import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
+import SelectProductsModal from "./../../../../../../../comp/features/modal-product2/SelectProductsModal"
+import StandardSelectCustomMemo from "./../../../../../../../comp/features/select/StandardSelectCustom";
+import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
+import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
+import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
+import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
+import { clearError, setError } from "../../../../../../../store/slicer/errorSlicer";
+import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
+import { formatCurrency } from "./../../../../../../../helpers/formttersNumeric";
+import { generateRandomIds } from "./../../../../../../../helpers/nanoId";
+import { Bookmark, ChevronLeft, Plus, Trash2 } from "lucide-react";
 import AddressModal from "../../../../modals/address/AddressModal";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { RowAction } from "interfaces/tableTypes";
+import type { AppDispatchRedux } from "store/store";
+import type { IProduct } from "interfaces/product";
 import {
     add_client_addresses, remove_client_addresses, add_client_product_discounts, next_step,
     remove_client_product_discounts, update_client_product_discounts, update_client,
     back_step
 } from "./../../../../../context/clientActions"
-import type { RowAction } from "interfaces/tableTypes";
-import { generateRandomIds } from "./../../../../../../../helpers/nanoId";
-import { formatCurrency } from "./../../../../../../../helpers/formttersNumeric";
-import SelectProductsModal from "./../../../../../../../comp/features/modal-product2/SelectProductsModal"
-import type { IProduct } from "interfaces/product";
-import type { AppDispatchRedux } from "store/store";
+import StyleModule from "./Step2.module.css";
 import { useDispatch } from "react-redux";
-import { clearError, setError } from "../../../../../../../store/slicer/errorSlicer";
-import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
-import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
-import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -327,7 +328,6 @@ const Step2 = ({
 
 
     const handleOnClickSaveContinue = useCallback(() => {
-
         if (
             street === '' || streetNumber === null ||
             neighborhood === '' || countryName === '' ||
@@ -367,10 +367,9 @@ const Step2 = ({
 
         dispatch(next_step());
 
-    }, [street, streetNumber, neighborhood, countryName, stateName, cityName, zipCode, dispatch, paymentTerms, state.data?.product_discounts_client]);
+    }, [street, streetNumber, neighborhood, countryName, stateName, cityName, zipCode, dispatch, paymentTerms, state.data]);
 
     const handleOnChangePaymentTerms = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => (() => setPaymentTerms(e.target.value))(), []);
-
 
     const handleOnClickBackStep = useCallback(() => {
         dispatch(back_step());
@@ -382,24 +381,23 @@ const Step2 = ({
                 <div className={StyleModule.taxAddressContainer}>
                     <span className={`nunito-bold ${StyleModule.subTitle}`}> Dirección fiscal *</span>
                     <div className={StyleModule.fieldBlock}>
-                        <InputTextCustom
+                        <UnderlineLabelInputText
                             value={street}
                             onChange={setStreet}
-                            placeholder="Calle"
+                            label="Calle"
                             withValidation
-                            icon={<Text />}
                         />
-                        <NumericInputCustom
+                        <UnderlineLabelInputNumeric
                             value={streetNumber}
                             onChange={setStreetNumber}
-                            placeholder="Numero"
+                            label="Numero exterior"
+                            withValidation
                         />
-                        <InputTextCustom
+                        <UnderlineLabelInputText
                             value={neighborhood}
                             onChange={setNeighborhood}
-                            placeholder="Colonia"
+                            label="Colonia"
                             withValidation
-                            icon={<Text />}
                         />
                     </div>
                     <div className={StyleModule.fieldBlock}>
@@ -430,10 +428,11 @@ const Step2 = ({
                             disabled={csc.cityNames.length === 0}
                             maxHeight="200px"
                         />
-                        <NumericInputCustom
+                        <UnderlineLabelInputNumeric
                             value={zipCode}
                             onChange={setZipCode}
-                            placeholder="Codigo postal"
+                            label="Codigo postal"
+                            withValidation
                         />
                     </div>
                 </div>

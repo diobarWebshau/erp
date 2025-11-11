@@ -1,14 +1,16 @@
-import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
-import { useCallback, useState, type Dispatch } from "react";
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
+import UnderlineLabelInputPhone from "../../../../../../../comp/primitives/input/layouts/underline-label/phone/UnderlineLabelInputPhone";
+import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
+import UnderlineLabelInputMail from "../../../../../../../comp/primitives/input/layouts/underline-label/mail/UnderlineLabelInputMail";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { Bookmark, MailIcon, Phone, Text } from "lucide-react";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import InputTextCustom from "../../../../../../../comp/primitives/input/text/custom/InputTextCustom";
-import { update_draft_client } from "../../../../../context/clientActions";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
-import StyleModule from "./Step1.module.css";
+import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
+import { update_draft_client } from "../../../../../context/clientActions";
 import { next_step } from "../../../../../context/clientActions";
+import { useCallback, useState, type Dispatch } from "react";
+import StyleModule from "./Step1.module.css";
+import { Bookmark} from "lucide-react";
 
 interface IStep1 {
     state: ClientState;
@@ -48,51 +50,37 @@ const Step1 = ({
     return (
         <div className={StyleModule.containerStep}>
             <div className={StyleModule.containerContent}>
-                <InputTextCustom
+
+                <UnderlineLabelInputText
                     value={company_name}
                     onChange={setCompanyName}
-                    icon={<Text />}
-                    placeholder="Nombre"
-                    classNameInput={StyleModule.inputTextCustom}
-                    classNameContainer={StyleModule.containerInputText}
+                    label="Nombre"
                     withValidation
                 />
-                <InputTextCustom
+                <UnderlineLabelInputText
                     value={taxId}
                     onChange={setTaxId}
-                    icon={<Text />}
-                    placeholder="RFC"
-                    classNameInput={StyleModule.inputTextCustom}
-                    classNameContainer={StyleModule.containerInputText}
+                    label="RFC"
                     withValidation
                 />
-                <InputTextCustom
+                <UnderlineLabelInputText
                     value={cfdi}
                     onChange={setCfdi}
-                    icon={<Text />}
-                    placeholder="Cfdi"
-                    classNameInput={StyleModule.inputTextCustom}
-                    classNameContainer={StyleModule.containerInputText}
+                    label="Cfdi"
                     withValidation
                 />
                 <span className={`nunito-bold ${StyleModule.subTitle}`}>Contacto principal</span>
                 <div className={StyleModule.blockContact}>
-                    <InputTextCustom
+                    <UnderlineLabelInputPhone
                         value={phone}
                         onChange={setPhone}
-                        icon={<Phone />}
-                        placeholder="Teléfono"
-                        classNameInput={StyleModule.inputTextCustom}
-                        classNameContainer={StyleModule.containerInputText}
+                        label="Teléfono"
                         withValidation
                     />
-                    <InputTextCustom
+                    <UnderlineLabelInputMail
                         value={email}
                         onChange={setEmail}
-                        icon={<MailIcon />}
-                        placeholder="Correo electrónico"
-                        classNameInput={StyleModule.inputTextCustom}
-                        classNameContainer={StyleModule.containerInputText}
+                        label="Correo electrónico"
                         withValidation
                     />
                 </div>

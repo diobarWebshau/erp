@@ -3,12 +3,12 @@ interface IClientAddress {
     client_id: number;
     address: string;
     street: string;
-    street_number: string;
+    street_number: number | null;
     neighborhood: string;
     city: string;
     state: string;
     country: string;
-    zip_code: string;
+    zip_code: number | null;
     created_at: string;
     updated_at: string;
 }
@@ -28,12 +28,12 @@ const defaultValueClientAddress:
     client_id: 0,
     address: '',
     street: '',
-    street_number: '',
+    street_number: 0,
     neighborhood: '',
     city: '',
     state: '',
     country: '',
-    zip_code: '',
+    zip_code: null,
     created_at: '',
     updated_at: '',
 };
@@ -43,12 +43,12 @@ const defaultValuePartialClientAddress:
     client_id: 0,
     address: '',
     street: '',
-    street_number: '',
+    street_number: null,
     neighborhood: '',
     city: '',
     state: '',
     country: '',
-    zip_code: '',
+    zip_code: null,
 };
 
 export type {

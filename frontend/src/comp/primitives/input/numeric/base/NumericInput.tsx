@@ -39,7 +39,7 @@ const NumericInput = memo(({
     classNameControlsIcon
 }: NumericInputProps) => {
 
-    const [inputValue, setInputValue] = useState(value?.toString() ?? "");
+    const [inputValue, setInputValue] = useState<string>(value?.toString() ?? "");
     const [isValid, setIsValid] = useState<boolean>(true);
 
     const handleOnClickUp = useCallback(() => {

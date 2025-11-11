@@ -2,12 +2,11 @@ import type { ClientState, ClientAction } from "../../../../../context/clientTyp
 import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { Bookmark, ChevronLeft, Plus, Text, Trash2 } from "lucide-react";
+import { Bookmark, ChevronLeft, Plus, Trash2 } from "lucide-react";
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import StyleModule from "./Step2.module.css";
 import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
 import StandardSelectCustomMemo from "./../../../../../../../comp/features/select/StandardSelectCustom";
-import InputTextCustom from "../../../../../../../comp/primitives/input/text/custom/InputTextCustom";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
@@ -29,6 +28,8 @@ import NumericInputCustom from "../../../../../../../comp/primitives/input/numer
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
 import type { IPartialClient } from "../../../../../../../interfaces/clients";
+import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
+import UnderlineLabelInputNumeric from "../../../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -58,9 +59,9 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
     const [countryName, setCountryName] = useState<string>(state?.draft?.country ?? "México");
     const [stateName, setStateName] = useState<string>(state?.draft?.state ?? "Baja California");
     const [cityName, setCityName] = useState<string>(state?.draft?.city ?? "Mexicali");
-    const [zipCode, setZipCode] = useState<number>(state?.draft?.zip_code ?? 0);
+    const [zipCode, setZipCode] = useState<number | null>(state?.draft?.zip_code || null);
     const [street, setStreet] = useState<string>(state?.draft?.street ?? "");
-    const [streetNumber, setStreetNumber] = useState<number>(state?.draft?.street_number ?? 0);
+    const [streetNumber, setStreetNumber] = useState<number | null>(state?.draft?.street_number || null);
     const [neighborhood, setNeighborhood] = useState<string>(state?.draft?.neighborhood ?? "");
     const [paymentTerms, setPaymentTerms] = useState<string>(state?.draft?.payment_terms ?? "");
 
@@ -327,9 +328,9 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
 
     const handleOnClickSaveContinue = useCallback(async () => {
         if (
-            street === '' || streetNumber === 0 ||
+            street === '' || streetNumber === 0 || streetNumber === null ||
             neighborhood === '' || countryName === '' ||
-            stateName === '' || cityName === '' || zipCode === 0
+            stateName === '' || cityName === '' || zipCode === null || zipCode === 0
         ) {
             ToastMantine.feedBackForm({ message: "Debe completar todos los campos" });
             return;
@@ -354,7 +355,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
             return;
         }
 
-        const updatedData = {
+        const updatedData: IPartialClient = {
             ...state.draft,
             street,
             street_number: streetNumber,
@@ -370,7 +371,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
             // 1) Persistir
             await onUpdate({ original: state.data, updated: updatedData });
 
-            // ⚠️ Nota: leer errorRedux aquí puede no reflejar el último dispatch.
+            //  Nota: leer errorRedux aquí puede no reflejar el último dispatch.
             if (Object.keys(errorRedux).length > 0) {
                 Object.entries(errorRedux).forEach(([_, value]) => {
                     ToastMantine.feedBackForm({ message: value as string });
@@ -405,24 +406,24 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
                 <div className={StyleModule.taxAddressContainer}>
                     <span className={`nunito-bold ${StyleModule.subTitle}`}> Dirección fiscal *</span>
                     <div className={StyleModule.fieldBlock}>
-                        <InputTextCustom
+                        <UnderlineLabelInputText
                             value={street}
                             onChange={setStreet}
-                            placeholder="Calle"
+                            label="Calle"
                             withValidation
-                            icon={<Text />}
                         />
-                        <NumericInputCustom
+
+                        <UnderlineLabelInputNumeric
                             value={streetNumber}
                             onChange={setStreetNumber}
-                            placeholder="Numero"
+                            label="Numero"
+                            withValidation
                         />
-                        <InputTextCustom
+                        <UnderlineLabelInputText
                             value={neighborhood}
                             onChange={setNeighborhood}
-                            placeholder="Colonia"
+                            label="Colonia"
                             withValidation
-                            icon={<Text />}
                         />
                     </div>
                     <div className={StyleModule.fieldBlock}>
@@ -453,10 +454,11 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
                             disabled={csc.cityNames.length === 0}
                             maxHeight="200px"
                         />
-                        <NumericInputCustom
+                        <UnderlineLabelInputNumeric
                             value={zipCode}
                             onChange={setZipCode}
-                            placeholder="Codigo postal"
+                            label="Codigo postal"
+                            withValidation
                         />
                     </div>
                 </div>

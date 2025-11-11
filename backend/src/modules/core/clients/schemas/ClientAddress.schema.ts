@@ -1,7 +1,7 @@
 import zod from 'zod';
 
 const ClientAddressSchema = zod.object({
-
+    
     client_id: zod.number().int().min(1),
     street: zod.string().min(1),
     street_number: zod.number().int(),

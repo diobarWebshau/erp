@@ -17,7 +17,7 @@ import useClients from "../../../modelos/clients/react-hooks/useClients";
 import DeleteModal from "../../../comp/primitives/modal/deleteModal/DeleteModal"
 import ClientModuleProvider from "../context/clientModuleProvider";
 import AddWizardClients from "./wizards/add/AddWizardClients";
-import { createCompleteClientInDB, updateCompleteClientInDB } from "../../../queries/clientsQueries";
+import { createCompleteClientInDB, updateCompleteClientInDB } from "../../../modelos/clients/queries/clientsQueries";
 import EditWizardClients from "./wizards/edit/EditWizardClients";
 import type { IPartialProductDiscountClient, IProductDiscountClientManager } from "../../../interfaces/product-discounts-clients";
 import type { IClientAddressesManager, IPartialClientAddress } from "../../../interfaces/clientAddress";

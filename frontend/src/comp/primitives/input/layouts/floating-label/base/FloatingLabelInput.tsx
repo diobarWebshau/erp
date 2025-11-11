@@ -1,17 +1,17 @@
-import { MailIcon } from "lucide-react";
-import { useCallback, useId, useMemo, useRef, useState, type ChangeEvent, type MouseEvent } from "react";
-import clsx from "clsx";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
+import withClassName from "../../../../../../utils/withClassName";
+import type { ChangeEvent, MouseEvent } from "react";
 import StyleModule from "./FloatingLabelInput.module.css";
-import withClassName from "../../../../../utils/withClassName";
+import { MailIcon } from "lucide-react";
+import clsx from "clsx";
 
 interface MailInputProps {
     value: string,
     onChange: (value: string) => void,
     label: string,
-    mainColor?: string,
 }
 
-const MailInput = ({ value, onChange, label, mainColor }: MailInputProps) => {
+const MailInput = ({ value, onChange, label }: MailInputProps) => {
 
     const id = useId();
     const refInput = useRef<HTMLInputElement>(null);

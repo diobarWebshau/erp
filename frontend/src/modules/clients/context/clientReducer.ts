@@ -31,6 +31,7 @@ const clientReducer = produce((
                 }
                 draft.data.addresses?.push(item);
             }
+            console.log(current(draft.data.addresses));
             break;
         }
         case clientActionsTypes.REMOVE_CLIENT_ADDRESSES: {
