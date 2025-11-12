@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 
-
 interface UseDebounceInputs {
     value: string | number;
     delay: number;
 }
 
-const useDebounceBasic = ({ value, delay }: UseDebounceInputs) => {
+const useDebounceBasic = ({ value, delay }: UseDebounceInputs): string | number => {
     // estado para el valor debounced
     const [debouncedValue, setDebouncedValue] = useState(value);
     // useEffect para manejar el delay cada vez que el valor cambia

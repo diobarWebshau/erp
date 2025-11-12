@@ -47,6 +47,14 @@
     align-items: stretch;
 }
 
+.containerCheckBoxesNoSelectedLoading {
+    flex: 1;
+    padding-block: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .containerCheckBoxesSelectedItems,
 .containerCheckBoxesNoSelectedItems {
     /* distribucion flex */

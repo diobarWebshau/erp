@@ -110,43 +110,43 @@ const Step2 = memo(({
         }
     ], []);
 
-    const fetchLoadProducts = useCallback(async (query: string | number): Promise<IProduct[]> => {
-        try {
+    const fetchLoadProducts = useCallback(
+        async (query: string | number, signal?: AbortSignal): Promise<IProduct[]> => {
+            try {
+                const params = new URLSearchParams();
+                params.append("filter", String(query));
 
-            // Anexamos el query
-            const params = new URLSearchParams();
-            params.append("filter", query.toString());
+                // Repite el param por cada id: ?excludeIds=1&excludeIds=2...
+                for (const id of excludeIds) params.append("excludeIds", String(id));
 
-            // Anexamos los ids a excluir
-            excludeIds.forEach((id) => params.append("excludeIds", id.toString()));
+                const url = new URL(API_URL.toString());
+                url.search = params.toString();
 
-            // Generamos la url
-            const url = new URL(API_URL.toString());
-            // Adjuntamos los params a la url
-            url.search = params.toString();
+                const response = await fetch(url.toString(), { method: "GET", signal });
 
-            // Realizamos la peticion
-            const response = await fetch(url.toString(), { method: "GET" });
+                if (!response.ok) {
+                    // intenta leer json, pero no lo asumas
+                    const errorData = await response.json().catch(() => ({}));
+                    const message = errorData?.message ?? "Error al cargar productos";
 
-            // Validamos la respuesta
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const message = errorData?.message ?? "Error al cargar productos";
-                if (response.status >= 500) throw new Error(message);
+                    if (response.status >= 500) throw new Error(message);
 
-                dispatchRedux(setError({ key: "likeWithExludeToProducts", message }));
+                    dispatchRedux(setError({ key: "likeWithExcludeToProducts", message }));
+                    return [];
+                }
+
+                dispatchRedux(clearError("likeWithExcludeToProducts"));
+                const data: IProduct[] = await response.json();
+                return data;
+            } catch (error) {
+                // Si fue aborto, simplemente ignora o retorna []
+                if ((error as any)?.name === "AbortError") return [];
+                console.error("Error fetching products:", error);
                 return [];
             }
-
-            dispatchRedux(clearError("likeWithExludeToProducts"));
-            const data: IProduct[] = await response.json();
-            return data;
-
-        } catch (error) {
-            console.error("Error fetching products:", error);
-            return [];
-        }
-    }, [state.data?.production_lines_products, dispatchRedux, excludeIds]);
+        },
+        [dispatchRedux, excludeIds, API_URL] // elimina deps que no se usan
+    );
 
 
     const handleOnClickSaveAndNext = useCallback(() => {

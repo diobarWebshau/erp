@@ -12,7 +12,6 @@ interface SelectObjectsModalProps<T> {
     onClick: (objects: T[]) => void,
     labelOnClick: string,
     headerTitle: string,
-
     // ? MultiSelectSearchCheckCustom
     emptyMessage: string,
     attribute: StrictStringKeys<T>,
@@ -20,6 +19,7 @@ interface SelectObjectsModalProps<T> {
     loadOptions?: (query: string | number) => Promise<T[]>
     options?: T[]
     maxHeight?: string
+
 }
 
 const SelectObjectsModal = <T,>({

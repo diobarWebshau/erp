@@ -138,15 +138,10 @@
     caret-color: #10b981;
 } */
 
-.iconChecking {
-  opacity: 0.8;
-  animation: spin 1s linear infinite;
-}
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
 
-.container[aria-busy="true"] {
-  cursor: progress;
+.errorText{
+    /* estilos */
+    color: var(--color-alert);
+    font-size: 12px;
 }

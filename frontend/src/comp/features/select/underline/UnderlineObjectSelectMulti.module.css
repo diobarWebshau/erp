@@ -1,0 +1,72 @@
+/* ********** PopoverFloating ********** */
+
+.popoverFloating {
+    /* dimension */
+    min-height: 0;
+
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.fieldSelectContainer {
+    /* posicionamiento */
+    position: relative;
+}
+
+.icon {
+    /* posicionamiento */
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+
+    /* dimension */
+    width: 16px;
+}
+
+
+/* ****************** Label ****************** */
+
+.label {
+    /* posicionamientos */
+    position: absolute;
+    left: 5px;
+    top: 0;
+    transform: translateY(13px);
+
+    /* animaciones */
+    transition:
+        transform .18s ease, font-size .18s ease,
+        color .18s ease, background-color .18s ease;
+
+    /* estilos */
+    color: var(--color-theme-neutral-primary);
+    font-size: 14px;
+    line-height: 1;
+    pointer-events: none;
+
+}
+
+/* Cuando hay foco o valor, “flota” arriba */
+.floating {
+
+    /* distribucion box */
+    padding-inline: 0.2rem;
+    border-radius: 15px;
+
+    /* estilos */
+    transform: translateY(-4px);
+    font-size: 12px;
+    color: var(--color-theme-primary);
+    background-color: var(--color-theme-font-white);
+}
+
+/* === Label rojo en , también cuando está flotando === */
+.labelError {
+    color: var(--color-alert);
+}

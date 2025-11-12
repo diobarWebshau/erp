@@ -1,16 +1,16 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import PopoverFloating from "../../../comp/external/floating/pop-over/PopoverFloating";
-import styles from "./StandardSelect.module.css";
-import withClassName from "../../../utils/withClassName";
+import PopoverFloating from "../../../../comp/external/floating/pop-over/PopoverFloating";
+import styles from "./UnderlineObjectSelectMulti.module.css";
+import withClassName from "../../../../utils/withClassName";
 import { ChevronDownIcon } from "lucide-react";
 import clsx from "clsx";
 
-interface IObjectSelect<T> {
-    value: T | null;
+interface IUnderlineObjectSelectMulti<T> {
+    value: T[] | [];
     options: T[];
     labelKey: keyof T;
-    onChange: (value: T) => void;
-    placeholder?: string;
+    onChange: (value: T[]) => void;
+    label: string,
     disabled?: boolean;
     initialOpen?: boolean;
     mainColor: string;
@@ -21,15 +21,17 @@ interface IObjectSelect<T> {
     classNameOptionSelected?: string;
     withValidation?: boolean;
     classNameTriggerDisabled?: string;
+    selectedLabelClassName?: string;
+    maxHeight?: string,
 }
 
-const ObjectSelect = <T,>({
+const UnderlineObjectSelectMulti = <T,>({
     initialOpen = false,
     value,
     options,
     labelKey,
     onChange,
-    placeholder = "Selecciona una opción",
+    label,
     disabled = false,
     mainColor,
     classNamePopoverFloating,
@@ -39,7 +41,9 @@ const ObjectSelect = <T,>({
     classNameOptionSelected,
     withValidation = false,
     classNameTriggerDisabled,
-}: IObjectSelect<T>) => {
+    selectedLabelClassName,
+    maxHeight,
+}: IUnderlineObjectSelectMulti<T>) => {
 
     const [open, setOpen] = useState<boolean>(initialOpen);
     const [listOptions, setListOptions] = useState<T[]>(options);
@@ -48,9 +52,9 @@ const ObjectSelect = <T,>({
         setOpen((prev) => !prev);
     }, []);
 
-    const selectedLabel = useMemo(() => {
-        return value ? String(value[labelKey]) : placeholder;
-    }, [value, labelKey, placeholder]);
+    const selectedLabel: string[] = useMemo(() => {
+        return value ? value.map((item) => String(item[labelKey])) : [label];
+    }, [value, labelKey, label]);
 
     useEffect(() => {
         setListOptions(options);
@@ -66,17 +70,20 @@ const ObjectSelect = <T,>({
             open={open}
             setOpen={setOpen}
             disabled={disabled}
+            {...(maxHeight && { maxHeight })}
             childrenTrigger={
                 <SelectTriggerMemo
                     selectedLabel={selectedLabel}
                     disabled={disabled}
-                    placeholder={placeholder}
                     toggleOpen={toggleOpen}
                     mainColor={mainColor}
                     classNameTrigger={classNameTrigger}
                     classNameTriggerInvalid={classNameTriggerInvalid}
                     withValidation={withValidation}
                     classNameTriggerDisabled={classNameTriggerDisabled}
+                    label={label}
+                    focused={open}
+                    selectedLabelClassName={selectedLabelClassName}
                 />
             }
             childrenFloating={
@@ -95,16 +102,15 @@ const ObjectSelect = <T,>({
     )
 }
 
-const ObjectSelectMemo = memo(ObjectSelect) as typeof ObjectSelect;
+const UnderlineObjectSelectMultiMemo = memo(UnderlineObjectSelectMulti) as typeof UnderlineObjectSelectMulti;
 
-export default ObjectSelectMemo;
+export default UnderlineObjectSelectMultiMemo;
 
 
 // * ************ SELECT TRIGGER ************ 
 
 interface ISelectTrigger {
-    placeholder: string,
-    selectedLabel: string,
+    selectedLabel: string[],
     toggleOpen: () => void
     mainColor: string;
     classNameTrigger?: string;
@@ -112,10 +118,12 @@ interface ISelectTrigger {
     withValidation?: boolean;
     disabled?: boolean;
     classNameTriggerDisabled?: string;
+    selectedLabelClassName?: string;
+    focused?: boolean;
+    label: string;
 }
 
 const SelectTrigger = ({
-    placeholder,
     selectedLabel,
     toggleOpen,
     mainColor,
@@ -123,14 +131,22 @@ const SelectTrigger = ({
     classNameTriggerInvalid,
     withValidation,
     disabled = false,
-    classNameTriggerDisabled
+    classNameTriggerDisabled,
+    selectedLabelClassName,
+    label
 }: ISelectTrigger) => {
+
+    const [focused, setFocused] = useState(false);
+
 
     const iconWithClass = useMemo(
         () => withClassName(
-            <ChevronDownIcon />, styles.icon,
-            { color: mainColor }), [mainColor]
-    );
+            <ChevronDownIcon />,
+            styles.icon,
+            {
+                color: (!disabled && selectedLabel.length > 0) ? mainColor : "var(--color-alert)"
+            }),
+        [mainColor, selectedLabel]);
 
     const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
@@ -138,26 +154,46 @@ const SelectTrigger = ({
         toggleOpen();
     }, [toggleOpen]);
 
-    const className = useMemo(() => {
-        return clsx(
+    const [classNameTri, classNameLabelValid, classNameLabel] = useMemo(() => {
+        const classNameTri = clsx(
             `${styles.fieldSelectContainer} ${classNameTrigger}`,
             disabled ? classNameTriggerDisabled : "",
             (!disabled && withValidation) ? (
-                (placeholder === selectedLabel)
+                (selectedLabel.length === 0)
                     ? `${styles.invalidValue} ${classNameTriggerInvalid}`
                     : ""
             ) : "",
         );
-    }, [selectedLabel, placeholder, classNameTriggerInvalid, classNameTrigger, withValidation, disabled, classNameTriggerDisabled]);
+        const classNameLabelValid = clsx(
+            "nunito-regular",
+            selectedLabelClassName
+        );
+        const classNameLabel = clsx(
+            "nunito-regular",
+            styles.label,
+            (focused && selectedLabel.length > 0) && styles.floating,
+        );
+
+        return [classNameTri, classNameLabelValid, classNameLabel];
+    }, [
+        selectedLabel, disabled, withValidation, classNameTriggerInvalid,
+        classNameTrigger, classNameTriggerDisabled, selectedLabelClassName, focused
+    ]);
 
     return (
         <div
             onClick={handleOnClick}
             tabIndex={disabled ? -1 : 0}
-            className={className}
+            className={classNameTri}
+            onFocus={() => setFocused(true)}
         >
-            {selectedLabel}
+            {
+                selectedLabel.length > 0 && <span className={classNameLabelValid}> {selectedLabel.join(", ")} </span>
+            }
             {iconWithClass}
+            <label className={classNameLabel}>
+                {label}
+            </label>
         </div>
     )
 }
@@ -168,10 +204,10 @@ const SelectTriggerMemo = memo(SelectTrigger) as typeof SelectTrigger;
 
 interface IFloatingComponent<T> {
     listOptions: T[];
-    value: T | null;
+    value: T[] | [];
     toggleOpen: () => void;
     labelKey: keyof T;
-    onChange: (value: T) => void;
+    onChange: (value: T[]) => void;
     classNameOption?: string;
     classNameOptionSelected?: string;
 }
@@ -193,22 +229,31 @@ const FloatingComponent = <T,>({
                 listOptions.map((option, index) => {
 
                     const label = String(option[labelKey]);
-                    const isSelected = value?.[labelKey] === option[labelKey];
-
+                    const isSelected = (value as T[]).some((item) => String(item[labelKey]) === label);
                     const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        onChange(option);
-                        toggleOpen();
-                    }, [option, toggleOpen]);
+                        if (isSelected) {
+                            const newValue = value.filter((item) => item !== option);
+                            onChange(newValue);
+                        } else {
+                            const newValue = [...value, option];
+                            onChange(newValue);
+                        }
+                    }, [value, isSelected, option, toggleOpen]);
 
                     const handleOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
-                            onChange(option);
-                            toggleOpen();
+                            if (isSelected) {
+                                const newValue = value.filter((item) => item !== option);
+                                onChange(newValue);
+                            } else {
+                                const newValue = [...value, option];
+                                onChange(newValue);
+                            }
                         }
-                    }, [option]);
+                    }, [value, isSelected, option, toggleOpen]);
 
                     const className = useMemo(
                         () => clsx

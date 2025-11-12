@@ -5,16 +5,34 @@ import UnderlineLabelInputMail from "../../../../../../../comp/primitives/input/
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
-import { validateCompanyName } from "../../../../../../../modelos/clients/queries/clientsQueries";
+// import { validateCompanyName } from "../../../../../../../modelos/clients/queries/clientsQueries";
 import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
 import { update_client } from "../../../../../context/clientActions";
 import { next_step } from "../../../../../context/clientActions";
 import { useCallback, useState, type Dispatch } from "react";
 import StyleModule from "./Step1.module.css";
 import { Bookmark } from "lucide-react";
-import { useDispatch } from "react-redux";
-import type { AppDispatchRedux } from "store/store";
-import FloatingLabelInput from "../../../../../../../comp/primitives/input/layouts/floating-label/FloatingLabelInput";
+import UnderlineStandardSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectMultiCustom";
+import UnderlineObjectSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectCustom";
+import UnderlineObjectSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectMultiCustom";
+
+// import { useDispatch } from "react-redux";
+// import type { AppDispatchRedux } from "store/store";
+
+const Options = ["Diobar", "Barbara", "Baez", "Diego", "Jesus", "Ortega"];
+interface IPerson {
+    id: string;
+    name: string;
+}
+
+const persons: IPerson[] = [
+    { id: "1", name: "Diobar" },
+    { id: "2", name: "Barbara" },
+    { id: "3", name: "Baez" },
+    { id: "4", name: "Diego" },
+    { id: "5", name: "Jesus" },
+    { id: "6", name: "Ortega" },
+];
 
 interface IStep1 {
     state: ClientState;
@@ -28,13 +46,17 @@ const Step1 = ({
     onCancel
 }: IStep1) => {
 
-    const dispatchRedux = useDispatch<AppDispatchRedux>();
+    // const dispatchRedux = useDispatch<AppDispatchRedux>();
 
     const [company_name, setCompanyName] = useState<string>(state.data?.company_name ?? "");
     const [cfdi, setCfdi] = useState<string>(state.data?.cfdi ?? "");
     const [phone, setPhone] = useState<string>(state.data?.phone ?? "");
     const [email, setEmail] = useState<string>(state.data?.email ?? "");
     const [taxId, setTaxId] = useState<string>(state.data?.tax_id ?? "");
+    const [names, setNames] = useState<string[]>([]);
+    const [name, setName] = useState<string | null>(null);
+    const [personSelected, setPersonSelected] = useState<IPerson | null>(null);
+    const [personsSelected, setPersonsSelected] = useState<IPerson[]>([]);
 
     const handleOnClickNext = useCallback(() => {
         if (company_name === "" || phone === "" || email === "" || cfdi === "" || taxId === "") {
@@ -53,10 +75,10 @@ const Step1 = ({
         dispatch(next_step());
     }, [dispatch, company_name, cfdi, phone, email, taxId]);
 
-    const validateCompanyNameAsync = useCallback(async () => {
-        const isValid = await validateCompanyName(company_name, dispatchRedux);
-        return isValid;
-    }, [company_name, dispatchRedux, validateCompanyName]);
+    // const validateCompanyNameAsync = useCallback(async () => {
+    //     const isValid = await validateCompanyName(company_name, dispatchRedux);
+    //     return isValid;
+    // }, [company_name, dispatchRedux, validateCompanyName]);
 
     return (
         <div className={StyleModule.containerStep}>
@@ -66,7 +88,6 @@ const Step1 = ({
                     onChange={setCompanyName}
                     label="Nombre"
                     withValidation
-                    isValidAsync={validateCompanyNameAsync}
                 />
                 <UnderlineLabelInputText
                     value={taxId}
@@ -80,15 +101,31 @@ const Step1 = ({
                     label="CURP"
                     withValidation
                 />
-                <FloatingLabelInput
-                    value={cfdi}
-                    onChange={setCfdi}
-                    label="CURP"
+                <UnderlineStandardSelectMultiCustomMemo
+                    options={Options}
+                    value={names}
+                    onChange={setNames}
+                    withValidation
+                    label="Nombres"
+                    maxHeight="150px"
                 />
-                <FloatingLabelInput
-                    value={cfdi}
-                    onChange={setCfdi}
-                    label="CURP"
+                <UnderlineObjectSelectCustomMemo
+                    options={persons}
+                    value={personSelected}
+                    onChange={setPersonSelected}
+                    label="Persona"
+                    labelKey="name"
+                    withValidation
+                    maxHeight="150px"
+                />
+                <UnderlineObjectSelectMultiCustomMemo
+                    options={persons}
+                    value={personsSelected}
+                    onChange={setPersonsSelected}
+                    label="Personas"
+                    labelKey="name"
+                    withValidation
+                    maxHeight="150px"
                 />
                 <span className={`nunito-bold ${StyleModule.subTitle}`}>Contacto principal</span>
                 <div className={StyleModule.blockContact}>
