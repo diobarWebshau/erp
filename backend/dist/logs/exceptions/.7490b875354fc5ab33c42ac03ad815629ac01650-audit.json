@@ -6,26 +6,6 @@
     "auditLog": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\.7490b875354fc5ab33c42ac03ad815629ac01650-audit.json",
     "files": [
         {
-            "date": 1761040124660,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-21.log",
-            "hash": "fdaa1a83f8cd355be2bf7f6645e65a51a9826a07fff769a554e94214fc7178ab"
-        },
-        {
-            "date": 1761277540536,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-23.log",
-            "hash": "d2a619eb9a8021f01705eb84319c924e628cda28df7f90241b48c2472c792d92"
-        },
-        {
-            "date": 1761289423418,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-24.log",
-            "hash": "8e916314d8b235ecb821cbe786db3d47081abce4019f97db30c2e99799776d6d"
-        },
-        {
-            "date": 1761525878901,
-            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-26.log",
-            "hash": "c766a050b92083a9b9e16004928d1b8720a4f583904a6dd0f954dc954ddaba6c"
-        },
-        {
             "date": 1761797356070,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-10-29.log",
             "hash": "dd20da20579784625699cd428a0ec9652ab7e5c36d63fa94ebdf99662735f088"
@@ -39,6 +19,11 @@
             "date": 1762186883113,
             "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-11-03.log",
             "hash": "5b6728e5a171b83f33bb7c6112973a41f0af273050196abbe1d2f1129a3a8123"
+        },
+        {
+            "date": 1762929985881,
+            "name": "C:\\Users\\Dioba\\Desktop\\webshauProjects\\erp\\backend\\dist\\logs\\exceptions\\exceptions-2025-11-11.log",
+            "hash": "344bcae70dbd4e5794132358462fcdf86b11cba7b775e26ad6e5df41e7780cd6"
         }
     ],
     "hashType": "sha256"

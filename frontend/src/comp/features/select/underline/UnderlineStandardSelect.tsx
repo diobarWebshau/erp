@@ -1,49 +1,49 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import PopoverFloating from "../../../../comp/external/floating/pop-over/PopoverFloating";
-import styles from "./UnderlineObjectSelect.module.css";
+import PopoverFloating from "../../../external/floating/pop-over/PopoverFloating";
+import styles from "./UnderlineStandardSelect.module.css";
 import withClassName from "../../../../utils/withClassName";
 import { ChevronDownIcon } from "lucide-react";
 import clsx from "clsx";
 
-interface IUnderlineObjectSelect<T> {
-    value: T | null;
-    options: T[];
-    labelKey: keyof T;
-    onChange: (value: T | null) => void;
-    label: string,
-    disabled?: boolean;
-    initialOpen?: boolean;
-    mainColor: string;
-    classNamePopoverFloating?: string;
-    classNameTrigger?: string;
-    classNameTriggerInvalid?: string;
-    classNameOption?: string;
-    classNameOptionSelected?: string;
-    withValidation?: boolean;
-    classNameTriggerDisabled?: string;
-    selectedLabelClassName?: string;
+interface IUnderlineStandardSelectMulti<T extends string> {
+    value: T | null,
+    options: T[],
+    onChange: (value: T | null) => void,
+    placeholder?: string,
+    disabled?: boolean,
+    initialOpen?: boolean,
+    mainColor: string,
+    classNamePopoverFloating?: string,
+    classNameTrigger?: string,
+    classNameTriggerDisabled?: string,
+    classNameTriggerInvalid?: string,
+    classNameOption?: string,
+    classNameOptionSelected?: string,
+    withValidation?: boolean,
+    placeholderClassName?: string,
+    selectedLabelClassName?: string,
     maxHeight?: string,
+    label: string,
 }
 
-const UnderlineObjectSelect = <T,>({
+const UnderlineStandardSelectMulti = <T extends string>({
     initialOpen = false,
     value,
     options,
-    labelKey,
     onChange,
-    label,
     disabled = false,
     mainColor,
     classNamePopoverFloating,
     classNameTrigger,
+    classNameTriggerDisabled,
     classNameTriggerInvalid,
     classNameOption,
     classNameOptionSelected,
     withValidation = false,
-    classNameTriggerDisabled,
     selectedLabelClassName,
     maxHeight,
-}: IUnderlineObjectSelect<T>) => {
+    label
+}: IUnderlineStandardSelectMulti<T>) => {
 
     const [open, setOpen] = useState<boolean>(initialOpen);
     const [listOptions, setListOptions] = useState<T[]>(options);
@@ -53,8 +53,8 @@ const UnderlineObjectSelect = <T,>({
     }, []);
 
     const selectedLabel: string | null = useMemo(() => {
-        return value ? String(value[labelKey]) : null;
-    }, [value, labelKey]);
+        return value ? String(value) : null;
+    }, [value]);
 
     useEffect(() => {
         setListOptions(options);
@@ -68,21 +68,21 @@ const UnderlineObjectSelect = <T,>({
     return (
         <PopoverFloating
             open={open}
-            setOpen={setOpen}
             disabled={disabled}
+            setOpen={setOpen}
             {...(maxHeight && { maxHeight })}
             childrenTrigger={
                 <SelectTriggerMemo
                     selectedLabel={selectedLabel}
-                    disabled={disabled}
                     toggleOpen={toggleOpen}
                     mainColor={mainColor}
                     classNameTrigger={classNameTrigger}
                     classNameTriggerInvalid={classNameTriggerInvalid}
-                    withValidation={withValidation}
                     classNameTriggerDisabled={classNameTriggerDisabled}
-                    label={label}
                     selectedLabelClassName={selectedLabelClassName}
+                    withValidation={withValidation}
+                    disabled={disabled}
+                    label={label}
                 />
             }
             childrenFloating={
@@ -90,7 +90,6 @@ const UnderlineObjectSelect = <T,>({
                     listOptions={listOptions}
                     value={value}
                     toggleOpen={toggleOpen}
-                    labelKey={labelKey}
                     onChange={onChange}
                     classNameOption={classNameOption}
                     classNameOptionSelected={classNameOptionSelected}
@@ -101,9 +100,9 @@ const UnderlineObjectSelect = <T,>({
     )
 }
 
-const UnderlineObjectSelectMemo = memo(UnderlineObjectSelect) as typeof UnderlineObjectSelect;
+const UnderlineStandardSelectMultiMemo = memo(UnderlineStandardSelectMulti) as typeof UnderlineStandardSelectMulti;
 
-export default UnderlineObjectSelectMemo;
+export default UnderlineStandardSelectMultiMemo;
 
 
 // * ************ SELECT TRIGGER ************ 
@@ -114,11 +113,12 @@ interface ISelectTrigger {
     mainColor: string;
     classNameTrigger?: string;
     classNameTriggerInvalid?: string;
-    withValidation?: boolean;
-    disabled?: boolean;
     classNameTriggerDisabled?: string;
     selectedLabelClassName?: string;
-    label: string;
+    withValidation?: boolean;
+    disabled?: boolean;
+    placeholder?: string;
+    label?: string;
 }
 
 const SelectTrigger = ({
@@ -127,11 +127,11 @@ const SelectTrigger = ({
     mainColor,
     classNameTrigger,
     classNameTriggerInvalid,
-    withValidation,
-    disabled = false,
     classNameTriggerDisabled,
     selectedLabelClassName,
-    label
+    withValidation,
+    disabled = false,
+    label = "Hola",
 }: ISelectTrigger) => {
 
     const [focused, setFocused] = useState(false);
@@ -174,7 +174,7 @@ const SelectTrigger = ({
         return [classNameTri, classNameLabelValid, classNameLabel];
     }, [
         selectedLabel, disabled, withValidation, classNameTriggerInvalid,
-        classNameTrigger, classNameTriggerDisabled, selectedLabelClassName, focused,
+        classNameTrigger, classNameTriggerDisabled, selectedLabelClassName, focused
     ]);
 
     return (
@@ -197,21 +197,19 @@ const SelectTriggerMemo = memo(SelectTrigger) as typeof SelectTrigger;
 
 // * ************ FloatingComponent ************ */
 
-interface IFloatingComponent<T> {
+interface IFloatingComponent<T extends string> {
     listOptions: T[];
     value: T | null;
     toggleOpen: () => void;
-    labelKey: keyof T;
     onChange: (value: T | null) => void;
     classNameOption?: string;
     classNameOptionSelected?: string;
 }
 
-const FloatingComponent = <T,>({
+const FloatingComponent = <T extends string>({
     listOptions,
     value,
     toggleOpen,
-    labelKey,
     onChange,
     classNameOption,
     classNameOptionSelected
@@ -223,15 +221,16 @@ const FloatingComponent = <T,>({
             {
                 listOptions.map((option, index) => {
 
-                    const label = String(option[labelKey]);
-                    const isSelected = value?.[labelKey] === option[labelKey];
+                    const label = String(option);
+                    const isSelected = value === option;
+
                     const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
                         e.stopPropagation();
                         e.preventDefault();
                         if (isSelected) onChange(null);
                         else onChange(option);
                         toggleOpen();
-                    }, [option, toggleOpen, onChange]);
+                    }, [value, option, toggleOpen, isSelected]);
 
                     const handleOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
                         if (e.key === "Enter") {
@@ -240,7 +239,7 @@ const FloatingComponent = <T,>({
                             else onChange(option);
                             toggleOpen();
                         }
-                    }, [option, toggleOpen, onChange]);
+                    }, [value, option, toggleOpen, isSelected]);
 
                     const className = useMemo(
                         () => clsx

@@ -13,6 +13,7 @@ import { useCallback, useState, type Dispatch } from "react";
 import StyleModule from "./Step1.module.css";
 import { Bookmark } from "lucide-react";
 import UnderlineStandardSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectMultiCustom";
+import UnderlineStandardSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
 import UnderlineObjectSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectCustom";
 import UnderlineObjectSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectMultiCustom";
 
@@ -107,6 +108,14 @@ const Step1 = ({
                     onChange={setNames}
                     withValidation
                     label="Nombres"
+                    maxHeight="150px"
+                />
+                <UnderlineStandardSelectCustomMemo
+                    options={Options}
+                    value={name}
+                    onChange={setName}
+                    withValidation
+                    label="Nombre"
                     maxHeight="150px"
                 />
                 <UnderlineObjectSelectCustomMemo

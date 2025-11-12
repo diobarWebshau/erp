@@ -5,64 +5,64 @@ const clientsData = [
   {
     client_id: 1,
     street: "Avenida Principal",
-    street_number: "123",
+    street_number: 123,
     neighborhood: "Colonia Centro",
     city: "Ciudad de México",
     state: "CDMX",
     country: "México",
-    zip_code: "06000"
+    zip_code: 106000
   },
   {
     client_id: 1,
     street: "Avenida Secundaria",
-    street_number: "456",
+    street_number: 456,
     neighborhood: "Colonia Norte",
     city: "Ciudad de México",
     state: "CDMX",
     country: "México",
-    zip_code: "06001"
+    zip_code: 106001
   },
   // Cliente 2
   {
     client_id: 2,
     street: "Calle Innovación",
-    street_number: "456",
+    street_number: 456,
     neighborhood: "Parque Industrial",
     city: "Monterrey",
     state: "Nuevo León",
     country: "México",
-    zip_code: "64000"
+    zip_code: 64000
   },
   {
     client_id: 2,
     street: "Calle Avanzada",
-    street_number: "789",
+    street_number: 789,
     neighborhood: "Zona Industrial",
     city: "Monterrey",
     state: "Nuevo León",
     country: "México",
-    zip_code: "64001"
+    zip_code: 64001
   },
   // Cliente 3
   {
     client_id: 3,
     street: "Sunset Blvd",
-    street_number: "789",
+    street_number: 789,
     neighborhood: "Downtown",
     city: "Los Ángeles",
     state: "California",
     country: "EE.UU.",
-    zip_code: "90012"
+    zip_code: 90012
   },
   {
     client_id: 3,
     street: "Hollywood Blvd",
-    street_number: "123",
+    street_number: 123,
     neighborhood: "Uptown",
     city: "Los Ángeles",
     state: "California",
     country: "EE.UU.",
-    zip_code: "90013"
+    zip_code: 90013
   }
 ];
 
