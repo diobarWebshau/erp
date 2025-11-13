@@ -202,7 +202,7 @@ const ProductionLinesModel = () => {
                 );
 
             const update_values_products: IProductionLineProductManager =
-                diffObjectArrays(
+                await diffObjectArrays(
                     products_old,
                     products
                 );

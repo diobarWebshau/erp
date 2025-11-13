@@ -1,0 +1,13 @@
+/* ********** Tag ********** */
+
+.tagActive {
+    /* estilos */
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.tagInactive {
+    /* estilos */
+    background-color: var(--color-alert-light);
+    color: var(--color-alert);
+}

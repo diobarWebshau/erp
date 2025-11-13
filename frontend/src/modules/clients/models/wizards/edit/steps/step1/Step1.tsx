@@ -10,7 +10,7 @@ import { update_draft_client } from "../../../../../context/clientActions";
 import { next_step } from "../../../../../context/clientActions";
 import { useCallback, useState, type Dispatch } from "react";
 import StyleModule from "./Step1.module.css";
-import { Bookmark} from "lucide-react";
+import { Bookmark } from "lucide-react";
 
 interface IStep1 {
     state: ClientState;
@@ -24,14 +24,20 @@ const Step1 = ({
     onDiscard
 }: IStep1) => {
 
-    const [company_name, setCompanyName] = useState<string>(state.draft?.company_name ?? "");
-    const [cfdi, setCfdi] = useState<string>(state.draft?.cfdi ?? "");
-    const [phone, setPhone] = useState<string>(state.draft?.phone ?? "");
-    const [email, setEmail] = useState<string>(state.draft?.email ?? "");
-    const [taxId, setTaxId] = useState<string>(state.draft?.tax_id ?? "");
+    const [company_name, setCompanyName] = useState<string | null>(state.draft?.company_name ?? null);
+    const [cfdi, setCfdi] = useState<string | null>(state.draft?.cfdi ?? null);
+    const [phone, setPhone] = useState<string | null>(state.draft?.phone ?? null);
+    const [email, setEmail] = useState<string | null>(state.draft?.email ?? null);
+    const [taxId, setTaxId] = useState<string | null>(state.draft?.tax_id ?? null);
 
     const handleOnClickNext = useCallback(() => {
-        if (company_name === "" || phone === "" || email === "" || cfdi === "" || taxId === "") {
+        if (
+            company_name === "" || company_name === null ||
+            phone === "" || phone === null ||
+            email === "" || email === null ||
+            cfdi === "" || cfdi === null ||
+            taxId === "" || taxId === null
+        ) {
             ToastMantine.feedBackForm({
                 message: "Debe completar todos los campos",
             });

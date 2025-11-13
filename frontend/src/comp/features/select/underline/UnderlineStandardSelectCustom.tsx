@@ -6,7 +6,6 @@ interface IStandardSelectMultiCustom<T extends string> {
     value: T | null;
     options: T[];
     onChange: (value: T | null) => void;
-    placeholder?: string;
     disabled?: boolean;
     initialOpen?: boolean;
     withValidation?: boolean;
@@ -18,7 +17,6 @@ const StandardSelectMultiCustom = <T extends string>({
     value,
     options,
     onChange,
-    placeholder = "Selecciona una opción",
     disabled = false,
     initialOpen,
     withValidation = false,
@@ -30,7 +28,6 @@ const StandardSelectMultiCustom = <T extends string>({
             value={value}
             options={options}
             onChange={onChange}
-            placeholder={placeholder}
             disabled={disabled}
             mainColor={disabled ? "var(--color-theme-neutral-primary)" : "var(--color-theme-primary)"}
             initialOpen={initialOpen}

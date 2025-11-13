@@ -1063,18 +1063,28 @@ BEGIN
 		COALESCE(
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
+					-- info
 					'id', l.id,
 					'name', l.name,
 					'description', l.description,
-					'is_active', l.is_active,
-					'address', l.address,
-					'mail', l.mail,
-					'phone', l.phone,
-					'city', l.city,
+				
+					-- address
+					'street', l.street,
+					'street_number', l.street_number,
+					'neighborhood', l.neighborhood,
 					'state', l.state,
+					'city', l.city,
+					'zip_code', l.zip_code,
 					'country', l.country,
+					
+					-- contact
+					'phone', l.phone,
+					
+					-- state
+					'is_active', l.is_active,
 					'created_at', l.created_at,
 					'updated_at', l.updated_at
+
 				)
 			),
 			JSON_ARRAY()
@@ -1116,16 +1126,25 @@ BEGIN
   FROM (
     SELECT
       JSON_OBJECT(
+		-- info
         'id',          l.id,
         'name',        l.name,
         'description', l.description,
-		'address', l.address,
-		'mail', l.mail,
-		'phone', l.phone,
-		'city', l.city,
+		
+		-- address
+		'street', l.street,
+		'street_number', l.street_number,
+		'neighborhood', l.neighborhood,
 		'state', l.state,
+		'city', l.city,
+		'zip_code', l.zip_code,
 		'country', l.country,
-        'is_active',   l.is_active,
+		
+		-- contact
+		'phone', l.phone,
+		
+		-- state
+		'is_active',   l.is_active,
         'created_at',  l.created_at,
         'updated_at',  l.updated_at,
         'inventory',
@@ -1329,16 +1348,22 @@ BEGIN
         -- Obtener datos extra de la orden de produccion
         SELECT 
             JSON_OBJECT(
+				-- info
                 'id', l.id,
                 'name', l.name,
                 'description', l.description,
-				'address', l.address,
-				'mail', l.mail,
-				'phone', l.phone,
-				'city', l.city,
+				-- address
+				'street', l.street,
+				'street_number', l.street_number,
+				'neighborhood', l.neighborhood,
 				'state', l.state,
+				'city', l.city,
+				'zip_code', l.zip_code,
 				'country', l.country,
-                'is_active', l.is_active,
+				-- contact
+				'phone', l.phone,
+				-- state
+				'is_active', l.is_active,
                 'created_at', l.created_at,
                 'updated_at', l.updated_at
             ),
@@ -1373,15 +1398,21 @@ BEGIN
       	SELECT 
 			/* location desde la orden interna */
 			JSON_OBJECT(
+				-- info
 				'id', l.id,
 				'name', l.name,
 				'description', l.description,
-				'address', l.address,
-				'mail', l.mail,
-				'phone', l.phone,
-				'city', l.city,
+				-- address
+				'street', l.street,
+				'street_number', l.street_number,
+				'neighborhood', l.neighborhood,
 				'state', l.state,
+				'city', l.city,
+				'zip_code', l.zip_code,
 				'country', l.country,
+				-- contact
+				'phone', l.phone,
+				-- state
 				'is_active', l.is_active,
 				'created_at', l.created_at,
 				'updated_at', l.updated_at
@@ -1445,15 +1476,21 @@ BEGIN
 		SELECT
 			JSON_OBJECT(
 				'location', JSON_OBJECT(
+					-- info
 					'id', l.id,
 					'name', l.name,
 					'description', l.description,
-					'address', l.address,
-					'mail', l.mail,
-					'phone', l.phone,
-					'city', l.city,
+					-- address
+					'street', l.street,
+					'street_number', l.street_number,
+					'neighborhood', l.neighborhood,
 					'state', l.state,
+					'city', l.city,
+					'zip_code', l.zip_code,
 					'country', l.country,
+					-- contact
+					'phone', l.phone,
+					-- state
 					'is_active', l.is_active,
 					'created_at', l.created_at,
 					'updated_at', l.updated_at
@@ -1478,14 +1515,20 @@ BEGIN
 					'city', pos.city,
 					'state', pos.state,
 					'country', pos.country,
-					'address', pos.address,
+					-- address
+					'street', pos.street,
+					'street_number', pos.street_number,
+					'neighborhood', pos.neighborhood,
 					'payment_terms', pos.payment_terms,
 					'zip_code', pos.zip_code,
 					'tax_regimen', pos.tax_regimen,
 					'cfdi', pos.cfdi,
 					'payment_method', pos.payment_method,
 					'client_address_id', pos.client_address_id,
-					'shipping_address', pos.shipping_address,
+					-- address
+					'shipping_street', pos.shipping_street,
+					'shipping_street_number', pos.shipping_street_number,
+					'shipping_neighborhood', pos.shipping_neighborhood,
 					'shipping_city', pos.shipping_city,
 					'shipping_state', pos.shipping_state,
 					'shipping_country', pos.shipping_country,
@@ -1554,16 +1597,22 @@ BEGIN
 		    COALESCE(
 				JSON_OBJECT(
 					'location', JSON_OBJECT(
+						-- info
 						'id', l.id,
 						'name', l.name,
 						'description', l.description,
-						'is_active', l.is_active,
-						'address', l.address,
-						'mail', l.mail,
-						'phone', l.phone,
-						'city', l.city,
+						-- address
+						'street', l.street,
+						'street_number', l.street_number,
+						'neighborhood', l.neighborhood,
 						'state', l.state,
+						'city', l.city,
+						'zip_code', l.zip_code,
 						'country', l.country,
+						-- contact
+						'phone', l.phone,
+						-- state
+						'is_active', l.is_active,
 						'created_at', l.created_at,
 						'updated_at', l.updated_at
 					),
@@ -1847,7 +1896,10 @@ BEGIN
 							'city', pos.city,
 							'state', pos.state,
 							'country', pos.country,
-							'address', pos.address,
+							-- address
+							'street', pos.street,
+							'street_number', pos.street_number,
+							'neighborhood', pos.neighborhood,
 							'zip_code', pos.zip_code,
 							'payment_terms', pos.payment_terms,
 							'tax_regimen', pos.tax_regimen,
@@ -1855,7 +1907,9 @@ BEGIN
 							'payment_method', pos.payment_method,
 							
 							'client_address_id', pos.client_address_id,
-							'shipping_address', pos.shipping_address,
+							'shipping_street', pos.shipping_street,
+							'shipping_street_number', pos.shipping_street_number,
+							'shipping_neighborhood', pos.shipping_neighborhood,
 							'shipping_city', pos.shipping_city,
 							'shipping_state', pos.shipping_state,
 							'shipping_country', pos.shipping_country,
@@ -2043,16 +2097,25 @@ BEGIN
 					COALESCE(
 						JSON_ARRAYAGG(
 							JSON_OBJECT(
+								-- info
 								'id', l.id,
 								'name', l.name,
 								'description', l.description,
-								'is_active', l.is_active,
-								'address', l.address,
-								'mail', l.mail,
-								'phone', l.phone,
-								'city', l.city,
+								
+								-- address
+								'street', l.street,
+								'street_number', l.street_number,
+								'neighborhood', l.neighborhood,
 								'state', l.state,
+								'city', l.city,
+								'zip_code', l.zip_code,
 								'country', l.country,
+
+								-- contact
+								'phone', l.phone,
+
+								-- state
+								'is_active', l.is_active,
 								'created_at', l.created_at,
 								'updated_at', l.updated_at
 							)
@@ -2080,13 +2143,15 @@ BEGIN
 								'id', l.id,
 								'name', l.name,
 								'description', l.description,
-								'is_active', l.is_active,
-								'address', l.address,
-								'mail', l.mail,
-								'phone', l.phone,
-								'city', l.city,
+								'street', l.street,
+								'street_number', l.street_number,
+								'neighborhood', l.neighborhood,
 								'state', l.state,
+								'city', l.city,
+								'zip_code', l.zip_code,
 								'country', l.country,
+								'phone', l.phone,
+								'is_active', l.is_active,
 								'created_at', l.created_at,
 								'updated_at', l.updated_at
 							)
@@ -2138,15 +2203,24 @@ BEGIN
         SELECT COALESCE(
                  JSON_ARRAYAGG(
                    JSON_OBJECT(
+					 -- info
                      'id',         l.id,
                      'name',       l.name,
 					 'description', l.description,
-					 'address', l.address,
-					 'mail', l.mail,
-					 'phone', l.phone,
+					 
+					 -- address
+					 'street', l.street,
+					 'street_number', l.street_number,
+					 'neighborhood', l.neighborhood,
 					 'city', l.city,
 					 'state', l.state,
 					 'country', l.country,
+					 'zip_code', l.zip_code,
+					 
+					 -- contact
+					 'phone', l.phone,
+					 
+					 -- state
 					 'is_active', l.is_active,
                      'created_at', l.created_at,
                      'updated_at', l.updated_at
@@ -2175,15 +2249,24 @@ BEGIN
         SELECT COALESCE(
                  JSON_ARRAYAGG(
                    JSON_OBJECT(
+					 -- info
                      'id',         l.id,
                      'name',       l.name,
 					 'description', l.description,
-					 'address', l.address,
-					 'mail', l.mail,
-					 'phone', l.phone,
+					 
+					 -- address
+					 'street', l.street,
+					 'street_number', l.street_number,
+					 'neighborhood', l.neighborhood,
 					 'city', l.city,
 					 'state', l.state,
 					 'country', l.country,
+					 'zip_code', l.zip_code,
+					 
+					 -- contact
+					 'phone', l.phone,
+					 
+					 -- state
 					 'is_active', l.is_active,
 					 'created_at', l.created_at,
 					 'updated_at', l.updated_at
@@ -2274,15 +2357,24 @@ BEGIN
         SELECT COALESCE(
                  JSON_ARRAYAGG(
                    JSON_OBJECT(
+					 -- info
                      'id',         l.id,
                      'name',       l.name,
 					 'description', l.description,
-					 'address', l.address,
-					 'mail', l.mail,
-					 'phone', l.phone,
+					 
+					 -- address
+					 'street', l.street,
+					 'street_number', l.street_number,
+					 'neighborhood', l.neighborhood,
 					 'city', l.city,
 					 'state', l.state,
 					 'country', l.country,
+					 'zip_code', l.zip_code,
+					 
+					 -- contact
+					 'phone', l.phone,
+					 
+					 -- state
 					 'is_active', l.is_active,
                      'created_at', l.created_at,
                      'updated_at', l.updated_at
@@ -2314,15 +2406,24 @@ BEGIN
         SELECT COALESCE(
                  JSON_ARRAYAGG(
                    JSON_OBJECT(
+					 -- info
                      'id',         l.id,
                      'name',       l.name,
 					 'description', l.description,
-					 'address', l.address,
-					 'mail', l.mail,
-					 'phone', l.phone,
+					 
+					 -- address
+					 'street', l.street,
+					 'street_number', l.street_number,
+					 'neighborhood', l.neighborhood,
 					 'city', l.city,
 					 'state', l.state,
 					 'country', l.country,
+					 'zip_code', l.zip_code,
+					 
+					 -- contact
+					 'phone', l.phone,
+					 
+					 -- state
 					 'is_active', l.is_active,
                      'created_at', l.created_at,
                      'updated_at', l.updated_at

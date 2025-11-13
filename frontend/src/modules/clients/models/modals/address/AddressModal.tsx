@@ -1,6 +1,5 @@
 import DialogModal from "../../../../../comp/primitives/modal2/dialog-modal/base/DialogModal";
 import StyleModule from "./AddressModal.module.css";
-import StandardSelectCustomMemo from "../../../../../comp/features/select/StandardSelectCustom";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useCountryStateCitySeparated } from "../../../../../hooks/useCountryStateCity";
@@ -10,6 +9,7 @@ import type { IPartialClientAddress } from "interfaces/clientAddress";
 import ToastMantine from "../../../../../comp/external/mantine/toast/base/ToastMantine";
 import UnderlineLabelInputText from "../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
 import UnderlineLabelInputNumeric from "../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
+import UnderlineStandardSelectCustomMemo from "../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
 
 interface IAddressModal {
     onClose: () => void,
@@ -18,12 +18,12 @@ interface IAddressModal {
 
 const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
 
-    const [street, setStreet] = useState<string>('');
+    const [street, setStreet] = useState<string | null>(null);
     const [streetNumber, setStreetNumber] = useState<number | null>(null);
-    const [neighborhood, setNeighborhood] = useState<string>('');
-    const [countryName, setCountryName] = useState<string>('México');
-    const [stateName, setStateName] = useState<string>('Baja California');
-    const [cityName, setCityName] = useState<string>('Mexicali');
+    const [neighborhood, setNeighborhood] = useState<string | null>(null);
+    const [countryName, setCountryName] = useState<string | null>('México');
+    const [stateName, setStateName] = useState<string | null>('Baja California');
+    const [cityName, setCityName] = useState<string | null>('Mexicali');
     const [zipCode, setZipCode] = useState<number | null>(null);
 
     const csc = useCountryStateCitySeparated({
@@ -36,9 +36,13 @@ const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
 
     const handleAddAddress = () => {
         if (
-            street === '' || streetNumber === null ||
-            neighborhood === '' || countryName === '' ||
-            stateName === '' || cityName === '' || zipCode === null) {
+            street === '' || !street ||
+            neighborhood === '' || !neighborhood ||
+            countryName === null || !countryName ||
+            stateName === '' || !stateName ||
+            cityName === '' || !cityName ||
+            !streetNumber || !zipCode
+        ) {
             ToastMantine.feedBackForm({
                 message: "Debe completar todos los campos",
             });
@@ -75,6 +79,7 @@ const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
                         value={streetNumber}
                         onChange={setStreetNumber}
                         label="Numero exterior"
+                        withValidation
                     />
                     <UnderlineLabelInputText
                         value={neighborhood}
@@ -84,29 +89,29 @@ const AddressModal = ({ onClose, onAdd }: IAddressModal) => {
                     />
                 </div>
                 <div className={StyleModule.fieldBlock}>
-                    <StandardSelectCustomMemo
+                    <UnderlineStandardSelectCustomMemo
                         options={csc.countryNames}
                         value={countryName}
                         onChange={setCountryName}
-                        placeholder="Selecciona un pais"
+                        label="Pais"
                         withValidation
                         disabled={csc.countryNames.length === 0}
                         maxHeight="200px"
                     />
-                    <StandardSelectCustomMemo
+                    <UnderlineStandardSelectCustomMemo
                         options={csc.stateNames}
                         value={stateName}
                         onChange={setStateName}
-                        placeholder="Selecciona un estado"
+                        label="Estado"
                         withValidation
                         disabled={csc.stateNames.length === 0}
                         maxHeight="200px"
                     />
-                    <StandardSelectCustomMemo
+                    <UnderlineStandardSelectCustomMemo
                         options={csc.cityNames}
                         value={cityName}
                         onChange={setCityName}
-                        placeholder="Selecciona una ciudad"
+                        label="Ciudad"
                         withValidation
                         disabled={csc.cityNames.length === 0}
                         maxHeight="200px"

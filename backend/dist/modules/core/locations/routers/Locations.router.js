@@ -4,6 +4,7 @@ import { Router } from "express";
 const createLocationsRouter = () => {
     const locationRouter = Router();
     locationRouter.get("/", LocationController.getAll);
+    locationRouter.get("/filter", LocationController.getAllWithFilters);
     locationRouter.get("/with-types", LocationController.getAllWithTypes);
     locationRouter.get("/id/:id", LocationController.getById);
     locationRouter.get("/with-all-information/:id", LocationController.getLocationWithAllInformation);

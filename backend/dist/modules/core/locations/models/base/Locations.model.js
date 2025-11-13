@@ -5,13 +5,15 @@ class LocationModel extends Model {
         return [
             "name",
             "description",
-            "address",
-            "mail",
             "phone",
             "city",
             "state",
             "country",
             "is_active",
+            "street",
+            "street_number",
+            "neighborhood",
+            "zip_code",
         ];
     };
     static getAllFields() {
@@ -19,8 +21,6 @@ class LocationModel extends Model {
             "id",
             "name",
             "description",
-            "address",
-            "mail",
             "phone",
             "city",
             "state",
@@ -28,10 +28,15 @@ class LocationModel extends Model {
             "is_active",
             "created_at",
             "updated_at",
+            "street",
+            "street_number",
+            "neighborhood",
+            "zip_code",
         ];
     }
 }
 LocationModel.init({
+    // info
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -46,15 +51,21 @@ LocationModel.init({
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    address: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    mail: {
+    // contact
+    phone: {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    phone: {
+    // address
+    street: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+    },
+    street_number: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    neighborhood: {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
@@ -70,6 +81,11 @@ LocationModel.init({
         type: DataTypes.STRING(100),
         allowNull: false,
     },
+    zip_code: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    // status
     is_active: {
         type: DataTypes.TINYINT,
         allowNull: false,

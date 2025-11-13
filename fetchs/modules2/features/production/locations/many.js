@@ -4,14 +4,45 @@ const locations = [
   {
     name: "Location A",
     description: "Description A",
+    
+    street: "Avenida Principal",
+    street_number: 123,
+    neighborhood: "Colonia Centro",
+    city: "Ciudad de México",
+    state: "Ciudad de México",
+    country: "México",
+    zip_code: 106000,
+    
+    phone: "+52 123 456 7890",
   },
   {
     name: "Location B",
     description: "Description B",
+    
+    street: "Calle Innovación",
+    street_number: 456,
+    neighborhood: "Parque Industrial",
+    city: "Monterrey",
+    state: "Nuevo León",
+    country: "México",
+    zip_code: 64000,
+    
+    phone: "+52 123 456 7890",
+
   },
   {
     name: "Location C",
     description: "Description C",
+
+    street: "Sunset Blvd",
+    street_number: 789,
+    neighborhood: "Downtown",
+    city: "Los Ángeles",
+    state: "California",
+    country: "United States",
+    zip_code: 90012,
+    
+    phone: "+1 123 456 7890",
   }
 ];
 

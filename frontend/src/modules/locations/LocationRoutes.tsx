@@ -1,26 +1,10 @@
-import type {
-    RouteObject
-} from "react-router-dom";
-import {
-    lazy,
-    Suspense
-} from "react";
+import type { RouteObject } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
-const Loading =
-    lazy(() =>
-        import("../../components/load/loading/Loading.tsx"));
-
-const Locations =
-    lazy(() =>
-        import("./models/locations/LocationsModel.tsx"));
-
-const PrivateRoute =
-    lazy(() =>
-        import("../../components/load/privateRoute/PrivateRoute.tsx"));
-
-const MainLayout =
-    lazy(() =>
-        import("../../layouts/main/MainLayout.tsx"));
+const PrivateRoute = lazy(() => import("../../components/load/privateRoute/PrivateRoute.tsx"));
+const Loading = lazy(() => import("../../components/load/loading/Loading.tsx"));
+const MainLayout = lazy(() => import("../../layouts/main/MainLayout.tsx"));
+const Locations = lazy(() => import("./models/LocationsModel.tsx"));
 
 const LocationsRoutes: RouteObject[] = [
     {

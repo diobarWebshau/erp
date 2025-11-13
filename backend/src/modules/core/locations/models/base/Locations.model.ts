@@ -1,7 +1,7 @@
 import sequelize from "../../../../../mysql/configSequelize.js";
 import { DataTypes, Model, Optional } from "sequelize";
 import { LocationTypeCreateAttributes } from "./LocationTypes.model.js";
-import { InventoryLocationItemCreationAttributes } from "../../../../../modules/types.js";
+import { InventoryLocationItemCreationAttributes, LocationLocationTypeAttributes } from "../../../../../modules/types.js";
 
 interface IInventory {
     stock: number;
@@ -19,18 +19,30 @@ interface IInventory {
 }
 
 interface LocationAttributes {
+    // info
     id: number;
     name: string;
     description: string;
-    address: string;
-    mail: string;
+
+    // contact
     phone: string;
+
+    // address
+    street: string;
+    street_number: string;
+    neighborhood: string;
     city: string;
     state: string;
     country: string;
+    zip_code: number;
+    location_location_type?: LocationLocationTypeAttributes[];
+
+    // status
     is_active: number;
     created_at: Date;
     updated_at: Date;
+
+    // relationships
     inventory_location_item?: InventoryLocationItemCreationAttributes[];
     types?: LocationTypeCreateAttributes[];
     inventory?: IInventory;
@@ -53,13 +65,15 @@ class LocationModel extends Model<LocationAttributes, LocationCreateAttributes> 
         return [
             "name",
             "description",
-            "address",
-            "mail",
             "phone",
             "city",
             "state",
             "country",
             "is_active",
+            "street",
+            "street_number",
+            "neighborhood",
+            "zip_code",
         ];
     };
 
@@ -68,8 +82,6 @@ class LocationModel extends Model<LocationAttributes, LocationCreateAttributes> 
             "id",
             "name",
             "description",
-            "address",
-            "mail",
             "phone",
             "city",
             "state",
@@ -77,12 +89,17 @@ class LocationModel extends Model<LocationAttributes, LocationCreateAttributes> 
             "is_active",
             "created_at",
             "updated_at",
+            "street",
+            "street_number",
+            "neighborhood",
+            "zip_code",
         ];
     }
 }
 
 LocationModel.init(
     {
+        // info
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -97,15 +114,21 @@ LocationModel.init(
             type: DataTypes.STRING(100),
             allowNull: false,
         },
-        address: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-        },
-        mail: {
+        // contact
+        phone: {
             type: DataTypes.STRING(100),
             allowNull: false,
         },
-        phone: {
+        // address
+        street: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+        },
+        street_number: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        neighborhood: {
             type: DataTypes.STRING(100),
             allowNull: false,
         },
@@ -121,6 +144,11 @@ LocationModel.init(
             type: DataTypes.STRING(100),
             allowNull: false,
         },
+        zip_code: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        // status
         is_active: {
             type: DataTypes.TINYINT,
             allowNull: false,

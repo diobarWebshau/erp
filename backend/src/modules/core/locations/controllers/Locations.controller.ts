@@ -1,39 +1,20 @@
-import collectorUpdateFields
-    from "../../../../scripts/collectorUpdateField.js";
-import sequelize
-    from "../../../../mysql/configSequelize.js";
+import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
+import sequelize from "../../../../mysql/configSequelize.js";
 import {
-    LocationModel,
-    LocationTypeModel,
-    LocationLocationTypeModel,
-    ProductionLineModel,
-    LocationsProductionLinesModel,
-    ProductionLineProductModel,
-    ProductModel,
-    ProductProcessModel,
-    ProcessModel,
-    ProductionLineQueueModel,
-    ProductionOrderModel,
-    ProductionModel
+    LocationModel, LocationTypeModel, LocationLocationTypeModel,
+    ProductionLineModel, LocationsProductionLinesModel, ProductionLineProductModel,
+    ProductModel, ProductProcessModel, ProcessModel, ProductionLineQueueModel,
+    ProductionOrderModel, ProductionModel
 } from "../../../associations.js";
 import {
-    LocationAttributes,
-    LocationCreateAttributes,
-    LocationLocationTypeAttributes,
-    LocationTypeAttributes
+    LocationAttributes, LocationCreateAttributes, LocationLocationTypeAttributes,
+    LocationTypeAttributes, LocationTypeCreateAttributes
 } from "../types.js";
-import {
-    Response,
-    Request,
-    NextFunction
-} from "express";
-import {
-    Op,
-    QueryTypes,
-    Transaction
-} from "sequelize";
+import { Response, Request, NextFunction } from "express";
+import { Op, QueryTypes, Transaction } from "sequelize";
 
 class LocationController {
+
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const response = await LocationModel.findAll();
@@ -51,149 +32,182 @@ class LocationController {
             }
         }
     }
-    // static getLocationWithAllInformation = async (req: Request, res: Response, next: NextFunction) => {
-    //     const { id } = req.params;
-    //     try {
-    //         const response = await LocationModel.findOne({
-    //             where: { id },
-    //             attributes: LocationModel.getAllFields(),
-    //             subQuery: false, // evita subconsultas que cambian alias
-    //             include: [
-    //                 {
-    //                     model: LocationsProductionLinesModel,
-    //                     as: "location_production_line",
-    //                     required: false,
-    //                     attributes: LocationsProductionLinesModel.getAllFields(),
-    //                     include: [
-    //                         {
-    //                             model: ProductionLineModel,
-    //                             as: "production_line",
-    //                             required: false,
-    //                             attributes: ProductionLineModel.getAllFields(),
-    //                             include: [
-    //                                 {
-    //                                     model: ProductionLineProductModel,
-    //                                     as: "production_lines_products",
-    //                                     required: false,
-    //                                     attributes: ProductionLineProductModel.getAllFields(),
-    //                                     include: [
-    //                                         {
-    //                                             model: ProductModel,
-    //                                             as: "products",
-    //                                             required: false,
-    //                                             attributes: ProductModel.getAllFields(),
-    //                                             include: [
-    //                                                 {
-    //                                                     model: ProductProcessModel,
-    //                                                     as: "product_processes",
-    //                                                     required: false,
-    //                                                     separate: true,                        // 👈 necesario para que 'order' funcione aquí
-    //                                                     order: [["sort_order", "ASC"]],        // 👈 ahora sí funciona
-    //                                                     attributes: ProductProcessModel.getAllFields(),
-    //                                                     include: [
-    //                                                         {
-    //                                                             model: ProcessModel,
-    //                                                             as: "process",
-    //                                                             required: false,
-    //                                                             attributes: ProcessModel.getAllFields()
-    //                                                         }
-    //                                                     ]
-    //                                                 }
-    //                                             ]
-    //                                         }
-    //                                     ],
-    //                                 },
-    //                                 {
-    //                                     model: PurchasedOrdersProductsLocationsProductionLinesModel,
-    //                                     as: "purchase_order_product_location_production_line",
-    //                                     required: false,
-    //                                     attributes: PurchasedOrdersProductsLocationsProductionLinesModel.getAllFields(),
-    //                                     include: [
-    //                                         {
-    //                                             model: PurchaseOrderProductModel,
-    //                                             as: "purchase_order_product",
-    //                                             required: false,
-    //                                             attributes: [
-    //                                                 ...PurchaseOrderProductModel.getAllFields(),
-    //                                                 // Usar ruta completa de alias con '->'
-    //                                                 [
-    //                                                     sequelize.fn(
-    //                                                         "func_get_productions_of_order",
-    //                                                         sequelize.col(
-    //                                                             "location_production_line->production_line->purchase_order_product_location_production_line->purchase_order_product.id"
-    //                                                         ),
-    //                                                         sequelize.literal("'client'")
-    //                                                     ),
-    //                                                     "production_order"
-    //                                                 ]
-    //                                             ],
-    //                                             include: [
-    //                                                 {
-    //                                                     model: ProductModel,
-    //                                                     as: "product",
-    //                                                     required: false,
-    //                                                     attributes: ProductModel.getAllFields(),
-    //                                                 }
-    //                                             ]
-    //                                         }
-    //                                     ]
-    //                                 },
-    //                                 {
-    //                                     model: InternalProductionOrderLineProductModel,
-    //                                     as: "internal_production_order_line_product",
-    //                                     required: false,
-    //                                     attributes: InternalProductionOrderLineProductModel.getAllFields(),
-    //                                     include: [
-    //                                         {
-    //                                             model: InternalProductProductionOrderModel,
-    //                                             as: "internal_product_production_order",
-    //                                             required: false,
-    //                                             attributes: [
-    //                                                 ...InternalProductProductionOrderModel.getAllFields(),
-    //                                                 [
-    //                                                     sequelize.fn(
-    //                                                         "func_get_productions_of_order",
-    //                                                         sequelize.col(
-    //                                                             "location_production_line->production_line->internal_production_order_line_product->internal_product_production_order.id"
-    //                                                         ),
-    //                                                         sequelize.literal("'internal'")
-    //                                                     ),
-    //                                                     "production_order"
-    //                                                 ]
-    //                                             ],
-    //                                             include: [
-    //                                                 {
-    //                                                     model: ProductModel,
-    //                                                     as: "product",
-    //                                                     required: false,
-    //                                                     attributes: ProductModel.getAllFields(),
-    //                                                 }
-    //                                             ]
-    //                                         }
-    //                                     ]
-    //                                 }
-    //                             ]
-    //                         },
-    //                     ],
-    //                 }
-    //             ]
-    //         });
 
-    //         if (!response) {
-    //             res.status(200).json([]);
-    //             return;
-    //         }
 
-    //         const locations = response.toJSON();
-    //         res.status(200).json(locations);
-    //     } catch (error: unknown) {
-    //         if (error instanceof Error) {
-    //             next(error);
-    //         } else {
-    //             console.error(`An unexpected error ocurred ${error}`);
-    //         }
-    //     }
-    // };
+
+    static getAllWithFilters = async (req: Request, res: Response, next: NextFunction) => {
+        const { filter, ...rest } = req.query as {
+            filter?: string;
+        } & Partial<LocationAttributes>;
+        try {
+
+            // 1️⃣ Condición base (para exclusiones)
+            const excludePerField = Object.fromEntries(
+                Object.entries(rest)
+                    .filter(([k, v]) => v !== undefined && k !== "name")
+                    .map(([k, v]) => [
+                        k,
+                        Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v },
+                    ])
+            );
+
+            // 2️⃣ Filtro de búsqueda general
+            const filterConditions: any[] = [];
+            if (filter && filter.trim()) {
+                const f = `%${filter.trim()}%`; // busca en cualquier parte
+                filterConditions.push(
+                    { name: { [Op.like]: f } }, // name del shipping order
+                    { street: { [Op.like]: f } },
+                    { city: { [Op.like]: f } },
+                    { state: { [Op.like]: f } },
+                    { country: { [Op.like]: f } },
+                    { description: { [Op.like]: f } },
+                    { phone: { [Op.like]: f } },
+                );
+            }
+
+            // 3️⃣ Construimos el WHERE principal
+            const where: any = {
+                ...excludePerField,
+                ...(filterConditions.length > 0 ? { [Op.or]: filterConditions } : {}),
+            };
+
+            console.log(`where`, where);
+
+            const response = await LocationModel.findAll({
+                where,
+                attributes: LocationModel.getAllFields(),
+                subQuery: false,
+                include: [
+                    {
+                        model: LocationsProductionLinesModel,
+                        as: "location_production_line",
+                        required: false,
+                        attributes: LocationsProductionLinesModel.getAllFields(),
+                        include: [
+                            {
+                                model: ProductionLineModel,
+                                as: "production_line",
+                                required: false,
+                                attributes: ProductionLineModel.getAllFields(),
+                                include: [
+                                    {
+                                        model: ProductionLineQueueModel,
+                                        as: "production_line_queue",
+                                        required: false,
+                                        attributes: ProductionLineQueueModel.getAllFields(),
+                                        separate: true, // 👈 esto permite que order funcione dentro del include
+                                        order: [["position", "ASC"]],
+                                        where: {
+                                            position: {
+                                                [Op.ne]: null
+                                            }
+                                        },
+                                        include: [
+                                            {
+                                                model: ProductionOrderModel,
+                                                as: "production_order",
+                                                required: false,
+                                                attributes: [
+                                                    ...ProductionOrderModel.getAllFields(),
+                                                    [
+                                                        sequelize.fn(
+                                                            "func_get_order_of_production_order",
+                                                            sequelize.col("production_order.id"),       // ✅ usa alias local
+                                                            sequelize.col("production_order.order_id"), // ✅ usa alias local
+                                                            sequelize.col("production_order.order_type")
+                                                        ),
+                                                        "order"
+                                                    ],
+                                                    [
+                                                        sequelize.fn(
+                                                            "func_get_order_progress_snapshot",
+                                                            sequelize.col("production_order.id"),
+                                                        ),
+                                                        "production_breakdown"
+                                                    ]
+                                                ],
+                                                include: [
+                                                    {
+                                                        model: ProductionModel,
+                                                        as: "productions",
+                                                        required: false,
+                                                        attributes: ProductionModel.getAllFields(),
+                                                    },
+                                                    {
+                                                        model: ProductModel,
+                                                        as: "product",
+                                                        required: false,
+                                                        attributes: ProductModel.getAllFields(),
+                                                        include: [
+                                                            {
+                                                                model: ProductProcessModel,
+                                                                as: "product_processes",
+                                                                required: false,
+                                                                attributes: ProductProcessModel.getAllFields(),
+                                                                include: [
+                                                                    {
+                                                                        model: ProcessModel,
+                                                                        as: "process",
+                                                                        required: false,
+                                                                        attributes: ProcessModel.getAllFields()
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    {
+                                        model: ProductionLineProductModel,
+                                        as: "production_lines_products",
+                                        required: false,
+                                        attributes: ProductionLineProductModel.getAllFields(),
+                                        include: [
+                                            {
+                                                model: ProductModel,
+                                                as: "products",
+                                                required: false,
+                                                attributes: ProductModel.getAllFields(),
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                    },
+                    {
+                        model: LocationLocationTypeModel,
+                        as: "location_location_type",
+                        required: false,
+                        attributes: LocationLocationTypeModel.getAllFields(),
+                        include: [
+                            {
+                                model: LocationTypeModel,
+                                as: "location_type",
+                                required: false,
+                                attributes: LocationTypeModel.getAllFields(),
+                            }
+                        ]
+                    }
+                ],
+            });
+            if (!(response.length > 0)) {
+                res.status(200).json([]);
+                return;
+            }
+            const data = response.map(l => l.toJSON());
+            res.status(200).json(data);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error ocurred ${error}`);
+            }
+        }
+    };
 
     static getLocationWithAllInformation = async (req: Request, res: Response, next: NextFunction) => {
         const { id } = req.params;
@@ -302,6 +316,20 @@ class LocationController {
                             }
                         ],
                     },
+                    {
+                        model: LocationLocationTypeModel,
+                        as: "location_location_type",
+                        required: false,
+                        attributes: LocationLocationTypeModel.getAllFields(),
+                        include: [
+                            {
+                                model: LocationTypeModel,
+                                as: "location_type",
+                                required: false,
+                                attributes: LocationTypeModel.getAllFields(),
+                            }
+                        ]
+                    }
                 ],
             });
 
@@ -576,7 +604,11 @@ class LocationController {
     }
 
     static create = async (req: Request, res: Response, next: NextFunction) => {
-        const { name, description, address, mail, phone, city, state, country, is_active } = req.body;
+        const {
+            name, description, street, street_number,
+            neighborhood, city, state, country, zip_code,
+            is_active, phone
+        } = req.body;
         try {
             const validateName = await LocationModel.findOne({ where: { name: name } });
             if (validateName) {
@@ -588,13 +620,15 @@ class LocationController {
             const response = await LocationModel.create({
                 name,
                 description,
-                address,
-                mail,
-                phone,
+                street,
+                street_number,
+                neighborhood,
                 city,
                 state,
                 country,
-                is_active,
+                zip_code,
+                phone,
+                is_active: is_active || 1,
             });
             if (!response) {
                 res.status(200).json({ message: "The location could not be created" });
@@ -724,24 +758,16 @@ class LocationController {
 
     static createComplete = async (req: Request, res: Response, next: NextFunction) => {
 
-
         const transaction = await sequelize.transaction({
             isolationLevel:
                 Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
         });
 
-        const { name, description, types, address, mail, phone, city, state, country, is_active } = req.body as {
-            name: string;
-            description: string;
-            address: string;
-            mail: string;
-            phone: string;
-            city: string;
-            state: string;
-            country: string;
-            is_active: boolean;
-            types: LocationTypeAttributes[];
-        };
+        const {
+            name, description, types, phone, city,
+            state, country, is_active, street,
+            street_number, neighborhood, zip_code
+        } = req.body as LocationCreateAttributes;
 
         try {
             // Validar nombre único de ubicación
@@ -764,8 +790,10 @@ class LocationController {
             const response = await LocationModel.create({
                 name,
                 description,
-                address,
-                mail,
+                street,
+                street_number,
+                neighborhood,
+                zip_code,
                 phone,
                 city,
                 state,
@@ -794,9 +822,11 @@ class LocationController {
             }
 
             // Validar que todos los location_types existen (una sola consulta)
-            const typeIds = types.map(t => t.id);
+            const typeIds = types.filter((t: LocationTypeCreateAttributes) => t?.id !== undefined)
+                .map((t: LocationTypeCreateAttributes) => t.id as number);
+
             const existingTypes = await LocationTypeModel.findAll({
-                where: { id: typeIds },
+                where: { id: { [Op.in]: typeIds } },
                 transaction,
                 lock: transaction.LOCK.UPDATE,
             });
@@ -831,7 +861,7 @@ class LocationController {
 
             // Crear las asignaciones en bulk
             const typesToCreate = types.map(type => ({
-                location_type_id: type.id,
+                location_type_id: type.id as number,
                 location_id: location.id
             }));
 

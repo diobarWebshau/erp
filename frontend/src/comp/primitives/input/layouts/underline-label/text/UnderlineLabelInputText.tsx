@@ -6,8 +6,8 @@ import { Text } from "lucide-react";
 import clsx from "clsx";
 
 interface UnderlineLabelInputTextProps {
-    value: string;
-    onChange: (value: string) => void;
+    value: string | null;
+    onChange: (value: string | null) => void;
     label: string;
     required?: boolean;
     withValidation?: boolean;
@@ -40,8 +40,8 @@ const UnderlineLabelInputText = ({
         const labelC = clsx(
             StyleModule.label,
             "nunito-semibold",
-            (focused || value.length > 0) && StyleModule.floating,
-            (errorActive && value.length === 0 && focused) && StyleModule.labelError
+            (focused || (value && value.length > 0)) && StyleModule.floating,
+            (errorActive && (!value || (typeof value === "string" && value.length === 0)) && focused) && StyleModule.labelError
         );
         const inputC = clsx(
             StyleModule.input,
@@ -70,7 +70,7 @@ const UnderlineLabelInputText = ({
     const handleOnBlur = useCallback(() => {
         setFocused(false);
         const v = refInput.current?.value ?? "";
-        setIsValid(withValidation ? (v.length > 0 ? true : false) : null);
+        setIsValid(withValidation ? (v && v.length > 0 ? true : false) : null);
     }, []);
 
     const handleOnFocus = useCallback(() => {
@@ -81,7 +81,7 @@ const UnderlineLabelInputText = ({
 
     useEffect(() => {
         const v = value ?? "";
-        setIsValid(withValidation ? (v.length > 0 ? true : false) : null);
+        setIsValid(withValidation ? ((v && v.length > 0) ? true : false) : null);
         if (!refInput.current) return;
     }, [value]);
 
@@ -95,7 +95,7 @@ const UnderlineLabelInputText = ({
                 ref={refInput}
                 className={classNameInput}
                 type="text"
-                value={value}
+                value={value ?? ""}
                 onChange={handleOnChangeInput}
                 onFocus={handleOnFocus}
                 onBlur={handleOnBlur}

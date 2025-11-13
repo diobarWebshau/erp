@@ -190,7 +190,6 @@ const createCompleteproductionLineInDB = async (
     dispatch: AppDispatchRedux
 ): Promise<any> => {
     try {
-        console.log(`DENTRO`,data);
         const response = await fetch(`${API_URL}/complete`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },

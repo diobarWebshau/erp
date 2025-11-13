@@ -1,22 +1,13 @@
 import type { IInventoryInput } from "../../../interfaces/inventoryInputs";
-import type {
-    IPartialLocation,
-    ILocation
-} from "../../../interfaces/locations";
-import type {
-    ILocationType
-} from "../../../interfaces/locationTypes";
+import type { IPartialLocation, ILocation } from "../../../interfaces/locations";
+import type { ILocationType } from "../../../interfaces/locationTypes";
 import type { IProductionLine } from "../../../interfaces/productionLines";
-import {
-    setError,
-    clearError,
-} from "../../../store/slicer/errorSlicer";
-import type {
-    AppDispatchRedux
-} from "../../../store/store";
+import { setError, clearError } from "../../../store/slicer/errorSlicer";
+import type { AppDispatchRedux } from "../../../store/store";
 
-const API_URL =
-    "http://localhost:3003/locations/locations";
+const BASE_URL = import.meta.env.VITE_API_URL;
+const relativePath = "locations/locations";
+const API_URL = new URL(relativePath, BASE_URL);
 
 const fetchLocationsFromDB = async (
     dispatch: AppDispatchRedux
@@ -84,6 +75,71 @@ const getLocationWithAllInformation = async (
         throw error;
     }
 }
+
+
+
+interface IFetchProductionLinesFromDB {
+    dispatch: AppDispatchRedux;
+    like?: string;
+    conditionsExclude?: IPartialLocation;
+    signal: AbortSignal;
+}
+
+const getLocationWithAllInformationFromDB = async ({
+    dispatch, like, conditionsExclude, signal
+}: IFetchProductionLinesFromDB): Promise<ILocation[]> => {
+    try {
+
+        // Creamos el objeto params
+        const params = new URLSearchParams();
+        if (like) params.set("filter", like);
+
+        // Agregamos los params de exclusion si se cumplen ciertas condiciones
+        if (conditionsExclude && Object.keys(conditionsExclude).length > 0) {
+            Object.entries(conditionsExclude).forEach(([key, value]) => {
+                if (Array.isArray(value) || typeof value === "object") {
+                    params.set(key, JSON.stringify(value));
+                } else {
+                    params.set(key, value.toString());
+                }
+            });
+        };
+
+        // Creamos el request
+        const request = new Request(`${API_URL}/filter?${params.toString()}`, {
+            method: "GET",
+            signal
+        });
+
+        // Realizamos la peticion a la DB
+        const response = await fetch(request);
+
+        // Validamos la respuesta
+        if (!response.ok) {
+            const errorText = await response.json();
+            if (response.status >= 500) {
+                throw new Error(`${errorText}`);
+            }
+            dispatch(setError({ key: "locations", message: errorText }));
+            return [];
+        }
+        dispatch(clearError("locations"));
+
+        // Parseamos la respuesta
+        const data: ILocation[] = await response.json();
+
+        // Retornamos la data
+        return data;
+    } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+            console.log("abort query locations");
+            return [];
+        }
+        throw error;
+    }
+};
+
+
 
 const fetchLocationsWithTypesFromDB = async (
     dispatch: AppDispatchRedux
@@ -461,5 +517,6 @@ export {
     getLocationsProducedOneProduct,
     getInventoryInputsOfProductInOneLocation,
     getProductionLinesForProductAtLocation,
-    getLocationWithAllInformation
+    getLocationWithAllInformation,
+    getLocationWithAllInformationFromDB
 };

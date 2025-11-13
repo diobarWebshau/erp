@@ -1,7 +1,6 @@
+import type { ILocationLocationType } from "./locationLocationType";
 import type { ILocationProductionLine } from "./locationsProductionLines";
-import type {
-  ILocationType
-} from "./locationTypes";
+import type { ILocationType } from "./locationTypes";
 
 interface IInventoryRecord {
   stock: number;
@@ -19,61 +18,47 @@ interface IInventoryRecord {
 }
 
 interface ILocation {
+  // info
   id: number,
+  custom_id: string,
   name: string,
   description: string,
-  types?: ILocationType[],
-  is_active: boolean,
-  created_at: string,
-  updated_at: string,
-  address: string,
-  zip_code: string,
+  location_manager: string,
+
+  // address
+  street: string,
+  street_number: number,
+  neighborhood: string,
+  zip_code: number,
   city: string,
   state: string,
   country: string,
+
+  // contact
   phone: string,
-  email: string,
+
+  // state
+  is_active: boolean,
+  created_at: string,
+  updated_at: string,
+
+  // relations
+  types?: ILocationType[],
   location_production_line?: ILocationProductionLine[]
+  location_location_type: ILocationLocationType[]
   inventory?: IInventoryRecord
 }
 
 type IPartialLocation = Partial<ILocation>;
 
-interface ILocationManager{
-    added: IPartialLocation[],
-    deleted: ILocation[],
-    modified: IPartialLocation[],
+interface ILocationManager {
+  added: IPartialLocation[],
+  deleted: ILocation[],
+  modified: IPartialLocation[],
 }
-
-const defaultValueLocation: ILocation = {
-  id: 0,
-  name: "",
-  address: "",
-  zip_code: "",
-  city: "",
-  state: "",
-  country: "",
-  phone: "",
-  email: "",
-  description: "",
-  is_active: true,
-  created_at: "",
-  updated_at: "",
-};
-
-const defaultValuePartialLocation: Partial<ILocation> = {
-  is_active: true,
-  name: "",
-  description: "",
-};
 
 export type {
   ILocation,
   IPartialLocation,
   ILocationManager
-};
-
-export {
-  defaultValueLocation,
-  defaultValuePartialLocation,
 };

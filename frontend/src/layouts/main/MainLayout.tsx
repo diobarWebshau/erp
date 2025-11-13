@@ -164,7 +164,7 @@ const menuItems: MenuItem[] = [
             {
                 label: "Ubicación",
                 icon: <MapPinned />,
-                path: "/locationss"
+                path: "/locations"
             },
             {
                 label: "Cliente",

@@ -6,7 +6,6 @@ import { Bookmark, ChevronLeft, Plus, Trash2 } from "lucide-react";
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import StyleModule from "./Step2.module.css";
 import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
-import StandardSelectCustomMemo from "./../../../../../../../comp/features/select/StandardSelectCustom";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
@@ -30,6 +29,7 @@ import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-are
 import type { IPartialClient } from "../../../../../../../interfaces/clients";
 import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
 import UnderlineLabelInputNumeric from "../../../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
+import UnderlineStandardSelectCustom from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -56,14 +56,14 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
 
     // * *********** Estados logicos locales ************ 
 
-    const [countryName, setCountryName] = useState<string>(state?.draft?.country ?? "México");
-    const [stateName, setStateName] = useState<string>(state?.draft?.state ?? "Baja California");
-    const [cityName, setCityName] = useState<string>(state?.draft?.city ?? "Mexicali");
+    const [countryName, setCountryName] = useState<string | null>(state?.draft?.country ?? null);
+    const [stateName, setStateName] = useState<string | null>(state?.draft?.state ?? null);
+    const [cityName, setCityName] = useState<string | null>(state?.draft?.city ?? null);
     const [zipCode, setZipCode] = useState<number | null>(state?.draft?.zip_code || null);
-    const [street, setStreet] = useState<string>(state?.draft?.street ?? "");
+    const [street, setStreet] = useState<string | null>(state?.draft?.street ?? null);
     const [streetNumber, setStreetNumber] = useState<number | null>(state?.draft?.street_number || null);
-    const [neighborhood, setNeighborhood] = useState<string>(state?.draft?.neighborhood ?? "");
-    const [paymentTerms, setPaymentTerms] = useState<string>(state?.draft?.payment_terms ?? "");
+    const [neighborhood, setNeighborhood] = useState<string | null>(state?.draft?.neighborhood ?? null);
+    const [paymentTerms, setPaymentTerms] = useState<string | null>(state?.draft?.payment_terms ?? null);
 
     // * *********** Estados gui locales ************ 
 
@@ -328,9 +328,13 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
 
     const handleOnClickSaveContinue = useCallback(async () => {
         if (
-            street === '' || streetNumber === 0 || streetNumber === null ||
-            neighborhood === '' || countryName === '' ||
-            stateName === '' || cityName === '' || zipCode === null || zipCode === 0
+            street === '' || street === null ||
+            streetNumber === 0 || streetNumber === null ||
+            neighborhood === '' || neighborhood === null ||
+            countryName === '' || countryName === null ||
+            stateName === '' || stateName === null ||
+            cityName === '' || cityName === null ||
+            zipCode === null || zipCode === 0
         ) {
             ToastMantine.feedBackForm({ message: "Debe completar todos los campos" });
             return;
@@ -364,7 +368,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
             state: stateName,
             city: cityName,
             zip_code: zipCode,
-            ...(paymentTerms !== "" ? { payment_terms: paymentTerms } : {})
+            ...(paymentTerms !== null && paymentTerms !== "" ? { payment_terms: paymentTerms } : {})
         };
 
         try {
@@ -427,29 +431,29 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
                         />
                     </div>
                     <div className={StyleModule.fieldBlock}>
-                        <StandardSelectCustomMemo
+                        <UnderlineStandardSelectCustom
                             options={csc.countryNames}
                             value={countryName}
                             onChange={setCountryName}
-                            placeholder="Selecciona un pais"
+                            label="Pais"
                             withValidation
                             disabled={csc.countryNames.length === 0}
                             maxHeight="200px"
                         />
-                        <StandardSelectCustomMemo
+                        <UnderlineStandardSelectCustom
                             options={csc.stateNames}
                             value={stateName}
                             onChange={setStateName}
-                            placeholder="Selecciona un estado"
+                            label="Estado"
                             withValidation
                             disabled={csc.stateNames.length === 0}
                             maxHeight="200px"
                         />
-                        <StandardSelectCustomMemo
+                        <UnderlineStandardSelectCustom
                             options={csc.cityNames}
                             value={cityName}
                             onChange={setCityName}
-                            placeholder="Selecciona una ciudad"
+                            label="Ciudad"
                             withValidation
                             disabled={csc.cityNames.length === 0}
                             maxHeight="200px"
@@ -491,7 +495,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
                 <div className={StyleModule.paymentTermsContainer}>
                     <span className="nunito-bold">{`Terminos de pago (Opcional)`}</span>
                     <StandarTextAreaCustom
-                        value={paymentTerms}
+                        value={paymentTerms ?? ""}
                         onChange={handleOnChangePaymentTerms}
                         placeholder="Terminos de pago"
                         maxLength={500}

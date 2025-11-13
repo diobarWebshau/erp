@@ -9,6 +9,8 @@ const createLocationsRouter = (): Router => {
     const locationRouter = Router();
     locationRouter.get("/",
         LocationController.getAll);
+    locationRouter.get("/filter",
+        LocationController.getAllWithFilters);
     locationRouter.get("/with-types",
         LocationController.getAllWithTypes);
     locationRouter.get("/id/:id",

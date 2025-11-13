@@ -7,8 +7,8 @@ import { isEmailValid } from "../../../../../../helpers/validations";
 import clsx from "clsx";
 
 interface UnderlineLabelInputMailProps {
-    value: string;
-    onChange: (value: string) => void;
+    value: string | null;
+    onChange: (value: string | null) => void;
     label: string;
     required?: boolean;
     withValidation?: boolean;
@@ -41,7 +41,7 @@ const UnderlineLabelInputMail = ({
         const labelC = clsx(
             StyleModule.label,
             "nunito-semibold",
-            (focused || value.length > 0) && StyleModule.floating,
+            (focused || (value && value.length > 0)) && StyleModule.floating,
             // errorActive ? StyleModule.labelError : StyleModule.labelValid
             (errorActive && focused) && StyleModule.labelError
         );
@@ -102,7 +102,7 @@ const UnderlineLabelInputMail = ({
                 ref={refInput}
                 className={classNameInput}
                 type="email"
-                value={value}
+                value={value ?? ""}
                 onChange={handleOnChangeInput}
                 onFocus={handleOnFocus}
                 onBlur={handleOnBlur}

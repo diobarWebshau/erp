@@ -9,7 +9,6 @@ interface IUnderlineStandardSelectMulti<T extends string> {
     value: T | null,
     options: T[],
     onChange: (value: T | null) => void,
-    placeholder?: string,
     disabled?: boolean,
     initialOpen?: boolean,
     mainColor: string,
@@ -20,7 +19,6 @@ interface IUnderlineStandardSelectMulti<T extends string> {
     classNameOption?: string,
     classNameOptionSelected?: string,
     withValidation?: boolean,
-    placeholderClassName?: string,
     selectedLabelClassName?: string,
     maxHeight?: string,
     label: string,
@@ -104,7 +102,6 @@ const UnderlineStandardSelectMultiMemo = memo(UnderlineStandardSelectMulti) as t
 
 export default UnderlineStandardSelectMultiMemo;
 
-
 // * ************ SELECT TRIGGER ************ 
 
 interface ISelectTrigger {
@@ -117,7 +114,6 @@ interface ISelectTrigger {
     selectedLabelClassName?: string;
     withValidation?: boolean;
     disabled?: boolean;
-    placeholder?: string;
     label?: string;
 }
 
@@ -141,7 +137,7 @@ const SelectTrigger = ({
             <ChevronDownIcon />,
             styles.icon,
             {
-                color: (!disabled && selectedLabel) ? mainColor : "var(--color-alert)"
+                color: ((!disabled && selectedLabel) || (disabled && !selectedLabel)) ? mainColor : "var(--color-alert)"
             }),
         [mainColor, selectedLabel]);
 
@@ -166,9 +162,9 @@ const SelectTrigger = ({
             selectedLabelClassName
         );
         const classNameLabel = clsx(
-            "nunito-regular",
+            "nunito-semibold",
             styles.label,
-            (focused && selectedLabel) && styles.floating,
+            ((focused && selectedLabel) || selectedLabel) && styles.floating,
         );
 
         return [classNameTri, classNameLabelValid, classNameLabel];

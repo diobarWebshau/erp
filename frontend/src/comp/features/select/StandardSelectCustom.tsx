@@ -3,9 +3,9 @@ import StyleModule from "./StandardSelectCustom.module.css";
 import StandardSelectMemo from "./StandardSelect";
 
 interface IStandardSelectCustom<T extends string> {
-    value: T;
+    value: T | null;
     options: T[];
-    onChange: (value: T) => void;
+    onChange: (value: T | null) => void;
     placeholder?: string;
     disabled?: boolean;
     initialOpen?: boolean;

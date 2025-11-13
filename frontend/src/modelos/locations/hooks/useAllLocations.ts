@@ -1,48 +1,73 @@
-import { useEffect, useState } from "react";
-import { clearError, setError } from "../../../store/slicer/errorSlicer";
-import { fetchLocationsFromDB } from "../queries/locationsQueries";
-import { useDispatch } from "react-redux";
+import { getLocationWithAllInformationFromDB } from "../../../modelos/locations/queries/locationsQueries";
+import type { ILocation, IPartialLocation } from "../../../interfaces/locations";
+import { clearError } from "../../../store/slicer/errorSlicer";
 import type { AppDispatchRedux } from "../../../store/store";
-import type { ILocation } from "../../../interfaces/locations";
+import useDebouncedFetch from "../../../hooks/useDebounce";
+import { useCallback, useMemo } from "react";
+import { useDispatch } from "react-redux";
 
-
-const useAllLocations = () => {
-    const dispatch = useDispatch<AppDispatchRedux>();
-    const [locations, setLocations] = useState<ILocation[]>([]);
-    const [loadingLocations, setLoadingLocations] = useState<boolean>(false);
-
-    const fetchLocationsFromDBFunction = async () => {
-        setLoadingLocations(true);
-        dispatch(
-            clearError("getLocationsHook")
-        );
-        try {
-            const data = await fetchLocationsFromDB(dispatch);
-            setLocations(data);
-        } catch (err: unknown) {
-            const msg = err instanceof Error
-                ? { validation: err.message }
-                : { validation: "Unknown error" };
-            dispatch(
-                setError({
-                    key: "getLocationsHook",
-                    message: msg
-                }));
-        } finally {
-            setLoadingLocations(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchLocationsFromDBFunction();
-    }, []);
-
-    return {
-        locations,
-        loadingLocations,
-        fetchLocationsFromDBFunction
-    };
+interface IuseAllLocationsProps {
+    like?: string | undefined;
+    debounce?: number;
+    conditionsExclude?: IPartialLocation;
 }
 
+interface IFetchAllLocationsFromDB {
+    query?: string;
+    signal: AbortSignal;
+    conditionsExclude?: IPartialLocation;
+}
+
+interface IuseAllLocationsResult {
+    locations: ILocation[];
+    loadingLocations: boolean;
+    refetchLocations: (options?: { immediate?: boolean }) => void;
+}
+
+const useAllLocations = ({
+    like,
+    debounce,
+    conditionsExclude
+}: IuseAllLocationsProps): IuseAllLocationsResult => {
+
+    const dispatch = useDispatch<AppDispatchRedux>();
+    const normalizedQuery = useMemo(() => (like ?? "").trim(), [like]);
+    const stableExclude = useMemo(() => conditionsExclude, [conditionsExclude]);
+
+    const stableFetch = useCallback(
+        async ({ query, signal, conditionsExclude }: IFetchAllLocationsFromDB): Promise<ILocation[]> => {
+            dispatch(clearError("allLocationsHook"));
+            return getLocationWithAllInformationFromDB({
+                dispatch,
+                like: query,
+                signal,
+                conditionsExclude
+            });
+        },
+        [dispatch]
+    );
+
+    const { data, loading, refetch } = useDebouncedFetch<ILocation[], IPartialLocation>({
+        query: normalizedQuery,
+        fetchFn: stableFetch,
+        delay: debounce ?? 0,
+        conditionalExclude: stableExclude
+    });
+
+    const refetchLocations = useCallback(
+        (options?: { immediate?: boolean }) => {
+            refetch(options);
+        },
+        [refetch]
+    );
+
+    return {
+        locations: data ?? [],
+        loadingLocations: loading,
+        refetchLocations
+    };
+};
 
 export default useAllLocations;
+
+

@@ -42,16 +42,16 @@ function buildAllowedIsoSet(all: ICountry[], allowed?: string[]) {
 /* ============ tipos públicos ============ */
 export type UseCSCSeparatedOptions = {
     // Controlado (opcional) o no-controlado por defaultX
-    countryName?: string;
-    onCountryNameChange?: (name: string) => void;
+    countryName?: string | null;
+    onCountryNameChange?: (name: string | null) => void;
     defaultCountryName?: string;
 
-    stateName?: string;
-    onStateNameChange?: (name: string) => void;
+    stateName?: string | null;
+    onStateNameChange?: (name: string | null) => void;
     defaultStateName?: string;
 
-    cityName?: string;
-    onCityNameChange?: (name: string) => void;
+    cityName?: string | null;
+    onCityNameChange?: (name: string | null) => void;
     defaultCityName?: string;
 
     // Catálogo (filtro)
@@ -66,9 +66,9 @@ export type UseCSCSeparated = {
     cityNames: string[];
 
     // selección actual (por nombre)
-    countryName: string;
-    stateName: string;
-    cityName: string;
+    countryName: string | null;
+    stateName: string | null;
+    cityName: string | null;
 
     // objetos seleccionados
     selectedCountry?: ICountry;
@@ -76,9 +76,9 @@ export type UseCSCSeparated = {
     selectedCity?: ICity;
 
     // setters (por nombre) con reseteo en cascada
-    setCountryName: (name: string) => void; // limpia state/city
-    setStateName: (name: string) => void;   // limpia city
-    setCityName: (name: string) => void;
+    setCountryName: (name: string | null) => void; // limpia state/city
+    setStateName: (name: string | null) => void;   // limpia city
+    setCityName: (name: string | null) => void;
 
     // helpers
     clearState: () => void;  // deja state/city en ""
@@ -225,18 +225,18 @@ export function useCountryStateCitySeparated(opts: UseCSCSeparatedOptions = {}):
     }, [cities]);
 
     // setters públicos con cascada
-    const setCountryName = useCallback((name: string) => {
+    const setCountryName = useCallback((name: string | null) => {
         setCountry(name || "");
         setState(""); // reset cascada
         setCity("");
     }, [setCountry, setState, setCity]);
 
-    const setStateName = useCallback((name: string) => {
+    const setStateName = useCallback((name: string | null) => {
         setState(name || "");
         setCity("");  // reset cascada
     }, [setState, setCity]);
 
-    const setCityName = useCallback((name: string) => {
+    const setCityName = useCallback((name: string | null) => {
         setCity(name || "");
     }, [setCity]);
 

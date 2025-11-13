@@ -12,28 +12,6 @@ import { next_step } from "../../../../../context/clientActions";
 import { useCallback, useState, type Dispatch } from "react";
 import StyleModule from "./Step1.module.css";
 import { Bookmark } from "lucide-react";
-import UnderlineStandardSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectMultiCustom";
-import UnderlineStandardSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
-import UnderlineObjectSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectCustom";
-import UnderlineObjectSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectMultiCustom";
-
-// import { useDispatch } from "react-redux";
-// import type { AppDispatchRedux } from "store/store";
-
-const Options = ["Diobar", "Barbara", "Baez", "Diego", "Jesus", "Ortega"];
-interface IPerson {
-    id: string;
-    name: string;
-}
-
-const persons: IPerson[] = [
-    { id: "1", name: "Diobar" },
-    { id: "2", name: "Barbara" },
-    { id: "3", name: "Baez" },
-    { id: "4", name: "Diego" },
-    { id: "5", name: "Jesus" },
-    { id: "6", name: "Ortega" },
-];
 
 interface IStep1 {
     state: ClientState;
@@ -49,18 +27,18 @@ const Step1 = ({
 
     // const dispatchRedux = useDispatch<AppDispatchRedux>();
 
-    const [company_name, setCompanyName] = useState<string>(state.data?.company_name ?? "");
-    const [cfdi, setCfdi] = useState<string>(state.data?.cfdi ?? "");
-    const [phone, setPhone] = useState<string>(state.data?.phone ?? "");
-    const [email, setEmail] = useState<string>(state.data?.email ?? "");
-    const [taxId, setTaxId] = useState<string>(state.data?.tax_id ?? "");
-    const [names, setNames] = useState<string[]>([]);
-    const [name, setName] = useState<string | null>(null);
-    const [personSelected, setPersonSelected] = useState<IPerson | null>(null);
-    const [personsSelected, setPersonsSelected] = useState<IPerson[]>([]);
+    const [company_name, setCompanyName] = useState<string | null>(state.data?.company_name ?? null);
+    const [cfdi, setCfdi] = useState<string | null>(state.data?.cfdi ?? null);
+    const [phone, setPhone] = useState<string | null>(state.data?.phone ?? null);
+    const [email, setEmail] = useState<string | null>(state.data?.email ?? null);
+    const [taxId, setTaxId] = useState<string | null>(state.data?.tax_id ?? null);
 
     const handleOnClickNext = useCallback(() => {
-        if (company_name === "" || phone === "" || email === "" || cfdi === "" || taxId === "") {
+        if (company_name === "" || company_name === null
+            || phone === "" || phone === null
+            || email === "" || email === null
+            || cfdi === "" || cfdi === null
+            || taxId === "" || taxId === null) {
             ToastMantine.feedBackForm({
                 message: "Debe completar todos los campos",
             });
@@ -101,40 +79,6 @@ const Step1 = ({
                     onChange={setCfdi}
                     label="CURP"
                     withValidation
-                />
-                <UnderlineStandardSelectMultiCustomMemo
-                    options={Options}
-                    value={names}
-                    onChange={setNames}
-                    withValidation
-                    label="Nombres"
-                    maxHeight="150px"
-                />
-                <UnderlineStandardSelectCustomMemo
-                    options={Options}
-                    value={name}
-                    onChange={setName}
-                    withValidation
-                    label="Nombre"
-                    maxHeight="150px"
-                />
-                <UnderlineObjectSelectCustomMemo
-                    options={persons}
-                    value={personSelected}
-                    onChange={setPersonSelected}
-                    label="Persona"
-                    labelKey="name"
-                    withValidation
-                    maxHeight="150px"
-                />
-                <UnderlineObjectSelectMultiCustomMemo
-                    options={persons}
-                    value={personsSelected}
-                    onChange={setPersonsSelected}
-                    label="Personas"
-                    labelKey="name"
-                    withValidation
-                    maxHeight="150px"
                 />
                 <span className={`nunito-bold ${StyleModule.subTitle}`}>Contacto principal</span>
                 <div className={StyleModule.blockContact}>

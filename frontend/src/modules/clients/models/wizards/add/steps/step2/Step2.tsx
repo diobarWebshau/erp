@@ -7,7 +7,6 @@ import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-are
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
 import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
 import SelectProductsModal from "./../../../../../../../comp/features/modal-product2/SelectProductsModal"
-import StandardSelectCustomMemo from "./../../../../../../../comp/features/select/StandardSelectCustom";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
@@ -30,6 +29,7 @@ import {
 } from "./../../../../../context/clientActions"
 import StyleModule from "./Step2.module.css";
 import { useDispatch } from "react-redux";
+import UnderlineStandardSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -53,14 +53,14 @@ const Step2 = ({
 
     // * *********** Estados logicos locales ************ 
 
-    const [countryName, setCountryName] = useState<string>(state?.data?.country ?? "México");
-    const [stateName, setStateName] = useState<string>(state?.data?.state ?? "Baja California");
-    const [cityName, setCityName] = useState<string>(state.data?.city ?? "Mexicali");
+    const [countryName, setCountryName] = useState<string | null>(state?.data?.country ?? "México");
+    const [stateName, setStateName] = useState<string | null>(state?.data?.state ?? "Baja California");
+    const [cityName, setCityName] = useState<string | null>(state.data?.city ?? "Mexicali");
     const [zipCode, setZipCode] = useState<number | null>(state.data?.zip_code ?? null);
-    const [street, setStreet] = useState<string>(state.data?.street ?? "");
+    const [street, setStreet] = useState<string | null>(state.data?.street ?? null);
     const [streetNumber, setStreetNumber] = useState<number | null>(state.data?.street_number ?? null);
-    const [neighborhood, setNeighborhood] = useState<string>(state.data?.neighborhood ?? "");
-    const [paymentTerms, setPaymentTerms] = useState<string>(state.data?.payment_terms ?? "");
+    const [neighborhood, setNeighborhood] = useState<string | null>(state.data?.neighborhood ?? null);
+    const [paymentTerms, setPaymentTerms] = useState<string | null>(state.data?.payment_terms ?? null);
     // * *********** Estados gui locales ************ 
 
     const [isActiveAddressModal, setIsActiveAddressModal] = useState<boolean>(false);
@@ -329,9 +329,14 @@ const Step2 = ({
 
     const handleOnClickSaveContinue = useCallback(() => {
         if (
-            street === '' || streetNumber === null ||
-            neighborhood === '' || countryName === '' ||
-            stateName === '' || cityName === '' || zipCode === null) {
+            street === null || street === undefined || street === '' ||
+            streetNumber === null || streetNumber === undefined || streetNumber === null ||
+            neighborhood === '' || neighborhood === null || neighborhood === undefined ||
+            countryName === '' || countryName === null || countryName === undefined ||
+            stateName === '' || stateName === null || stateName === undefined ||
+            cityName === '' || cityName === null || cityName === undefined ||
+            zipCode === null || zipCode === undefined
+        ) {
             ToastMantine.feedBackForm({
                 message: "Debe completar todos los campos",
             });
@@ -362,7 +367,7 @@ const Step2 = ({
             state: stateName,
             city: cityName,
             zip_code: zipCode,
-            ...{ ...(paymentTerms !== "" ? { payment_terms: paymentTerms } : {}) }
+            ...{ ...(paymentTerms && paymentTerms !== "" ? { payment_terms: paymentTerms } : {}) }
         }));
 
         dispatch(next_step());
@@ -401,29 +406,29 @@ const Step2 = ({
                         />
                     </div>
                     <div className={StyleModule.fieldBlock}>
-                        <StandardSelectCustomMemo
+                        <UnderlineStandardSelectCustomMemo
+                            label="País"
                             options={csc.countryNames}
                             value={countryName}
                             onChange={setCountryName}
-                            placeholder="Selecciona un pais"
                             withValidation
                             disabled={csc.countryNames.length === 0}
                             maxHeight="200px"
                         />
-                        <StandardSelectCustomMemo
+                        <UnderlineStandardSelectCustomMemo
+                            label="Estado"
                             options={csc.stateNames}
                             value={stateName}
                             onChange={setStateName}
-                            placeholder="Selecciona un estado"
                             withValidation
                             disabled={csc.stateNames.length === 0}
                             maxHeight="200px"
                         />
-                        <StandardSelectCustomMemo
+                        <UnderlineStandardSelectCustomMemo
+                            label="Ciudad"
                             options={csc.cityNames}
                             value={cityName}
                             onChange={setCityName}
-                            placeholder="Selecciona una ciudad"
                             withValidation
                             disabled={csc.cityNames.length === 0}
                             maxHeight="200px"
@@ -465,7 +470,7 @@ const Step2 = ({
                 <div className={StyleModule.paymentTermsContainer}>
                     <span className="nunito-bold">{`Terminos de pago (Opcional)`}</span>
                     <StandarTextAreaCustom
-                        value={paymentTerms}
+                        value={paymentTerms ?? ""}
                         onChange={handleOnChangePaymentTerms}
                         placeholder="Terminos de pago"
                         maxLength={500}

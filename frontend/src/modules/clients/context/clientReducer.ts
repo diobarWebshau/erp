@@ -1,4 +1,4 @@
-import { produce, type Draft, current } from "immer";
+import { produce, type Draft } from "immer";
 import { clientActionsTypes } from "./clientTypes";
 import type { ClientAction, ClientState } from "./clientTypes";
 
@@ -31,7 +31,6 @@ const clientReducer = produce((
                 }
                 draft.data.addresses?.push(item);
             }
-            console.log(current(draft.data.addresses));
             break;
         }
         case clientActionsTypes.REMOVE_CLIENT_ADDRESSES: {
