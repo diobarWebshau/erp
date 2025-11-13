@@ -276,6 +276,20 @@ class LocationController {
                             }
                         ],
                     },
+                    {
+                        model: LocationLocationTypeModel,
+                        as: "location_location_type",
+                        required: false,
+                        attributes: LocationLocationTypeModel.getAllFields(),
+                        include: [
+                            {
+                                model: LocationTypeModel,
+                                as: "location_type",
+                                required: false,
+                                attributes: LocationTypeModel.getAllFields(),
+                            }
+                        ]
+                    }
                 ],
             });
             if (!response) {

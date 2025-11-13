@@ -5,6 +5,9 @@ GET http://localhost:3003/locations/locations HTTP/1.0
 GET http://localhost:3003/locations/locations/with-types HTTP/1.0
 
 ### GET
+GET http://localhost:3003/locations/locations/filter HTTP/1.0
+
+### GET
 GET http://localhost:3003/locations/locations/with-all-information/2 HTTP/1.0
 
 ### GET

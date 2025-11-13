@@ -7,13 +7,15 @@ import UnderlineLabelInputPhone from "../../../../../../../comp/primitives/input
 import UnderlineStandardSelectCustom from "./../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom"
 import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
 import type { LocationState, LocationAction } from "../../../../context/locationTypes";
-import { next_step } from "../../../../context/locationActions";
+import { next_step, update_location } from "../../../../context/locationActions";
 import { useMemo, useState, type Dispatch } from "react";
 import { Bookmark } from "lucide-react";
 import StyleModule from "./Step1.module.css";
 import useLocationTypes from "../../../../../../../modelos/location_types/hooks/useLocationTypes";
 import UnderlineObjectSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectMultiCustom";
 import type { ILocationType } from "interfaces/locationTypes";
+import ToastMantine from "comp/external/mantine/toast/base/ToastMantine";
+import type { IPartialLocation } from "interfaces/locations";
 
 interface IStep1Props {
     state: LocationState,
@@ -44,7 +46,6 @@ const Step1 = ({
     const [streetNumber, setStreetNumber] = useState<number | null>(state.data?.street_number ?? null);
     const [locationType, setLocationType] = useState<ILocationType[]>(state.data?.location_location_type?.map((item) => item.location_type) ?? []);
 
-
     // *************** Hooks *************** */
 
     const csc = useCountryStateCitySeparated({
@@ -57,7 +58,47 @@ const Step1 = ({
 
     // *************** Functions *************** */
 
-    const handleOnClickNext = useMemo(() => () => dispatch(next_step()), [dispatch]);
+    const handleOnClickNext = useMemo(() => () => {
+        if (
+            !name || name === "" ||
+            !customId || customId === "" ||
+            !locationManager || locationManager === "" ||
+            !countryName || countryName === "" ||
+            !stateName || stateName === "" ||
+            !cityName || cityName === "" ||
+            !zipCode || zipCode > 0 ||
+            !phone || phone === "" ||
+            !neighborhood || neighborhood === "" ||
+            !street || street === "" ||
+            !streetNumber || streetNumber > 0
+        ) {
+            ToastMantine.feedBackForm({
+                message: "Debes completar todos los campos",
+            });
+            return;
+        }
+        if (locationType.length === 0) {
+            ToastMantine.feedBackForm({
+                message: "Debes seleccionar al menos un tipo de ubicación",
+            });
+            return;
+        }
+        const updateLocation: IPartialLocation = {
+            name,
+            custom_id: customId,
+            location_manager: locationManager,
+            country: countryName,
+            state: stateName,
+            city: cityName,
+            zip_code: zipCode,
+            phone,
+            neighborhood,
+            street,
+            street_number: streetNumber,
+        }
+        dispatch(update_location(updateLocation));
+        dispatch(next_step());
+    }, [dispatch]);
 
     return (
         <div className={StyleModule.containerStep}>
@@ -130,15 +171,7 @@ const Step1 = ({
                             label="Código postal"
                             withValidation
                         />
-                        <UnderlineObjectSelectMultiCustomMemo
-                            value={locationType}
-                            onChange={setLocationType}
-                            label="Tipo de ubicación"
-                            options={locationTypes}
-                            withValidation
-                            maxHeight="150px"
-                            labelKey="name"
-                        />
+
                     </div>
                 </div>
                 <div className={StyleModule.thirdBlock}>
@@ -153,6 +186,15 @@ const Step1 = ({
                         onChange={setLocationManager}
                         label="Responsable"
                         withValidation
+                    />
+                    <UnderlineObjectSelectMultiCustomMemo
+                        value={locationType}
+                        onChange={setLocationType}
+                        label="Tipo de ubicación"
+                        options={locationTypes}
+                        withValidation
+                        maxHeight="150px"
+                        labelKey="name"
                     />
                 </div>
             </div>

@@ -8,16 +8,11 @@ class LocationLocationTypeModel extends Model {
     };
     static getAllFields() {
         return [
-            "id", "location_type_id", "location_id"
+            "location_type_id", "location_id"
         ];
     }
 }
 LocationLocationTypeModel.init({
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
     location_type_id: {
         type: DataTypes.INTEGER,
         references: {

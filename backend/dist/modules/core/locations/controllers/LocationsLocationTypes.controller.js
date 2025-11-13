@@ -1,5 +1,4 @@
 import { LocationModel, LocationLocationTypeModel, LocationTypeModel } from "../../associations.js";
-import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import { Op } from "sequelize";
 class LocationsLocationTypesController {
     static getAll = async (req, res, next) => {
@@ -23,32 +22,13 @@ class LocationsLocationTypesController {
             }
         }
     };
-    static getById = async (req, res, next) => {
-        const { id } = req.params;
-        try {
-            const response = await LocationLocationTypeModel.findOne({ where: { id: id } });
-            if (!response) {
-                res.status(404).json({
-                    validation: "No types assigment have been assigned to location"
-                });
-                return;
-            }
-            const relationship = response.toJSON();
-            res.status(200).json(relationship);
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                next(error);
-            }
-            else {
-                console.error(`An unexpected error ocurred ${error}`);
-            }
-        }
-    };
     static getTypesByLocationId = async (req, res, next) => {
-        const { id } = req.params;
+        const { location_id } = req.query;
         try {
-            const response = await LocationLocationTypeModel.findAll({ where: { location_id: id } });
+            const response = await LocationLocationTypeModel.findAll({
+                where: { location_id: Number(location_id) },
+                attributes: LocationLocationTypeModel.getAllFields()
+            });
             if (!response) {
                 res.status(404).json([]);
                 return;
@@ -121,96 +101,14 @@ class LocationsLocationTypesController {
             }
         }
     };
-    static update = async (req, res, next) => {
-        const { id } = req.params;
-        const body = req.body;
-        try {
-            const validateRelationship = await LocationLocationTypeModel.findByPk(id);
-            if (!validateRelationship) {
-                res.status(200).json({
-                    validation: "The type assigment to the location does not exist"
-                });
-                return;
-            }
-            const relationship = validateRelationship.toJSON();
-            const editableFields = LocationLocationTypeModel.getEditableFields();
-            const update_values = collectorUpdateFields(editableFields, body);
-            if (Object.keys(update_values).length === 0) {
-                res.status(400).json({
-                    validation: "No validated properties were found for updating" +
-                        "the type assignment to the location"
-                });
-                return;
-            }
-            if (update_values?.location_id || update_values?.location_type_id) {
-                const [location, locationType] = await Promise.all([
-                    update_values.location_id ?
-                        LocationModel.findByPk(update_values?.location_id) : null,
-                    update_values.location_type_id ?
-                        LocationTypeModel.findByPk(update_values?.location_type_id) : null
-                ]);
-                if (update_values?.location_id && !location) {
-                    res.status(404).json({
-                        validation: "The assigned location does not exist"
-                    });
-                    return;
-                }
-                if (update_values?.location_type_id && !locationType) {
-                    res.status(404).json({
-                        validation: "The assigned location type does not exist"
-                    });
-                    return;
-                }
-            }
-            const validateDuplicate = await LocationLocationTypeModel.findOne({
-                where: {
-                    [Op.and]: [
-                        {
-                            location_id: update_values.location_id
-                                || relationship.location_id
-                        },
-                        {
-                            location_type_id: update_values.location_type_id
-                                || relationship.location_type_id
-                        },
-                        { id: { [Op.ne]: id } }
-                    ]
-                }
-            });
-            if (validateDuplicate) {
-                res.status(409).json({
-                    validation: "The assigned type to location already exists"
-                });
-                return;
-            }
-            const response = await LocationLocationTypeModel.update(update_values, {
-                where: { id: id },
-                individualHooks: true
-            });
-            if (!(response[0] > 0)) {
-                res.status(200).json({
-                    validation: "No changes were made to the type assignment to the location"
-                });
-                return;
-            }
-            res.status(200).json({
-                message: "Type assignment to location updated successfully"
-            });
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                next(error);
-            }
-            else {
-                console.error(`An unexpected error ocurred ${error}`);
-            }
-        }
-    };
     static deleteById = async (req, res, next) => {
-        const { id } = req.params;
+        const { location_id, location_type_id } = req.query;
         try {
             const response = await LocationLocationTypeModel.destroy({
-                where: { id: id },
+                where: {
+                    location_id: Number(location_id),
+                    location_type_id: Number(location_type_id)
+                },
                 individualHooks: true
             });
             if (!(response > 0)) {

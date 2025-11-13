@@ -3,7 +3,7 @@ import { setError, clearError } from "./../../../store/slicer/errorSlicer";
 import type { AppDispatchRedux } from "./../../../store/store";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
-const relative_path = "location_types/location_types";
+const relative_path = "locations/location-types";
 const API_URL = new URL(relative_path, BASE_URL);
 
 
@@ -43,7 +43,7 @@ interface IFetchLocationTypesFromDB {
 const fetchLocationTypesFromDB = async ({ dispatch, signal }: IFetchLocationTypesFromDB): Promise<ILocationType[]> => {
     try {
         dispatch(clearError("locationTypes"));
-        const response = await fetch(API_URL, {
+        const response = await fetch(`${API_URL}`, {
             method: "GET",
             signal
         });
