@@ -47,7 +47,9 @@ const Step2 = ({
     const {
         locations,
         loadingLocations,
-    } = useAllLocations();
+    } = useAllLocations({
+        like: ""
+    });
 
     const handleOnClickButtonAddProduct = (selectedItems: IItem[]) => {
         const items: IPartialInventoryDetails[] = selectedItems.map(item => {
@@ -63,8 +65,8 @@ const Step2 = ({
         setIsActiveSelectProductModal(false);
     }
 
-    const fetchItemsLike = async (query: string,): Promise<IItem[]> => {
-        if (!query || query.trim().length === 0) return [];
+    const fetchItemsLike = async (query: string | number): Promise<IItem[]> => {
+        if (!query || typeof query !== "string") return [];
 
         const encodedQuery = encodeURIComponent(query);
 
@@ -154,7 +156,7 @@ const Step2 = ({
                 }
                 return (
                     <NumericInputCustom
-                        value={value}
+                        value={value ?? null}
                         onChange={handleOnChangeQty}
                         min={1}
                         onlyCommitOnBlur={true}

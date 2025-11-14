@@ -4,9 +4,11 @@ import { Router } from "express";
 const createLocationsLocationTypesRouter = () => {
     const locationsLocationTypesRouter = Router();
     locationsLocationTypesRouter.get("/", LocationsLocationTypesController.getAll);
-    locationsLocationTypesRouter.get("/location", LocationsLocationTypesController.getTypesByLocationId);
+    locationsLocationTypesRouter.get("/id/:id", LocationsLocationTypesController.getById);
+    locationsLocationTypesRouter.get("/location/:id", LocationsLocationTypesController.getTypesByLocationId);
     locationsLocationTypesRouter.post("/", validateLocationsLocationTypeMiddleware, LocationsLocationTypesController.create);
-    locationsLocationTypesRouter.delete("/", LocationsLocationTypesController.deleteById);
+    locationsLocationTypesRouter.patch("/:id", validateLocationsLocationTypeMiddleware, LocationsLocationTypesController.update);
+    locationsLocationTypesRouter.delete("/:id", LocationsLocationTypesController.deleteById);
     return locationsLocationTypesRouter;
 };
 export default createLocationsLocationTypesRouter;

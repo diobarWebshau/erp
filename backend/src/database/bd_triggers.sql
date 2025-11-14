@@ -1164,3 +1164,60 @@ DELIMITER ;
 /************************************************************
 *						clients								*
 ************************************************************/
+
+
+/************************************************************
+*						Products							*
+************************************************************/
+
+
+
+DROP TRIGGER IF EXISTS tgr_create_product;
+DELIMITER //
+CREATE TRIGGER tgr_create_product
+AFTER INSERT ON products
+FOR EACH ROW
+BEGIN
+	INSERT INTO items(item_type, item_id) 
+	VALUES('product', NEW.id);
+END //
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tgr_delete_product;
+DELIMITER //
+CREATE TRIGGER tgr_delete_product
+BEFORE DELETE ON products
+FOR EACH ROW
+BEGIN
+	DELETE FROM items
+	WHERE item_type = 'product'
+	AND item_id = OLD.id;
+END //
+DELIMITER ;
+
+/************************************************************
+*						 Inputs  							*
+************************************************************/
+
+DROP TRIGGER IF EXISTS tgr_create_input;
+DELIMITER //
+CREATE TRIGGER tgr_create_input
+AFTER INSERT ON inputs
+FOR EACH ROW
+BEGIN
+	INSERT INTO items(item_type, item_id) 
+	VALUES('input', NEW.id);
+END //
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tgr_delete_input;
+DELIMITER //
+CREATE TRIGGER tgr_delete_input
+BEFORE DELETE ON inputs
+FOR EACH ROW
+BEGIN
+	DELETE FROM items
+	WHERE item_type = 'input'
+	AND item_id = OLD.id;
+END //
+DELIMITER ;

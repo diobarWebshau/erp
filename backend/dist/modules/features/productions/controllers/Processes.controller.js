@@ -1,23 +1,25 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import { ProcessModel } from "../associations.js";
-import { Op } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
+import sequelize from "../../../../mysql/configSequelize.js";
 class ProcessesController {
     static getAll = async (req, res, next) => {
         try {
-            const response = await ProcessModel.findAll();
-            if (!(response.length > 0)) {
-                res.status(200).json({ validation: "Processes no found" });
+            const response = await sequelize.query("SELECT func_get_items()", { type: QueryTypes.SELECT });
+            if (response.length === 0) {
+                res.status(200).json({ validation: "Processes not found" });
                 return;
             }
-            const processes = response.map(p => p.toJSON());
-            res.status(200).json(processes);
+            const raw = response[0];
+            const items = typeof raw === "string" ? JSON.parse(raw) : raw;
+            res.status(200).json(items);
         }
         catch (error) {
             if (error instanceof Error) {
                 next(error);
             }
             else {
-                console.error(`An unexpected error ocurred ${error}`);
+                console.error(`An unexpected error occurred ${error}`);
             }
         }
     };

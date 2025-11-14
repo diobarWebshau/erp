@@ -171,7 +171,7 @@ const SelectTrigger = ({
         const classNameLabel = clsx(
             "nunito-regular",
             styles.label,
-            (focused && selectedLabel.length > 0) && styles.floating,
+            (focused && selectedLabel.length > 0 || selectedLabel.length > 0) && styles.floating,
         );
 
         return [classNameTri, classNameLabelValid, classNameLabel];
@@ -234,19 +234,21 @@ const FloatingComponent = <T,>({
                         e.stopPropagation();
                         e.preventDefault();
                         if (isSelected) {
-                            const newValue = value.filter((item) => item !== option);
+                            const newValue = value.filter(
+                                (item) => String(item[labelKey]) !== String(option[labelKey])
+                            );
                             onChange(newValue);
                         } else {
                             const newValue = [...value, option];
                             onChange(newValue);
                         }
-                    }, [value, isSelected, option, toggleOpen]);
+                    }, [value, isSelected, option, labelKey, onChange]);
 
                     const handleOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
                             if (isSelected) {
-                                const newValue = value.filter((item) => item !== option);
+                                const newValue = value.filter((item) => String(item[labelKey]) !== String(option[labelKey]));
                                 onChange(newValue);
                             } else {
                                 const newValue = [...value, option];

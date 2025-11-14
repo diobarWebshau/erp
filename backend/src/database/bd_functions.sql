@@ -2523,3 +2523,363 @@ END //
 DELIMITER ;
 
 
+DROP FUNCTION IF EXISTS func_get_inventory_movements_commited_pop;
+DELIMITER //
+CREATE FUNCTION func_get_inventory_movements_commited_pop(
+	in_pop_id INT
+)
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA  
+BEGIN 
+	DECLARE v_json JSON DEFAULT JSON_OBJECT();
+    
+    SELECT
+		JSON_OBJECT(
+			'id', im.id,
+            'location_id', im.location_id,
+            'location_name', im.location_name,
+            'item_name', im.item_name,
+            'item_id', im.item_id,
+            'item_type', im.item_type,
+            'movement_type', im.movement_type,
+            'reference_id', im.reference_id,
+            'reference_type', im.reference_type,
+            'production_id', im.production_id,
+            'description', im.description,
+            'is_locked', im.is_locked,
+            'qty', (
+                SELECT IFNULL(SUM(im2.qty), 0)
+                FROM inventory_movements AS im2
+                WHERE im2.reference_id = im.reference_id
+                  AND im2.reference_type = im.reference_type
+                  AND im2.movement_type = im.movement_type
+            ),
+            'location', (
+                SELECT JSON_OBJECT(
+                    -- info
+                    'id', l.id,
+                    'name', l.name,
+                    'description', l.description,
+
+                    -- address
+                    'street', l.street,
+                    'street_number', l.street_number,
+                    'neighborhood', l.neighborhood,
+                    'zip_code', l.zip_code,
+                    'city', l.city,
+                    'state', l.state,
+                    'country', l.country,
+
+                    -- contact
+                    'phone', l.phone,
+                    
+                    -- state
+                    'is_active', l.is_active,
+                    'created_at', l.created_at,
+                    'updated_at', l.updated_at,
+                    /* --- agregado: objeto inventory --- */
+                    'inventory',
+                    (
+                      SELECT
+                        COALESCE(
+                          JSON_OBJECT(
+                            'location_id',   l2.id,
+                            'location_name', l2.name,
+                            'item_type',     idt.item_type,
+                            'item_id',       idt.item_id,
+                            'inventory_id',  idt.inventory_id,
+                            'item_name',
+                              CASE
+                                WHEN idt.item_type = 'product' THEN p.name
+                                WHEN idt.item_type = 'input'   THEN inp.name
+                                ELSE NULL
+                              END,
+                            'stock',                  IFNULL(idt.stock, 0),
+                            'minimum_stock',          IFNULL(idt.minimum_stock, 0),
+                            'maximum_stock',          IFNULL(idt.maximum_stock, 0),
+                            'committed_qty',          IFNULL(idt.committed, 0),
+                            'pending_production_qty', IFNULL(iip.qty, 0),
+                            'available',              IFNULL(IFNULL(idt.stock,0) - IFNULL(idt.committed,0), 0)
+                            -- ,'produced_qty',       IFNULL(ipr.produced, 0)
+                          ),
+                          JSON_OBJECT()
+                        )
+                      FROM locations AS l2
+                      /* --- inventory_data (idt): stock + committed bloqueado --- */
+                      LEFT JOIN (
+                        SELECT
+                          ili.item_type,
+                          ili.item_id,
+                          ili.location_id,
+                          inv.stock AS stock,
+                          inv.minimum_stock AS minimum_stock,
+                          inv.maximum_stock AS maximum_stock,
+                          inv.id    AS inventory_id,
+                          IFNULL(SUM(
+                            CASE
+                              WHEN im3.movement_type  = 'allocate'
+                               AND im3.reference_type NOT IN ('Transfer','Scrap')
+                               AND im3.is_locked      = 1
+                              THEN im3.qty ELSE 0
+                            END
+                          ),0) AS committed
+                        FROM inventories_locations_items AS ili
+                        JOIN inventories AS inv
+                          ON inv.id = ili.inventory_id
+                        LEFT JOIN inventory_movements AS im3
+                          ON im3.item_type   = ili.item_type
+                         AND im3.item_id     = ili.item_id
+                         AND im3.location_id = ili.location_id
+                        GROUP BY
+                          ili.item_type, ili.item_id, ili.location_id, inv.stock, inv.minimum_stock, inv.maximum_stock, inv.id
+                      ) AS idt
+                        ON idt.location_id = l2.id
+                       AND idt.item_type   = im.item_type
+                       AND idt.item_id     = im.item_id
+
+                      /* Nombres por tipo */
+                      LEFT JOIN products p
+                        ON idt.item_type = 'product' AND p.id   = idt.item_id
+                      LEFT JOIN inputs   inp
+                        ON idt.item_type = 'input'   AND inp.id = idt.item_id
+
+                      /* --- inventory_inProduction (iip): pendiente por producir --- */
+                      LEFT JOIN (
+                        SELECT item_type, item_id, location_id, SUM(qty) AS qty
+                        FROM (
+                          SELECT
+                            'product' AS item_type,
+                            po.product_id AS item_id,
+                            l3.id AS location_id,
+                            po.qty
+                          FROM production_orders po
+                          LEFT JOIN purchased_orders_products pop
+                            ON po.order_type = 'client'  AND pop.id  = po.order_id
+                          LEFT JOIN internal_product_production_orders ippo
+                            ON po.order_type = 'internal' AND ippo.id = po.order_id
+                          LEFT JOIN internal_production_orders_lines_products ipolp
+                            ON ippo.id = ipolp.internal_product_production_order_id
+                          LEFT JOIN purchased_orders_products_locations_production_lines poplpl
+                            ON poplpl.purchase_order_product_id = pop.id
+                          JOIN locations_production_lines lpl
+                            ON (
+                                  (po.order_type = 'client'  AND lpl.production_line_id = poplpl.production_line_id)
+                               OR (po.order_type = 'internal' AND lpl.production_line_id = ipolp.production_line_id)
+                            )
+                          LEFT JOIN locations l3 ON l3.id = lpl.location_id
+                          WHERE po.order_type IN ('client','internal')
+                            AND (po.product_id = pop.product_id OR po.product_id = ippo.product_id)
+                            AND po.status <> 'completed'
+                            AND po.product_id = im.item_id   -- correlación con el item del movimiento
+                        ) z
+                        GROUP BY item_type, item_id, location_id
+                      ) AS iip
+                        ON iip.location_id = l2.id
+                       AND iip.item_id     = idt.item_id
+                       AND iip.item_type   = idt.item_type
+
+                      WHERE l2.id = im.location_id
+                    )
+                )
+                FROM locations AS l
+                WHERE l.id = im.location_id
+            )
+        )
+	INTO v_json
+	FROM inventory_movements AS im
+	WHERE
+		im.reference_id = in_pop_id
+		AND im.reference_type = 'Order'
+		AND im.movement_type = 'allocate'
+	LIMIT 1;
+
+    RETURN v_json;
+END //
+DELIMITER ;
+
+
+DROP FUNCTION IF EXISTS func_get_items;
+DELIMITER //
+CREATE FUNCTION func_get_items()
+RETURNS JSON
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+  	RETURN (
+		SELECT 
+			COALESCE(
+				JSON_ARRAYAGG(
+					JSON_OBJECT(
+						'id', itm.id,
+						'item_type', itm.item_type,
+						'item_id', itm.item_id,
+						'item', (
+							CASE
+								WHEN itm.item_type = 'product' THEN (
+									SELECT 
+										COALESCE(
+											JSON_OBJECT(
+												'id', prod.id,
+												'name', prod.name,
+												'type', prod.type,
+												'description', prod.description,
+												'sku', prod.sku,
+												'active', prod.active,
+												'sale_price', prod.sale_price,
+												'photo', prod.photo,
+												'created_at', prod.created_at,
+												'updated_at', prod.updated_at,
+												'product_processes', (
+													SELECT 
+														COALESCE(
+															JSON_ARRAYAGG(
+																JSON_OBJECT(
+																	'id', pp.id,
+																	'product_id', pp.product_id,
+																	'process_id', pp.process_id,
+																	'sort_order', pp.sort_order,
+																	'process', COALESCE(
+																		JSON_OBJECT(
+																			'id', proc.id,
+																			'name', proc.name,
+																			'created_at', proc.created_at,
+																			'updated_at', proc.updated_at
+																		),
+																		JSON_OBJECT()
+																	)
+																)
+															),
+															JSON_ARRAY()
+														)
+													FROM products_processes AS pp
+													LEFT JOIN processes AS proc ON proc.id = pp.process_id
+													WHERE pp.product_id = itm.item_id
+												),
+												'product_discount_ranges', (
+													SELECT 
+														COALESCE(
+															JSON_ARRAYAGG(
+																JSON_OBJECT(
+																	'id', pdr.id,
+																	'product_id', pdr.product_id,
+																	'unit_price', pdr.unit_price,
+																	'min_qty', pdr.min_qty,
+																	'max_qty', pdr.max_qty,
+																	'created_at', pdr.created_at,
+																	'updated_at', pdr.updated_at
+																)
+															),
+															JSON_ARRAY()
+														)
+													FROM product_discounts_ranges AS pdr
+													WHERE pdr.product_id = itm.item_id
+												),
+												'products_inputs', (
+													SELECT 
+														COALESCE(
+															JSON_ARRAYAGG(
+																JSON_OBJECT(
+																	'id', pi.id,
+																	'product_id', pi.product_id,
+																	'input_id', pi.input_id,
+																	'equivalence', pi.equivalence,
+																	'inputs', (
+																		SELECT
+																			COALESCE(
+																				JSON_OBJECT(
+																					'id', inp_sub.id,
+																					'name', inp_sub.name,
+																					'input_types_id', inp_sub.input_types_id,
+																					'unit_cost', inp_sub.unit_cost,
+																					'supplier', inp_sub.supplier,
+																					'photo', inp_sub.photo,
+																					'status', inp_sub.status,
+																					'created_at', inp_sub.created_at,
+																					'updated_at', inp_sub.updated_at,
+
+																					'input_types', (
+																						SELECT 
+																							COALESCE(
+																								JSON_ARRAYAGG(
+																									JSON_OBJECT(
+																										'id', it.id,
+																										'name', it.name,
+																										'created_at', it.created_at,
+																										'updated_at', it.updated_at
+																									)
+																								),
+																								JSON_ARRAY()
+																							)
+																						FROM input_types AS it
+																						WHERE it.id = inp_sub.input_types_id
+																					)
+																				),
+																				JSON_OBJECT()
+																			)
+																		FROM inputs AS inp_sub
+																		WHERE inp_sub.id = pi.input_id
+																	)
+																)
+															),
+															JSON_ARRAY()
+														)
+													FROM products_inputs AS pi
+													LEFT JOIN inputs AS inp ON inp.id = pi.input_id
+													WHERE pi.product_id = itm.item_id
+												)
+											),
+											JSON_OBJECT()
+										)
+									FROM products AS prod
+									WHERE prod.id = itm.item_id
+								)
+								WHEN itm.item_type = 'input' THEN (
+									SELECT 
+										COALESCE(
+											JSON_OBJECT(
+												'id', inp2.id,
+												'name', inp2.name,
+												'input_types_id', inp2.input_types_id,
+												'unit_cost', inp2.unit_cost,
+												'supplier', inp2.supplier,
+												'photo', inp2.photo,
+												'status', inp2.status,
+												'created_at', inp2.created_at,
+												'updated_at', inp2.updated_at,
+												'input_types', (
+													SELECT 
+														COALESCE(
+															JSON_ARRAYAGG(
+																JSON_OBJECT(
+																	'id', it2.id,
+																	'name', it2.name,
+																	'created_at', it2.created_at,
+																	'updated_at', it2.updated_at
+																)
+															),
+															JSON_ARRAY()
+														)
+													FROM input_types AS it2
+													WHERE it2.id = inp2.input_types_id
+												)
+											),
+											JSON_OBJECT()
+										)
+									FROM inputs AS inp2
+									WHERE inp2.id = itm.item_id
+								)
+								ELSE JSON_OBJECT()
+							END
+						)
+					)
+				),
+				JSON_ARRAY()
+			)
+		FROM items AS itm
+  	);
+END //
+DELIMITER ;
+
+
+SELECT func_get_items();

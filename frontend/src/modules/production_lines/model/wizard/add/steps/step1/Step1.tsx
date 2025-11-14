@@ -38,7 +38,12 @@ const Step3 = memo(({
         }));
     }, [dispatch]);
 
-    const { locations } = useLocations();
+    const { locations } = useLocations({
+        like: "",
+        conditionsExclude: {
+            is_active: false
+        }
+    });
 
     const handleOnClickNext = useCallback(() => {
         if (name === "" || customId === "" || state.data?.location_production_line?.location === undefined) {

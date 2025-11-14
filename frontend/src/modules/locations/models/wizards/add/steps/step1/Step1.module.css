@@ -22,7 +22,6 @@
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: auto;
-
 }
 
 /* *************** Container Content *************** */
@@ -56,6 +55,7 @@
 }
 
 .firstBlock>* {
+    /* distribucion flex */
     flex: 1;
 }
 
@@ -72,6 +72,7 @@
 }
 
 .secondBlock>* {
+    /* distribucion flex */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -80,6 +81,7 @@
 }
 
 .secondBlock>*>* {
+    /* distribucion flex respecto al padre */
     flex: 1;
 }
 
@@ -96,6 +98,7 @@
 }
 
 .thirdBlock>* {
+    /* distribucion flex respecto al padre */
     flex: 1;
 }
 

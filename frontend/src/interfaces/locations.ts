@@ -1,5 +1,5 @@
-import type { ILocationLocationType } from "./locationLocationType";
-import type { ILocationProductionLine } from "./locationsProductionLines";
+import type { IPartialLocationLocationType } from "./locationLocationType";
+import type { IPartialLocationProductionLine } from "./locationsProductionLines";
 import type { ILocationType } from "./locationTypes";
 
 interface IInventoryRecord {
@@ -39,13 +39,14 @@ interface ILocation {
 
   // state
   is_active: boolean,
+  production_capacity: number,
   created_at: string,
   updated_at: string,
 
   // relations
   types?: ILocationType[],
-  location_production_line?: ILocationProductionLine[]
-  location_location_type: ILocationLocationType[]
+  location_production_line?: IPartialLocationProductionLine[]
+  location_location_type: IPartialLocationLocationType[]
   inventory?: IInventoryRecord
 }
 

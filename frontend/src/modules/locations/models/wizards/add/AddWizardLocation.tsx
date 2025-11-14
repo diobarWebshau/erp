@@ -7,8 +7,8 @@ import { ChevronLeft, FileCheck, MapPinned, UserPen } from "lucide-react";
 import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";
-import StyleModule from "./AddWizardLocation,.module.css";
 import { useMemo, useState } from "react";
+import StyleModule from "./AddWizardLocation,.module.css";
 
 
 interface IAddWizardLocationProps {
@@ -38,7 +38,7 @@ const AddWizardLocaton = ({ onClose }: IAddWizardLocationProps) => {
         },
         {
             title: "Configuración",
-            content: <Step2 />,
+            content: <Step2 state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
             icon: <MapPinned />
         },
         {

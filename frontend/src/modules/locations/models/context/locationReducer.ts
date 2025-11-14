@@ -17,6 +17,32 @@ const locationReducer = produce((draft: Draft<LocationState>, action: LocationAc
             Object.assign(draft.data, action.payload);
             break;
         }
+        case locationActonsType.ADD_LOCATION_LOCATION_TYPE: {
+            draft.data.location_location_type?.push(action.payload);
+            break;
+        }
+        case locationActonsType.REMOVE_LOCATION_LOCATION_TYPE: {
+            if (!draft.data.location_location_type) return;
+            const idsToRemove = new Set<string | number>(action.payload);
+            draft.data.location_location_type = draft.data.location_location_type.filter(it => {
+                const id = it?.location_type_id;
+                return id == null ? true : !idsToRemove.has(id);
+            });
+            break;
+        }
+        case locationActonsType.ADD_LOCATION_PRODUCTION_LINE: {
+            draft.data.location_production_line?.push(...action.payload);
+            break;
+        }
+        case locationActonsType.REMOVE_LOCATION_PRODUCTION_LINE: {
+            if (!draft.data.location_production_line) return;
+            const idsToRemove = new Set<string | number>(action.payload);
+            draft.data.location_production_line = draft.data.location_production_line.filter(it => {
+                const id = it?.production_line_id;
+                return id == null ? true : !idsToRemove.has(id);
+            });
+            break;
+        }
         // draft
         case locationActonsType.SET_DRAFT_LOCATION: {
             Object.assign(draft.draft, action.payload);
@@ -24,6 +50,32 @@ const locationReducer = produce((draft: Draft<LocationState>, action: LocationAc
         }
         case locationActonsType.UPDATE_DRAFT_LOCATION: {
             Object.assign(draft.draft, action.payload);
+            break;
+        }
+        case locationActonsType.ADD_DRAFT_LOCATION_LOCATION_TYPE: {
+            draft.draft.location_location_type?.push(action.payload);
+            break;
+        }
+        case locationActonsType.REMOVE_DRAFT_LOCATION_LOCATION_TYPE: {
+            if (!draft.draft.location_location_type) return;
+            const idsToRemove = new Set<string | number>(action.payload);
+            draft.draft.location_location_type = draft.draft.location_location_type.filter(it => {
+                const id = it?.location_type_id;
+                return id == null ? true : !idsToRemove.has(id);
+            });
+            break;
+        }
+        case locationActonsType.ADD_DRAFT_LOCATION_PRODUCTION_LINE: {
+            draft.draft.location_production_line?.push(...action.payload);
+            break;
+        }
+        case locationActonsType.REMOVE_DRAFT_LOCATION_PRODUCTION_LINE: {
+            if (!draft.draft.location_production_line) return;
+            const idsToRemove = new Set<string | number>(action.payload);
+            draft.draft.location_production_line = draft.draft.location_production_line.filter(it => {
+                const id = it?.production_line_id;
+                return id == null ? true : !idsToRemove.has(id);
+            });
             break;
         }
         // steps
