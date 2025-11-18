@@ -69,6 +69,10 @@ import {
     ProductInputProcessAttributes,
     ProductInputProcessCreateAttributes,
 } from "./models/junctions/products_inputs_processes.model.js";
+import {
+    IItem,
+    IPartialItem
+} from "./models/base/items.model.js";
 export type {
     InputTypeAttributes,
     InputTypeCreateAttributes,
@@ -106,5 +110,7 @@ export type {
     ProductionLineQueueAttributes,
     ProductionLineQueueCreateAttributes,
     ProductInputProcessAttributes,
-    ProductInputProcessCreateAttributes
+    ProductInputProcessCreateAttributes,
+    IItem,
+    IPartialItem
 }

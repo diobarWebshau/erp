@@ -6,7 +6,7 @@ ClientAddressesModel, ClientModel,
 // PRODUCT MODULE
 ProductModel, ProductDiscountRangeModel, 
 // LOCATION MODULE
-LocationModel, LocationLocationTypeModel, LocationTypeModel } from "./core/associations.js";
+LocationModel, LocationLocationTypeModel, LocationTypeModel, } from "./core/associations.js";
 // MODULE SERVICES
 import { 
 // AUTHENTICATION MODULE
@@ -24,7 +24,7 @@ AppliedProductDiscountClientModel, AppliedProductDiscountRangeModel, ProductDisc
 // INTEGRATION MODULES
 import { 
 // PRODUCTION
-ProductionModel, ProductionOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ProductionLineProductModel, InternalProductProductionOrderModel, InternalProductionOrderLineProductModel, LocationsProductionLinesModel, ProductionLineModel, ProductProcessModel, ProductInputModel, InputTypeModel, ProcessModel, InputModel, InventoryMovementModel, ProductionLineQueueModel, ProductInputProcessModel, } from "./features/associations.js";
+ProductionModel, ProductionOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ProductionLineProductModel, InternalProductProductionOrderModel, InternalProductionOrderLineProductModel, LocationsProductionLinesModel, ProductionLineModel, ProductProcessModel, ProductInputModel, InputTypeModel, ProcessModel, InputModel, InventoryMovementModel, ProductionLineQueueModel, ProductInputProcessModel, ItemModel, } from "./features/associations.js";
 /*
     En Sequelize (y en cualquier ORM con asociaciones), la regla de oro es:
 
@@ -3518,4 +3518,4 @@ ClientModel, ClientAddressesModel, ProductDiscountRangeModel, ProductModel, Loca
 /* SERVICE'S MODULES */
 UserModel, PermissionModel, RoleModel, RolePermissionModel, InventoryLocationItemModel, InventoryModel, InventoryTransferModel, CarrierModel, ShippingOrderModel, PurchaseOrderProductModel, AppliedProductDiscountClientModel, AppliedProductDiscountRangeModel, ProductDiscountClientModel, PurchasedOrderModel, LogModel, TableModel, OperationModel, 
 /* INTEGRATION MODULES */
-ProductionModel, ProductionOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ProductionLineProductModel, InternalProductProductionOrderModel, InternalProductionOrderLineProductModel, LocationsProductionLinesModel, ProductionLineModel, ProductProcessModel, ProductInputModel, InputTypeModel, ProcessModel, InputModel, InventoryMovementModel, ScrapModel, ProductionLineQueueModel, ProductInputProcessModel };
+ProductionModel, ProductionOrderModel, PurchasedOrdersProductsLocationsProductionLinesModel, ShippingOrderPurchaseOrderProductModel, ProductionLineProductModel, InternalProductProductionOrderModel, InternalProductionOrderLineProductModel, LocationsProductionLinesModel, ProductionLineModel, ProductProcessModel, ProductInputModel, InputTypeModel, ProcessModel, InputModel, InventoryMovementModel, ScrapModel, ProductionLineQueueModel, ProductInputProcessModel, ItemModel };

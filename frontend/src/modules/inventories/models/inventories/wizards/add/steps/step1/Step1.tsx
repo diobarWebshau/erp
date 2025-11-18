@@ -6,7 +6,7 @@ import MainActionButtonCustom from "../../../../../../../../comp/primitives/butt
 import { useInventoriesState, useInventoriesDispatch } from "./../../../../context/InventoiresHooks";
 import { add_items, next_step, remove_items, } from "./../../../../context/InvenrtoriesActions";
 import MultiSelectSearchCheckCustom from "../../../../../../../../comp/primitives/select/multi-select/custom/MultiSelectSearchCheckCustom";
-import type { IItem, IPartialInventoryDetails } from "./../../../../../../../../interfaces/inventories";
+import type { IItemInventory, IPartialInventoryDetails } from "./../../../../../../../../interfaces/inventories";
 import { useState } from "react";
 
 interface IStep1 {
@@ -20,13 +20,13 @@ const Step1 = ({
     const dispatch = useInventoriesDispatch();
 
     const [selectedItem, setSelectedItem] =
-        useState<IItem[]>(state.data.map(item => item?.item as IItem) ?? []);
+        useState<IItemInventory[]>(state.data.map(item => item?.item as IItemInventory) ?? []);
     const [searchMulti, setSearchMulti] =
         useState<string>("");
     const [openMulti, setOpenMulti] =
         useState<boolean>(true);
 
-    const fetchItemsLike = async (query: string): Promise<IItem[]> => {
+    const fetchItemsLike = async (query: string): Promise<IItemInventory[]> => {
         if (!query || query.trim().length === 0) return [];
 
         const encodedQuery = encodeURIComponent(query);
@@ -43,7 +43,7 @@ const Step1 = ({
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            const items: IItem[] = await response.json();
+            const items: IItemInventory[] = await response.json();
             return items;
         } catch (error) {
             console.error("Error fetching items:", error);

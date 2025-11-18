@@ -1,0 +1,2 @@
+###  GET ALL
+GET http://localhost:3003/production/items HTTP/1.1

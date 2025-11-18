@@ -8,7 +8,7 @@ import { useInventoriesDispatch, useInventoriesState } from "../../../../context
 import { back_step, next_step, update_item, remove_items, add_items } from "../../../../context/InvenrtoriesActions";
 import GenericTable from "../../../../../../../../components/ui/table/tableContext/GenericTable";
 import type { ColumnDef, Table } from "@tanstack/react-table";
-import type { IItem, IPartialInventoryDetails } from "../../../../../../../../interfaces/inventories";
+import type { IItemInventory, IPartialInventoryDetails } from "../../../../../../../../interfaces/inventories";
 import type { ILocation } from "../../../../../../../../interfaces/locations";
 import ObjectSelectCustom from "../../../../../../../../comp/primitives/select/object-select/custom/ObjectSelectCustom";
 import NumericInputCustom from "../../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
@@ -51,7 +51,7 @@ const Step2 = ({
         like: ""
     });
 
-    const handleOnClickButtonAddProduct = (selectedItems: IItem[]) => {
+    const handleOnClickButtonAddProduct = (selectedItems: IItemInventory[]) => {
         const items: IPartialInventoryDetails[] = selectedItems.map(item => {
             return {
                 item_id: item.item_id,
@@ -65,13 +65,13 @@ const Step2 = ({
         setIsActiveSelectProductModal(false);
     }
 
-    const fetchItemsLike = async (query: string | number): Promise<IItem[]> => {
+    const fetchItemsLike = async (query: string | number): Promise<IItemInventory[]> => {
         if (!query || typeof query !== "string") return [];
 
         const encodedQuery = encodeURIComponent(query);
 
-        const stateItems: IItem[] = state.data.map(
-            item => item?.item as IItem
+        const stateItems: IItemInventory[] = state.data.map(
+            item => item?.item as IItemInventory 
         ) ?? [];
 
         try {
@@ -86,7 +86,7 @@ const Step2 = ({
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            const items: IItem[] = await response.json();
+            const items: IItemInventory[] = await response.json();
             return items;
         } catch (error) {
             console.error("Error fetching items:", error);

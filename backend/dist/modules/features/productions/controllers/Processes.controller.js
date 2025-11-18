@@ -23,6 +23,23 @@ class ProcessesController {
             }
         }
     };
+    // static getAll = async (req: Request, res: Response, next: NextFunction) => {
+    //     try {
+    //         const response = await ProcessModel.findAll();
+    //         if (!(response.length > 0)) {
+    //             res.status(200).json({ validation: "Processes no found" });
+    //             return;
+    //         }
+    //         const processes = response.map(p => p.toJSON());
+    //         res.status(200).json(processes);
+    //     } catch (error: unknown) {
+    //         if (error instanceof Error) {
+    //             next(error);
+    //         } else {
+    //             console.error(`An unexpected error ocurred ${error}`);
+    //         }
+    //     }
+    // }
     static getById = async (req, res, next) => {
         const { id } = req.params;
         try {

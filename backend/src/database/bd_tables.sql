@@ -96,6 +96,7 @@ CREATE TABLE clients_addresses(
 -- PRODUCTS
 CREATE TABLE products(
     id INT AUTO_INCREMENT,
+    custom_id VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL UNIQUE,
     type VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
@@ -361,8 +362,7 @@ CREATE TABLE applied_product_discounts_client (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
     FOREIGN KEY (purchase_order_product_id) REFERENCES purchased_orders_products(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_discount_client_id) REFERENCES product_discounts_clients(id) ON DELETE
-    SET NULL
+    FOREIGN KEY (product_discount_client_id) REFERENCES product_discounts_clients(id) ON DELETE SET NULL
 );
 CREATE TABLE applied_product_discounts_ranges (
     id INT AUTO_INCREMENT,
@@ -390,6 +390,7 @@ CREATE TABLE input_types(
 );
 CREATE TABLE inputs(
     id INT AUTO_INCREMENT,
+    custom_id VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL UNIQUE,
     input_types_id INT,
     unit_cost DECIMAL(14, 4),

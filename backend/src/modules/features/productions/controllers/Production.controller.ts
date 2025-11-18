@@ -1,25 +1,8 @@
-import collectorUpdateFields
-    from "../../../../scripts/collectorUpdateField.js";
-import {
-    Request,
-    Response,
-    NextFunction
-} from "express";
-import {
-    Op
-} from "sequelize";
-import {
-    ProductionModel, ProductModel,
-    ProductionOrderModel,
-    PurchaseOrderProductModel
-} from "../../../associations.js";
-import {
-    ProductionAttributes,
-    ProductAttributes,
-    ProductionOrderAttributes,
-    PurchaseOrderProductAttributes
-} from "./../../../types.js";
-
+import { ProductionAttributes, ProductAttributes, ProductionOrderAttributes, PurchaseOrderProductAttributes } from "./../../../types.js";
+import { ProductionModel, ProductModel, ProductionOrderModel, PurchaseOrderProductModel } from "../../../associations.js";
+import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
+import { Request, Response, NextFunction } from "express";
+import { Op } from "sequelize";
 
 interface ProductionsInProductionOrder
     extends ProductionOrderAttributes {

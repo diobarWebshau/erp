@@ -9,7 +9,7 @@ import {
     ProductModel, ProductDiscountRangeModel,
     // LOCATION MODULE
     LocationModel, LocationLocationTypeModel,
-    LocationTypeModel
+    LocationTypeModel,
 
 } from "./core/associations.js";
 
@@ -57,6 +57,7 @@ import {
     InventoryMovementModel,
     ProductionLineQueueModel,
     ProductInputProcessModel,
+    ItemModel,  
 } from "./features/associations.js"
 
 /*
@@ -4727,5 +4728,6 @@ export {
     InventoryMovementModel,
     ScrapModel,
     ProductionLineQueueModel,
-    ProductInputProcessModel
+    ProductInputProcessModel,
+    ItemModel
 };

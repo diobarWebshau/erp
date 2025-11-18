@@ -10,7 +10,7 @@ interface IInventory {
     updated_at: string;
 }
 
-interface IItem {
+interface IItemInventory {
     id: string,
     item_id: number,
     item_name: string,
@@ -33,7 +33,7 @@ interface IInventoryDetails {
     maximum_stock: number,
     lead_time: number,
     location_name: string,
-    item?: IItem,
+    item?: IItemInventory,
     qty?: number,
     location?: ILocation | null
 }
@@ -79,7 +79,7 @@ export type {
     IPartialInventory,
     IInventoryDetails,
     IPartialInventoryDetails,
-    IItem
+    IItemInventory
 };
 
 export {

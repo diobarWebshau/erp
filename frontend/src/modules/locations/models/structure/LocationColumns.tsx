@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { ILocation } from "../../../../interfaces/locations";
-import type { ILocationLocationType } from "interfaces/locationLocationType";
+import type { IPartialLocationLocationType } from "interfaces/locationLocationType";
 import StyleModule from "./LocationColumns.module.css"
 import Tag from "../../../../comp/primitives/tag/Tag";
 
@@ -29,8 +29,8 @@ const columnsLocations: ColumnDef<ILocation>[] = [
         id: "locationTypes",
         header: "Tipos de ubicación",
         accessorFn: (row: ILocation) => {
-            const types: ILocationLocationType[] = row.location_location_type ?? [];
-            const value: string = types.map((type: ILocationLocationType) => {
+            const types: IPartialLocationLocationType[] = row.location_location_type ?? [];
+            const value: string = types.map((type: IPartialLocationLocationType) => {
                 if (type.location_type?.name === "Store") {
                     return "Almacén";
                 } else if (type.location_type?.name === "Production") {

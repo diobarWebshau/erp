@@ -12,7 +12,7 @@ const Loading =
 
 const ProductModel =
     lazy(() =>
-        import("../../models/products/ProductModel.tsx"));
+        import("../../models/products/ProductModel2.tsx"));
 
 const PrivateRoute =
     lazy(() =>

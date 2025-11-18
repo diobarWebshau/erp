@@ -23,7 +23,7 @@ import {
     lazy, Suspense
 } from "react";
 import ProductsModel
-    from "../../models/products/ProductModel.tsx";
+    from "../../models/products/ProductModel2.tsx";
 import ProductionLinesModel
     from "../../models/production-lines/ProductionLinesModel.tsx";
 import ClientsModel

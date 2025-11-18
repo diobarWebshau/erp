@@ -89,7 +89,11 @@ import {
     ProductProcessManager,
     ShippingOrderPurchaseOrderProductManager,
     ProductionLineQueueAttributes,
-    ProductionLineQueueCreateAttributes
+    ProductionLineQueueCreateAttributes,
+    ProductInputProcessAttributes,
+    ProductInputProcessCreateAttributes,
+    IPartialItem,
+    IItem
 } from "./features/types.js"
 
 export type {

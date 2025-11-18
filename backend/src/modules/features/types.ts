@@ -35,7 +35,9 @@ import {
     ProductionLineQueueAttributes,
     ProductionLineQueueCreateAttributes,
     ProductInputProcessAttributes,
-    ProductInputProcessCreateAttributes
+    ProductInputProcessCreateAttributes,
+    IPartialItem,
+    IItem
 } from "./productions/types.js"
 
 
@@ -76,5 +78,7 @@ export type {
     ProductionLineQueueAttributes,
     ProductionLineQueueCreateAttributes,
     ProductInputProcessAttributes,
-    ProductInputProcessCreateAttributes
+    ProductInputProcessCreateAttributes,
+    IPartialItem,
+    IItem
 }

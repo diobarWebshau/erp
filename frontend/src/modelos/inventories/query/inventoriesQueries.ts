@@ -1,5 +1,5 @@
 import type {
-    IInventory, IInventoryDetails, IItem, IPartialInventory
+    IInventory, IInventoryDetails, IItemInventory, IPartialInventory
 } from "../../../interfaces/inventories";
 import {
     setError,
@@ -48,7 +48,7 @@ const fetchInventoriesFromDB = async (
 
 const fetchItemsFromDB = async (
     dispatch: AppDispatchRedux
-): Promise<IItem[]> => {
+): Promise<IItemInventory[]> => {
     try {
         const response = await fetch(API_URL + "/items", {
             method: "GET",
@@ -73,7 +73,7 @@ const fetchItemsFromDB = async (
         dispatch(
             clearError("fetchItems")
         );
-        const data: IItem[] = await response.json();
+        const data: IItemInventory[] = await response.json();
         return data;
     } catch (error: unknown) {
         throw error;

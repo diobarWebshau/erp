@@ -123,6 +123,8 @@ const createApp = () => {
         .createProductionLineQueueRouter());
     app.use("/production/products-inputs-processes", Features.Production
         .createProductInputProcessRouter());
+    app.use("/production/items", Features.Production
+        .createItemsRouter());
     app.use(errorMiddleware);
     return app;
 };

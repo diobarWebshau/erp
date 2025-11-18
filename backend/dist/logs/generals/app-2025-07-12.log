@@ -1,3 +1,0 @@
-2025-07-12 08:22:18 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [12/Jul/2025:15:22:18 +0000] "GET /logistics/shipping-orders HTTP/1.1" 200 2986 "-" "vscode-restclient"
-2025-07-12 08:24:18 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [12/Jul/2025:15:24:18 +0000] "GET /logistics/shipping-orders HTTP/1.1" 200 138404 "-" "vscode-restclient"
-2025-07-12 08:25:16 [[32MINFO[39M]: ::ffff:127.0.0.1 - - [12/Jul/2025:15:25:16 +0000] "GET /logistics/shipping-orders HTTP/1.1" 200 138404 "-" "vscode-restclient"

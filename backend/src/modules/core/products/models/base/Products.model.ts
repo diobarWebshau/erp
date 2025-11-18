@@ -1,17 +1,10 @@
 import {
-    ProductProcessCreateAttributes,
-    ProductDiscountRangeCreateAttributes,
-    ProductInputAttributes,
-    ProductInputManager,
-    ProductDiscountRangeManager,
+    ProductProcessCreateAttributes, ProductDiscountRangeCreateAttributes,
+    ProductInputAttributes, ProductInputManager, ProductDiscountRangeManager,
     ProductProcessManager
 } from "../../../../types";
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import {
-    DataTypes,
-    Model, Optional
-} from "sequelize";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model, Optional } from "sequelize";
 
 interface ProductLocationAvailability {
     location_id: number;      // id de la ubicación
@@ -26,6 +19,7 @@ interface ProductLocationAvailability {
 
 interface ProductAttributes {
     id: number,
+    custom_id: string,
     name: string,
     description: string,
     type: string,
@@ -56,13 +50,13 @@ class ProductModel
         ProductCreateAttributes> {
     static getEditableFields(): string[] {
         return [
-            "name", "description", "type",
+            "custom_id", "name", "description", "type",
             "sku", "active", "sale_price", "photo"
         ];
     }
     static getAllFields(): string[] {
         return [
-            "id", "name", "description", "type",
+            "id", "custom_id", "name", "description", "type",
             "sku", "active", "sale_price", "photo",
             "created_at", "updated_at"
         ];
@@ -75,6 +69,11 @@ ProductModel.init(
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
+        },
+        custom_id: {
+            type: DataTypes.STRING(100),
+            unique: true,
+            allowNull: false,
         },
         name: {
             type: DataTypes.STRING(100),
