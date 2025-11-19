@@ -357,7 +357,7 @@ class ProductVProductionController extends ProductsControllers.ProductController
         }
     };
     static createCompleteProduct = async (req, res, next) => {
-        const { name, description, type, sku, active, sale_price, photo, product_processes, products_inputs, product_discount_ranges } = req.body;
+        const { name, description, type, sku, active, sale_price, custom_id, photo, product_processes, products_inputs, product_discount_ranges, barcode } = req.body;
         const transaction = await sequelize.transaction({
             isolationLevel: Transaction
                 .ISOLATION_LEVELS
@@ -387,8 +387,9 @@ class ProductVProductionController extends ProductsControllers.ProductController
                 return;
             }
             const responseProduct = await ProductModel.create({
-                name, description, type,
-                sku, active, sale_price, photo
+                name, description, type, custom_id,
+                sku, active, sale_price, photo,
+                barcode: barcode ?? null
             }, {
                 individualHooks: true,
                 transaction: transaction

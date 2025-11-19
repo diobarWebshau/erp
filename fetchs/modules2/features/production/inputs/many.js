@@ -17,20 +17,26 @@ const inputs = [
   {
     id: 1,
     name: "Insumo x",
+    description: "Descripción del Insumo x",
+    barcode: "123456789",
     input_types_id: 1,
     unit_cost: 50.5,
     supplier: "Proveedor 1",
     photo: "images.jpg", 
-    status: 1
+    status: 1,
+    custom_id: "Insx"
   },
   {
     id: 2,
     name: "Insumo z",
+    description: "Descripción del Insumo z",
+    barcode: "123456790",
     input_types_id: 1,
     unit_cost: 75.0,
     supplier: "Proveedor 2",
     photo: "images.jpg",
-    status: 1
+    status: 1,
+    custom_id: "InsZ"
   },
 ];
 
@@ -40,10 +46,13 @@ const sendDataWithImage = async (input) => {
     const formData = new FormData();
     formData.append('id', input.id);
     formData.append('name', input.name);
+    formData.append('description', input.description);
+    formData.append('barcode', input.barcode);
     formData.append('input_types_id', input.input_types_id);
     formData.append('unit_cost', input.unit_cost);
     formData.append('supplier', input.supplier);
     formData.append('status', input.status);
+    formData.append('custom_id', input.custom_id);
 
     const imagePath = path.join(imagesBasePath, input.photo); // Ruta completa del archivo
     // console.log('Ruta de la imagen:', imagePath);

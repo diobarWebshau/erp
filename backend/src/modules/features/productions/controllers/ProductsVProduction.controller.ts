@@ -393,9 +393,9 @@ class ProductVProductionController extends ProductsControllers.ProductController
 
             const {
                 name, description, type,
-                sku, active, sale_price,
+                sku, active, sale_price, custom_id,
                 photo, product_processes, products_inputs,
-                product_discount_ranges
+                product_discount_ranges, barcode
             } = req.body;
 
             const transaction = await sequelize.transaction({
@@ -438,8 +438,9 @@ class ProductVProductionController extends ProductsControllers.ProductController
                 const responseProduct =
                     await ProductModel.create(
                         {
-                            name, description, type,
-                            sku, active, sale_price, photo
+                            name, description, type, custom_id,
+                            sku, active, sale_price, photo,
+                            barcode: barcode ?? null
                         }, {
                         individualHooks: true,
                         transaction: transaction

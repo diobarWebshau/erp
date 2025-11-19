@@ -1,6 +1,6 @@
+import { ProductionModel, ProductModel, ProductionOrderModel, PurchaseOrderProductModel } from "../../../associations.js";
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import { Op } from "sequelize";
-import { ProductionModel, ProductModel, ProductionOrderModel, PurchaseOrderProductModel } from "../../../associations.js";
 class ProductionsController {
     static getAll = async (req, res, next) => {
         try {

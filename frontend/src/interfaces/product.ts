@@ -30,6 +30,7 @@ interface ProductLocationAvailability {
 
 interface IProduct {
     id: number,
+    custom_id: string,
     name: string,
     type: string,
     description: string,
@@ -53,6 +54,7 @@ type IPartialProduct = Partial<IProduct>;
 
 const defaultValueProduct: IProduct = {
     id: 0,
+    custom_id: '',
     name: '',
     type: '',
     description: '',
@@ -65,8 +67,8 @@ const defaultValueProduct: IProduct = {
 };
 
 const defaultValuePartialProduct: IPartialProduct = {
+    custom_id: '',
     name: '',
-    type: '',
     description: '',
     sku: '',
     active: true,

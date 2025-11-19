@@ -3,13 +3,13 @@ import sequelize from "../../../../../mysql/configSequelize.js";
 class InputModel extends Model {
     static getEditableFields = () => {
         return [
-            "name", "input_types_id", "unit_cost",
+            "custom_id", "description", "barcode", "name", "input_types_id", "unit_cost",
             "supplier", "photo", "status"
         ];
     };
     static getAllFields = () => {
         return [
-            "id", "name", "input_types_id", "unit_cost",
+            "id", "custom_id", "description", "barcode", "name", "input_types_id", "unit_cost",
             "supplier", "photo", "status", "created_at",
             "updated_at"
         ];
@@ -20,6 +20,18 @@ InputModel.init({
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
+    },
+    custom_id: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    barcode: {
+        type: DataTypes.INTEGER,
+        allowNull: true
     },
     name: {
         type: DataTypes.STRING(50),
@@ -51,12 +63,10 @@ InputModel.init({
     },
     created_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
         allowNull: false
     },
     updated_at: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
         allowNull: false
     }
 }, {

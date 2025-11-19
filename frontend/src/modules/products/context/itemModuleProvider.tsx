@@ -1,30 +1,30 @@
+import type { IPartialItem } from "interfaces/item";
 import type { ReactNode } from "react";
-import LocationProvider from "./LocationProvider";
-import type { IPartialLocation } from "../../../../interfaces/locations";
+import ItemProvider from "./itemProvider";
 
-interface ILocationModuleProvider {
+interface IItemModuleProvider {
     children: ReactNode;
-    data?: IPartialLocation;
+    data?: IPartialItem;
     currentStep: number;
     totalSteps: number;
 };
 
-const LocationModuleProvider = ({
+const ItemModuleProvider = ({
     children,
     data,
     currentStep,
     totalSteps,
-}: ILocationModuleProvider) => {
+}: IItemModuleProvider) => {
     return (
-        <LocationProvider
+        <ItemProvider
             id={data?.id ?? null}
             currentStep={currentStep}
             totalSteps={totalSteps}
             initialData={data}
         >
             {children}
-        </LocationProvider>
+        </ItemProvider>
     );
 };
 
-export default LocationModuleProvider;
+export default ItemModuleProvider;

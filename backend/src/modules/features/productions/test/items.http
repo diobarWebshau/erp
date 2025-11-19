@@ -1,2 +1,5 @@
 ###  GET ALL
 GET http://localhost:3003/production/items HTTP/1.1
+
+###  GET BY ID
+GET http://localhost:3003/production/items/1 HTTP/1.1

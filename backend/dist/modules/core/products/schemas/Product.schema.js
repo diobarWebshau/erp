@@ -4,6 +4,9 @@ const productSchema = zod.object({
     name: zod.string()
         .min(1, "Name is required")
         .max(100, "Name must be at most 100 characters"),
+    custom_id: zod.string()
+        .min(1, "Custom id is required")
+        .max(100, "Custom id must be at most 100 characters"),
     type: zod.string()
         .min(1, "Type is required")
         .max(100, "Type must be at most 100 characters"),

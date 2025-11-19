@@ -14,6 +14,8 @@ import {
 
 const inputSchema = zod.object({
     name: zod.string().min(1, "Name is required"),
+    custom_id: zod.string().min(1, "Custom id is required"),
+    description: zod.string().min(1, "Description is required").optional(),
     input_types_id: zod
         .string()
         .min(1, "El tipo de entrada debe ser mayor o igual a 1")

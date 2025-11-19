@@ -10,9 +10,6 @@ import { Op, QueryTypes, Transaction } from "sequelize";
 import { formatWithBase64 }
     from "../../../../scripts/formatWithBase64.js";
 import sequelize from "../../../../mysql/configSequelize.js";
-import {
-    InputCreateAttributes
-} from "../types.js";
 import toBoolean from "../../../../scripts/toBolean.js";
 
 class InputController {
@@ -123,8 +120,8 @@ class InputController {
         }
     }
     static create = async (req: Request, res: Response, next: NextFunction) => {
-        const { name, input_types_id, unit_cost,
-            supplier, photo, status } = req.body;
+        const { name, custom_id, input_types_id, unit_cost,
+            supplier, photo, status, description, barcode } = req.body;
         try {
             const validateName = await InputModel.findOne({
                 where: { name: name }
@@ -160,11 +157,14 @@ class InputController {
             }
             const response = await InputModel.create({
                 name,
+                description: description ?? null,
+                custom_id,
                 input_types_id,
                 unit_cost,
                 supplier,
                 photo,
-                status
+                status,
+                barcode: barcode ?? null
             });
             if (!response) {
                 await ImageHandler.removeImageIfExists(photo);
@@ -200,9 +200,11 @@ class InputController {
             });
 
         const {
-            name, input_types_id,
+            name, custom_id, input_types_id,
             unit_cost, supplier,
-            photo, status
+            photo, status,
+            description,
+            barcode
         } = req.body;
 
         try {
@@ -226,11 +228,14 @@ class InputController {
             const responseInput =
                 await InputModel.create({
                     name,
+                    description: description ?? null,
+                    custom_id,
                     input_types_id,
                     unit_cost,
                     supplier,
                     photo,
-                    status
+                    status,
+                    barcode: barcode ?? null
                 }, { transaction }
                 );
 

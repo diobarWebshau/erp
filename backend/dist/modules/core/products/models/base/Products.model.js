@@ -3,13 +3,13 @@ import { DataTypes, Model } from "sequelize";
 class ProductModel extends Model {
     static getEditableFields() {
         return [
-            "name", "description", "type",
+            "custom_id", "name", "description", "barcode", "type",
             "sku", "active", "sale_price", "photo"
         ];
     }
     static getAllFields() {
         return [
-            "id", "name", "description", "type",
+            "id", "custom_id", "name", "description", "barcode", "type",
             "sku", "active", "sale_price", "photo",
             "created_at", "updated_at"
         ];
@@ -21,6 +21,11 @@ ProductModel.init({
         autoIncrement: true,
         primaryKey: true
     },
+    custom_id: {
+        type: DataTypes.STRING(100),
+        unique: true,
+        allowNull: false,
+    },
     name: {
         type: DataTypes.STRING(100),
         unique: true,
@@ -29,6 +34,10 @@ ProductModel.init({
     description: {
         type: DataTypes.TEXT,
         allowNull: false,
+    },
+    barcode: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
     },
     type: {
         type: DataTypes.STRING(100),

@@ -10,4 +10,4 @@ export {
     LocationStateContext,
     LocationDispatchContext,
     LocationCommandsContext
-}
+};

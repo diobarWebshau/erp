@@ -154,7 +154,7 @@ const menuItems: MenuItem[] = [
             {
                 label: "Producto",
                 icon: <Package />,
-                path: "/productss"
+                path: "/products"
             },
             {
                 label: "Linea de producción",

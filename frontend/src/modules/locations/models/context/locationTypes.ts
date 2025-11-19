@@ -14,7 +14,6 @@ type LocationCommands = {
     reset: () => void;
 }
 
-
 const initialLocationState: LocationState = {
     total_steps: 2,
     current_step: 0,

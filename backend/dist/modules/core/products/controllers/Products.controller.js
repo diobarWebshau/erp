@@ -201,7 +201,7 @@ class ProductController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, description, type, sku, active, sale_price, photo } = req.body;
+        const { name, description, type, sku, active, sale_price, photo, custom_id, barcode } = req.body;
         try {
             const validateName = await ProductModel.findOne({ where: { name: name } });
             if (validateName) {
@@ -213,12 +213,14 @@ class ProductController {
             }
             const response = await ProductModel.create({
                 name,
+                custom_id,
                 description,
                 type,
                 sku,
                 active,
                 sale_price,
-                photo
+                photo,
+                barcode: barcode ?? null
             });
             if (!response) {
                 await ImageHandler.removeImageIfExists(photo);

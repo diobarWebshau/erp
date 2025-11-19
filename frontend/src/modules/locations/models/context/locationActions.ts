@@ -11,7 +11,6 @@ const set_location = (payload: IPartialLocation): LocationAction => ({
     payload
 });
 
-
 const update_location = (payload: IPartialLocation): LocationAction => ({
     type: locationActonsType.UPDATE_LOCATION,
     payload

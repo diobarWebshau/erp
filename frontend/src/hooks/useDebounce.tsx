@@ -1,5 +1,8 @@
 // hooks/useDebounce.ts
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { setError } from "../store/slicer/errorSlicer";
+import type { AppDispatchRedux } from "../store/store";
 
 /**
  * Hook personalizado para realizar peticiones con debounce y cancelación.
@@ -48,6 +51,9 @@ function useDebouncedFetch<T, F>({
     delay = 400,
     conditionalExclude
 }: IUseDebouncedFetch<T, F>) {
+
+    const dispatch = useDispatch<AppDispatchRedux>();
+
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -89,6 +95,8 @@ function useDebouncedFetch<T, F>({
             if (!(err instanceof DOMException && err.name === "AbortError")) {
                 console.error("useDebouncedFetch error:", err);
                 // si lo prefieres, podrías setear data = null aquí
+            } else {
+                dispatch(setError({ key: "useDebouncedFetch", message: { validation: err.message } }));
             }
         } finally {
             // limpia el controlador si corresponde
@@ -97,7 +105,7 @@ function useDebouncedFetch<T, F>({
             }
             setLoading(false);
         }
-    }, [queryKey, excludeKey]); // <- depende solo de las "claves estables"
+    }, [queryKey, excludeKey, dispatch]); // <- depende solo de las "claves estables"
 
     useEffect(() => {
         // comportamiento original con debounce, pero usando las refs

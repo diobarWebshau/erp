@@ -103,7 +103,7 @@ class InputController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, input_types_id, unit_cost, supplier, photo, status } = req.body;
+        const { name, custom_id, input_types_id, unit_cost, supplier, photo, status, description, barcode } = req.body;
         try {
             const validateName = await InputModel.findOne({
                 where: { name: name }
@@ -137,11 +137,14 @@ class InputController {
             }
             const response = await InputModel.create({
                 name,
+                description: description ?? null,
+                custom_id,
                 input_types_id,
                 unit_cost,
                 supplier,
                 photo,
-                status
+                status,
+                barcode: barcode ?? null
             });
             if (!response) {
                 await ImageHandler.removeImageIfExists(photo);
@@ -169,7 +172,7 @@ class InputController {
                 .ISOLATION_LEVELS
                 .REPEATABLE_READ
         });
-        const { name, input_types_id, unit_cost, supplier, photo, status } = req.body;
+        const { name, custom_id, input_types_id, unit_cost, supplier, photo, status, description, barcode } = req.body;
         try {
             const validateName = await InputModel.findOne({
                 where: { name: name }
@@ -185,11 +188,14 @@ class InputController {
             }
             const responseInput = await InputModel.create({
                 name,
+                description: description ?? null,
+                custom_id,
                 input_types_id,
                 unit_cost,
                 supplier,
                 photo,
-                status
+                status,
+                barcode: barcode ?? null
             }, { transaction });
             if (!responseInput) {
                 await ImageHandler

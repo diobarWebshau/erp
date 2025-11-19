@@ -181,5 +181,9 @@ export type {
     PurchaseOrderProductAttributes,
     PurchaseOrderProductCreateAttributes,
     ProductionLineQueueAttributes,
-    ProductionLineQueueCreateAttributes
+    ProductionLineQueueCreateAttributes,
+    ProductInputProcessAttributes,
+    ProductInputProcessCreateAttributes,
+    IItem,
+    IPartialItem
 };

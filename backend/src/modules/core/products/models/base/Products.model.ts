@@ -22,6 +22,7 @@ interface ProductAttributes {
     custom_id: string,
     name: string,
     description: string,
+    barcode: number,
     type: string,
     sku: string,
     sale_price: number,
@@ -50,13 +51,13 @@ class ProductModel
         ProductCreateAttributes> {
     static getEditableFields(): string[] {
         return [
-            "custom_id", "name", "description", "type",
+            "custom_id", "name", "description", "barcode", "type",
             "sku", "active", "sale_price", "photo"
         ];
     }
     static getAllFields(): string[] {
         return [
-            "id", "custom_id", "name", "description", "type",
+            "id", "custom_id", "name", "description", "barcode", "type",
             "sku", "active", "sale_price", "photo",
             "created_at", "updated_at"
         ];
@@ -83,6 +84,10 @@ ProductModel.init(
         description: {
             type: DataTypes.TEXT,
             allowNull: false,
+        },
+        barcode: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
         },
         type: {
             type: DataTypes.STRING(100),
