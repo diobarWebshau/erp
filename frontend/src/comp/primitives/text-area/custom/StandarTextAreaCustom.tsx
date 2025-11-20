@@ -1,4 +1,4 @@
-import type { TextareaHTMLAttributes } from "react";
+import { memo, type TextareaHTMLAttributes } from "react";
 import StandardTextArea from "../base/StandarTextArea"
 import StyleModule from "./StandarTextAreaCustom.module.css"
 
@@ -12,7 +12,7 @@ interface StandardTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaEleme
     disabled?: boolean;
 }
 
-const StandarTextAreaCustom = ({
+const StandarTextAreaCustom = memo(({
     classNameContainer,
     classNameTextArea,
     value,
@@ -34,7 +34,6 @@ const StandarTextAreaCustom = ({
             disabled={disabled}
         />
     )
-}
-
+});
 
 export default StandarTextAreaCustom

@@ -1,7 +1,8 @@
 
 import StyleModule from "./imageLoader.module.css"
 import TransparentButtonCustom from "../../button/custom-button/transparent/TransparentButtonCustom";
-import { Pencil, Upload, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
+// import { Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import type { ReactNode } from "react";
@@ -38,10 +39,10 @@ const ImageLoader = ({
     classNameImage,
     classNameActions,
     classNameRemoveButton,
-    classNameEditButton,
+    // classNameEditButton,
     classNameTriggerContainer,
     classNameRemoveButtonIcon,
-    classNameEditButtonIcon,
+    // classNameEditButtonIcon,
     triggerComponent,
     isEditable = true,
     maxFiles
@@ -114,10 +115,10 @@ const ImageLoader = ({
      * Entra en "modo reemplazo" para el índice indicado
      * y programa un click() sobre el input para abrir el diálogo de archivos.
      */
-    const handleReplace = (index: number) => () => {
-        setReplaceIndex(index);
-        inputFileRef.current?.click();
-    };
+    // const handleReplace = (index: number) => () => {
+    //     setReplaceIndex(index);
+    //     inputFileRef.current?.click();
+    // };
 
     const handleUpload = () => {
         setReplaceIndex(null);
@@ -171,7 +172,7 @@ const ImageLoader = ({
                                             >
                                                 <X className={clsx(StyleModule.removeButtonIcon, classNameRemoveButtonIcon)} />
                                             </button>
-                                            {typeLoader === "multiple" && (
+                                            {/* {typeLoader === "multiple" && (
                                                 <button
                                                     type="button"
                                                     className={clsx(StyleModule.editButton, classNameEditButton)}
@@ -179,7 +180,7 @@ const ImageLoader = ({
                                                 >
                                                     <Pencil className={clsx(StyleModule.editButtonIcon, classNameEditButtonIcon)} />
                                                 </button>
-                                            )}
+                                            )} */}
                                         </div>
                                         : null
                                 }

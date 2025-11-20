@@ -6,6 +6,7 @@ interface IInput {
     name: string,
     description: string,
     input_types_id: number | null,
+    presentation: string,
     unit_cost: number | null,
     supplier: string,
     photo: string | File,
@@ -13,6 +14,7 @@ interface IInput {
     created_at: string,
     updated_at: string,
     input_types?: IInputType,
+    barcode?: number
 }
 
 type IPartialInput = Partial<IInput>;
@@ -22,6 +24,7 @@ const defaultValueInput: IInput = {
     custom_id: '',
     name: '',
     description: '',
+    presentation: "",
     input_types_id: null,
     unit_cost: 0,
     supplier: '',
@@ -35,6 +38,7 @@ const defaultValuePartialInput: IPartialInput = {
     custom_id: '',
     name: '',
     description: '',
+    presentation: "",
     input_types_id: null,
     unit_cost: 0,
     supplier: '',

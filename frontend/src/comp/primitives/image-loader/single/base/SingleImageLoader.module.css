@@ -1,0 +1,87 @@
+/* * **************  Container ************** */
+
+.container {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* * **************  Image ************** */
+
+.imageCard {
+
+    /* dimension */
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+
+    /* posicionamiento */
+    position: relative;
+    overflow: hidden;
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.image {
+    /* dimension */
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+
+    /* distribucion de bloque */
+    display: block;
+
+    /* distribucion de la imagen */
+    object-fit: scale-down;
+    object-position: center;
+}
+
+.actions {
+    /* posicionamiento */
+    position: absolute;
+    top: 2px;
+    right: 2px;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+}
+
+.editButton,
+.removeButton {
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* * **************  Input File ************** */
+
+.inputFile {
+    /* su distribucion esta oculta */
+    display: none;
+}
+
+/* * **************  Trigger ************** */
+
+.triggerContainer {
+    /* positionamiento */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

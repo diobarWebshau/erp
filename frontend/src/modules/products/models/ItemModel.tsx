@@ -12,6 +12,8 @@ import { useCallback, useMemo, useState } from "react";
 import ItemsColumns from "./columns/columns";
 import type { IItem } from "interfaces/item";
 import StyleModule from "./IttemModel.module.css";
+import ItemModuleProvider from "./../context/itemModuleProvider"
+import AddWizardItem from "./wizard/add/AddWizardItem";
 
 const ItemModel = () => {
 
@@ -74,6 +76,11 @@ const ItemModel = () => {
         );
     }, [search]);
 
+
+    const handleCreate = async () => {
+
+    };
+
     return (
         <div className={StyleModule.itemModelContainer}>
             <div className={StyleModule.itemModelHeader}>
@@ -111,6 +118,11 @@ const ItemModel = () => {
                 // classes
                 classNameGenericTableContainer={StyleModule.containerTable}
             />
+            {isActiveAddModal &&
+                <ItemModuleProvider totalSteps={3} currentStep={0}>
+                    <AddWizardItem onClose={toggleIsActiveAddModal} onCreate={handleCreate} />
+                </ItemModuleProvider>
+            }
         </div>
     );
 }

@@ -36,17 +36,20 @@ interface IProduct {
     description: string,
     sku: string,
     active: boolean,
+    presentation: string,
     sale_price: number,
     photo: string | File,
     created_at: string,
     updated_at: string,
+    production_cost: number,
     product_processes?: IPartialProductProcess[],
     product_discount_ranges?: IPartialProductDiscountRange[],
     products_inputs?: IPartialProductInput[]
     product_discount_ranges_updated?: ProductDiscountRangeManager,
     products_inputs_updated?: ProductInputManager,
     product_processes_updated?: ProductProcessManager,
-    summary_location?: ProductLocationAvailability
+    summary_location?: ProductLocationAvailability,
+    barcode?: number
 }
 
 type IPartialProduct = Partial<IProduct>;
@@ -55,6 +58,8 @@ type IPartialProduct = Partial<IProduct>;
 const defaultValueProduct: IProduct = {
     id: 0,
     custom_id: '',
+    presentation: "",
+    production_cost: 0,
     name: '',
     type: '',
     description: '',
@@ -68,6 +73,7 @@ const defaultValueProduct: IProduct = {
 
 const defaultValuePartialProduct: IPartialProduct = {
     custom_id: '',
+    presentation: '',
     name: '',
     description: '',
     sku: '',

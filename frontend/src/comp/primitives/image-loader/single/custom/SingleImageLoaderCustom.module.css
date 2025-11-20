@@ -1,0 +1,37 @@
+.container {
+    /* distribucion box */
+    border: 1px solid var(--color-theme-boder-table);
+    border-radius: 15px;
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+}
+
+.removeButton {
+    /* interactividad */
+    cursor: pointer;
+
+}
+
+.removeButton, .editButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 15px;
+    padding: 0.1rem;
+    background-color:rgba(255, 255, 255, 0.7);
+}
+
+.removeButtonIcon.removeButtonIcon {
+    width: 90%;
+    height: 90%;
+    color: var(--color-alert);
+}
+
+.removeButton:hover {
+    background-color: var(--color-alert);
+    color: var(--color-theme-font-white);
+}
+
+.removeButton:hover .removeButtonIcon {
+    color: var(--color-theme-font-white);
+}
