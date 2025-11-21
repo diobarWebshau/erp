@@ -97,10 +97,14 @@ type ItemAction =
 
     | { type: typeof itemActionsType.SET_PRODUCT, payload: IPartialProduct }
     | { type: typeof itemActionsType.UPDATE_PRODUCT, payload: IPartialProduct }
+    
     | { type: typeof itemActionsType.ADDS_INPUTS_TO_PRODUCTS, payload: IPartialProductInput[] }
     | { type: typeof itemActionsType.REMOVE_INPUTS_FROM_PRODUCTS, payload: number[] }
+    | { type: typeof itemActionsType.UPDATE_INPUTS_FROM_PRODUCTS, payload: {id: number, attributes: IPartialProductInput } }
+    
     | { type: typeof itemActionsType.ADDS_DISCOUNT_TO_PRODUCTS, payload: IPartialProductDiscountRange[] }
     | { type: typeof itemActionsType.REMOVE_DISCOUNT_FROM_PRODUCTS, payload: number[] }
+    | { type: typeof itemActionsType.UPDATE_DISCOUNT_FROM_PRODUCTS, payload: {id: number, attributes: IPartialProductDiscountRange } }
 
     // ? data --> item == input
 
@@ -116,10 +120,14 @@ type ItemAction =
 
     | { type: typeof itemActionsType.SET_DRAFT_PRODUCT, payload: IPartialProduct }
     | { type: typeof itemActionsType.UPDATE_DRAFT_PRODUCT, payload: IPartialProduct }
+
     | { type: typeof itemActionsType.ADDS_INPUTS_TO_DRAFT_PRODUCTS, payload: IPartialProductInput[] }
     | { type: typeof itemActionsType.REMOVE_INPUTS_FROM_DRAFT_PRODUCTS, payload: number[] }
+    | { type: typeof itemActionsType.UPDATE_INPUTS_FROM_DRAFT_PRODUCTS, payload: {id: number, attributes: IPartialProductInput } }
+    
     | { type: typeof itemActionsType.ADDS_DISCOUNT_TO_DRAFT_PRODUCTS, payload: IPartialProductDiscountRange[] }
     | { type: typeof itemActionsType.REMOVE_DISCOUNT_FROM_DRAFT_PRODUCTS, payload: number[] }
+    | { type: typeof itemActionsType.UPDATE_DISCOUNT_FROM_DRAFT_PRODUCTS, payload: {id: number, attributes: IPartialProductDiscountRange } }
 
     // ? draft --> item == input
 

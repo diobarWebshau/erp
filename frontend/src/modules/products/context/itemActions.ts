@@ -1,6 +1,9 @@
 import type { ItemAction} from "./itemTypes";
 import { itemActionsType } from "./itemTypes";
 import type { IPartialItem } from "../../../interfaces/item";
+import type { IPartialProductInput } from "interfaces/productsInputs";
+import type { IPartialProduct } from "interfaces/product";
+import type { IPartialProductDiscountRange } from "interfaces/product-discounts-ranges";
 
 // * data
 
@@ -21,17 +24,20 @@ const set_from_server = (payload: IPartialItem): ItemAction => ({
 
 // ? data --> item == product
 
-const set_product = (payload: IPartialItem): ItemAction => ({
+
+const set_product = (payload: IPartialProduct): ItemAction => ({
     type: itemActionsType.SET_PRODUCT,
     payload
 });
 
-const update_product = (payload: IPartialItem): ItemAction => ({
+const update_product = (payload: IPartialProduct): ItemAction => ({
     type: itemActionsType.UPDATE_PRODUCT,
     payload
 });
 
-const add_inputs_to_products = (payload: IPartialItem[]): ItemAction => ({
+
+
+const add_inputs_to_products = (payload: IPartialProductInput[]): ItemAction => ({
     type: itemActionsType.ADDS_INPUTS_TO_PRODUCTS,
     payload
 });
@@ -41,7 +47,14 @@ const remove_inputs_from_products = (payload: number[]): ItemAction => ({
     payload
 });
 
-const add_discount_to_products = (payload: IPartialItem[]): ItemAction => ({
+const update_inputs_from_products = (payload: {id: number, attributes: IPartialProductInput }): ItemAction => ({
+    type: itemActionsType.UPDATE_INPUTS_FROM_PRODUCTS,
+    payload
+});
+
+
+
+const add_discount_to_products = (payload: IPartialProductDiscountRange[]): ItemAction => ({
     type: itemActionsType.ADDS_DISCOUNT_TO_PRODUCTS,
     payload
 });
@@ -50,6 +63,12 @@ const remove_discount_from_products = (payload: number[]): ItemAction => ({
     type: itemActionsType.REMOVE_DISCOUNT_FROM_PRODUCTS,
     payload
 });
+
+const update_discount_from_products = (payload: {id: number, attributes: IPartialProductDiscountRange }): ItemAction => ({
+    type: itemActionsType.UPDATE_DISCOUNT_FROM_PRODUCTS,
+    payload
+});
+
 
 // ? data --> item == input
 
@@ -77,17 +96,20 @@ const update_draft_item = (payload: IPartialItem): ItemAction => ({
 
 // ? draft --> item == product
 
-const set_draft_product = (payload: IPartialItem): ItemAction => ({
+
+const set_draft_product = (payload: IPartialProduct): ItemAction => ({
     type: itemActionsType.SET_DRAFT_PRODUCT,
     payload
 });
 
-const update_draft_product = (payload: IPartialItem): ItemAction => ({
+const update_draft_product = (payload: IPartialProduct): ItemAction => ({
     type: itemActionsType.UPDATE_DRAFT_PRODUCT,
     payload
 });
 
-const add_inputs_to_draft_products = (payload: IPartialItem[]): ItemAction => ({
+
+
+const add_inputs_to_draft_products = (payload: IPartialProductInput[]): ItemAction => ({
     type: itemActionsType.ADDS_INPUTS_TO_DRAFT_PRODUCTS,
     payload
 });
@@ -97,7 +119,15 @@ const remove_inputs_from_draft_products = (payload: number[]): ItemAction => ({
     payload
 });
 
-const add_discount_to_draft_products = (payload: IPartialItem[]): ItemAction => ({
+const update_inputs_from_draft_products = (payload: {id: number, attributes: IPartialProductInput }): ItemAction => ({
+    type: itemActionsType.UPDATE_INPUTS_FROM_DRAFT_PRODUCTS,
+    payload
+});
+
+
+
+
+const add_discount_to_draft_products = (payload: IPartialProductDiscountRange[]): ItemAction => ({
     type: itemActionsType.ADDS_DISCOUNT_TO_DRAFT_PRODUCTS,
     payload
 });
@@ -106,6 +136,12 @@ const remove_discount_from_draft_products = (payload: number[]): ItemAction => (
     type: itemActionsType.REMOVE_DISCOUNT_FROM_DRAFT_PRODUCTS,
     payload
 });
+
+const update_discount_from_draft_products = (payload: {id: number, attributes: IPartialProductDiscountRange }): ItemAction => ({
+    type: itemActionsType.UPDATE_DISCOUNT_FROM_DRAFT_PRODUCTS,
+    payload
+});
+
 
 
 
@@ -145,29 +181,49 @@ const clear = (): ItemAction => ({
 
 
 export {
+
+    // data 
     set_item,
     update_item,
     set_from_server,
+
     set_product,
     update_product,
+    
     add_inputs_to_products,
     remove_inputs_from_products,
+    update_inputs_from_products,
+    
     add_discount_to_products,
     remove_discount_from_products,
+    update_discount_from_products,
+    
     set_input,
     update_input,
+
+    // * draft
     set_draft_item,
     update_draft_item,
+
     set_draft_product,
     update_draft_product,
+
     add_inputs_to_draft_products,
     remove_inputs_from_draft_products,
+    update_inputs_from_draft_products,
+
     add_discount_to_draft_products,
     remove_discount_from_draft_products,
+    update_discount_from_draft_products,
+
     set_draft_input,
     update_draft_input,
+
+    // * steps
     set_step,
     back_step,
     next_step,
+
+    // * clear
     clear
 }

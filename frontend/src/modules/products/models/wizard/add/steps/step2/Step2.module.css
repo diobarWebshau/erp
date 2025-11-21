@@ -49,7 +49,7 @@
 .imageContainer {
     /* dimension */
     height: 150px;
-    width: 350px;
+    width: 200px;
 
     /* distribucion flex */
     display: flex;
