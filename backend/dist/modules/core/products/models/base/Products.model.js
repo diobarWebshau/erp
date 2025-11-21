@@ -3,14 +3,16 @@ import { DataTypes, Model } from "sequelize";
 class ProductModel extends Model {
     static getEditableFields() {
         return [
-            "custom_id", "name", "description", "barcode", "type",
+            "custom_id", "name", "description", "barcode", "type", "presentation",
+            "production_cost", "is_draft", "storage_conditions",
             "sku", "active", "sale_price", "photo"
         ];
     }
     static getAllFields() {
         return [
             "id", "custom_id", "name", "description", "barcode", "type",
-            "sku", "active", "sale_price", "photo",
+            "sku", "active", "sale_price", "photo", "presentation",
+            "production_cost", "is_draft", "storage_conditions",
             "created_at", "updated_at"
         ];
     }
@@ -24,16 +26,31 @@ ProductModel.init({
     custom_id: {
         type: DataTypes.STRING(100),
         unique: true,
-        allowNull: false,
+        allowNull: true,
+    },
+    storage_conditions: {
+        type: DataTypes.TEXT,
+        allowNull: true,
     },
     name: {
         type: DataTypes.STRING(100),
         unique: true,
-        allowNull: false,
+        allowNull: true,
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
+    },
+    presentation: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+    },
+    production_cost: {
+        type: DataTypes.DECIMAL(14, 4),
+        allowNull: true,
+    },
+    is_draft: {
+        type: DataTypes.TINYINT,
     },
     barcode: {
         type: DataTypes.INTEGER,
@@ -41,33 +58,33 @@ ProductModel.init({
     },
     type: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     sku: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     sale_price: {
         type: DataTypes.DECIMAL(14, 4),
-        allowNull: false
+        allowNull: true,
     },
     active: {
         type: DataTypes.TINYINT,
-        allowNull: false
+        allowNull: true,
     },
     photo: {
         type: DataTypes.STRING(200),
-        allowNull: false,
+        allowNull: true,
     },
     created_at: {
         type: DataTypes.DATE(),
-        allowNull: false,
-        defaultValue: DataTypes.NOW()
+        defaultValue: DataTypes.NOW(),
+        allowNull: true,
     },
     updated_at: {
         type: DataTypes.DATE(),
-        allowNull: false,
-        defaultValue: DataTypes.NOW()
+        defaultValue: DataTypes.NOW(),
+        allowNull: true,
     }
 }, {
     sequelize,

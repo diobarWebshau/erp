@@ -18,31 +18,36 @@ const inputs = [
     id: 1,
     name: "Insumo x",
     description: "Descripción del Insumo x",
+    presentation: "Caja x 12 unidades",
     barcode: "123456789",
-    input_types_id: 1,
-    unit_cost: 50.5,
+    input_types_id: "1",
+    unit_cost: "50.5",
     supplier: "Proveedor 1",
     photo: "images.jpg", 
-    status: 1,
-    custom_id: "Insx"
+    status: "1",
+    custom_id: "Insx",
+    is_draft: "0"
   },
   {
     id: 2,
     name: "Insumo z",
     description: "Descripción del Insumo z",
+    presentation: "Caja x 6 unidades",
     barcode: "123456790",
     input_types_id: 1,
     unit_cost: 75.0,
     supplier: "Proveedor 2",
     photo: "images.jpg",
     status: 1,
-    custom_id: "InsZ"
+    custom_id: "InsZ",
+    is_draft: "0"
   },
 ];
 
 // Función para enviar un insumo con su imagen
 const sendDataWithImage = async (input) => {
   try {
+
     const formData = new FormData();
     formData.append('id', input.id);
     formData.append('name', input.name);
@@ -53,6 +58,8 @@ const sendDataWithImage = async (input) => {
     formData.append('supplier', input.supplier);
     formData.append('status', input.status);
     formData.append('custom_id', input.custom_id);
+    formData.append('presentation', input.presentation);
+    formData.append('is_draft', input.is_draft);
 
     const imagePath = path.join(imagesBasePath, input.photo); // Ruta completa del archivo
     // console.log('Ruta de la imagen:', imagePath);

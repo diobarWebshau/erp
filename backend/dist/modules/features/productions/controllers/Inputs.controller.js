@@ -103,7 +103,7 @@ class InputController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, custom_id, input_types_id, unit_cost, supplier, photo, status, description, barcode } = req.body;
+        const { name, custom_id, input_types_id, unit_cost, supplier, photo, status, description, barcode, storage_conditions } = req.body;
         try {
             const validateName = await InputModel.findOne({
                 where: { name: name }
@@ -138,13 +138,14 @@ class InputController {
             const response = await InputModel.create({
                 name,
                 description: description ?? null,
-                custom_id,
-                input_types_id,
-                unit_cost,
-                supplier,
-                photo,
-                status,
-                barcode: barcode ?? null
+                custom_id: custom_id ?? null,
+                input_types_id: input_types_id ?? null,
+                unit_cost: unit_cost ?? null,
+                supplier: supplier ?? null,
+                photo: photo ?? null,
+                status: status ?? null,
+                barcode: barcode ?? null,
+                storage_conditions: storage_conditions ?? null
             });
             if (!response) {
                 await ImageHandler.removeImageIfExists(photo);
@@ -172,7 +173,7 @@ class InputController {
                 .ISOLATION_LEVELS
                 .REPEATABLE_READ
         });
-        const { name, custom_id, input_types_id, unit_cost, supplier, photo, status, description, barcode } = req.body;
+        const { name, custom_id, input_types_id, unit_cost, supplier, storage_conditions, photo, status, description, barcode } = req.body;
         try {
             const validateName = await InputModel.findOne({
                 where: { name: name }
@@ -187,15 +188,16 @@ class InputController {
                 return;
             }
             const responseInput = await InputModel.create({
-                name,
+                name: name ?? null,
                 description: description ?? null,
-                custom_id,
-                input_types_id,
-                unit_cost,
-                supplier,
-                photo,
-                status,
-                barcode: barcode ?? null
+                custom_id: custom_id ?? null,
+                input_types_id: custom_id ?? null,
+                unit_cost: custom_id ?? null,
+                supplier: custom_id ?? null,
+                photo: custom_id ?? null,
+                status: custom_id ?? null,
+                barcode: barcode ?? null,
+                storage_conditions: storage_conditions ?? null
             }, { transaction });
             if (!responseInput) {
                 await ImageHandler
@@ -229,7 +231,6 @@ class InputController {
         });
         const { id } = req.params;
         const completeBody = req.body;
-        console.log(completeBody);
         let urlImageOld = "";
         let IsupdateImage = false;
         let isSuccessFully = false;
@@ -297,7 +298,6 @@ class InputController {
                         return;
                     }
                 }
-                console.log(update_values);
                 const responseInput = await InputModel.update(update_values, {
                     where: { id },
                     transaction: transaction
@@ -332,7 +332,7 @@ class InputController {
         }
         finally {
             if (isSuccessFully && IsupdateImage &&
-                urlImageOld !== '') {
+                urlImageOld !== '' && urlImageOld !== undefined) {
                 // console.log("Eliminando imagen vieja");
                 // console.log(urlImageOld);
                 await ImageHandler
@@ -407,8 +407,10 @@ class InputController {
                 return;
             }
             if (update_values?.photo) {
-                await ImageHandler
-                    .removeImageIfExists(validateInput.toJSON().photo);
+                const inputAux = validateInput.toJSON();
+                if (inputAux.photo) {
+                    await ImageHandler.removeImageIfExists(inputAux.photo);
+                }
             }
             res.status(200).json({
                 message: "Input updated succefally"
@@ -459,8 +461,9 @@ class InputController {
                 });
                 return;
             }
-            await ImageHandler
-                .removeImageIfExists(inputDelete.photo);
+            if (inputDelete.photo) {
+                await ImageHandler.removeImageIfExists(inputDelete.photo);
+            }
             res.status(200).json({
                 message: "Input deleted successfully"
             });

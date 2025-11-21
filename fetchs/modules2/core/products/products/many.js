@@ -18,33 +18,42 @@ const products = [
     description: "Descripción del Producto A",
     type: "Tipo A",
     barcode: "987654321",
+    presentation: "Caja x 12 unidades",
+    production_cost: "152.55",
     sku: "A12345",
-    sale_price: 150.0,
-    active: 1,
+    sale_price: "150.0",
+    active: "1",
     photo: "images.jpg",
-    custom_id: "ProdA"
+    custom_id: "ProdA",
+    is_draft: "0"
   },
   {
     name: "Producto B",
     description: "Descripción del Producto B",
+    presentation: "Caja x 6 unidades",
     type: "Tipo B",
     barcode: "987654322",
+    production_cost: "200.25",
     sku: "B67890",
-    sale_price: 200.0,
-    active: 0,
+    sale_price: "200.0",
+    active: "0",
     photo: "images.jpg",
-    custom_id: "ProdB"
+    custom_id: "ProdB",
+    is_draft: "0"
   },
   {
     name: "Producto C",
     description: "Descripción del Producto C",
     type: "Tipo B",
+    presentation: "Caja x 24 unidades",
     barcode: "987654323",
     sku: "B6789052",
-    sale_price: 300.0,
-    active: 0,
+    production_cost: "250.75",
+    sale_price: "300.0",
+    active: "0",
     photo: "images.jpg",
-    custom_id: "ProdC"
+    custom_id: "ProdC",
+    is_draft: "0"
   },
 ];
 
@@ -59,6 +68,9 @@ const sendProductWithImage = async (product) => {
     formData.append('sale_price', product.sale_price);
     formData.append('active', product.active);
     formData.append('custom_id', product.custom_id);
+    formData.append('presentation', product.presentation);
+    formData.append('production_cost', product.production_cost);
+    formData.append('is_draft', product.is_draft);
 
     const imagePath = path.join(imagesBasePath, product.photo);
     // console.log(imagePath);

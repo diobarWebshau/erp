@@ -188,7 +188,7 @@ class ProductionsController {
                 const response = await ProductionModel.create({
                     production_order_id,
                     product_id,
-                    product_name: product.name,
+                    product_name: product.name ?? "",
                     qty,
                     process_id
                 });

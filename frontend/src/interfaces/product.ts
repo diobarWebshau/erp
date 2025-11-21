@@ -1,21 +1,10 @@
-import type {
-    IPartialProductDiscountRange
-} from "./product-discounts-ranges"
-import type {
-    IPartialProductInput
-} from "./productsInputs";
-import type {
-    IPartialProductProcess
-} from "./productsProcesses";
-import type {
-    ProductInputManager
-} from "./productsInputs";
-import type {
-    ProductProcessManager
-} from "./productsProcesses";
-import type {
-    ProductDiscountRangeManager
-} from "./product-discounts-ranges";
+import type { IPartialProductDiscountRange } from "./product-discounts-ranges"
+import type { IPartialProductInput } from "./productsInputs";
+import type { IPartialProductProcess } from "./productsProcesses";
+import type { ProductInputManager } from "./productsInputs";
+import type { ProductProcessManager } from "./productsProcesses";
+import type { ProductDiscountRangeManager } from "./product-discounts-ranges";
+import type { IPartialProductInputProcess, IProductInputProcessManager } from "./productInpustProcesses"
 
 interface ProductLocationAvailability {
     location_id: number;      // id de la ubicación
@@ -37,6 +26,8 @@ interface IProduct {
     sku: string,
     active: boolean,
     presentation: string,
+    storage_conditions: string,
+    is_draft: boolean,
     sale_price: number,
     photo: string | File,
     created_at: string,
@@ -44,7 +35,9 @@ interface IProduct {
     production_cost: number,
     product_processes?: IPartialProductProcess[],
     product_discount_ranges?: IPartialProductDiscountRange[],
-    products_inputs?: IPartialProductInput[]
+    products_inputs?: IPartialProductInput[],
+    product_inputs_processes?: IPartialProductInputProcess[],
+    product_inputs_processes_updated?: IProductInputProcessManager,
     product_discount_ranges_updated?: ProductDiscountRangeManager,
     products_inputs_updated?: ProductInputManager,
     product_processes_updated?: ProductProcessManager,
@@ -58,6 +51,8 @@ type IPartialProduct = Partial<IProduct>;
 const defaultValueProduct: IProduct = {
     id: 0,
     custom_id: '',
+    is_draft: false,
+    storage_conditions: '',
     presentation: "",
     production_cost: 0,
     name: '',

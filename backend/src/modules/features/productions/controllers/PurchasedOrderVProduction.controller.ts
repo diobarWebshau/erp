@@ -163,7 +163,7 @@ class PurchasedOrdersVProduction extends SalesControllers.PurchasedOrderControll
                 product_id: Number(product_id),
                 qty,
                 recorded_price,
-                product_name,
+                product_name: product_name ?? "",
                 status,
                 original_price: recorded_price
             });
@@ -1340,7 +1340,7 @@ class PurchasedOrdersVProduction extends SalesControllers.PurchasedOrderControll
                                     value.purchase_order_id =
                                         Number(purchaseOrder.id);
                                     value.status = "pending";
-                                    value.original_price = product.sale_price;
+                                    value.original_price = product.sale_price ?? 0;
                                     return value;
                                 }
                             }) as PurchaseOrderProductCreateAttributes[];

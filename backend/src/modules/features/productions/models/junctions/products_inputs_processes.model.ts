@@ -1,12 +1,16 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../../../mysql/configSequelize.js";
+import { ProductInputCreateAttributes } from "./product-Input.model.js";
+import { ProductProcessAttributes } from "./products-processes.model.js";
 
 interface ProductInputProcessAttributes {
-  id: number;
-  product_id: number;
-  product_input_id: number;
-  product_process_id: number;
-  qty: string | number; // DECIMAL puede venir como string
+  id: number,
+  product_id: number,
+  product_input_id: number,
+  product_process_id: number,
+  qty: string | number,
+  product_input?: ProductInputCreateAttributes,
+  product_process?: ProductProcessAttributes
 }
 
 interface ProductInputProcessCreateAttributes

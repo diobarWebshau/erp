@@ -12,10 +12,6 @@ interface GenericTableProps<T> {
     data: T[];
     rowActions?: RowAction<T>[];
     typeRowActions?: "ellipsis" | "icon";
-    enableSortableRows?: boolean;
-    getSortField?: (row: T) => number;
-    setSortField?: (row: T, value: number) => T;
-    setOnReorderRows?: (rows: T[]) => void;
     isLoadingData?: boolean;
     enableFilters?: boolean;
     enableSorting?: boolean;
@@ -41,7 +37,6 @@ interface GenericTableProps<T> {
     expandedComponent?: React.ReactNode;
     isExpanded?: boolean;
     initialState?: TableStatePartial;
-    modeTable?: "scroll" | "content";
 };
 
 const GenericTable = <T,>({
@@ -58,13 +53,9 @@ const GenericTable = <T,>({
     enableOptionsColumn = false,
     noResultsMessage = "No results.",
     classNameGenericTableContainer,
-    getSortField,
-    setSortField,
     classNameTableContainer,
     onRowSelectionChangeExternal,
     conditionalRowSelection,
-    enableSortableRows = false,
-    setOnReorderRows,
     classNameTable,
     classNameTableBody,
     classNameTableHeader,
@@ -79,7 +70,6 @@ const GenericTable = <T,>({
     expandedComponent,
     isExpanded,
     initialState,
-    modeTable
 }: GenericTableProps<T>) => {
     /*
         Calculamos el estado final unicamente si, se establece initialState
@@ -98,10 +88,6 @@ const GenericTable = <T,>({
                 modelName={modelName}
                 columns={columns}
                 data={data}
-                getSortField={getSortField}
-                setSortField={setSortField}
-                enableSortableRows={enableSortableRows}
-                setOnReorderRows={setOnReorderRows}
                 rowActions={rowActions}
                 typeRowActions={typeRowActions}
                 isLoadingData={isLoadingData}
@@ -128,7 +114,6 @@ const GenericTable = <T,>({
                 enableRowEditClickHandler={enableRowEditClickHandler}
                 expandedComponent={expandedComponent}
                 isExpanded={isExpanded}
-                modeTable={modeTable}
             />
         </ProviderTableContext >
     );

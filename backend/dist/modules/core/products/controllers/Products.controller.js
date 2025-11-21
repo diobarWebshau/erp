@@ -201,7 +201,7 @@ class ProductController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, description, type, sku, active, sale_price, photo, custom_id, barcode } = req.body;
+        const { name, description, type, sku, active, sale_price, photo, custom_id, barcode, presentation, is_draft, storage_conditions, production_cost } = req.body;
         try {
             const validateName = await ProductModel.findOne({ where: { name: name } });
             if (validateName) {
@@ -212,15 +212,19 @@ class ProductController {
                 return;
             }
             const response = await ProductModel.create({
-                name,
-                custom_id,
-                description,
-                type,
-                sku,
-                active,
-                sale_price,
-                photo,
-                barcode: barcode ?? null
+                presentation: presentation ?? null,
+                production_cost: production_cost ?? null,
+                is_draft: is_draft ?? 0,
+                name: name ?? null,
+                custom_id: custom_id ?? null,
+                description: description ?? null,
+                type: type ?? null,
+                sku: sku ?? null,
+                active: active ?? null,
+                sale_price: sale_price ?? null,
+                photo: photo ?? null,
+                barcode: barcode ?? null,
+                storage_conditions: storage_conditions ?? null
             });
             if (!response) {
                 await ImageHandler.removeImageIfExists(photo);
@@ -283,7 +287,11 @@ class ProductController {
                 return;
             }
             if (update_values?.photo) {
-                await ImageHandler.removeImageIfExists(validateProduct.toJSON().photo);
+                const productAux = validateProduct.toJSON();
+                if (productAux.photo) {
+                    await ImageHandler.removeImageIfExists(productAux.photo);
+                }
+                ;
             }
             res.status(200).json({ message: "Product updated successfully" });
         }
@@ -328,8 +336,11 @@ class ProductController {
                 });
                 return;
             }
-            await ImageHandler
-                .removeImageIfExists(validateProduct.toJSON().photo);
+            const productAux = validateProduct.toJSON();
+            if (productAux.photo) {
+                await ImageHandler.removeImageIfExists(productAux.photo);
+            }
+            ;
             res.status(200).json({
                 message: "Product deleted successfully"
             });

@@ -197,7 +197,7 @@ class PurchaseOrderProductController {
                 product_id,
                 qty,
                 recorded_price,
-                product_name,
+                product_name: product_name ?? "",
                 status: status || "pending",
                 original_price: recorded_price
             });

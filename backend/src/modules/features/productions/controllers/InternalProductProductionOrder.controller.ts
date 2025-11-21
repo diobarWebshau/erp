@@ -141,7 +141,7 @@ class InternalProductProductionOrderController {
                     product_id,
                     qty: qty,
                     status: "pending",
-                    product_name: product.name,
+                    product_name: product.name ?? "",
                     location_id: location.id,
                     location_name: location.name
                 });

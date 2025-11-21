@@ -96,15 +96,19 @@ CREATE TABLE clients_addresses(
 -- PRODUCTS
 CREATE TABLE products(
     id INT AUTO_INCREMENT,
-    custom_id VARCHAR(100) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    type VARCHAR(100) NOT NULL,
+    custom_id VARCHAR(100) NULL UNIQUE,
+    name VARCHAR(100) NULL UNIQUE,
+    type VARCHAR(100) NULL,
     description TEXT NOT NULL,
+    presentation VARCHAR(100) NULL,
+    production_cost DECIMAL(14, 4) NULL,
+    storage_conditions TEXT NULL,
     barcode INT NULL UNIQUE,
-    sku VARCHAR(100) NOT NULL UNIQUE,
-    active TINYINT NOT NULL,
-    sale_price DECIMAL(14, 4) NOT NULL,
-    photo VARCHAR(200) NOT NULL,
+    sku VARCHAR(100) NULL UNIQUE,
+    active TINYINT NULL,
+    sale_price DECIMAL(14, 4) NULL,
+    photo VARCHAR(200) NULL,
+    is_draft TINYINT NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
@@ -391,20 +395,22 @@ CREATE TABLE input_types(
 );
 CREATE TABLE inputs(
     id INT AUTO_INCREMENT,
-    custom_id VARCHAR(100) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    description TEXT,
+    custom_id VARCHAR(100) NULL UNIQUE,
+    name VARCHAR(100) NULL UNIQUE,
+    description TEXT NULL,
+    presentation VARCHAR(100) NULL,
+    storage_conditions TEXT NULL,
     barcode INT NULL UNIQUE,
-    input_types_id INT,
-    unit_cost DECIMAL(14, 4),
-    supplier VARCHAR(100) NOT NULL,
-    photo VARCHAR(200) NOT NULL,
-    status TINYINT NOT NULL,
+    input_types_id INT NULL,
+    unit_cost DECIMAL(14, 4) NULL,
+    supplier VARCHAR(100) NULL,
+    photo VARCHAR(200) NULL,
+    is_draft TINYINT NOT NULL DEFAULT 0,
+    status TINYINT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
-    FOREIGN KEY(input_types_id) REFERENCES input_types(id) ON DELETE
-    SET NULL
+    FOREIGN KEY(input_types_id) REFERENCES input_types(id) ON DELETE SET NULL
 );
 CREATE TABLE processes(
     id INT AUTO_INCREMENT,
@@ -637,11 +643,11 @@ CREATE TABLE production_line_queue (
 
 DROP TABLE IF EXISTS products_inputs_processes;
 CREATE TABLE products_inputs_processes (
+    
   id INT AUTO_INCREMENT PRIMARY KEY,
   product_id INT NOT NULL,
   product_input_id INT NOT NULL,
   product_process_id INT NOT NULL,
-
   qty DECIMAL(18,6) NOT NULL DEFAULT 0,  -- consumo en ESTA etapa por 1 ud del producto
 
   CONSTRAINT fk_pip_input_same_product
@@ -659,7 +665,6 @@ CREATE TABLE products_inputs_processes (
   KEY ix_pip_input   (product_input_id),
   KEY ix_pip_process (product_process_id)
 );
-
 
 CREATE TABLE suppliers (
     id INT AUTO_INCREMENT,

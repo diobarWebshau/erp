@@ -12,7 +12,7 @@ import { useCallback, useMemo, useState } from "react";
 import ItemsColumns from "./columns/columns";
 import type { IItem } from "interfaces/item";
 import StyleModule from "./IttemModel.module.css";
-import ItemModuleProvider from "./../context/itemModuleProvider"
+import ItemModuleProvider from "./../context/ItemModuleProvider";
 import AddWizardItem from "./wizard/add/AddWizardItem";
 
 const ItemModel = () => {

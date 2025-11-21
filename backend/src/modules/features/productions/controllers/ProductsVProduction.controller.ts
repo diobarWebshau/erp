@@ -392,10 +392,10 @@ class ProductVProductionController extends ProductsControllers.ProductController
         async (req: Request, res: Response, next: NextFunction) => {
 
             const {
-                name, description, type,
+                name, description, type, presentation, is_draft, production_cost,
                 sku, active, sale_price, custom_id,
                 photo, product_processes, products_inputs,
-                product_discount_ranges, barcode
+                product_discount_ranges, barcode, storage_conditions
             } = req.body;
 
             const transaction = await sequelize.transaction({
@@ -438,9 +438,19 @@ class ProductVProductionController extends ProductsControllers.ProductController
                 const responseProduct =
                     await ProductModel.create(
                         {
-                            name, description, type, custom_id,
-                            sku, active, sale_price, photo,
-                            barcode: barcode ?? null
+                            name: name ?? null,
+                            description: description ?? null,
+                            type: type ?? null,
+                            custom_id: custom_id ?? null,
+                            presentation: presentation ?? null,
+                            is_draft: is_draft ?? false,
+                            sku: sku ?? null,
+                            active: active ?? null,
+                            sale_price: sale_price ?? null,
+                            photo: photo ?? null,
+                            production_cost: production_cost ?? null,
+                            barcode: barcode ?? null,
+                            storage_conditions: storage_conditions ?? null
                         }, {
                         individualHooks: true,
                         transaction: transaction
@@ -765,9 +775,7 @@ class ProductVProductionController extends ProductsControllers.ProductController
 
                 if (update_values?.photo) {
                     IsupdateImage = true;
-                    console.log(typeof product.photo);
-                    console.log(update_values.photo);
-                    urlImageOld = product.photo;
+                    if (product.photo) urlImageOld = product.photo;
                 }
 
                 if (update_values?.active) {

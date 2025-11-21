@@ -1,26 +1,12 @@
-import collectorUpdateFields
-    from "../../../../scripts/collectorUpdateField.js";
-import ImageHandler
-    from "../../../../classes/ImageHandler.js";
-import {
-    ProductDiscountRangeModel,
-    ProductModel
-} from "../../../associations.js";
-import {
-    Request, Response, NextFunction
-} from "express";
-import {
-    Op, QueryTypes,
-    Sequelize
-} from "sequelize";
-import {
-    formatWithBase64
-} from "../../../../scripts/formatWithBase64.js";
+import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
+import ImageHandler from "../../../../classes/ImageHandler.js";
+import { ProductDiscountRangeModel, ProductModel } from "../../../associations.js";
+import { Request, Response, NextFunction } from "express";
+import { Op, QueryTypes } from "sequelize";
+import { formatWithBase64 } from "../../../../scripts/formatWithBase64.js";
 import sequelize from "../../../../mysql/configSequelize.js";
 import sequelize2 from "sequelize";
-import {
-    ProductLocationAvailability
-} from "../models/base/Products.model.js";
+import { ProductLocationAvailability } from "../models/base/Products.model.js";
 
 class ProductController {
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -245,7 +231,11 @@ class ProductController {
         }
     }
     static create = async (req: Request, res: Response, next: NextFunction) => {
-        const { name, description, type, sku, active, sale_price, photo, custom_id, barcode } = req.body;
+        const {
+            name, description, type, sku, active, sale_price,
+            photo, custom_id, barcode, presentation, is_draft,
+            storage_conditions, production_cost
+        } = req.body;
         try {
             const validateName = await ProductModel.findOne({ where: { name: name } })
             if (validateName) {
@@ -256,17 +246,23 @@ class ProductController {
                 });
                 return;
             }
+
             const response = await ProductModel.create({
-                name,
-                custom_id,
-                description,
-                type,
-                sku,
-                active,
-                sale_price,
-                photo,
-                barcode: barcode ?? null
+                presentation: presentation ?? null,
+                production_cost: production_cost ?? null,
+                is_draft: is_draft ?? 0,
+                name: name ?? null,
+                custom_id: custom_id ?? null,
+                description: description ?? null,
+                type: type ?? null,
+                sku: sku ?? null,
+                active: active ?? null,
+                sale_price: sale_price ?? null,
+                photo: photo ?? null,
+                barcode: barcode ?? null,
+                storage_conditions : storage_conditions ?? null
             });
+
             if (!response) {
                 await ImageHandler.removeImageIfExists(photo);
                 res.status(200).json({
@@ -329,7 +325,10 @@ class ProductController {
                 return;
             }
             if (update_values?.photo) {
-                await ImageHandler.removeImageIfExists(validateProduct.toJSON().photo);
+                const productAux = validateProduct.toJSON();
+                if (productAux.photo) {
+                    await ImageHandler.removeImageIfExists(productAux.photo);
+                };
             }
             res.status(200).json({ message: "Product updated successfully" });
         } catch (error: unknown) {
@@ -393,9 +392,12 @@ class ProductController {
                 });
                 return;
             }
-            await ImageHandler
-                .removeImageIfExists(
-                    validateProduct.toJSON().photo);
+            const productAux = validateProduct.toJSON();
+            if (productAux.photo) {
+                await ImageHandler.removeImageIfExists(
+                    productAux.photo
+                );
+            };
             res.status(200).json({
                 message: "Product deleted successfully"
             });

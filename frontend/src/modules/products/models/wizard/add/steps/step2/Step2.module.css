@@ -48,7 +48,7 @@
 
 .imageContainer {
     /* dimension */
-    height: 200px;
+    height: 150px;
     width: 350px;
 
     /* distribucion flex */
@@ -56,6 +56,7 @@
 }
 
 .infoContainer {
+    /* distribucion flex respecto al padre */
     flex:1;
     /* distribucion flex */
     display: flex;
@@ -64,7 +65,25 @@
     align-items: stretch;
     gap: 1rem;
 
-    border:1px solid red;
+}
+
+.inputGroup{
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.inputGroup > *{
+    /* distribucion flex respecto al padre */
+    flex: 1;
+}
+
+.subTitle{
+    /* estilos */
+    font-size: 16px;
+    color: var(--color-theme-font-black);
 }
 
 /* *************** Container Buttons *************** */
@@ -75,5 +94,6 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 1rem;
 }
