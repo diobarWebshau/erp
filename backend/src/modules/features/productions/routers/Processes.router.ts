@@ -10,6 +10,8 @@ const createProcessesRouter = (): Router => {
         processesController.getAll);
     processesRouter.get("/id/:id",
         processesController.getById);
+    processesRouter.get("/exclude",
+        processesController.getByLikeExcludeIds);
     processesRouter.get("/name/:name",
         processesController.getByName);
     processesRouter.post("/",

@@ -61,7 +61,7 @@
 }
 
 /* Cuando hay foco o valor, “flota” arriba */
-.floating {
+.labelFloating {
 
     /* distribucion box */
     padding-inline: 0.2rem;
@@ -137,7 +137,6 @@
 .inputValid{
     caret-color: #10b981;
 } */
-
 
 
 .errorText{

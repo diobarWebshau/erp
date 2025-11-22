@@ -1,0 +1,171 @@
+/* ********** PopoverFloating ********** */
+
+.popoverFloating {
+    /* dimension */
+    min-height: 0;
+
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+
+    /* estilos */
+    background-color: var(--color-theme-font-white);
+}
+
+/* ********** containerCheckBoxesMain ********** */
+
+.containerCheckBoxesMain {
+    /* dimension */
+    min-height: 0;
+
+    /* distribucion flex respecto al padre */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.containerCheckBoxesMain>* {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+}
+
+/* ********** containerCheckBoxesSelected  y containerCheckBoxesNoSelected********** */
+
+.containerCheckBoxesSelected,
+.containerCheckBoxesNoSelected {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.containerCheckBoxesNoSelectedLoading {
+    flex: 1;
+    padding-block: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerCheckBoxesSelectedItems,
+.containerCheckBoxesNoSelectedItems {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.containerEmptyMessage {
+    /* dimension */
+    height: 44px;
+
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ********** checkBoxItem ********** */
+
+.checkBoxItem {
+
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 44px;
+
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+
+    /* distribucion box */
+    padding-left: 0.5rem;
+
+}
+
+.label {
+    /* estilos */
+    font-size: 14px;
+}
+
+
+/* ********** containerFieldSearch ********** */
+
+.containerFieldSearch {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+
+    border: 1px solid red;
+}
+
+.inputTagsContainer {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    border: 1px solid green;
+}
+
+.attrTagObject {
+    font-size: 12px;
+}
+
+.iconSearchContainer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 30px;
+
+    /* distribucion flex */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconSearch {
+    width: 15px;
+    height: 15px;
+}
+
+.inputTagsContainer {
+    flex: 1;
+}
+
+.tagObjectInput {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.tagDeleteIconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tagDeleteIcon {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+}
+
+.inputFieldSearch {
+    flex: 1;
+}

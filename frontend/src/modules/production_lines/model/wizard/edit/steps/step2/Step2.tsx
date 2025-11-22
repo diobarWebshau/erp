@@ -68,6 +68,8 @@ const Step2 = memo(({
         }
     ], []);
 
+    const getRowAttr = useMemo(() => (data: IProduct) => data.name || "", []);
+
     const handleOnClickBack = useCallback(() => {
         dispatch(back_step());
     }, [dispatch]);
@@ -257,7 +259,7 @@ const Step2 = memo(({
                     labelOnClick="Asignar productos"
                     headerTitle="Asignar productos"
                     emptyMessage="No hay productos que coincidan con la búsqueda"
-                    attribute="name"
+                    getRowAttr={getRowAttr}
                     loadOptions={fetchLoadProducts}
                 />
             )

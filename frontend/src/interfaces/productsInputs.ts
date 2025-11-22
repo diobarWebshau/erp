@@ -6,7 +6,7 @@ import type {
 } from "./inputs";
 
 interface IProductInput {
-    id: number,
+    id: number | string,
     product_id: number,
     input_id: number,
     equivalence: number,

@@ -1,14 +1,14 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import type { KeyboardEvent, KeyboardEventHandler, MouseEvent, MouseEventHandler, ReactNode } from "react";
-import PopoverFloating from "../../../../external/floating/pop-over/PopoverFloating";
 import InputTextCustom from "./../../../../../comp/primitives/input/text/custom/InputTextCustom";
-import { Search } from "lucide-react";
+import PopoverFloating from "../../../../external/floating/pop-over/PopoverFloating";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import useDebounceBasic from "./../../../../../hooks/useDebounceBasic";
+import StyleModule from "./SingleSelectCheckSearch.module.css";
 import { Divider, Loader } from "@mantine/core";
+import { Search } from "lucide-react";
 import clsx from "clsx";
-import StyleModule from "./MultiSelectCheckSearch.module.css";
 
-interface MultiSelectCheckSearchProps<T> {
+interface SingleSelectCheckSearchProps<T> {
     // popover
     initialOpen?: boolean;
 
@@ -21,9 +21,9 @@ interface MultiSelectCheckSearchProps<T> {
     loadOptions?: (inputValue: string | number, signal: AbortSignal) => Promise<T[]>;
     rowId: (data: T) => string;
 
-    // selección
-    selected: T[];
-    setSelected: (selected: T[]) => void;
+    // selección (SINGLE-SELECT)
+    selected: T | null;
+    setSelected: (selected: T | null) => void;
     colorMain?: string;
 
     // clases opcionales
@@ -45,7 +45,7 @@ interface MultiSelectCheckSearchProps<T> {
 
 const MIN_SPINNER_MS = 200;
 
-const MultiSelectCheckSearch = <T,>({
+const SingleSelectCheckSearch = <T,>({
     initialOpen,
     placeholder,
     emptyMessage,
@@ -67,7 +67,7 @@ const MultiSelectCheckSearch = <T,>({
     classNameLabel,
     classNameCheckBox,
     maxHeight,
-}: MultiSelectCheckSearchProps<T>) => {
+}: SingleSelectCheckSearchProps<T>) => {
     // estado de búsqueda
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounceBasic({ value: search, delay: 300 });
@@ -83,13 +83,12 @@ const MultiSelectCheckSearch = <T,>({
         setIsLoading(true);
     }, [open, loadOptions, search]);
 
-    // --- ASYNC: sólo cuando hay loadOptions; depende de open + debouncedSearch + loadOptions
+    // --- ASYNC
     useEffect(() => {
         if (!open || !loadOptions) return;
 
         const ac = new AbortController();
         const start = performance.now();
-        // (isLoading ya se activó en el efecto de arriba)
 
         Promise.resolve(loadOptions(debouncedSearch, ac.signal))
             .then((res) => {
@@ -111,10 +110,9 @@ const MultiSelectCheckSearch = <T,>({
         return () => ac.abort();
     }, [open, debouncedSearch, loadOptions]);
 
-    // --- LOCAL: sólo cuando hay options; depende de open + options + search
+    // --- LOCAL
     useEffect(() => {
         if (!open || !options) return;
-        // local no usa loader
         setIsLoading(false);
         const term = String(search ?? "").trim().toLowerCase();
         const filtered =
@@ -127,20 +125,23 @@ const MultiSelectCheckSearch = <T,>({
         setList(filtered);
     }, [open, options, rowId, search]);
 
-    // --- Limpieza al cerrar el popover
+    // --- Limpieza
     useEffect(() => {
         if (open) return;
         setList([]);
         setIsLoading(false);
     }, [open]);
 
-    // Asegura que los seleccionados estén presentes
+    // SINGLE-SELECT: final list incluye el seleccionado arriba
     const finalList = useMemo(() => {
-        if (!selected || selected.length === 0) return list;
-        const missingSelected = selected.filter(
-            (s) => !list.some((i) => String(rowId(i)) === String(rowId(s)))
-        );
-        return [...missingSelected, ...list].filter((item, idx, arr) => {
+        if (!selected) return list;
+
+        const exists = list.some((i) => String(rowId(i)) === String(rowId(selected)));
+        const missingSelected = exists ? [] : [selected];
+
+        const combined = [...missingSelected, ...list];
+
+        return combined.filter((item, idx, arr) => {
             const id = String(rowId(item));
             return arr.findIndex((x) => String(rowId(x)) === id) === idx;
         });
@@ -148,22 +149,24 @@ const MultiSelectCheckSearch = <T,>({
 
     // helpers selección
     const isItemSelected = useCallback(
-        (item: T) => selected.some((i) => String(rowId(i)) === String(rowId(item))),
+        (item: T) => selected !== null && String(rowId(selected)) === String(rowId(item)),
         [selected, rowId]
     );
 
     const toggleItem = useCallback(
         (item: T) => {
+            // SINGLE-SELECT real
             if (isItemSelected(item)) {
-                setSelected(selected.filter((i) => String(rowId(i)) !== String(rowId(item))));
+                setSelected(null); // permite deseleccionar
             } else {
-                setSelected([...selected, item]);
+                setSelected(item);
             }
         },
-        [isItemSelected, selected, rowId, setSelected]
+        [isItemSelected, setSelected]
     );
 
-    const filteredItems: T[] = useMemo(
+    // todos menos el seleccionado
+    const filteredItems = useMemo(
         () => finalList.filter((item) => !isItemSelected(item)),
         [finalList, isItemSelected]
     );
@@ -200,6 +203,8 @@ const MultiSelectCheckSearch = <T,>({
                     classNameCheckBoxItemSelected={classNameCheckBoxItemSelected}
                     classNameLabel={classNameLabel}
                     classNameCheckBox={classNameCheckBox}
+                    setOpen={setOpen}
+                    setSearch={setSearch}
                 />
             }
             classNamePopoverFloating={`${StyleModule.popoverFloating} ${classNameContainerPopover ?? ""}`}
@@ -207,8 +212,8 @@ const MultiSelectCheckSearch = <T,>({
     );
 };
 
-const MultiSelectCheckSearchMemo = memo(MultiSelectCheckSearch) as typeof MultiSelectCheckSearch;
-export default MultiSelectCheckSearchMemo;
+const SingleSelectCheckSearchMemo = memo(SingleSelectCheckSearch) as typeof SingleSelectCheckSearch;
+export default SingleSelectCheckSearchMemo;
 
 /* ***************** InputDiv ***************** */
 
@@ -221,7 +226,6 @@ interface InputDivProps {
 
 const InputDiv = ({ placeholder, value, onChange, classNameFieldSearch }: InputDivProps) => {
     const handleOnKeyDownCapture = (e: KeyboardEvent<HTMLDivElement>) => {
-        // permite espacio en el input sin burbujeo
         if (e.key === " ") e.stopPropagation();
     };
 
@@ -241,7 +245,7 @@ const InputDivMemo = memo(InputDiv) as typeof InputDiv;
 
 interface IPopoverSelectProps<T> {
     filteredItems: T[];
-    selected: T[];
+    selected: T | null;
     rowId: (data: T) => string;
     toggleItem: (item: T) => void;
     isLoading?: boolean;
@@ -256,6 +260,8 @@ interface IPopoverSelectProps<T> {
     classNameLabel?: string;
     classNameContainerEmptyMessage?: string;
     classNameCheckBox?: string;
+    setOpen: (value: boolean) => void;
+    setSearch: (value: string) => void;
 }
 
 const PopoverSelect = <T,>({
@@ -275,6 +281,8 @@ const PopoverSelect = <T,>({
     classNameLabel,
     classNameContainerEmptyMessage,
     classNameCheckBox,
+    setSearch,
+    setOpen
 }: IPopoverSelectProps<T>) => {
     const classNameNoSelected = clsx(
         isLoading ? StyleModule.containerCheckBoxesNoSelectedLoading : StyleModule.containerCheckBoxesNoSelected,
@@ -284,26 +292,26 @@ const PopoverSelect = <T,>({
     return (
         <div className={`${StyleModule.containerCheckBoxesMain} ${classNameContainerCheckBoxesMain ?? ""}`}>
             <div className={`${StyleModule.containerCheckBoxesSelected} ${classNameContainerCheckBoxesSelected ?? ""}`}>
-                {selected.length > 0 && (
+                {selected && (
                     <div className={`${StyleModule.containerCheckBoxesSelectedItems} ${classNameContainerCheckBoxesItems ?? ""}`}>
-                        {selected.map((item) => (
-                            <CheckBoxItemMemo
-                                key={String(rowId(item))}
-                                rowId={rowId}
-                                item={item}
-                                isSelected
-                                toggleItem={toggleItem}
-                                classNameCheckBoxItem={classNameCheckBoxItem}
-                                classNameCheckBoxItemSelected={classNameCheckBoxItemSelected}
-                                classNameLabel={classNameLabel}
-                                classNameCheckBox={classNameCheckBox}
-                            />
-                        ))}
+                        <CheckBoxItemMemo
+                            key={String(rowId(selected))}
+                            setOpen={setOpen}
+                            rowId={rowId}
+                            item={selected}
+                            isSelected
+                            toggleItem={toggleItem}
+                            classNameCheckBoxItem={classNameCheckBoxItem}
+                            classNameCheckBoxItemSelected={classNameCheckBoxItemSelected}
+                            classNameLabel={classNameLabel}
+                            classNameCheckBox={classNameCheckBox}
+                            setSearch={setSearch}
+                        />
                     </div>
                 )}
             </div>
 
-            {selected.length > 0 && filteredItems.length > 0 && (
+            {selected && filteredItems.length > 0 && (
                 <Divider orientation="horizontal" color={colorMain} />
             )}
 
@@ -320,6 +328,7 @@ const PopoverSelect = <T,>({
                     <div className={`${StyleModule.containerCheckBoxesNoSelectedItems} ${classNameContainerCheckBoxesItems ?? ""}`}>
                         {filteredItems.map((item) => (
                             <CheckBoxItemMemo
+                                setOpen={setOpen}
                                 key={String(rowId(item))}
                                 rowId={rowId}
                                 item={item}
@@ -328,6 +337,7 @@ const PopoverSelect = <T,>({
                                 classNameCheckBoxItemSelected={classNameCheckBoxItemSelected}
                                 classNameLabel={classNameLabel}
                                 classNameCheckBox={classNameCheckBox}
+                                setSearch={setSearch}
                             />
                         ))}
                     </div>
@@ -344,12 +354,14 @@ const PopoverSelectMemo = memo(PopoverSelect) as typeof PopoverSelect;
 interface ICheckBoxItemProps<T> {
     rowId: (data: T) => string;
     item: T;
+    setOpen: (value: boolean) => void;
     isSelected?: boolean;
     toggleItem: (item: T) => void;
     classNameCheckBoxItem?: string;
     classNameLabel?: string;
     classNameCheckBoxItemSelected?: string;
     classNameCheckBox?: string;
+    setSearch: (value: string) => void;
 }
 
 const CheckBoxItem = <T,>({
@@ -358,9 +370,11 @@ const CheckBoxItem = <T,>({
     isSelected = false,
     toggleItem,
     classNameCheckBoxItem,
+    setOpen,
     classNameLabel,
     classNameCheckBoxItemSelected,
     classNameCheckBox,
+    setSearch
 }: ICheckBoxItemProps<T>) => {
     const value = useMemo(() => String(rowId(item) ?? ""), [item, rowId]);
 
@@ -370,6 +384,8 @@ const CheckBoxItem = <T,>({
                 e.preventDefault();
                 e.stopPropagation();
                 toggleItem(item);
+                setSearch(rowId(item));
+                setOpen(false);
             }
         },
         [item, toggleItem]
@@ -380,6 +396,8 @@ const CheckBoxItem = <T,>({
             e.preventDefault();
             e.stopPropagation();
             toggleItem(item);
+            setSearch(rowId(item));
+            setOpen(false);
         },
         [item, toggleItem]
     );
@@ -391,7 +409,7 @@ const CheckBoxItem = <T,>({
             tabIndex={0}
             className={`${StyleModule.checkBoxItem} ${isSelected ? classNameCheckBoxItemSelected ?? "" : classNameCheckBoxItem ?? ""}`}
         >
-            <input
+            {/* <input
                 id={`id-${value}`}
                 type="checkbox"
                 role="option"
@@ -400,7 +418,7 @@ const CheckBoxItem = <T,>({
                 readOnly
                 tabIndex={-1}
                 className={classNameCheckBox}
-            />
+            /> */}
             <label className={`nunito-regular ${StyleModule.label} ${classNameLabel ?? ""}`} htmlFor={`id-${value}`}>
                 {value}
             </label>

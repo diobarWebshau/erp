@@ -86,6 +86,8 @@ const Step2 = memo(({
         }))
     }, [dispatch]);
 
+    const getRowAttr = useMemo(() => (data: IProduct) => data.name || "", []);
+
     const excludeIds = useMemo<number[]>(
         () =>
             state.data?.production_lines_products
@@ -248,7 +250,7 @@ const Step2 = memo(({
                     labelOnClick="Asignar productos"
                     headerTitle="Asignar productos"
                     emptyMessage="No hay productos que coincidan con la búsqueda"
-                    attribute="name"
+                    getRowAttr={getRowAttr}
                     loadOptions={fetchLoadProducts}
                 />
             )

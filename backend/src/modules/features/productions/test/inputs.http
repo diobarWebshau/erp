@@ -7,6 +7,9 @@ GET http://localhost:3003/production/inputs/types/1
 ### Obtener un input por ID
 GET http://localhost:3003/production/inputs/id/1
 
+### Obtener un input por ID
+GET http://localhost:3003/production/inputs/exclude?filter=insX&excludeIds=5&excludeIds=9
+
 ### Obtener un input por nombre
 GET http://localhost:3003/production/inputs/name/nombreEjemplo
 

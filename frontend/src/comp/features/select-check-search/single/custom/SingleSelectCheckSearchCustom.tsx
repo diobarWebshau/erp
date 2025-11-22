@@ -1,12 +1,12 @@
 
-import MultiSelectCheckSearchMemo from "../base/MultiSelectCheckSearch";
-import StyleModule from "./MultiSelectCheckSearchCustom.module.css"
+import SingleSelectCheckSearchMemo from "../base/SingleSelectCheckSearch";
+import StyleModule from "./SingleSelectCheckSearchCustom.module.css"
 import { memo, type ReactNode } from "react";
 
-interface MultiSelectCheckSearchCustomProps<T> {
+interface SingleSelectCheckSearchCustomProps<T> {
     options?: T[];
-    selected: T[];
-    setSelected: (selected: T[]) => void;
+    selected: T | null;
+    setSelected: (selected: T | null) => void;
     rowId: (data: T) => string;
     colorMain?: string;
     initialOpen?: boolean;
@@ -16,7 +16,7 @@ interface MultiSelectCheckSearchCustomProps<T> {
     loadOptions?: (query: string | number) => Promise<T[]>;
 }
 
-const MultiSelectCheckSearchCustom = <T,>({
+const SingleSelectCheckSearchCustom = <T,>({
     options,
     selected,
     setSelected,
@@ -27,8 +27,8 @@ const MultiSelectCheckSearchCustom = <T,>({
     maxHeight,
     emptyMessage,
     loadOptions,
-}: MultiSelectCheckSearchCustomProps<T>) => {
-    return <MultiSelectCheckSearchMemo
+}: SingleSelectCheckSearchCustomProps<T>) => {
+    return <SingleSelectCheckSearchMemo
         options={options}
         selected={selected}
         setSelected={setSelected}
@@ -49,6 +49,6 @@ const MultiSelectCheckSearchCustom = <T,>({
     />
 };
 
-const MultiSelectCheckSearchCustomMemo = memo(MultiSelectCheckSearchCustom) as typeof MultiSelectCheckSearchCustom;
+const SingleSelectCheckSearchCustomMemo = memo(SingleSelectCheckSearchCustom) as typeof SingleSelectCheckSearchCustom;
 
-export default MultiSelectCheckSearchCustomMemo;
+export default SingleSelectCheckSearchCustomMemo;

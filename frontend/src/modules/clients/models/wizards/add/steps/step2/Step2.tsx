@@ -160,6 +160,8 @@ const Step2 = ({
 
     // * *********** Funciones memoizadas para las tablas ************ 
 
+    const getRowAttr = useMemo(() => (data: IProduct) => data.name || "", []);
+
     const getRowIdAddresses = useMemo(() => (row: IPartialClientAddress, index: number) => row.id?.toString() ?? index.toString(), []);
     const getRowIdDiscounts = useMemo(() => (row: IPartialProductDiscountClient, index: number) => row.id?.toString() ?? index.toString(), []);
 
@@ -512,7 +514,7 @@ const Step2 = ({
                     labelOnClick="Agregar productos"
                     headerTitle="Selecciona los productos"
                     emptyMessage="No hay productos o no coinciden con la busqueda"
-                    attribute="name"
+                    getRowAttr={getRowAttr}
                     loadOptions={fetchLoadProducts}
                 />
             )}

@@ -5,6 +5,7 @@ const createProcessesRouter = () => {
     const processesRouter = Router();
     processesRouter.get("/", processesController.getAll);
     processesRouter.get("/id/:id", processesController.getById);
+    processesRouter.get("/exclude", processesController.getByLikeExcludeIds);
     processesRouter.get("/name/:name", processesController.getByName);
     processesRouter.post("/", validateProcessesMiddleware, processesController.create);
     processesRouter.patch("/:id", validateProcessesMiddleware, processesController.update);

@@ -1,4 +1,4 @@
-import type { IProduct } from "interfaces/product";
+import type { IPartialProduct } from "interfaces/product";
 import type { ItemState, ItemAction } from "./itemTypes";
 import { itemActionsType } from "./itemTypes";
 import { produce } from "immer";
@@ -20,36 +20,64 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             break;
         }
         // ? data --> item == product
+        case itemActionsType.SET_PRODUCT: {
+            Object.assign(draft.data, action.payload);
+            break;
+        }
+        case itemActionsType.UPDATE_PRODUCT: {
+            Object.assign(draft.data, action.payload);
+            break;
+        }
         case itemActionsType.ADDS_INPUTS_TO_PRODUCTS: {
-            const item = draft.data.item as IProduct;
+            const item = draft.data.item as IPartialProduct;
             if (!item.products_inputs) item.products_inputs = [];
             item.products_inputs.push(...action.payload);
             break;
         }
         case itemActionsType.REMOVE_INPUTS_FROM_PRODUCTS: {
-            const item = draft.data.item as IProduct;
-            if (!item.products_inputs || item.products_inputs?.length === 0) return;
-            const idsToRemove = new Set<string | number>(action.payload);
+            const item = draft.data.item as IPartialProduct;
+            if (!item.products_inputs || item.products_inputs.length === 0) return;
+            const idsToRemove = new Set(action.payload.map(id => String(id)));
             item.products_inputs = item.products_inputs.filter(it => {
-                const id = it.id;
-                return id == null ? true : !idsToRemove.has(id);
+                if (it.id == null) return true;
+                return !idsToRemove.has(String(it.id));
             });
             break;
         }
+        case itemActionsType.UPDATE_INPUTS_FROM_PRODUCTS: {
+            const item = draft.data.item as IPartialProduct;
+            if (!item.products_inputs || item.products_inputs?.length === 0) return;
+            const { id, attributes } = action.payload;
+            const input = item.products_inputs.find(it => it.id === id);
+            if (input) {
+                Object.assign(input, attributes);
+            }
+            break;
+        }
         case itemActionsType.ADDS_DISCOUNT_TO_PRODUCTS: {
-            const item = draft.data.item as IProduct;
+            const item = draft.data.item as IPartialProduct;
             if (!item.product_discount_ranges) item.product_discount_ranges = [];
             item.product_discount_ranges.push(...action.payload);
             break;
         }
         case itemActionsType.REMOVE_DISCOUNT_FROM_PRODUCTS: {
-            const item = draft.data.item as IProduct;
+            const item = draft.data.item as IPartialProduct;
             if (!item.product_discount_ranges || item.product_discount_ranges?.length === 0) return;
             const idsToRemove = new Set<string | number>(action.payload);
             item.product_discount_ranges = item.product_discount_ranges.filter(it => {
-                const id = it.id;
-                return id == null ? true : !idsToRemove.has(id);
+                if (it.id == null) return true;
+                return !idsToRemove.has(String(it.id));
             });
+            break;
+        }
+        case itemActionsType.UPDATE_DISCOUNT_FROM_DRAFT_PRODUCTS: {
+            const item = draft.data.item as IPartialProduct;
+            if (!item.product_discount_ranges || item.product_discount_ranges?.length === 0) return;
+            const { id, attributes } = action.payload;
+            const discount = item.product_discount_ranges.find(it => it.id === id);
+            if (discount) {
+                Object.assign(discount, attributes);
+            }
             break;
         }
         // ? data -> item == input
@@ -71,14 +99,22 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             break;
         }
         // ? draft --> item == product
+        case itemActionsType.SET_DRAFT_PRODUCT: {
+            Object.assign(draft.draft, action.payload);
+            break;
+        }
+        case itemActionsType.UPDATE_DRAFT_PRODUCT: {
+            Object.assign(draft.draft, action.payload);
+            break;
+        }
         case itemActionsType.ADDS_INPUTS_TO_DRAFT_PRODUCTS: {
-            const item = draft.draft.item as IProduct;
+            const item = draft.draft.item as IPartialProduct;
             if (!item.products_inputs) item.products_inputs = [];
             item.products_inputs.push(...action.payload);
             break;
         }
         case itemActionsType.REMOVE_INPUTS_FROM_DRAFT_PRODUCTS: {
-            const item = draft.draft.item as IProduct;
+            const item = draft.draft.item as IPartialProduct;
             if (!item.products_inputs || item.products_inputs?.length === 0) return;
             const idsToRemove = new Set<string | number>(action.payload);
             item.products_inputs = item.products_inputs.filter(it => {
@@ -87,20 +123,40 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             });
             break;
         }
+        case itemActionsType.UPDATE_INPUTS_FROM_DRAFT_PRODUCTS: {
+            const item = draft.draft.item as IPartialProduct;
+            if (!item.products_inputs || item.products_inputs?.length === 0) return;
+            const { id, attributes } = action.payload;
+            const input = item.products_inputs.find(it => it.id === id);
+            if (input) {
+                Object.assign(input, attributes);
+            }
+            break;
+        }
         case itemActionsType.ADDS_DISCOUNT_TO_DRAFT_PRODUCTS: {
-            const item = draft.draft.item as IProduct;
+            const item = draft.draft.item as IPartialProduct;
             if (!item.product_discount_ranges) item.product_discount_ranges = [];
             item.product_discount_ranges.push(...action.payload);
             break;
         }
         case itemActionsType.REMOVE_DISCOUNT_FROM_DRAFT_PRODUCTS: {
-            const item = draft.draft.item as IProduct;
+            const item = draft.draft.item as IPartialProduct;
             if (!item.product_discount_ranges || item.product_discount_ranges?.length === 0) return;
             const idsToRemove = new Set<string | number>(action.payload);
             item.product_discount_ranges = item.product_discount_ranges.filter(it => {
                 const id = it.id;
                 return id == null ? true : !idsToRemove.has(id);
             });
+            break;
+        }
+        case itemActionsType.UPDATE_DISCOUNT_FROM_DRAFT_PRODUCTS: {
+            const item = draft.draft.item as IPartialProduct;
+            if (!item.product_discount_ranges || item.product_discount_ranges?.length === 0) return;
+            const { id, attributes } = action.payload;
+            const discount = item.product_discount_ranges.find(it => it.id === id);
+            if (discount) {
+                Object.assign(discount, attributes);
+            }
             break;
         }
         // ? draft --> item == input

@@ -13,6 +13,7 @@ import sequelize from "../../../../mysql/configSequelize.js";
 import toBoolean from "../../../../scripts/toBolean.js";
 
 class InputController {
+
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const response = await InputModel.findAll();
@@ -30,6 +31,45 @@ class InputController {
             }
         }
     }
+
+    static getByLikeExcludeIds = async (req: Request, res: Response, next: NextFunction) => {
+        const raw = req.query.excludeIds;
+        const filter = req.query.filter;
+        const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+        const ids = arr.map(Number).filter(Number.isFinite);
+        const where: any = {};
+
+        if (filter !== "" && filter !== undefined) {
+            where[Op.or] = [
+                { name: { [Op.like]: `${filter}%` } },
+                { description: { [Op.like]: `${filter}%` } },
+                { custom_id: { [Op.like]: `${filter}%` } },
+            ];
+        }
+
+        if (ids.length > 0) {
+            where.id = { [Op.notIn]: ids };
+        }
+
+        try {
+            const results = await InputModel.findAll({
+                where: where,
+                attributes: InputModel.getAllFields()
+            });
+            if (!(results.length > 0)) {
+                res.status(200).json([]);
+                return;
+            }
+            const products = results.map((p) => p.toJSON());
+            res.status(200).json(products);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                next(error);
+            } else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    };
 
     static getInputsWithInputType = async (
         req: Request,
@@ -230,12 +270,12 @@ class InputController {
                 await InputModel.create({
                     name: name ?? null,
                     description: description ?? null,
-                    custom_id : custom_id ?? null,
-                    input_types_id : custom_id ?? null,
-                    unit_cost : custom_id ?? null,
-                    supplier : custom_id ?? null,
-                    photo : custom_id ?? null,
-                    status : custom_id ?? null,
+                    custom_id: custom_id ?? null,
+                    input_types_id: custom_id ?? null,
+                    unit_cost: custom_id ?? null,
+                    supplier: custom_id ?? null,
+                    photo: custom_id ?? null,
+                    status: custom_id ?? null,
                     barcode: barcode ?? null,
                     storage_conditions: storage_conditions ?? null
                 }, { transaction }
@@ -534,7 +574,7 @@ class InputController {
             }
             if (update_values?.photo) {
                 const inputAux = validateInput.toJSON();
-                if (inputAux.photo){
+                if (inputAux.photo) {
                     await ImageHandler.removeImageIfExists(inputAux.photo);
                 }
             }
@@ -612,8 +652,8 @@ class InputController {
                 });
                 return;
             }
-            if (inputDelete.photo){
-                await ImageHandler .removeImageIfExists(inputDelete.photo);
+            if (inputDelete.photo) {
+                await ImageHandler.removeImageIfExists(inputDelete.photo);
 
             }
             res.status(200).json({

@@ -3,7 +3,6 @@ import MainActionButtonCustom from "../../primitives/button/custom-button/main-a
 import DialogModal from "../../primitives/modal2/dialog-modal/base/DialogModal";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import type { StrictStringKeys } from "../../../interfaces/globalTypes";
 import styleModule from "./SelectProductsModal.module.css"
 import MultiSelectCheckSearchCustomMemo from "../select-check-search/multiple/custom/MultiSelectCheckSearchCustom";
 
@@ -12,10 +11,9 @@ interface SelectObjectsModalProps<T> {
     onClick: (objects: T[]) => void,
     labelOnClick: string,
     headerTitle: string,
-
     // ? MultiSelectSearchCheckCustom
     emptyMessage: string,
-    attribute: StrictStringKeys<T>,
+    getRowAttr: (data: T) => string,
     loadOptions: (query: string | number) => Promise<T[]>
 }
 
@@ -25,7 +23,7 @@ const SelectObjectsModal = <T,>({
     labelOnClick,
     headerTitle,
     emptyMessage,
-    attribute,
+    getRowAttr,
     loadOptions
 }: SelectObjectsModalProps<T>) => {
 
@@ -48,7 +46,7 @@ const SelectObjectsModal = <T,>({
                         {headerTitle}
                     </h2>
                     <MultiSelectCheckSearchCustomMemo
-                        rowId={attribute}
+                        rowId={getRowAttr}
                         loadOptions={loadOptions}
                         selected={selectedObject}
                         setSelected={setSelectedObject}

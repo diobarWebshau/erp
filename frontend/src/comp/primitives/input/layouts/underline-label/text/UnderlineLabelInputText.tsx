@@ -40,7 +40,7 @@ const UnderlineLabelInputText = ({
         const labelC = clsx(
             StyleModule.label,
             "nunito-semibold",
-            (focused || (value && value.length > 0)) && StyleModule.floating,
+            (focused || (value && value.length > 0)) && StyleModule.labelFloating,
             (errorActive && (!value || (typeof value === "string" && value.length === 0)) && focused) && StyleModule.labelError
         );
         const inputC = clsx(

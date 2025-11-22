@@ -124,6 +124,8 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
         [state.draft?.product_discounts_client]
     );
 
+    const getRowAttr = useMemo(() => (data: IProduct) => data.name || "", []);
+
     const fetchLoadProducts = useCallback(async (query: string | number): Promise<IProduct[]> => {
         try {
 
@@ -532,7 +534,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
                     labelOnClick="Agregar productos"
                     headerTitle="Selecciona los productos"
                     emptyMessage="No hay productos o no coinciden con la busqueda"
-                    attribute="name"
+                    getRowAttr={getRowAttr}
                     loadOptions={fetchLoadProducts}
                 />
             )}

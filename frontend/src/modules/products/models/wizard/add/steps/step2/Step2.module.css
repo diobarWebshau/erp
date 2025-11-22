@@ -1,6 +1,10 @@
 /* *************** Container *************** */
 
 .containerStep {
+    /*dimension */
+    min-width: 0;
+    min-height: 0;
+
     /* distirbucion flex respecto al padre*/
     flex: 1;
 
@@ -9,6 +13,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
+    gap: 1rem;
 }
 
 .containerContent {
@@ -17,6 +22,10 @@
 }
 
 .containerButtons {
+    /*dimension */
+    min-width: 0;
+    min-height: 0;
+
     /* distribucion flex respecto al padre */
     flex-grow: 0;
     flex-shrink: 0;
@@ -26,11 +35,20 @@
 /* ************** Container Content **************** */
 
 .containerContent {
+    /*dimension */
+    min-width: 0;
+    min-height: 0;
+
     /* distribucion flex */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     gap: 1rem;
+
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-theme-primary) transparent;
+
 }
 
 .firstBlock {
@@ -38,7 +56,7 @@
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: auto;
-    
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -57,17 +75,18 @@
 
 .infoContainer {
     /* distribucion flex respecto al padre */
-    flex:1;
+    flex: 1;
     /* distribucion flex */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
     gap: 1rem;
+    padding-top: 1rem;
 
 }
 
-.inputGroup{
+.inputGroup {
     /* distribucion flex */
     display: flex;
     flex-direction: row;
@@ -75,15 +94,55 @@
     gap: 0.5rem;
 }
 
-.inputGroup > *{
+.inputGroup>* {
     /* distribucion flex respecto al padre */
     flex: 1;
 }
 
-.subTitle{
+.externalContainerTable {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.contentHeaderTable {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.subTitle {
     /* estilos */
     font-size: 16px;
     color: var(--color-theme-font-black);
+}
+
+.containerButtonsDiv{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+
+}
+
+/* ********** Options Row ********** */
+
+.iconTrash {
+    /* interactividad */
+    cursor: pointer;
+    /* estilos svg */
+    stroke: var(--color-alert);
+    width: 16px;
+    height: 16px;
 }
 
 /* *************** Container Buttons *************** */

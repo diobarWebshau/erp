@@ -25,6 +25,43 @@ class InputController {
             }
         }
     };
+    static getByLikeExcludeIds = async (req, res, next) => {
+        const raw = req.query.excludeIds;
+        const filter = req.query.filter;
+        const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+        const ids = arr.map(Number).filter(Number.isFinite);
+        const where = {};
+        if (filter !== "" && filter !== undefined) {
+            where[Op.or] = [
+                { name: { [Op.like]: `${filter}%` } },
+                { description: { [Op.like]: `${filter}%` } },
+                { custom_id: { [Op.like]: `${filter}%` } },
+            ];
+        }
+        if (ids.length > 0) {
+            where.id = { [Op.notIn]: ids };
+        }
+        try {
+            const results = await InputModel.findAll({
+                where: where,
+                attributes: InputModel.getAllFields()
+            });
+            if (!(results.length > 0)) {
+                res.status(200).json([]);
+                return;
+            }
+            const products = results.map((p) => p.toJSON());
+            res.status(200).json(products);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                next(error);
+            }
+            else {
+                console.error(`An unexpected error occurred: ${error}`);
+            }
+        }
+    };
     static getInputsWithInputType = async (req, res, next) => {
         const { id } = req.params;
         try {

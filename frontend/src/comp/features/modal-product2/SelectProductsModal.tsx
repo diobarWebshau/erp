@@ -1,9 +1,8 @@
 import CriticalActionButton from "../../primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../primitives/button/custom-button/main-action/MainActionButtonCustom";
 import DialogModal from "../../primitives/modal2/dialog-modal/base/DialogModal";
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { Plus } from "lucide-react";
-import type { StrictStringKeys } from "../../../interfaces/globalTypes";
 import styleModule from "./SelectProductsModal.module.css"
 import MultiSelectCheckSearchCustomMemo from "../select-check-search/multiple/custom/MultiSelectCheckSearchCustom";
 
@@ -14,7 +13,7 @@ interface SelectObjectsModalProps<T> {
     headerTitle: string,
     // ? MultiSelectSearchCheckCustom
     emptyMessage: string,
-    attribute: StrictStringKeys<T>,
+    getRowAttr: (data: T) => string,
     placeholder: string,
     loadOptions?: (query: string | number) => Promise<T[]>
     options?: T[]
@@ -28,7 +27,7 @@ const SelectObjectsModal = <T,>({
     labelOnClick,
     headerTitle,
     emptyMessage,
-    attribute,
+    getRowAttr,
     placeholder,
     loadOptions,
     options,
@@ -51,7 +50,7 @@ const SelectObjectsModal = <T,>({
                         {headerTitle}
                     </h2>
                     <MultiSelectCheckSearchCustomMemo
-                        rowId={attribute}
+                        rowId={getRowAttr}
                         {...(loadOptions
                             ? { loadOptions }
                             : { options }
@@ -81,4 +80,6 @@ const SelectObjectsModal = <T,>({
     );
 };
 
-export default SelectObjectsModal;
+const SelectObjectsModalMemo = memo(SelectObjectsModal) as typeof SelectObjectsModal;
+
+export default SelectObjectsModalMemo;

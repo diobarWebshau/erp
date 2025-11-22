@@ -27,7 +27,6 @@ const options = ["Producto terminado", "Materia prima"];
 
 const Step1 = ({ state, dispatch, onCancel }: Step1Prop) => {
 
-
     const [name, setName] = useState<string | null>(state.data.item?.name ?? null);
     const [customId, setCustomId] = useState<string | null>(state.data.item?.custom_id ?? null);
     const [itemType, setItemType] = useState<string | null>(
@@ -56,19 +55,30 @@ const Step1 = ({ state, dispatch, onCancel }: Step1Prop) => {
             return;
         }
         const castItemType = itemType === "Producto terminado" ? "product" : "input";
-        let item: IPartialProduct | IPartialInput = {
-            name: name ?? undefined,
-            custom_id: customId ?? undefined,
-            barcode: barcode ?? undefined,
-            description: description ?? undefined
-        };
+        let item: IPartialProduct | IPartialInput = {};
+        if (state.data.item_type !== castItemType) {
+            item = {
+                name: name ?? undefined,
+                custom_id: customId ?? undefined,
+                barcode: barcode ?? undefined,
+                description: description ?? undefined
+            };
+        } else {
+            item = {
+                ...state.data.item,
+                name: name ?? undefined,
+                custom_id: customId ?? undefined,
+                barcode: barcode ?? undefined,
+                description: description ?? undefined
+            };
+        }
         const itemObject: IPartialItem = {
             item: item,
             item_type: castItemType
         };
         dispatch(update_item(itemObject));
         dispatch(next_step());
-    }, [dispatch, name, customId, barcode, itemType, description]);
+    }, [dispatch, state.data, name, customId, barcode, itemType, description]);
 
     return (
         <div className={StyleModule.containerStep}>

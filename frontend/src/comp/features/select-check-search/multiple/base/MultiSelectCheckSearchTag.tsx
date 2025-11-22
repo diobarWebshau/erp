@@ -1,10 +1,9 @@
 import { memo, useCallback, useEffect, useMemo, useState, type KeyboardEvent, type KeyboardEventHandler, type MouseEvent, type MouseEventHandler, type ReactNode } from "react";
 import PopoverFloating from "../../../../external/floating/pop-over/PopoverFloating"
-import InputTextCustom from "./../../../../../comp/primitives/input/text/custom/InputTextCustom";
-import { Loader, Search } from "lucide-react";
+import { Loader, Search, X } from "lucide-react";
 import useDebounceBasic from "./../../../../../hooks/useDebounceBasic"
 import { Divider } from "@mantine/core";
-import StyleModule from "./MultiSelectCheckSearch.module.css"
+import StyleModule from "./MultiSelectCheckSearchTag.module.css"
 
 interface MultiSelectCheckSearchProps<T> {
 
@@ -18,7 +17,7 @@ interface MultiSelectCheckSearchProps<T> {
     // props para la fuente de datos(Solo se puede habilitar una a la vez)
     options?: T[]
     loadOptions?: (inputValue: string | number) => Promise<T[]>;
-    rowId: keyof T;
+    rowId: (data: T) => string;
 
     // props para el estado de seleccion
     selected: T[];
@@ -97,11 +96,10 @@ const MultiSelectCheckSearch = <T,>({
             if (search.trim() !== "") {
                 // Se filtra la lista de datos
                 filtered = options.filter((item) => {
-                    const val = String(item[rowId] ?? "").toLowerCase();
+                    const val = String(rowId(item) ?? "").toLowerCase();
                     return val.includes(search.toLowerCase());
                 });
             }
-            // Se coloca la lista de datos
             setList(filtered);
         }
     }, [search, loadOptions, options, open, debouncedSearch]);
@@ -113,22 +111,22 @@ const MultiSelectCheckSearch = <T,>({
         // Se crea un set de los ids de los seleccionados
         // const selectedIds = new Set(selected.map((s) => String(s[rowId])));
         // Se filtra la lista de datos( los que no esten seleccionados)
-        const missingSelected = selected.filter((s) => !list.some((i) => String(i[rowId]) === String(s[rowId])));
+        const missingSelected = selected.filter((s) => !list.some((i) => String(rowId(i)) === String(rowId(s))));
         // Coloca seleccionados primero (útil en UIs densas); si prefieres al final, cambia el spread
         return [...missingSelected, ...list].filter((item, idx, arr) => { // Para evitar que haya duplicados
-            const id = String(item[rowId]); // Obtiene el id del item
-            return arr.findIndex((x) => String(x[rowId]) === id) === idx; // Si el id es el mismo, se coloca el item
+            const id = String(rowId(item)); // Obtiene el id del item
+            return arr.findIndex((x) => String(rowId(x)) === id) === idx; // Si el id es el mismo, se coloca el item
         });
     }, [list, selected, rowId]);
 
 
     // ? Esta function es para verificar si un item esta seleccionado
-    const isItemSelected = useCallback((item: T) => selected.some((i) => String(i[rowId]) === String(item[rowId])), [selected, rowId]);
+    const isItemSelected = useCallback((item: T) => selected.some((i) => String(rowId(i)) === String(rowId(item))), [selected, rowId]);
 
     // ? Esta function es para alternar la seleccion de un item
     const toggleItem = useCallback((item: T) => {
         if (isItemSelected(item)) {
-            setSelected(selected.filter((i) => String(i[rowId]) !== String(item[rowId])));
+            setSelected(selected.filter((i) => String(rowId(i)) !== String(rowId(item))));
         } else {
             setSelected([...selected, item]);
         }
@@ -144,26 +142,16 @@ const MultiSelectCheckSearch = <T,>({
         {...(maxHeight && { maxHeight })}
         childrenTrigger={
             <div className={StyleModule.containerTrigger}>
-                {selected.map((item) => (
-                    <span
-                        className={StyleModule.tagObject}
-                        key={String(item[rowId])}
-                    >
-                        {String(item[rowId])}
-                    </span>
-                ))}
                 <InputDivMemo
+                    rowId={rowId}
+                    selected={selected}
+                    search={search}
+                    setSelected={setSelected}
                     value={search}
                     onChange={setSearch}
                     placeholder={placeholder}
                     classNameFieldSearch={classNameFieldSearch}
                 />
-                {/* <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder={placeholder}
-                /> */}
             </div>
         }
         childrenFloating={
@@ -197,19 +185,27 @@ export default MultiSelectCheckSearchMemo;
 
 /* * ******** InputDiv ******** */
 
-interface InputDivProps {
-    value: string;
-    onChange: (value: string) => void;
-    placeholder?: string;
-    classNameFieldSearch?: string;
+interface InputDivProps<T> {
+    value: string,
+    rowId: (data: T) => string,
+    onChange: (value: string) => void,
+    placeholder?: string,
+    search: string,
+    selected: T[],
+    setSelected: (selected: T[]) => void,
+    classNameFieldSearch?: string
 }
 
-const InputDiv = ({
+const InputDiv = <T,>({
     placeholder,
+    rowId,
     value,
+    search,
     onChange,
     classNameFieldSearch,
-}: InputDivProps) => {
+    selected,
+    setSelected
+}: InputDivProps<T>) => {
 
     const handleOnKeyDownCapture = (e: KeyboardEvent<HTMLDivElement>) => {
         // No hacemos el e.preventDefault() para que el input escriba el espacio
@@ -219,17 +215,49 @@ const InputDiv = ({
         }
     };
 
-    return <div
-        onKeyDownCapture={handleOnKeyDownCapture}
-        className={`${StyleModule.containerFieldSearch} ${classNameFieldSearch}`}
-    >
-        <InputTextCustom
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            icon={<Search />}
-        />
-    </div>
+    const handleOnChangeInput = (useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        onChange(e.target.value);
+    }, [onChange]));
+
+    return (
+        <div
+            onKeyDownCapture={handleOnKeyDownCapture}
+            className={`${StyleModule.containerFieldSearch} ${classNameFieldSearch}`}
+        >
+            <div className={StyleModule.inputTagsContainer}>
+                {
+                    selected.map(
+                        (item, index) => (
+                            <div
+                                key={index}
+                                className={StyleModule.tagObjectInput}
+                            >
+                                <span className={`nunito-bold ${StyleModule.attrTagObject}`}>{String(rowId(item))}</span>
+                                <span className={StyleModule.tagDeleteIconContainer}>
+                                    <X className={StyleModule.tagDeleteIcon}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const newSelected = selected.filter((_, i) => i !== index);
+                                            setSelected(newSelected);
+                                        }}
+                                    />
+                                </span>
+                            </div>
+                        )
+                    )
+                }
+                <input
+                    type="text"
+                    className={StyleModule.inputFieldSearch}
+                    value={search}
+                    onChange={handleOnChangeInput}
+                />
+            </div>
+            <div className={StyleModule.iconSearchContainer}>
+                <Search className={StyleModule.iconSearch} />
+            </div>
+        </div>
+    );
 }
 
 const InputDivMemo = memo(InputDiv) as typeof InputDiv;
@@ -240,7 +268,7 @@ interface IPopoverSelectProps<T> {
     filteredItems: T[];
     finalList: T[];
     selected: T[];
-    rowId: keyof T;
+    rowId: (data: T) => string;
     toggleItem: (item: T) => void;
     isLoading?: boolean;
     EmptyMessage?: React.ReactNode;
@@ -347,7 +375,7 @@ const PopoverSelectMemo = memo(PopoverSelect) as typeof PopoverSelect;
 // * ********** CheckBoxItem ********** */
 
 interface ICheckBoxItemProps<T> {
-    rowId: keyof T;
+    rowId: (data: T) => string;
     item: T;
     isSelected?: boolean;
     toggleItem: (item: T) => void;
@@ -368,7 +396,7 @@ const CheckBoxItem = <T,>({
     classNameCheckBox,
 }: ICheckBoxItemProps<T>) => {
 
-    const value = useMemo(() => String(item[rowId] ?? ""), [item, rowId]);
+    const value = useMemo(() => String(rowId(item) ?? ""), [item, rowId]);
 
     const handleOnKeyDown: KeyboardEventHandler<HTMLDivElement> = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
         // Esto evita que el input pierda el focus
@@ -388,7 +416,7 @@ const CheckBoxItem = <T,>({
 
     return (
         <div
-            key={String(item[rowId])}
+            key={String(rowId(item))}
             onKeyDown={handleOnKeyDown}
             onMouseDown={handleMouseDown}
             tabIndex={0}

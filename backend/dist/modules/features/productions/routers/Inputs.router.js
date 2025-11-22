@@ -8,6 +8,7 @@ const createInputsRouter = () => {
     InputRouter.get("/types/:id", InputsController.getInputsWithInputType);
     InputRouter.get("/id/:id", InputsController.getById);
     InputRouter.get("/name/:name", InputsController.getByName);
+    InputRouter.get("/exclude", InputsController.getByLikeExcludeIds);
     InputRouter.post("/", uploadImageMiddleware, validateInputsMiddleware, InputsController.create);
     InputRouter.post(`/create-complete`, uploadImageMiddleware, validateInputsMiddleware, InputsController.createComplete);
     InputRouter.patch("/:id", uploadImageMiddleware, validateInputsMiddleware, InputsController.update);
