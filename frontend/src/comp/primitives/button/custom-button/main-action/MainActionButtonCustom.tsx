@@ -29,7 +29,7 @@ const MainActionButtonCustom = ({
         const spanClassNames = `${ classNameSpan } ${ StyleModule.mainActionButtonCustomSpan }`;
         const labelClassNames = `nunito-medium ${StyleModule.mainActionLabel} ${disabled ? StyleModule.mainActionButtonCustomLabelDisabled : StyleModule.mainActionButtonCustomLabelEnabled} ${classNameLabel} `;
         return [iconWithClass, buttonClassNames, spanClassNames, labelClassNames];
-    }, [icon, disabled, classNameButton, classNameSpan, classNameLabel, classNameSpan])
+    }, [icon, disabled, classNameButton, classNameSpan, classNameLabel])
 
     return (
         <FadeButton

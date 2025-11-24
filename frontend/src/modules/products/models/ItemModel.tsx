@@ -8,11 +8,11 @@ import InputTextCustom from "../../../comp/primitives/input/text/custom/InputTex
 import { Download, Eraser, PlusIcon, Search, Trash2 } from "lucide-react";
 import type { RowAction } from "comp/primitives/table/types";
 import useItems from "../../../modelos/item/hooks/useItem";
-import { useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import ItemsColumns from "./columns/columns";
 import type { IItem } from "interfaces/item";
 import StyleModule from "./IttemModel.module.css";
-import ItemModuleProvider from "./../context/ItemModuleProvider";
+import ItemModuleProvider from "./../context/itemModuleProvider";
 import AddWizardItem from "./wizard/add/AddWizardItem";
 
 const ItemModel = () => {
@@ -33,49 +33,9 @@ const ItemModel = () => {
         }
     ], []);
 
-    const ExtraComponents = useCallback(() => {
-        const state = useTableState();
-        const dispatch = useTableDispatch();
-
-        const handleClearFilters = useCallback(() => {
-            dispatch(reset_column_filters());
-        }, [dispatch]);
-
-        const handleExportTable = useCallback(() => {
-            console.log("exporting table")
-        }, []);
-
-        return (
-            <div className={StyleModule.containerExtraComponents}>
-                <div className={StyleModule.searchSection}>
-                    <InputTextCustom
-                        value={search ?? ""}
-                        onChange={setSearch}
-                        placeholder="Buscar"
-                        icon={<Search />}
-                        classNameInput={StyleModule.inputTextCustom}
-                        classNameContainer={StyleModule.containerInputSearch}
-                        withValidation={false}
-                    />
-                </div>
-                <div className={StyleModule.containerButtons}>
-                    <SecundaryActionButtonCustom
-                        label="Limpiar filtros"
-                        onClick={handleClearFilters}
-                        icon={<Eraser />}
-                        disabled={state.columnFiltersState.length === 0}
-                    />
-                    <SecundaryActionButtonCustom
-                        label="Exportar tabla"
-                        onClick={handleExportTable}
-                        icon={<Download />}
-                        disabled={Object.keys(state.rowSelectionState).length === 0}
-                    />
-                </div>
-            </div>
-        );
-    }, [search]);
-
+    const ExtraComponents = useCallback(() => (
+        <ExtraComponentMemo search={search} setSearch={setSearch} />
+    ), [search]);
 
     const handleCreate = async () => {
 
@@ -128,3 +88,57 @@ const ItemModel = () => {
 }
 
 export default ItemModel;
+
+
+const ExtraComponent = ({
+    search,
+    setSearch
+}: {
+    search: string | null;
+    setSearch: (v: string | null) => void;
+}) => {
+
+    const state = useTableState();
+    const dispatch = useTableDispatch();
+
+    const handleClearFilters = useCallback(() => {
+        dispatch(reset_column_filters());
+    }, [dispatch]);
+
+    const handleExportTable = useCallback(() => {
+        console.log("exporting table");
+    }, []);
+
+    return (
+        <div className={StyleModule.containerExtraComponents}>
+            <div className={StyleModule.searchSection}>
+                <InputTextCustom
+                    value={search ?? ""}
+                    onChange={setSearch}
+                    placeholder="Buscar"
+                    icon={<Search />}
+                    classNameInput={StyleModule.inputTextCustom}
+                    classNameContainer={StyleModule.containerInputSearch}
+                    withValidation={false}
+                />
+            </div>
+            <div className={StyleModule.containerButtons}>
+                <SecundaryActionButtonCustom
+                    label="Limpiar filtros"
+                    onClick={handleClearFilters}
+                    icon={<Eraser />}
+                    disabled={state.columnFiltersState.length === 0}
+                />
+                <SecundaryActionButtonCustom
+                    label="Exportar tabla"
+                    onClick={handleExportTable}
+                    icon={<Download />}
+                    disabled={Object.keys(state.rowSelectionState).length === 0}
+                />
+            </div>
+        </div>
+    );
+};
+
+
+const ExtraComponentMemo = memo(ExtraComponent) as typeof ExtraComponent;

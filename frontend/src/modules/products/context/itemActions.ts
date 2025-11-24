@@ -1,9 +1,10 @@
-import type { ItemAction} from "./itemTypes";
+import type { ItemAction } from "./itemTypes";
 import { itemActionsType } from "./itemTypes";
 import type { IPartialItem } from "../../../interfaces/item";
-import type { IPartialProductInput } from "interfaces/productsInputs";
-import type { IPartialProduct } from "interfaces/product";
-import type { IPartialProductDiscountRange } from "interfaces/product-discounts-ranges";
+import type { IPartialProductInput } from "../../../interfaces/productsInputs";
+import type { IPartialProduct } from "../../../interfaces/product";
+import type { IPartialProductDiscountRange } from "../../../interfaces/product-discounts-ranges";
+import type { IPartialProductProcess } from "../../../interfaces/productsProcesses";
 
 // * data
 
@@ -35,20 +36,36 @@ const update_product = (payload: IPartialProduct): ItemAction => ({
     payload
 });
 
-
-
 const add_inputs_to_products = (payload: IPartialProductInput[]): ItemAction => ({
     type: itemActionsType.ADDS_INPUTS_TO_PRODUCTS,
     payload
 });
 
-const remove_inputs_from_products = (payload: number[]): ItemAction => ({
+const remove_inputs_from_products = (payload: (number | string)[]): ItemAction => ({
     type: itemActionsType.REMOVE_INPUTS_FROM_PRODUCTS,
     payload
 });
 
-const update_inputs_from_products = (payload: {id: number, attributes: IPartialProductInput }): ItemAction => ({
+const update_inputs_from_products = (payload: { id: (number | string), attributes: IPartialProductInput }): ItemAction => ({
     type: itemActionsType.UPDATE_INPUTS_FROM_PRODUCTS,
+    payload
+});
+
+
+
+
+const add_product_process = (payload: IPartialProductProcess[]): ItemAction => ({
+    type: itemActionsType.ADDS_PRODUCT_PROCESS,
+    payload
+});
+
+const remove_product_process = (payload: (number | string)[]): ItemAction => ({
+    type: itemActionsType.REMOVE_PRODUCT_PROCESS,
+    payload
+});
+
+const update_product_process = (payload: IPartialProductProcess[]): ItemAction => ({
+    type: itemActionsType.UPDATE_PRODUCT_PROCESS,
     payload
 });
 
@@ -59,12 +76,12 @@ const add_discount_to_products = (payload: IPartialProductDiscountRange[]): Item
     payload
 });
 
-const remove_discount_from_products = (payload: number[]): ItemAction => ({
+const remove_discount_from_products = (payload: (number | string)[]): ItemAction => ({
     type: itemActionsType.REMOVE_DISCOUNT_FROM_PRODUCTS,
     payload
 });
 
-const update_discount_from_products = (payload: {id: number, attributes: IPartialProductDiscountRange }): ItemAction => ({
+const update_discount_from_products = (payload: { id: (number | string), attributes: IPartialProductDiscountRange }): ItemAction => ({
     type: itemActionsType.UPDATE_DISCOUNT_FROM_PRODUCTS,
     payload
 });
@@ -114,16 +131,34 @@ const add_inputs_to_draft_products = (payload: IPartialProductInput[]): ItemActi
     payload
 });
 
-const remove_inputs_from_draft_products = (payload: number[]): ItemAction => ({
+const remove_inputs_from_draft_products = (payload: (number | string)[]): ItemAction => ({
     type: itemActionsType.REMOVE_INPUTS_FROM_DRAFT_PRODUCTS,
     payload
 });
 
-const update_inputs_from_draft_products = (payload: {id: number, attributes: IPartialProductInput }): ItemAction => ({
+const update_inputs_from_draft_products = (payload: { id: (number | string), attributes: IPartialProductInput }): ItemAction => ({
     type: itemActionsType.UPDATE_INPUTS_FROM_DRAFT_PRODUCTS,
     payload
 });
 
+
+
+
+
+const add_draft_product_process = (payload: IPartialProductProcess[]): ItemAction => ({
+    type: itemActionsType.ADDS_DRAFT_PRODUCT_PROCESS,
+    payload
+});
+
+const remove_draft_product_process = (payload: (number | string)[]): ItemAction => ({
+    type: itemActionsType.REMOVE_DRAFT_PRODUCT_PROCESS,
+    payload
+});
+
+const update_draft_product_process = (payload: IPartialProductProcess[]): ItemAction => ({
+    type: itemActionsType.UPDATE_DRAFT_PRODUCT_PROCESS,
+    payload
+});
 
 
 
@@ -132,12 +167,12 @@ const add_discount_to_draft_products = (payload: IPartialProductDiscountRange[])
     payload
 });
 
-const remove_discount_from_draft_products = (payload: number[]): ItemAction => ({
+const remove_discount_from_draft_products = (payload: (number | string)[]): ItemAction => ({
     type: itemActionsType.REMOVE_DISCOUNT_FROM_DRAFT_PRODUCTS,
     payload
 });
 
-const update_discount_from_draft_products = (payload: {id: number, attributes: IPartialProductDiscountRange }): ItemAction => ({
+const update_discount_from_draft_products = (payload: { id: (number | string), attributes: IPartialProductDiscountRange }): ItemAction => ({
     type: itemActionsType.UPDATE_DISCOUNT_FROM_DRAFT_PRODUCTS,
     payload
 });
@@ -189,15 +224,19 @@ export {
 
     set_product,
     update_product,
-    
+
     add_inputs_to_products,
     remove_inputs_from_products,
     update_inputs_from_products,
-    
+
+    add_product_process,
+    remove_product_process,
+    update_product_process,
+
     add_discount_to_products,
     remove_discount_from_products,
     update_discount_from_products,
-    
+
     set_input,
     update_input,
 
@@ -211,6 +250,10 @@ export {
     add_inputs_to_draft_products,
     remove_inputs_from_draft_products,
     update_inputs_from_draft_products,
+
+    add_draft_product_process,
+    remove_draft_product_process,
+    update_draft_product_process,
 
     add_discount_to_draft_products,
     remove_discount_from_draft_products,

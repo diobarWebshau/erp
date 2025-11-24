@@ -62,7 +62,7 @@ const UnderlineLabelInputNumeric = memo(({
             setInputValue(prev => String((isNaN(Number(prev)) ? 0 : Number(prev)) + 1));
             onChange(Number(inputValue) + 1);
         }
-    }, [inputValue, max, onChange, computeIsValid]);
+    }, [inputValue, max, onChange, computeIsValid, disabled]);
 
     const handleOnClickDown = useCallback(() => {
         if (disabled) return;
@@ -72,7 +72,7 @@ const UnderlineLabelInputNumeric = memo(({
             setInputValue(prev => String((isNaN(Number(prev)) ? 0 : Number(prev)) - 1));
             onChange(Number(inputValue) - 1);
         }
-    }, [inputValue, min, onChange]);
+    }, [inputValue, min, onChange, computeIsValid, disabled]);
 
     // *************** Manejo de eventos ***************
 
@@ -109,7 +109,7 @@ const UnderlineLabelInputNumeric = memo(({
         const ok = computeIsValid(inputValue);
         setIsValid(ok);
         if (onlyCommitOnBlur) commitChange();
-    }, [onlyCommitOnBlur, commitChange, computeIsValid]);
+    }, [onlyCommitOnBlur, commitChange, computeIsValid, inputValue]);
 
     // ? Funcion que maneja el keydown del input
     const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
@@ -147,7 +147,7 @@ const UnderlineLabelInputNumeric = memo(({
             (withValidation && errorActive && inputValue.length === 0) && styleModule.iconError
         );
         return [labelClassNames, inputClassNames, containerClassNames, iconControlClassNames];
-    }, [focused, inputValue, errorActive, withValidation]);
+    }, [focused, inputValue, errorActive, withValidation, disabled]);
 
     // *************** Manejo de efectos ***************
 
@@ -157,7 +157,7 @@ const UnderlineLabelInputNumeric = memo(({
         setInputValue(synced);
         setIsValid(computeIsValid(synced));
         if (!refInput.current) return;
-    }, [value]);
+    }, [value, refInput, computeIsValid]);
 
     return (
         <div className={clsx(classNamesContainer)}>

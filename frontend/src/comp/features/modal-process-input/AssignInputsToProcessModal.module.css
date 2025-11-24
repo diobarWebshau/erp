@@ -20,8 +20,8 @@
     /* distribucion flex */
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 1rem;
 
 }
@@ -42,11 +42,15 @@
     max-height: 90%;
 
     /* distribucion flex */
+    display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
+    justify-content: flex-start;
+    align-items: stretch;
     gap: 1rem;
     overflow-y: hidden;
+
+    padding-top: 1rem;
+
 }
 
 /* *************** Footer *************** */

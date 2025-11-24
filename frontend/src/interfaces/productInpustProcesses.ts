@@ -2,7 +2,7 @@ import type { IPartialProductInput } from "./productsInputs";
 import type { IPartialProductProcess } from "./productsProcesses";
 
 interface IProductInputProcess {
-    id: number;
+    id: number | string;
     product_id: number,
     product_input_id: number,
     product_process_id: number,

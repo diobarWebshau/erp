@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState, type ChangeEvent, type KeyboardEvent } from "react";
+import { memo, useCallback, useEffect, useState, type ChangeEvent, type KeyboardEvent, type MouseEvent } from "react";
 import styleModule from "./NumericInput.module.css";
 import clsx from "clsx";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -119,13 +119,15 @@ const NumericInput = memo(({
             isValid ? classNameInputValid : classNameInputInvalid);
         return [containerClassNames, inputClassNames];
     })();
+    const handleOnMouseDown = useCallback((e: MouseEvent<HTMLSpanElement>) => e.preventDefault(), []);
+
 
     // ? useEffect que sincroniza el valor del input con el valor del prop value
     useEffect(() => {
         const synced = value?.toString() ?? "";
         setInputValue(synced);
         setIsValid(computeIsValid(synced));
-    }, [value, min, max]);
+    }, [value, min, max, computeIsValid]);
 
 
     return (
@@ -143,10 +145,10 @@ const NumericInput = memo(({
                 min={min}
             />
             <div className={clsx(classNameControls, styleModule.controls)}>
-                <span onClick={handleOnClickUp}>
+                <span onClick={handleOnClickUp} onMouseDown={handleOnMouseDown}>
                     <ChevronUp className={clsx(styleModule.iconControl, classNameControlsIcon)} />
                 </span>
-                <span onClick={handleOnClickDown}>
+                <span onClick={handleOnClickDown} onMouseDown={handleOnMouseDown}>
                     <ChevronDown className={clsx(styleModule.iconControl, classNameControlsIcon)} />
                 </span>
             </div>

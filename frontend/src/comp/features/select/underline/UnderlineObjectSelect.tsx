@@ -143,7 +143,7 @@ const SelectTrigger = ({
             {
                 color: (!disabled && selectedLabel) ? mainColor : "var(--color-alert)"
             }),
-        [mainColor, selectedLabel]);
+        [mainColor, selectedLabel, disabled]);
 
     const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
@@ -216,54 +216,85 @@ const FloatingComponent = <T,>({
     classNameOption,
     classNameOptionSelected
 }: IFloatingComponent<T>) => {
+
+    const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => ({ option, isSelected }: { option: T, isSelected: boolean }) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (isSelected) onChange(null);
+        else onChange(option);
+        toggleOpen();
+    }, [toggleOpen, onChange]);
+
+    const handleOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => ({ option, isSelected }: { option: T, isSelected: boolean }) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (isSelected) onChange(null);
+            else onChange(option);
+            toggleOpen();
+        }
+    }, [toggleOpen, onChange])
+
     return (
         <div
             className={styles.floatingComponent}
         >
-            {
-                listOptions.map((option, index) => {
-
-                    const label = String(option[labelKey]);
-                    const isSelected = value?.[labelKey] === option[labelKey];
-                    const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        if (isSelected) onChange(null);
-                        else onChange(option);
-                        toggleOpen();
-                    }, [option, toggleOpen, onChange]);
-
-                    const handleOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            if (isSelected) onChange(null);
-                            else onChange(option);
-                            toggleOpen();
-                        }
-                    }, [option, toggleOpen, onChange]);
-
-                    const className = useMemo(
-                        () => clsx
-                            (`${styles.option} ${isSelected ? `${styles.selected} ${classNameOptionSelected}` : ""}`, classNameOption),
-                        [styles.option, isSelected, classNameOption, classNameOptionSelected]
-                    );
-
-                    return (
-                        <div
-                            key={index}
-                            onClick={handleOnClick}
-                            onKeyDown={handleOnKeyDown}
-                            tabIndex={0}
-                            className={className}
-                        >
-                            {label}
-                        </div>
-                    )
-                })
-            }
+            {listOptions.map((option: T, index: number) => {
+                return (
+                    <OptionComponentMemo
+                        option={option}
+                        index={index}
+                        handleOnClick={handleOnClick}
+                        handleOnKeyDown={handleOnKeyDown}
+                        labelKey={labelKey}
+                        value={value}
+                        classNameOption={classNameOption}
+                        classNameOptionSelected={classNameOptionSelected}
+                    />
+                )
+            })}
         </div>
     )
 }
 
 const FloatingComponentMemo = memo(FloatingComponent) as typeof FloatingComponent;
 
+// ************ OptionComponent ************
+
+interface IOptionComponent<T> {
+    value: T | null,
+    option: T,
+    index: number,
+    labelKey: keyof T,
+    classNameOption?: string;
+    classNameOptionSelected?: string;
+    handleOnClick?: (e: React.MouseEvent<HTMLDivElement>) => ({ option, isSelected }: { option: T, isSelected: boolean }) => void,
+    handleOnKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => ({ option, isSelected }: { option: T, isSelected: boolean }) => void
+}
+
+const OptionComponent = <T,>({
+    index, option, labelKey, value,
+    classNameOption, classNameOptionSelected,
+    handleOnKeyDown, handleOnClick
+}: IOptionComponent<T>) => {
+
+    const label = String(option[labelKey]);
+    const isSelected = value?.[labelKey] === option[labelKey];
+
+    const className = useMemo(
+        () => clsx(`${styles.option} ${isSelected ? `${styles.selected} ${classNameOptionSelected}` : ""}`, classNameOption),
+        [isSelected, classNameOption, classNameOptionSelected]
+    );
+
+    return (
+        <div
+            key={index} tabIndex={0}
+            onClick={handleOnClick}
+            onKeyDown={handleOnKeyDown}
+            className={className}
+        >
+            {label}
+        </div>
+    );
+};
+
+const OptionComponentMemo = memo(OptionComponent) as typeof OptionComponent;

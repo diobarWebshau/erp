@@ -64,8 +64,6 @@
 }
 
 .containerEmptyMessage {
-    /* dimension */
-    height: 44px;
 
     /* distribucion flex */
     display: flex;
@@ -104,50 +102,43 @@
 /* ********** containerFieldSearch ********** */
 
 .containerFieldSearch {
+        /*posicionamiento */
+    position: relative;
+    /* dimension */
+    min-height: 44px;
+
     /* distribucion flex */
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    align-items: center;
 
-    border: 1px solid red;
 }
 
+.inputTagsContainer>*{
+    height: 30px;
+}
+
+/* ? ***** inputTagsContainer ***** */
+
 .inputTagsContainer {
+    /* distribucion flex respecto al padre */
+    flex: 1;
     /* distribucion flex */
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     flex-wrap: wrap;
-
-    border: 1px solid green;
 }
 
 .attrTagObject {
+    flex: 1;
+    /* estilos */
     font-size: 12px;
 }
 
-.iconSearchContainer {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 30px;
-
-    /* distribucion flex */
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.iconSearch {
-    width: 15px;
-    height: 15px;
-}
-
-.inputTagsContainer {
-    flex: 1;
-}
-
 .tagObjectInput {
+    /* distribucion flex */
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -155,17 +146,101 @@
 }
 
 .tagDeleteIconContainer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    /* distribucion flex */
     display: flex;
     justify-content: center;
     align-items: center;
+
+    cursor: pointer;
 }
 
 .tagDeleteIcon {
-    cursor: pointer;
+    /* dimension */
     width: 15px;
     height: 15px;
 }
 
 .inputFieldSearch {
-    flex: 1;
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-grow: 0;
+    flex-basis: auto;
+    border: none;
+    width: auto;
+    /* estilos */
+    background-color: transparent;
+}
+
+.inputFieldSearch:focus{
+    outline: none;
+}
+
+/* ? ***** iconSearchContainer ***** */
+
+.iconSearchContainer {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 30px;
+    
+    /* distribucion flex */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconSearch {
+    /*dimension*/
+    width: 12px;
+    height: 12px;
+    stroke: var(--color-theme-primary);
+    stroke-width: 3px;
+}
+
+.tagDeleteIconContainer:hover{
+    background-color: var(--color-alert);
+}
+
+.tagDeleteIconContainer:hover .tagDeleteIcon{
+    stroke: var(--color-theme-font-white);
+} 
+
+.tagDeleteIcon{
+    stroke: var(--color-alert);
+}
+
+.labelFloating.labelFloating {
+
+    /* distribucion box */
+    padding-inline: 0.2rem;
+    border-radius: 15px;
+
+    /* estilos */
+    transform: translateY(-7px);
+    font-size: 12px;
+    color: var(--color-theme-primary);
+    background-color: var(--color-theme-font-white);
+}
+
+.labelBase{
+    /* posicionamientos */
+    position: absolute;
+    left: 7.5px;
+    top: 0;
+    transform: translateY(13px);
+
+    /* animaciones */
+    transition:
+        transform .18s ease, font-size .18s ease,
+        color .18s ease, background-color .18s ease;
+
+    /* estilos */
+    font-size: 14px;
+    line-height: 1;
+    color: var(--color-theme-neutral-primary);
+    pointer-events: none;
+
 }

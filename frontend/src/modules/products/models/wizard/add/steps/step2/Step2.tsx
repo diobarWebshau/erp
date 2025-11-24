@@ -1,6 +1,7 @@
 import SecundaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/secundary-action/SecundaryActionButtonCustom";
 import UnderlineLabelInputNumeric from "../../../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
+import { add_inputs_to_products, remove_inputs_from_products } from "./../../../../../context/itemActions"
 import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
@@ -8,10 +9,10 @@ import SingleImageLoaderCustom from "../../../../../../../comp/primitives/image-
 import AssignInputsToProcessModal from "../../../../../../../comp/features/modal-process-input/AssignInputsToProcessModal";
 import type { IPartialProductDiscountRange } from "../../../../../../../interfaces/product-discounts-ranges";
 import SelectObjectsModalMemo from "../../../../../../../comp/features/modal-product2/SelectProductsModal";
-import { add_inputs_to_products, remove_inputs_from_products } from "./../../../../../context/itemActions"
-import type { IPartialProductInputProcess } from "../../../../../../../interfaces/productInpustProcesses";
 import type { RowAction } from "../../../../../../../comp/primitives/table/tableContext/tableTypes";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
+import type { IPartialProductProcess } from "../../../../../../../interfaces/productsProcesses";
+import { back_step, update_product_process, add_product_process } from "../../../../../context/itemActions";
 import type { IPartialProductInput } from "../../../../../../../interfaces/productsInputs";
 import base64ToFileOrNull from "../../.../../../../../../../scripts/convertBase64ToFile";
 import { clearError, setError } from "../../../../../../../store/slicer/errorSlicer";
@@ -21,7 +22,6 @@ import { useCallback, useEffect, useMemo, useState, type Dispatch } from "react"
 import type { IPartialProduct } from "../../../../../../../interfaces/product";
 import type { ItemAction, ItemState } from "../../../../../context/itemTypes";
 import { generateRandomIds } from "../../../../../../../helpers/nanoId";
-import { back_step } from "../../../../../context/itemActions";
 import { useDispatch as useDispatchRedux } from "react-redux";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Bookmark, Plus, Trash2 } from "lucide-react";
@@ -66,8 +66,8 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
 
     const computePhotoFiles = useCallback((): File | null => {
         if (!state.data.item) return null;
-        return base64ToFileOrNull(state.data.item.photo || null, "product-photo")
-    }, [state.data.item?.photo]);
+        return base64ToFileOrNull(state.data.item?.photo || null, "product-photo")
+    }, [state.data.item]);
 
     const [photo, setPhoto] = useState<File | null>(computePhotoFiles());
     const [cost, setCost] = useState<number | null>(computeCostValue());
@@ -75,13 +75,18 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
     const [storageConditions, setStorageConditions] = useState<string | null>(state.data.item?.storage_conditions ?? null);
     const [productionCost, setProductionCost] = useState<number | null>(computeProductionCost());
     const [isActiveProductInputAddModal, setIsActiveProductInputAddModal] = useState<boolean>(false);
-    const [isActiveProductInputProcessAddModal, setIsActiveProductInputProcessAddModal] = useState<boolean>(false);
+    const [isActiveProductProcessAddModal, setIsActiveProductProcessAddModal] = useState<boolean>(false);
     const [isAvailableInputs, setIsAvailableInputs] = useState<boolean>(false);
     const [modeAssignProcess, setModeAssignProcess] = useState<"new" | "asingn" | null>("new");
 
+    const toggleIsActiveProductInputAddModal = useCallback(() => {
+        setIsActiveProductInputAddModal(prev => !prev);
+    }, []);
+
     //  * ************ Components Table ProductInput ************ 
 
-    const getRowAttr = useMemo(() => (row: IInput) => row.name, []);
+    const getRowAttrProductInput = useMemo(() => (row: IInput) => row.name, []);
+    const getRowIdProductInput = useMemo(() => (row: IPartialProductInput, index: number) => row.inputs?.id && row.inputs.id?.toString() || index.toString(), []);
 
     const excludeIds = useMemo((): number[] => {
         const item = state.data.item as IPartialProduct;
@@ -96,10 +101,11 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
         }));
         dispatch(add_inputs_to_products(inputPartialProductInputs));
         toggleIsActiveProductInputAddModal();
-    }, [dispatch]);
+    }, [dispatch, toggleIsActiveProductInputAddModal]);
 
     const handleOnClickDeleteProductInput = useCallback((row: IPartialProductInput) => {
-        dispatch(remove_inputs_from_products([row.id as number]));
+        if (!row?.id) return;
+        dispatch(remove_inputs_from_products([row.id]));
     }, [dispatch]);
 
     const fetchLoadInputs = useCallback(async (query: string | number): Promise<IInput[]> => {
@@ -130,11 +136,8 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
             console.error("Error fetching products:", error);
             return [];
         }
-    }, [state.data.item, dispatchRedux, excludeIds]);
+    }, [dispatchRedux, excludeIds]);
 
-    const toggleIsActiveProductInputAddModal = useCallback(() => {
-        setIsActiveProductInputAddModal(prev => !prev);
-    }, []);
 
     const columnsProductInput: ColumnDef<IPartialProductInput>[] = useMemo(() => [
         {
@@ -168,29 +171,32 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
             onClick: handleOnClickDeleteProductInput,
             icon: <Trash2 className={StyleModule.iconTrash} />
         }
-    ], []);
+    ], [handleOnClickDeleteProductInput]);
 
-    //  * ************ Components Table ProductInputProcess ************ 
+    //  * ************ Components Table ProductProcess ************ 
 
-    const getRowIdProductInputProcess = useMemo(() => (row: IPartialProductInput, index: number) => (row?.id && row?.id.toString()) || index.toString(), []);
+    const handleUpdateItemOrder = useCallback((items: IPartialProductProcess[]) => {
+        dispatch(update_product_process(items));
+    }, [dispatch]);
 
-    const handleUpdateItemOrder = useCallback((items: IPartialProductInputProcess[]) => {
-    }, []);
+    const getRowIdProductProcess = useMemo(() => (row: IPartialProductProcess, index: number) => (row?.process_id && row?.process_id.toString()) || index.toString(), []);
 
-    const toggleIsActiveProductInputProcessAddModalAssing = useCallback(() => {
+    const toggleIsActiveProductProcessAddModalAssing = useCallback(() => {
+        console.log(state.data.item);
         setModeAssignProcess("asingn");
-        setIsActiveProductInputProcessAddModal(prev => !prev);
-    }, []);
-    const toggleIsActiveProductInputProcessAddModalNew = useCallback(() => {
+        setIsActiveProductProcessAddModal(prev => !prev);
+    }, [state.data.item]);
+    const toggleIsActiveProductProcessAddModalNew = useCallback(() => {
+        console.log(state.data.item);
         setModeAssignProcess("new");
-        setIsActiveProductInputProcessAddModal(prev => !prev);
-    }, []);
+        setIsActiveProductProcessAddModal(prev => !prev);
+    }, [state.data.item]);
 
-    const columnsProductInputProcess: ColumnDef<IPartialProductInputProcess>[] = useMemo(() => [
+    const columnsProductInputProcess: ColumnDef<IPartialProductProcess>[] = useMemo(() => [
         {
             id: "name",
             header: "Nombre",
-            accessorFn: (row: IPartialProductInputProcess) => row.product_process?.process?.name,
+            accessorFn: (row: IPartialProductProcess) => row.process?.name,
             meta: {
                 hidden: false,
                 type: "string",
@@ -201,7 +207,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
         {
             id: "sort_order",
             header: "Orden",
-            accessorFn: (row: IPartialProductInputProcess) => row.product_process?.sort_order,
+            accessorFn: (row: IPartialProductProcess) => row.sort_order,
             meta: {
                 hidden: false,
                 type: "number",
@@ -211,19 +217,21 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
         },
     ], []);
 
-    const getSortFieldProductInputProcess = useCallback((row: IPartialProductInputProcess): number => {
-        return row.product_process?.sort_order as number;
+    const getSortFieldProductProcess = useCallback((row: IPartialProductProcess): number => {
+        return row.sort_order as number;
     }, []);
 
-    const setSortFieldProductInputProcess = useCallback((row: IPartialProductInputProcess, value: number): IPartialProductInputProcess => {
-        return {
+    const setSortFieldProductProcess = useCallback((row: IPartialProductProcess, value: number): IPartialProductProcess => {
+        return ({
             ...row,
-            product_process: {
-                ...row.product_process,
-                sort_order: value,
-            } as IPartialProductInputProcess,
-        };
+            sort_order: value
+        });
     }, []);
+
+
+    const handleOnClickAddProductInpuProcess = useCallback((values: IPartialProductProcess[]) => {
+        dispatch(add_product_process(values));
+    }, [dispatch]);
 
     //  * ************ Components Table ProductDiscountRange ************ 
 
@@ -254,9 +262,9 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
             cell: ({ row }) => {
                 const value = row.original.min_qty ?? null;
 
-                const onChange = useCallback((value: number | null) => {
+                const onChange = (value: number | null) => {
                     onHandleChangeValueMinQty(row.original.id as number, value);
-                }, [row.original.id, onHandleChangeValueMinQty]);
+                }
 
                 return (
                     <UnderlineLabelInputNumeric
@@ -278,9 +286,9 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
             cell: ({ row }) => {
                 const value = row.original.max_qty ?? null;
 
-                const onChange = useCallback((value: number | null) => {
+                const onChange = (value: number | null) => {
                     onHandleChangeValueMaxQty(row.original.id as number, value);
-                }, [row.original.id, onHandleChangeValueMaxQty]);
+                };
 
                 return (
                     <UnderlineLabelInputNumeric
@@ -302,9 +310,9 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
             cell: ({ row }) => {
                 const value = row.original.unit_price ?? null;
 
-                const onChange = useCallback((value: number | null) => {
+                const onChange = (value: number | null) => {
                     onHandleChangeValueUnitPrice(row.original.id as number, value);
-                }, [row.original.id, onHandleChangeValueUnitPrice]);
+                };
 
                 return (
                     <UnderlineLabelInputNumeric
@@ -314,14 +322,11 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                 )
             }
         },
-    ], [state.data, dispatch, onHandleChangeValueMinQty, onHandleChangeValueMaxQty, onHandleChangeValueUnitPrice]);
-
+    ], [onHandleChangeValueMinQty, onHandleChangeValueMaxQty, onHandleChangeValueUnitPrice]);
 
     // * ************ Handlers ************ 
 
-    const handleOnClickNextStep = useCallback(() => {
-
-    }, [dispatch]);
+    const handleOnClickNextStep = useCallback(() => { }, []);
 
     const handleOnClickBackStep = useCallback(() => {
         dispatch(back_step());
@@ -336,7 +341,6 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
         };
         load();
     }, [fetchLoadInputs]);
-
 
     return (
         <div className={StyleModule.containerStep}>
@@ -397,7 +401,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                         </div>
                         <GenericTableMemo
                             modelName="Insumos de producción"
-                            getRowId={getRowIdProductInputProcess}
+                            getRowId={getRowIdProductInput}
                             data={(state.data.item as IPartialProduct).products_inputs || []}
                             columns={columnsProductInput}
                             typeRowActions="icon"
@@ -416,23 +420,24 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                                 <SecundaryActionButtonCustom
                                     label="Nuevo proceso"
                                     icon={<Plus />}
-                                    onClick={toggleIsActiveProductInputProcessAddModalNew}
+                                    onClick={toggleIsActiveProductProcessAddModalNew}
                                 />
                                 <MainActionButtonCustom
                                     label="Asignar procesos"
                                     icon={<Plus />}
-                                    onClick={toggleIsActiveProductInputProcessAddModalAssing}
+                                    onClick={toggleIsActiveProductProcessAddModalAssing}
                                 />
                             </div>
                         </div>
                         <GenericTableMemo
                             modelName="Procesos de producción"
-                            getRowId={getRowIdProductInputProcess}
-                            getSortField={getSortFieldProductInputProcess}
-                            setSortField={setSortFieldProductInputProcess}
+                            getRowId={getRowIdProductProcess}
+                            getSortField={getSortFieldProductProcess}
+                            setSortField={setSortFieldProductProcess}
                             enableSortableRows
+
                             setOnReorderRows={handleUpdateItemOrder}
-                            data={(state.data.item as IPartialProduct).product_inputs_processes || []}
+                            data={(state.data.item as IPartialProduct).product_processes || []}
                             columns={columnsProductInputProcess}
                             modeTable="content"
                             noResultsMessage="No hay procesos de producción asignados"
@@ -485,7 +490,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                 <SelectObjectsModalMemo
                     loadOptions={fetchLoadInputs}
                     emptyMessage="No se encontraron insumos"
-                    getRowAttr={getRowAttr}
+                    getRowAttr={getRowAttrProductInput}
                     headerTitle="Asignar insumos"
                     labelOnClick="Agregar insumos"
                     placeholder="Buscar"
@@ -495,13 +500,13 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                 />
             }
             {
-                (isActiveProductInputProcessAddModal && state.data.item_type === "product" && modeAssignProcess) &&
+                (isActiveProductProcessAddModal && state.data.item_type === "product" && modeAssignProcess) &&
                 <AssignInputsToProcessModal
                     validInputs={(state.data.item as IPartialProduct).products_inputs}
-                    selectedProcessBase={(state.data.item as IPartialProduct).product_inputs_processes || []}
+                    selectedProcessProductBase={(state.data.item as IPartialProduct).product_processes || []}
                     mode={modeAssignProcess}
-                    onClick={(inputs: IPartialProductInputProcess[]) => { }}
-                    onClose={toggleIsActiveProductInputProcessAddModalAssing}
+                    onClick={handleOnClickAddProductInpuProcess}
+                    onClose={toggleIsActiveProductProcessAddModalAssing}
                 />
             }
         </div>

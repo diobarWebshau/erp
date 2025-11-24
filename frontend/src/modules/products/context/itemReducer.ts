@@ -1,8 +1,9 @@
 import type { IPartialProduct } from "interfaces/product";
 import type { ItemState, ItemAction } from "./itemTypes";
 import { itemActionsType } from "./itemTypes";
-import { produce } from "immer";
+import { current, produce } from "immer";
 import type { Draft } from "immer";
+import type { IPartialProductProcess } from "interfaces/productsProcesses";
 
 const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
     switch (action.type) {
@@ -28,6 +29,7 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             Object.assign(draft.data, action.payload);
             break;
         }
+
         case itemActionsType.ADDS_INPUTS_TO_PRODUCTS: {
             const item = draft.data.item as IPartialProduct;
             if (!item.products_inputs) item.products_inputs = [];
@@ -54,6 +56,38 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             }
             break;
         }
+        case itemActionsType.ADDS_PRODUCT_PROCESS: {
+            const item = draft.data.item as IPartialProduct;
+            console.log(`Antes del if`);
+            if (!item.product_processes) {
+                item.product_processes = [];
+            }
+            console.log(`Entro y procedo al ciclo`);
+            action.payload.forEach((it) => {
+                const process: IPartialProductProcess = {
+                    ...it,
+                    sort_order: (item.product_processes?.length ?? 0) + 1,
+                };
+                item.product_processes?.push(process);
+            });
+            console.log(`current(item)`, current(item));
+            break;
+        }
+        case itemActionsType.REMOVE_PRODUCT_PROCESS: {
+            const item = draft.data.item as IPartialProduct;
+            if (!item.product_processes || item.product_processes.length === 0) return;
+            const idsToRemove = new Set(action.payload.map(id => String(id)));
+            item.product_processes = item.product_processes.filter(it => {
+                if (it.id == null) return true;
+                return !idsToRemove.has(String(it.id));
+            });
+            break;
+        }
+        case itemActionsType.UPDATE_PRODUCT_PROCESS: {
+            const item = draft.data.item as IPartialProduct;
+            item.product_processes = action.payload;
+            break;
+        }
         case itemActionsType.ADDS_DISCOUNT_TO_PRODUCTS: {
             const item = draft.data.item as IPartialProduct;
             if (!item.product_discount_ranges) item.product_discount_ranges = [];
@@ -70,7 +104,7 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             });
             break;
         }
-        case itemActionsType.UPDATE_DISCOUNT_FROM_DRAFT_PRODUCTS: {
+        case itemActionsType.UPDATE_DISCOUNT_FROM_PRODUCTS: {
             const item = draft.data.item as IPartialProduct;
             if (!item.product_discount_ranges || item.product_discount_ranges?.length === 0) return;
             const { id, attributes } = action.payload;
@@ -121,6 +155,27 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
                 const id = it.id;
                 return id == null ? true : !idsToRemove.has(id);
             });
+            break;
+        }
+        case itemActionsType.ADDS_DRAFT_PRODUCT_PROCESS: {
+            const item = draft.draft.item as IPartialProduct;
+            if (!item.product_processes) item.product_processes = [];
+            item.product_processes.push(...action.payload);
+            break;
+        }
+        case itemActionsType.REMOVE_DRAFT_PRODUCT_PROCESS: {
+            const item = draft.draft.item as IPartialProduct;
+            if (!item.product_processes || item.product_processes.length === 0) return;
+            const idsToRemove = new Set<string | number>(action.payload);
+            item.product_processes = item.product_processes.filter(it => {
+                const id = it.id;
+                return id == null ? true : !idsToRemove.has(id);
+            });
+            break;
+        }
+        case itemActionsType.UPDATE_DRAFT_PRODUCT_PROCESS: {
+            const item = draft.draft.item as IPartialProduct;
+            item.product_processes = action.payload;
             break;
         }
         case itemActionsType.UPDATE_INPUTS_FROM_DRAFT_PRODUCTS: {

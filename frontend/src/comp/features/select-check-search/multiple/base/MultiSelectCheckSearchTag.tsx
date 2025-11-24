@@ -4,6 +4,8 @@ import { Loader, Search, X } from "lucide-react";
 import useDebounceBasic from "./../../../../../hooks/useDebounceBasic"
 import { Divider } from "@mantine/core";
 import StyleModule from "./MultiSelectCheckSearchTag.module.css"
+import withClassName from "../../../../../utils/withClassName";
+import clsx from "clsx";
 
 interface MultiSelectCheckSearchProps<T> {
 
@@ -13,7 +15,6 @@ interface MultiSelectCheckSearchProps<T> {
     // props de retroalimentacion
     placeholder?: string;
     emptyMessage?: ReactNode;
-
     // props para la fuente de datos(Solo se puede habilitar una a la vez)
     options?: T[]
     loadOptions?: (inputValue: string | number) => Promise<T[]>;
@@ -36,6 +37,11 @@ interface MultiSelectCheckSearchProps<T> {
     classNameLabel?: string;
     classNameCheckBox?: string;
     maxHeight?: string;
+    classNameInputTagsContainer?: string,
+    classNameInputFieldSearch?: string
+    classNameIconSearchContainer?: string,
+    classNameTagObjectInput?: string,
+    label?: string
 }
 
 const MultiSelectCheckSearch = <T,>({
@@ -57,7 +63,12 @@ const MultiSelectCheckSearch = <T,>({
     classNameCheckBoxItemSelected,
     classNameLabel,
     classNameCheckBox,
+    classNameInputTagsContainer,
+    classNameInputFieldSearch,
+    classNameIconSearchContainer,
+    classNameTagObjectInput,
     maxHeight,
+    label
 }: MultiSelectCheckSearchProps<T>) => {
 
     // variable para el manejo del search
@@ -102,7 +113,7 @@ const MultiSelectCheckSearch = <T,>({
             }
             setList(filtered);
         }
-    }, [search, loadOptions, options, open, debouncedSearch]);
+    }, [search, loadOptions, options, open, debouncedSearch, rowId]);
 
     // ? Esta variable es para asegurar que los seleccionados estén presentes en la lista (aunque no vengan en la página remota)
     const finalList = useMemo(() => {
@@ -130,7 +141,7 @@ const MultiSelectCheckSearch = <T,>({
         } else {
             setSelected([...selected, item]);
         }
-    }, [isItemSelected, selected, rowId]);
+    }, [isItemSelected, selected, rowId, setSelected]);
 
     // ? Esta variable es para obtener los items disponibles (no seleccionados)
     const filteredItems: T[] = useMemo(() => finalList.filter((item) => !isItemSelected(item)), [finalList, isItemSelected]);
@@ -151,6 +162,12 @@ const MultiSelectCheckSearch = <T,>({
                     onChange={setSearch}
                     placeholder={placeholder}
                     classNameFieldSearch={classNameFieldSearch}
+                    classNameInputTagsContainer={classNameInputTagsContainer}
+                    classNameInputFieldSearch={classNameInputFieldSearch}
+                    classNameIconSearchContainer={classNameIconSearchContainer}
+                    classNameTagObjectInput={classNameTagObjectInput}
+                    colorMain={colorMain}
+                    label={label}
                 />
             </div>
         }
@@ -192,20 +209,35 @@ interface InputDivProps<T> {
     placeholder?: string,
     search: string,
     selected: T[],
+    colorMain: string,
     setSelected: (selected: T[]) => void,
     classNameFieldSearch?: string
+    classNameInputTagsContainer?: string,
+    classNameInputFieldSearch?: string
+    classNameIconSearchContainer?: string,
+    classNameTagObjectInput?: string,
+    label?: string
 }
 
 const InputDiv = <T,>({
     placeholder,
     rowId,
-    value,
+    // value,
     search,
     onChange,
     classNameFieldSearch,
+    colorMain,
     selected,
-    setSelected
+    setSelected,
+    classNameInputTagsContainer,
+    classNameInputFieldSearch,
+    classNameIconSearchContainer,
+    classNameTagObjectInput,
+    label
 }: InputDivProps<T>) => {
+
+    const [focused, setFocused] = useState(false);
+    const iconSearchWithClass = withClassName(<Search />, StyleModule.iconSearch, { stroke: colorMain });
 
     const handleOnKeyDownCapture = (e: KeyboardEvent<HTMLDivElement>) => {
         // No hacemos el e.preventDefault() para que el input escriba el espacio
@@ -215,6 +247,14 @@ const InputDiv = <T,>({
         }
     };
 
+    const labelClassName = useMemo(() => {
+        return clsx(
+            'nunito-regular',
+            StyleModule.labelBase,
+            (focused || selected.length > 0) && StyleModule.labelFloating
+        );
+    }, [focused, selected]);
+
     const handleOnChangeInput = (useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value);
     }, [onChange]));
@@ -223,44 +263,79 @@ const InputDiv = <T,>({
         <div
             onKeyDownCapture={handleOnKeyDownCapture}
             className={`${StyleModule.containerFieldSearch} ${classNameFieldSearch}`}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
         >
-            <div className={StyleModule.inputTagsContainer}>
+            {label ? <label className={labelClassName}>{label}</label> : null}
+            <div className={`${StyleModule.inputTagsContainer} ${classNameInputTagsContainer}`}
+            >
                 {
                     selected.map(
-                        (item, index) => (
-                            <div
+                        (item: T, index: number) => (
+                            <ChipComponentMemo
                                 key={index}
-                                className={StyleModule.tagObjectInput}
-                            >
-                                <span className={`nunito-bold ${StyleModule.attrTagObject}`}>{String(rowId(item))}</span>
-                                <span className={StyleModule.tagDeleteIconContainer}>
-                                    <X className={StyleModule.tagDeleteIcon}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            const newSelected = selected.filter((_, i) => i !== index);
-                                            setSelected(newSelected);
-                                        }}
-                                    />
-                                </span>
-                            </div>
+                                index={index}
+                                item={item}
+                                rowId={rowId}
+                                selected={selected}
+                                setSelected={setSelected}
+                                classNameTagObjectInput={classNameTagObjectInput}
+                            />
                         )
                     )
                 }
                 <input
                     type="text"
-                    className={StyleModule.inputFieldSearch}
+                    className={`${StyleModule.inputFieldSearch} ${classNameInputFieldSearch}`}
                     value={search}
                     onChange={handleOnChangeInput}
+                    {...((focused || selected.length > 0) && { placeholder: placeholder })}
                 />
             </div>
-            <div className={StyleModule.iconSearchContainer}>
-                <Search className={StyleModule.iconSearch} />
+            <div className={`${StyleModule.iconSearchContainer} ${classNameIconSearchContainer}`}>
+                {iconSearchWithClass}
             </div>
         </div>
     );
 }
 
 const InputDivMemo = memo(InputDiv) as typeof InputDiv;
+
+interface IChipComponentProps<T> {
+    rowId: (data: T) => string
+    item: T,
+    index: number,
+    selected: T[]
+    setSelected: (data: T[]) => void,
+    classNameTagObjectInput?: string
+}
+
+const ChipComponent = <T,>({
+    index, item, setSelected, rowId, selected, classNameTagObjectInput
+}: IChipComponentProps<T>) => {
+
+    const handleOnClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+        e.stopPropagation();
+        const newSelected = selected.filter((_, i) => i !== index);
+        setSelected(newSelected);
+    }, [index, selected, setSelected]);
+
+    return (
+        <div
+            key={index}
+            className={`${StyleModule.tagObjectInput} ${classNameTagObjectInput}`}
+        >
+            <span className={`nunito-bold ${StyleModule.attrTagObject}`}>{String(rowId(item))}</span>
+            <span className={StyleModule.tagDeleteIconContainer}>
+                <X className={StyleModule.tagDeleteIcon}
+                    onClick={handleOnClick}
+                />
+            </span>
+        </div>
+    )
+}
+
+const ChipComponentMemo = memo(ChipComponent) as typeof ChipComponent;
 
 // * ******** MultiSelectCheckSearch ******** */
 
@@ -312,6 +387,7 @@ const PopoverSelect = <T,>({
                             {
                                 selected.map((item) => {
                                     return <CheckBoxItemMemo
+                                        key={rowId(item)}
                                         rowId={rowId}
                                         item={item}
                                         isSelected
@@ -350,6 +426,7 @@ const PopoverSelect = <T,>({
                                     {
                                         filteredItems.map((item) => {
                                             return <CheckBoxItemMemo
+                                                key={rowId(item)}
                                                 rowId={rowId}
                                                 item={item}
                                                 toggleItem={toggleItem}
@@ -406,7 +483,7 @@ const CheckBoxItem = <T,>({
             e.stopPropagation();
             toggleItem(item);
         }
-    }, [item]);
+    }, [item, toggleItem]);
 
     const handleMouseDown: MouseEventHandler<HTMLDivElement> = useCallback((e: MouseEvent<HTMLDivElement>) => {
         e.preventDefault();   // mantiene el foco en el input de búsqueda
@@ -416,10 +493,9 @@ const CheckBoxItem = <T,>({
 
     return (
         <div
-            key={String(rowId(item))}
+            key={String(rowId(item))} tabIndex={0}
             onKeyDown={handleOnKeyDown}
             onMouseDown={handleMouseDown}
-            tabIndex={0}
             className={`${StyleModule.checkBoxItem} ${isSelected ? classNameCheckBoxItemSelected : classNameCheckBoxItem}`}
         >
             <input

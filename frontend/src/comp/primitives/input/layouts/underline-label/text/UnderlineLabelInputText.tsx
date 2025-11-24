@@ -71,7 +71,7 @@ const UnderlineLabelInputText = ({
         setFocused(false);
         const v = refInput.current?.value ?? "";
         setIsValid(withValidation ? (v && v.length > 0 ? true : false) : null);
-    }, []);
+    }, [withValidation]);
 
     const handleOnFocus = useCallback(() => {
         setFocused(true);
@@ -83,7 +83,7 @@ const UnderlineLabelInputText = ({
         const v = value ?? "";
         setIsValid(withValidation ? ((v && v.length > 0) ? true : false) : null);
         if (!refInput.current) return;
-    }, [value]);
+    }, [value, withValidation]);
 
     return (
         <div className={classNameContainer} onClick={handleOnClickContainer}>

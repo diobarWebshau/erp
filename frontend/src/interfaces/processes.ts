@@ -1,8 +1,11 @@
+import type { IPartialProductInputProcess } from "./productInpustProcesses";
+
 interface IProcess {
     id: number,
     name: string,
     created_at: string,
     updated_at: string,
+    product_input_processes?: IPartialProductInputProcess[]
 }
 
 type IPartialProcess = Partial<IProcess>;

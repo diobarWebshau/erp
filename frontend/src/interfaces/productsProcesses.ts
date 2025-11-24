@@ -4,7 +4,7 @@ import type { IProcess }
     from "./processes";
 
 interface IProductProcess {
-    id: number;
+    id: number | string;
     product_id: number;
     process_id: number;
     sort_order: number;
