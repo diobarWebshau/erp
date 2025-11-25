@@ -1,7 +1,7 @@
 import type { IPartialProduct } from "interfaces/product";
 import type { ItemState, ItemAction } from "./itemTypes";
 import { itemActionsType } from "./itemTypes";
-import { current, produce } from "immer";
+import { produce } from "immer";
 import type { Draft } from "immer";
 import type { IPartialProductProcess } from "interfaces/productsProcesses";
 
@@ -22,14 +22,26 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
         }
         // ? data --> item == product
         case itemActionsType.SET_PRODUCT: {
-            Object.assign(draft.data, action.payload);
+            draft.data.item = action.payload;
             break;
         }
         case itemActionsType.UPDATE_PRODUCT: {
-            Object.assign(draft.data, action.payload);
+            const product = draft.data.item as IPartialProduct
+            draft.data.item = {
+                ...product,
+                ...action.payload,
+                product_discount_ranges: action.payload.product_discount_ranges
+                    ? [...action.payload.product_discount_ranges]
+                    : product.product_discount_ranges,
+                product_processes: action.payload.product_processes
+                    ? [...action.payload.product_processes]
+                    : product.product_processes,
+                products_inputs: action.payload.products_inputs
+                    ? [...action.payload.products_inputs]
+                    : product.products_inputs,
+            };
             break;
         }
-
         case itemActionsType.ADDS_INPUTS_TO_PRODUCTS: {
             const item = draft.data.item as IPartialProduct;
             if (!item.products_inputs) item.products_inputs = [];
@@ -58,11 +70,9 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
         }
         case itemActionsType.ADDS_PRODUCT_PROCESS: {
             const item = draft.data.item as IPartialProduct;
-            console.log(`Antes del if`);
             if (!item.product_processes) {
                 item.product_processes = [];
             }
-            console.log(`Entro y procedo al ciclo`);
             action.payload.forEach((it) => {
                 const process: IPartialProductProcess = {
                     ...it,
@@ -70,7 +80,6 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
                 };
                 item.product_processes?.push(process);
             });
-            console.log(`current(item)`, current(item));
             break;
         }
         case itemActionsType.REMOVE_PRODUCT_PROCESS: {
@@ -78,8 +87,8 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             if (!item.product_processes || item.product_processes.length === 0) return;
             const idsToRemove = new Set(action.payload.map(id => String(id)));
             item.product_processes = item.product_processes.filter(it => {
-                if (it.id == null) return true;
-                return !idsToRemove.has(String(it.id));
+                if (!it.process?.id) return true;
+                return !idsToRemove.has(String(it.process?.id));
             });
             break;
         }
@@ -116,11 +125,15 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
         }
         // ? data -> item == input
         case itemActionsType.SET_INPUT: {
-            Object.assign(draft.data, action.payload);
+            draft.data.item = action.payload;
             break;
         }
         case itemActionsType.UPDATE_INPUT: {
-            Object.assign(draft.data, action.payload);
+            const product = draft.data.item as IPartialProduct;
+            draft.data.item = {
+                ...product,
+                ...action.payload,
+            }
             break;
         }
         // * draft
@@ -133,12 +146,26 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
             break;
         }
         // ? draft --> item == product
+
         case itemActionsType.SET_DRAFT_PRODUCT: {
-            Object.assign(draft.draft, action.payload);
+            draft.draft.item = action.payload;
             break;
         }
         case itemActionsType.UPDATE_DRAFT_PRODUCT: {
-            Object.assign(draft.draft, action.payload);
+            const product = draft.draft.item as IPartialProduct
+            draft.data.item = {
+                ...product,
+                ...action.payload,
+                product_discount_ranges: action.payload.product_discount_ranges
+                    ? [...action.payload.product_discount_ranges]
+                    : product.product_discount_ranges,
+                product_processes: action.payload.product_processes
+                    ? [...action.payload.product_processes]
+                    : product.product_processes,
+                products_inputs: action.payload.products_inputs
+                    ? [...action.payload.products_inputs]
+                    : product.products_inputs,
+            };
             break;
         }
         case itemActionsType.ADDS_INPUTS_TO_DRAFT_PRODUCTS: {
@@ -216,11 +243,15 @@ const itemReducer = produce((draft: Draft<ItemState>, action: ItemAction) => {
         }
         // ? draft --> item == input
         case itemActionsType.SET_DRAFT_INPUT: {
-            Object.assign(draft.draft, action.payload);
+            draft.data.item = action.payload;
             break;
         }
         case itemActionsType.UPDATE_DRAFT_INPUT: {
-            Object.assign(draft.draft, action.payload);
+            const product = draft.data.item as IPartialProduct;
+            draft.data.item = {
+                ...product,
+                ...action.payload,
+            }
             break;
         }
         // * steps

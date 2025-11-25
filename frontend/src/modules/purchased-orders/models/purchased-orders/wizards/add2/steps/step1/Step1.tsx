@@ -1,21 +1,8 @@
-import {
-    Plus,
-    Search,
-    ArrowRight,
-    ChevronRight,
-    CircleX,
-} from "lucide-react"
-import FadeButton
-    from "../../../../../../../../components/ui/table/components/gui/button/fade-button/FadeButton"
-import StyleModule
-    from "./Step1.module.css"
-import type {
-    IClient
-} from "../../../../../../../../interfaces/clients"
-import {
-    useEffect,
-    useState
-} from "react"
+import { Plus, Search, ChevronRight, CircleX } from "lucide-react"
+import FadeButton from "../../../../../../../../components/ui/table/components/gui/button/fade-button/FadeButton"
+import StyleModule from "./Step1.module.css"
+import type { IClient } from "../../../../../../../../interfaces/clients"
+import { useEffect, useState } from "react"
 import {
     useModalAddState,
     useModalAddDispatch
@@ -104,6 +91,7 @@ const Step1 = ({
     }, [selectedSingle]);
 
     const fetchClientsLike = async (query: string): Promise<IClient[]> => {
+
         if (!query || query.trim().length === 0) {
             return [];
         }
@@ -121,6 +109,7 @@ const Step1 = ({
             // El backend responde directamente con un array de clientes
             const clients: IClient[] = await response.json();
 
+            console.log(clients);
             return clients;
 
         } catch (error) {

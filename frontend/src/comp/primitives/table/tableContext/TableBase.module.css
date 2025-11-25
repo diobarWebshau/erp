@@ -146,12 +146,23 @@
     align-items: stretch;
 
     /* desbordamiento */
-    overflow-x: auto;
-    overflow-y: auto;
+    /* overflow-x: auto;
+    overflow-y: auto; */
 
     /* estilos */
     background-color: var(--color-theme-font-white);
 }
+
+.noScrollTable {
+    overflow-x: visible;
+    overflow-y: visible;
+}
+
+.scrollTable {
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
 
 .wrapperTable {
     /* distribucion flex respecto al padre */

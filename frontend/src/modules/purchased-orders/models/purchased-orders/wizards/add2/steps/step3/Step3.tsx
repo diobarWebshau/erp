@@ -11,7 +11,7 @@ import {
     useModalAddDispatch, useModalAddState
 } from "../../context/modalAddHooks";
 import {
-    next_step, update_purchase_order,
+    update_purchase_order,
     back_step, set_step,
     remove_purchase_order_products,
     set_purchase_order_products_qty,
@@ -562,8 +562,6 @@ const Step3 = ({
             </div>
         );
     };
-
-
 
     // * ************ Funciones para control de acciones de la tabla ************/
 

@@ -4,7 +4,7 @@ import styleModule from "./NumericInputCustom.module.css";
 
 interface NumericInputCustomProps {
     value: number | null;
-    onChange: (value: number) => void;
+    onChange: (value: number | null) => void;
     placeholder?: string;
     min?: number;
     max?: number;

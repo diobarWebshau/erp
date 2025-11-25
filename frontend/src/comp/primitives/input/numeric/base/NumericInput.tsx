@@ -5,7 +5,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface NumericInputProps {
     value: number | null;
-    onChange: (value: number) => void;
+    onChange: (value: number | null) => void;
     min?: number;
     max?: number;
     classNameContainer?: string;
@@ -27,7 +27,7 @@ interface NumericInputProps {
 const NumericInput = memo(({
     value,
     onChange,
-    min = 1,
+    min = 0,
     max = 100000000000,
     classNameContainer,
     classNameInput,
@@ -63,6 +63,7 @@ const NumericInput = memo(({
     const computeIsValid = useCallback((val: string) => {
         const num = Number(val);
         if (val === "" || Number.isNaN(num)) return false;
+        if (!(num > 0)) return false;
         if (num < min) return false;
         if (num > max) return false;
         return true;
@@ -78,6 +79,8 @@ const NumericInput = memo(({
         // ? Si no se debe commitear al perder el foco y el valor es valido, se llama a onChange
         if (!onlyCommitOnBlur && ok) {
             onChange(Number(val));
+        } else {
+            onChange(null);
         }
     }, [computeIsValid, onlyCommitOnBlur, onChange, setInputValue, setIsValid]);
 

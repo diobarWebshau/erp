@@ -3,7 +3,7 @@ import type {
 } from "./product";
 
 interface IProductDiscountRange {
-    id: number;
+    id: number | string;
     product_id: number | null;
     unit_price: number;
     min_qty: number;

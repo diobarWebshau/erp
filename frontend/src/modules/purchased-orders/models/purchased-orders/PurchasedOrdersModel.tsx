@@ -113,7 +113,7 @@ const PurchasedOrderModel = () => {
     const {
         purchasedOrderProducts,
         refetchPurchasedOrderProducts
-    } = usePurchasedOrderProducts(purchasedOrderRecord?.id);
+    } = usePurchasedOrderProducts(purchasedOrderRecord?.id as number);
 
     // * ******************** Funciones de operaciones CRUD ******************** 
 
@@ -208,7 +208,7 @@ const PurchasedOrderModel = () => {
                     purchase_order_product_manager: productDiffs
                 };
                 const response = await updatePurchasedOrderInDB(
-                    record?.id,
+                    record?.id as number,
                     new_purchased_order,
                     dispatch
                 );
@@ -233,7 +233,7 @@ const PurchasedOrderModel = () => {
         try {
             const response = await
                 deletePurchasedOrderInDB(
-                    purchasedOrderRecord.id,
+                    purchasedOrderRecord.id as number,
                     dispatch
                 );
             if (!response) {
@@ -261,7 +261,7 @@ const PurchasedOrderModel = () => {
         setServerError(null);
         setPurchasedOrderRecord(record);
         const updatedProducts =
-            await refetchPurchasedOrderProducts(record.id);
+            await refetchPurchasedOrderProducts(record.id as number);
         setOriginalProductsInOrder(updatedProducts);
         setIsActiveEditModal(true);
     };

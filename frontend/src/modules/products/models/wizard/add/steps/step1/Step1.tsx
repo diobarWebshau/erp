@@ -8,14 +8,15 @@ import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-are
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import type { IPartialProduct } from "../../../../../../../interfaces/product";
 import type { ItemAction, ItemState } from "../../../../../context/itemTypes";
-import { update_item } from "../../../../../context/itemActions";
 import type { IPartialInput } from "../../../../../../../interfaces/inputs";
+import type { IPartialItem } from "../../../../../../../interfaces/item";
+import { update_item } from "../../../../../context/itemActions";
 import { next_step } from "../../../../../context/itemActions";
 import type { ChangeEvent, Dispatch } from "react";
 import { useCallback, useState } from "react";
-import { Bookmark } from "lucide-react";
+import { Bookmark} from "lucide-react";
 import StyleModule from "./Step1.module.css"
-import type { IPartialItem } from "interfaces/item";
+
 
 interface Step1Prop {
     state: ItemState,

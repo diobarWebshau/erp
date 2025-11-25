@@ -24,7 +24,7 @@ interface NumericInputProps {
 const UnderlineLabelInputNumeric = memo(({
     value,
     onChange,
-    min = 1,
+    min = 0,
     max = 1000000000000000000000000000000000000,
     onlyCommitOnBlur = false,
     label,
@@ -48,6 +48,7 @@ const UnderlineLabelInputNumeric = memo(({
     // ? Funcion que valida que el valor ingresado sea valido
     const computeIsValid = useCallback((val: string) => {
         const num = Number(val);
+        if (!(num > 0)) return false;
         if (val === "" || Number.isNaN(num) || val.length === 0) return false;
         if (num < min) return false;
         if (num > max) return false;
@@ -85,6 +86,8 @@ const UnderlineLabelInputNumeric = memo(({
         // ? Si no se debe commitear al perder el foco y el valor es valido, se llama a onChange
         if (!onlyCommitOnBlur && ok) {
             onChange(Number(val));
+        } else {
+            onChange(null);
         }
     }, [computeIsValid, onlyCommitOnBlur, onChange, setInputValue, setIsValid]);
 
@@ -130,24 +133,29 @@ const UnderlineLabelInputNumeric = memo(({
             styleModule.label,
             "nunito-semibold",
             (focused || inputValue.length > 0) && styleModule.labelFloating,
-            (withValidation && errorActive && inputValue.length === 0 && focused) && styleModule.labelError
+            (withValidation && errorActive) && styleModule.labelError
         );
+
         const inputClassNames = clsx(
             styleModule.input,
             "nunito-regular",
-            (withValidation && errorActive && inputValue.length === 0) && styleModule.inputError
+            (withValidation && errorActive) && styleModule.inputError
         );
+
         const containerClassNames = clsx(
             styleModule.container,
-            (withValidation && errorActive && inputValue.length === 0) && styleModule.errorContainer,
+            (withValidation && errorActive) && styleModule.errorContainer,
             disabled && styleModule.disabledContainer
         );
+
         const iconControlClassNames = clsx(
             styleModule.iconControl,
-            (withValidation && errorActive && inputValue.length === 0) && styleModule.iconError
+            (withValidation && errorActive) && styleModule.iconError
         );
+
         return [labelClassNames, inputClassNames, containerClassNames, iconControlClassNames];
     }, [focused, inputValue, errorActive, withValidation, disabled]);
+
 
     // *************** Manejo de efectos ***************
 

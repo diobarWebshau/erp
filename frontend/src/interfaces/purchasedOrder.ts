@@ -3,7 +3,7 @@ import type { IPartialClient } from "./clients";
 import type { IPartialClientAddress } from "./clientAddress";
 
 interface IPurchasedOrder {
-  id: number;
+  id: number | string;
   order_code?: string;
   delivery_date: string;
   status: string;
@@ -16,21 +16,21 @@ interface IPurchasedOrder {
   state: string;
   country: string;
   street: string;
-  street_number: string;
+  street_number: number;
   neighborhood: string;
-  zip_code: string;
+  zip_code: number;
   tax_regimen: string;
   cfdi: string;
   payment_method: string;
   client_address_id: number | null;
   shipping_street: string;
-  shipping_street_number: string;
+  shipping_street_number: number;
   payment_terms: string;
   shipping_neighborhood: string;
   shipping_city: string;
   shipping_state: string;
   shipping_country: string;
-  shipping_zip_code: string;
+  shipping_zip_code: number;
   total_price: number;
   created_at: string;
   updated_at: string;
@@ -57,21 +57,21 @@ const defaultValuePurchasedOrder: IPurchasedOrder = {
   state: "",
   country: "",
   street: "",
-  street_number: "",
+  street_number: 525,
   neighborhood: "",
-  zip_code: "",
+  zip_code: 525,
   tax_regimen: "",
   cfdi: "",
   payment_method: "",
   client_address_id: null,
   shipping_street: "",
-  shipping_street_number: "",
+  shipping_street_number: 525,
   payment_terms: "",
   shipping_neighborhood: "",
   shipping_city: "",
   shipping_state: "",
   shipping_country: "",
-  shipping_zip_code: "",
+  shipping_zip_code: 525,
   total_price: 0,
   created_at: "",
   updated_at: ""
@@ -91,21 +91,21 @@ const defaultValuePartialPurchasedOrder: Partial<IPurchasedOrder> = {
   state: "",
   country: "",
   street: "",
-  street_number: "",
+  street_number: 51,
   neighborhood: "",
-  zip_code: "",
+  zip_code: 26,
   tax_regimen: "",
   cfdi: "",
   payment_method: "",
   client_address_id: null,
   shipping_street: "",
-  shipping_street_number: "",
+  shipping_street_number: 626,
   payment_terms: "",
   shipping_neighborhood: "",
   shipping_city: "",
   shipping_state: "",
   shipping_country: "",
-  shipping_zip_code: "",
+  shipping_zip_code: 151,
   total_price: 0,
   created_at: "",
   updated_at: "",

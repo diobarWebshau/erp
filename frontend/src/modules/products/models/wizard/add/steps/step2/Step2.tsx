@@ -1,8 +1,8 @@
 import SecundaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/secundary-action/SecundaryActionButtonCustom";
 import UnderlineLabelInputNumeric from "../../../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import { add_inputs_to_products, remove_inputs_from_products } from "./../../../../../context/itemActions"
 import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
+import DobleIconInputNumeric from "../../../../../../../comp/primitives/input/layouts/doble-icon/numeric/base/DobleIconInputNumeric";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import SingleImageLoaderCustom from "../../../../../../../comp/primitives/image-loader/single/custom/SingleImageLoaderCustom";
@@ -12,8 +12,13 @@ import SelectObjectsModalMemo from "../../../../../../../comp/features/modal-pro
 import type { RowAction } from "../../../../../../../comp/primitives/table/tableContext/tableTypes";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
 import type { IPartialProductProcess } from "../../../../../../../interfaces/productsProcesses";
-import { back_step, update_product_process, add_product_process } from "../../../../../context/itemActions";
 import type { IPartialProductInput } from "../../../../../../../interfaces/productsInputs";
+import {
+    back_step, update_product_process, add_product_process, remove_product_process,
+    remove_discount_from_products, add_inputs_to_products, remove_inputs_from_products,
+    add_discount_to_products, update_product,
+    update_input, next_step
+} from "../../../../../context/itemActions";
 import base64ToFileOrNull from "../../.../../../../../../../scripts/convertBase64ToFile";
 import { clearError, setError } from "../../../../../../../store/slicer/errorSlicer";
 import type { IInput, IPartialInput } from "../../../../../../../interfaces/inputs";
@@ -21,10 +26,11 @@ import { update_discount_from_products } from "../../../../../context/itemAction
 import { useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
 import type { IPartialProduct } from "../../../../../../../interfaces/product";
 import type { ItemAction, ItemState } from "../../../../../context/itemTypes";
+import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import { generateRandomIds } from "../../../../../../../helpers/nanoId";
 import { useDispatch as useDispatchRedux } from "react-redux";
+import { Bookmark, DollarSign, Plus, Trash2 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Bookmark, Plus, Trash2 } from "lucide-react";
 import StyleModule from "./Step2.module.css"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -66,7 +72,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
 
     const computePhotoFiles = useCallback((): File | null => {
         if (!state.data.item) return null;
-        return base64ToFileOrNull(state.data.item?.photo || null, "product-photo")
+        return base64ToFileOrNull(state.data.item?.photo || null, "photo")
     }, [state.data.item]);
 
     const [photo, setPhoto] = useState<File | null>(computePhotoFiles());
@@ -79,9 +85,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
     const [isAvailableInputs, setIsAvailableInputs] = useState<boolean>(false);
     const [modeAssignProcess, setModeAssignProcess] = useState<"new" | "asingn" | null>("new");
 
-    const toggleIsActiveProductInputAddModal = useCallback(() => {
-        setIsActiveProductInputAddModal(prev => !prev);
-    }, []);
+    const toggleIsActiveProductInputAddModal = useCallback(() => setIsActiveProductInputAddModal(prev => !prev), []);
 
     //  * ************ Components Table ProductInput ************ 
 
@@ -106,6 +110,11 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
     const handleOnClickDeleteProductInput = useCallback((row: IPartialProductInput) => {
         if (!row?.id) return;
         dispatch(remove_inputs_from_products([row.id]));
+    }, [dispatch]);
+
+    const handleOnClickDeleteProductProcess = useCallback((row: IPartialProductProcess) => {
+        if (!row?.process?.id) return;
+        dispatch(remove_product_process([row?.process?.id]));
     }, [dispatch]);
 
     const fetchLoadInputs = useCallback(async (query: string | number): Promise<IInput[]> => {
@@ -164,7 +173,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
         },
     ], []);
 
-    const actionsRow: RowAction<IPartialProductInput>[] = useMemo(() => [
+    const actionsRowProductInput: RowAction<IPartialProductInput>[] = useMemo(() => [
         {
             id: "delete",
             label: "Eliminar",
@@ -182,17 +191,15 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
     const getRowIdProductProcess = useMemo(() => (row: IPartialProductProcess, index: number) => (row?.process_id && row?.process_id.toString()) || index.toString(), []);
 
     const toggleIsActiveProductProcessAddModalAssing = useCallback(() => {
-        console.log(state.data.item);
         setModeAssignProcess("asingn");
         setIsActiveProductProcessAddModal(prev => !prev);
     }, [state.data.item]);
     const toggleIsActiveProductProcessAddModalNew = useCallback(() => {
-        console.log(state.data.item);
         setModeAssignProcess("new");
         setIsActiveProductProcessAddModal(prev => !prev);
     }, [state.data.item]);
 
-    const columnsProductInputProcess: ColumnDef<IPartialProductProcess>[] = useMemo(() => [
+    const columnsProductProcess: ColumnDef<IPartialProductProcess>[] = useMemo(() => [
         {
             id: "name",
             header: "Nombre",
@@ -222,14 +229,19 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
     }, []);
 
     const setSortFieldProductProcess = useCallback((row: IPartialProductProcess, value: number): IPartialProductProcess => {
-        return ({
-            ...row,
-            sort_order: value
-        });
+        return ({ ...row, sort_order: value });
     }, []);
 
+    const actionsRowProductProcess: RowAction<IPartialProductProcess>[] = useMemo(() => [
+        {
+            id: "delete",
+            label: "Eliminar",
+            onClick: handleOnClickDeleteProductProcess,
+            icon: <Trash2 className={StyleModule.iconTrash} />
+        }
+    ], [handleOnClickDeleteProductProcess]);
 
-    const handleOnClickAddProductInpuProcess = useCallback((values: IPartialProductProcess[]) => {
+    const handleOnClickAddProductProcess = useCallback((values: IPartialProductProcess[]) => {
         dispatch(add_product_process(values));
     }, [dispatch]);
 
@@ -237,16 +249,90 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
 
     const getRowIdProductDiscountRange = useMemo(() => (row: IPartialProductDiscountRange, index: number) => (row?.id && row?.id.toString()) || index.toString(), []);
     const onHandleChangeValueMinQty = useCallback((id: number, value: number | null) => {
-        const attributes: IPartialProductDiscountRange = { min_qty: value as number };
+        const attributes: IPartialProductDiscountRange = { min_qty: value ?? undefined };
         dispatch(update_discount_from_products({ id, attributes: attributes }));
     }, [dispatch]);
     const onHandleChangeValueMaxQty = useCallback((id: number, value: number | null) => {
-        const attributes: IPartialProductDiscountRange = { max_qty: value as number };
+        const attributes: IPartialProductDiscountRange = { max_qty: value ?? undefined };
         dispatch(update_discount_from_products({ id, attributes: attributes }));
     }, [dispatch]);
     const onHandleChangeValueUnitPrice = useCallback((id: number, value: number | null) => {
-        const attributes: IPartialProductDiscountRange = { unit_price: value as number };
+        const attributes: IPartialProductDiscountRange = { unit_price: value ?? undefined };
         dispatch(update_discount_from_products({ id, attributes: attributes }));
+    }, [dispatch]);
+
+    const handleOnClickDeleteProductDiscountRange = useCallback((row: IPartialProductDiscountRange) => {
+        dispatch(remove_discount_from_products([row.id as string]));
+    }, [dispatch])
+
+
+    type RangeConflict = "duplicate" | "overlap" | null;
+
+    const checkRangeConflicts = useCallback((ranges: IPartialProductDiscountRange[]): RangeConflict => {
+
+        if (ranges.length < 2) return null;
+
+        // Normalizar rangos (asegurar números válidos)
+        const cleaned = ranges.map(r => ({
+            min: Number(r.min_qty ?? 0),
+            max: Number(r.max_qty ?? 0)
+        }));
+
+        // Ordenar por inicio
+        const sorted = cleaned.sort((a, b) => a.min - b.min);
+
+        for (let i = 0; i < sorted.length - 1; i++) {
+            const a = sorted[i];
+            const b = sorted[i + 1];
+
+            // 1. Duplicado exacto
+            if (a.min === b.min && a.max === b.max) {
+                return "duplicate";
+            }
+
+            // 2. Traslape
+            if (b.min <= a.max) {
+                return "overlap";
+            }
+        }
+
+        return null;
+    }, []);
+
+    const hasInvalidRangeValues = useCallback((ranges: IPartialProductDiscountRange[]): boolean => {
+
+        for (const r of ranges) {
+            const min = Number(r.min_qty);
+            const max = Number(r.max_qty);
+            const price = Number(r.unit_price);
+
+            // valores obligatorios y > 0
+            if (Number.isNaN(min) || min <= 0) return true;
+            if (Number.isNaN(max) || max <= 0) return true;
+            if (Number.isNaN(price) || price <= 0) return true;
+
+            // rango mínimo debe ser menor al máximo
+            if (min >= max) return true;
+        }
+
+        return false;
+    }, []);
+
+
+    const actionsRowProductDiscountRanges: RowAction<IPartialProductDiscountRange>[] = useMemo(() => [
+        {
+            id: "delete",
+            label: "Eliminar",
+            onClick: handleOnClickDeleteProductDiscountRange,
+            icon: <Trash2 className={StyleModule.iconTrash} />
+        }
+    ], [handleOnClickDeleteProductDiscountRange]);
+
+    const handleOnClickAddDiscountRange = useCallback(() => {
+        const newProductDiscountRanges: IPartialProductDiscountRange = {
+            min_qty: undefined, max_qty: undefined, unit_price: undefined, id: generateRandomIds()
+        }
+        dispatch(add_discount_to_products([newProductDiscountRanges]))
     }, [dispatch]);
 
     const columnsProductDiscountRange: ColumnDef<IPartialProductDiscountRange>[] = useMemo(() => [
@@ -270,6 +356,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                     <UnderlineLabelInputNumeric
                         value={value}
                         onChange={onChange}
+                        withValidation
                     />
                 )
             }
@@ -294,6 +381,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                     <UnderlineLabelInputNumeric
                         value={value}
                         onChange={onChange}
+                        withValidation
                     />
                 )
             }
@@ -315,9 +403,11 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                 };
 
                 return (
-                    <UnderlineLabelInputNumeric
+                    <DobleIconInputNumeric
                         value={value}
                         onChange={onChange}
+                        withValidation
+                        firstIcon={<DollarSign />}
                     />
                 )
             }
@@ -326,7 +416,62 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
 
     // * ************ Handlers ************ 
 
-    const handleOnClickNextStep = useCallback(() => { }, []);
+    const handleOnClickNextStep = useCallback(() => {
+        if (state.data.item_type === "product") {
+            const item = { ...state.data.item } as IPartialProduct;
+            if (!cost || cost == 0 || !productionCost || productionCost === 0) {
+                ToastMantine.feedBackForm({
+                    message: "Debes completar todos los campos."
+                });
+                return;
+            }
+            const productDiscountRange: IPartialProductDiscountRange[] = item.product_discount_ranges || [];
+            if (productDiscountRange.length > 0) {
+                const isInvalidValuesDiscountRange = hasInvalidRangeValues(productDiscountRange);
+                if (isInvalidValuesDiscountRange) {
+                    ToastMantine.feedBackForm({
+                        message: "Los rangos de precios deben tener valores validos."
+                    });
+                    return;
+                }
+                const isExistingDiscountRangeConflict = checkRangeConflicts(productDiscountRange);
+                if (isExistingDiscountRangeConflict) {
+                    if (isExistingDiscountRangeConflict === "duplicate") {
+                        ToastMantine.feedBackForm({
+                            message: "Los rangos de precios no deben duplicarse."
+                        });
+                        return;
+                    } else {
+                        ToastMantine.feedBackForm({
+                            message: "Los rangos de precios no deben traslaparse."
+                        });
+                        return;
+                    }
+                }
+            }
+            if (presentation && presentation !== "") item.presentation = presentation;
+            if (storageConditions && storageConditions !== "") item.storage_conditions = storageConditions;
+            if (photo) item.photo = photo;
+            item.production_cost = productionCost;
+            item.sale_price = cost;
+            console.log
+            dispatch(update_product(item));
+        } else {
+            const item = { ...state.data.item } as IPartialInput;
+            if (!cost || cost == 0 || !productionCost || productionCost === 0) {
+                ToastMantine.feedBackForm({
+                    message: "Debes completar todos los campos."
+                });
+                return;
+            }
+            if (presentation && presentation !== "") item.presentation = presentation;
+            if (storageConditions && storageConditions !== "") item.storage_conditions = storageConditions;
+            if (photo) item.photo = photo;
+            item.unit_cost = cost;
+            dispatch(update_input(item));
+        }
+        dispatch(next_step());
+    }, [state.data.item, checkRangeConflicts, dispatch, productionCost, cost, presentation, storageConditions, photo]);
 
     const handleOnClickBackStep = useCallback(() => {
         dispatch(back_step());
@@ -408,7 +553,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                             modeTable="content"
                             noResultsMessage="No hay insumos de producción asignados"
                             enableOptionsColumn
-                            rowActions={actionsRow}
+                            rowActions={actionsRowProductInput}
                         />
                     </div>
                 }
@@ -435,11 +580,13 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                             getSortField={getSortFieldProductProcess}
                             setSortField={setSortFieldProductProcess}
                             enableSortableRows
-
                             setOnReorderRows={handleUpdateItemOrder}
                             data={(state.data.item as IPartialProduct).product_processes || []}
-                            columns={columnsProductInputProcess}
+                            columns={columnsProductProcess}
                             modeTable="content"
+                            enableOptionsColumn
+                            rowActions={actionsRowProductProcess}
+                            typeRowActions="icon"
                             noResultsMessage="No hay procesos de producción asignados"
                         />
                     </div>
@@ -451,7 +598,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                             <MainActionButtonCustom
                                 label="Agregar rango"
                                 icon={<Plus />}
-                                onClick={() => console.log("Agregar rango")}
+                                onClick={handleOnClickAddDiscountRange}
                             />
                         </div>
                         <GenericTableMemo
@@ -460,6 +607,9 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                             data={(state.data.item as IPartialProduct).product_discount_ranges || []}
                             columns={columnsProductDiscountRange}
                             modeTable="content"
+                            typeRowActions="icon"
+                            enableOptionsColumn
+                            rowActions={actionsRowProductDiscountRanges}
                             noResultsMessage="No hay descuentos de rangos asignados"
                         />
                     </div>
@@ -505,7 +655,7 @@ const Step2 = ({ state, dispatch, onCancel }: Step2Props) => {
                     validInputs={(state.data.item as IPartialProduct).products_inputs}
                     selectedProcessProductBase={(state.data.item as IPartialProduct).product_processes || []}
                     mode={modeAssignProcess}
-                    onClick={handleOnClickAddProductInpuProcess}
+                    onClick={handleOnClickAddProductProcess}
                     onClose={toggleIsActiveProductProcessAddModalAssing}
                 />
             }

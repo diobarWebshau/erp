@@ -33,12 +33,12 @@ const AddWizardProduct = ({ onClose, onCreate }: IAddWizardItems) => {
         },
         {
             title: "Configuración",
-            content: <Step2 state={state} dispatch={dispatch} onCancel={toggleWarningModal}/>,
+            content: <Step2 state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
             icon: <MapPinned />
         },
         {
             title: "Resumen y finalización",
-            content: <Step3 />,
+            content: <Step3 state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
             icon: <FileCheck />
         }
     ], [state, dispatch, toggleWarningModal]);
