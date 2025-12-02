@@ -4,7 +4,7 @@ const locations = [
   {
     name: "Location A",
     description: "Description A",
-    
+
     street: "Avenida Principal",
     street_number: 123,
     neighborhood: "Colonia Centro",
@@ -12,13 +12,14 @@ const locations = [
     state: "Ciudad de México",
     country: "México",
     zip_code: 106000,
-    
+    custom_id: "LOCA",
+    production_capacity: 1000,
+    location_manager: "Diobar",
     phone: "+52 123 456 7890",
   },
   {
     name: "Location B",
     description: "Description B",
-    
     street: "Calle Innovación",
     street_number: 456,
     neighborhood: "Parque Industrial",
@@ -26,14 +27,15 @@ const locations = [
     state: "Nuevo León",
     country: "México",
     zip_code: 64000,
-    
+    custom_id: "LOCB",
+    production_capacity: 1000,
+    location_manager: "Diobar",
     phone: "+52 123 456 7890",
 
   },
   {
     name: "Location C",
     description: "Description C",
-
     street: "Sunset Blvd",
     street_number: 789,
     neighborhood: "Downtown",
@@ -41,7 +43,9 @@ const locations = [
     state: "California",
     country: "United States",
     zip_code: 90012,
-    
+    production_capacity: 1000,
+    custom_id: "LOCC",
+    location_manager: "Diobar",
     phone: "+1 123 456 7890",
   }
 ];

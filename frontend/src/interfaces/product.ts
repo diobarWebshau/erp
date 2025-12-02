@@ -1,10 +1,10 @@
+import type { IPartialProductInputProcess, IProductInputProcessManager } from "./productInpustProcesses"
 import type { IPartialProductDiscountRange } from "./product-discounts-ranges"
 import type { IPartialProductInput } from "./productsInputs";
 import type { IPartialProductProcess } from "./productsProcesses";
 import type { ProductInputManager } from "./productsInputs";
 import type { ProductProcessManager } from "./productsProcesses";
 import type { ProductDiscountRangeManager } from "./product-discounts-ranges";
-import type { IPartialProductInputProcess, IProductInputProcessManager } from "./productInpustProcesses"
 
 interface ProductLocationAvailability {
     location_id: number;      // id de la ubicación
@@ -30,19 +30,21 @@ interface IProduct {
     is_draft: boolean,
     sale_price: number,
     photo: string | File,
+    unit_of_measure: string,
     created_at: string,
     updated_at: string,
     production_cost: number,
+    barcode?: number
     product_processes?: IPartialProductProcess[],
     product_discount_ranges?: IPartialProductDiscountRange[],
     products_inputs?: IPartialProductInput[],
+    summary_location?: ProductLocationAvailability,
     product_inputs_processes?: IPartialProductInputProcess[],
+    
     product_inputs_processes_updated?: IProductInputProcessManager,
     product_discount_ranges_updated?: ProductDiscountRangeManager,
     products_inputs_updated?: ProductInputManager,
     product_processes_updated?: ProductProcessManager,
-    summary_location?: ProductLocationAvailability,
-    barcode?: number
 }
 
 type IPartialProduct = Partial<IProduct>;
@@ -54,6 +56,7 @@ const defaultValueProduct: IProduct = {
     is_draft: false,
     storage_conditions: '',
     presentation: "",
+    unit_of_measure: "",
     production_cost: 0,
     name: '',
     type: '',

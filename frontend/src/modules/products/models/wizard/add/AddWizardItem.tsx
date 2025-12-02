@@ -4,16 +4,16 @@ import WarningModal from "../../../../../comp/primitives/modal2/dialog-modal/cus
 import FullContainerModal from "../../../../../comp/primitives/modal/full-container/FullContainerModal";
 import { useItemDispatch, useItemState } from "../../../context/itemHooks";
 import { ChevronLeft, FileCheck, MapPinned, UserPen } from "lucide-react";
-import type { IPartialItem } from "interfaces/item";
+import type { IPartialItem } from "../../../../../interfaces/item";
 import { useMemo, useState } from "react";
-import StyleModule from "./AddWizardItem.module.css"
 import Step1 from "./steps/step1/Step1"
 import Step2 from "./steps/step2/Step2"
 import Step3 from "./steps/step3/Step3"
+import StyleModule from "./AddWizardItem.module.css"
 
 interface IAddWizardItems {
     onClose: () => void,
-    onCreate: (record: IPartialItem) => Promise<void>
+    onCreate: (record: IPartialItem) => Promise<boolean>
 }
 
 const AddWizardProduct = ({ onClose, onCreate }: IAddWizardItems) => {
@@ -23,7 +23,6 @@ const AddWizardProduct = ({ onClose, onCreate }: IAddWizardItems) => {
 
     const [showWarningModal, setShowWarningModal] = useState<boolean>(false);
     const toggleWarningModal = useMemo(() => () => setShowWarningModal(prev => !prev), []);
-
 
     const steps = useMemo(() => [
         {
@@ -38,10 +37,10 @@ const AddWizardProduct = ({ onClose, onCreate }: IAddWizardItems) => {
         },
         {
             title: "Resumen y finalización",
-            content: <Step3 state={state} dispatch={dispatch} onCancel={toggleWarningModal} />,
+            content: <Step3 state={state} dispatch={dispatch} onCancel={toggleWarningModal} onCreate={onCreate} onClose={onClose} />,
             icon: <FileCheck />
         }
-    ], [state, dispatch, toggleWarningModal]);
+    ], [state, dispatch, toggleWarningModal, onCreate, onClose]);
 
     return (
         <FullContainerModal>

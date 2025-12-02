@@ -71,7 +71,7 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
         onCreate(state.data);
         if (Object.keys(validationError).length > 0) {
             const errorsEntries = Object.entries(validationError);
-            const errors = errorsEntries.map(([_, value]) => value);
+            const errors = errorsEntries.map(([value]) => value);
             errors.forEach(error => toastMantine.error({ message: error as string }));
             return;
         }
@@ -88,10 +88,9 @@ const Step4 = ({ onClose, onLeave, onCreate }: IStep4) => {
                         <div className={StyleModule.subContentItem}>
                             <span className={`nunito-bold ${StyleModule.boldText}`}>Empresa de Mexicali</span>
                             <span>{location?.name}</span>
-                            <span>{location?.email}</span>
                             <span>{`Tel. ${location?.phone}`}</span>
                             <span>{`${location?.city}, ${location?.state}, ${location?.country}`}</span>
-                            <span>{location?.address}</span>
+                            <span>{`${location?.street} ${location?.street}, ${location?.neighborhood}, ${location?.city}, ${location?.state}, ${location?.country}  `}</span>
                         </div>
                         <div className={StyleModule.subContentItem}>
                             <dl>

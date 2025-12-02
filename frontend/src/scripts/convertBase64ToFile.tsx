@@ -15,7 +15,7 @@ const base64ToFileOrNull = (
   if (!mimeMatch) return null;
 
   const mime = mimeMatch[1];
-  const ext = mime.split('/')[1] || 'bin';
+  // const ext = mime.split('/')[1] || 'bin';
 
   let bstr: string;
   try {

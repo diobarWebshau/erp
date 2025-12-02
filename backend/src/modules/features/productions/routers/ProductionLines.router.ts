@@ -17,13 +17,13 @@ const createProductionLineRouter = (): Router => {
     productionLineRouter.post("/",
         validateProductionLinesMiddleware,
         ProductionLinesController.create);
-    productionLineRouter.post("/complete",
+    productionLineRouter.post("/create-complete",
         validateProductionLinesMiddleware,
         ProductionLinesController.createComplete);
     productionLineRouter.patch("/:id",
         validateProductionLinesMiddleware,
         ProductionLinesController.update);
-    productionLineRouter.patch("/complete/:id",
+    productionLineRouter.patch("/update-complete/:id",
         validateProductionLinesMiddleware,
         ProductionLinesController.updateComplete);
     productionLineRouter.delete("/:id",

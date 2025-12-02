@@ -283,7 +283,7 @@ class InventoryTransfersController {
             }
             const sourceInventoryItem =
                 sourceLocationInventoryItem
-                    ?.inventory_location_item
+                    ?.inventories_locations_items
                     ?.shift() as InventoryLocationItemAttributes;
 
             const sourceInventory =
@@ -293,7 +293,7 @@ class InventoryTransfersController {
 
             const destinationInventoryItem =
                 destinationLocationInventoryItem
-                    ?.inventory_location_item
+                    ?.inventories_locations_items
                     ?.shift() as InventoryLocationItemAttributes;
             const destinationInventory =
                 destinationInventoryItem

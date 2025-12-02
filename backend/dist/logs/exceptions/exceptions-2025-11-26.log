@@ -1,0 +1,54 @@
+2025-11-26 11:25:01 [[31MERROR[39M]: uncaughtException: Validation error
+Error
+    at Query.run (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
+    at C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\sequelize.js:315:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MySQLQueryInterface.insert (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\dialects\abstract\query-interface.js:308:21)
+    at async ProcessModel.save (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\model.js:2490:35)
+    at async ProcessModel.create (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\model.js:1362:12)
+    at async file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/features/productions/controllers/ProductsVProduction.controller.js:456:59
+2025-11-26 18:01:13 [[31MERROR[39M]: uncaughtException: You have used the alias product_input_processes in two separate associations. Aliased associations must have unique aliases.
+SequelizeAssociationError: You have used the alias product_input_processes in two separate associations. Aliased associations must have unique aliases.
+    at new Association (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\base.js:13:13)
+    at new BelongsTo (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\belongs-to.js:25:5)
+    at ProductInputProcessModel.<anonymous> (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\mixin.js:70:25)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/associations.js:538:26
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-11-26 18:01:14 [[31MERROR[39M]: uncaughtException: You have used the alias product_input_processes in two separate associations. Aliased associations must have unique aliases.
+SequelizeAssociationError: You have used the alias product_input_processes in two separate associations. Aliased associations must have unique aliases.
+    at new Association (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\base.js:13:13)
+    at new BelongsTo (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\belongs-to.js:25:5)
+    at ProductInputProcessModel.<anonymous> (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\mixin.js:70:25)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/associations.js:538:26
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-11-26 18:01:39 [[31MERROR[39M]: uncaughtException: You have used the alias product_input_processes in two separate associations. Aliased associations must have unique aliases.
+SequelizeAssociationError: You have used the alias product_input_processes in two separate associations. Aliased associations must have unique aliases.
+    at new Association (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\base.js:13:13)
+    at new BelongsTo (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\belongs-to.js:25:5)
+    at ProductInputProcessModel.<anonymous> (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\mixin.js:70:25)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/associations.js:538:26
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-11-26 18:04:17 [[31MERROR[39M]: uncaughtException: You have used the alias inputs_processes in two separate associations. Aliased associations must have unique aliases.
+SequelizeAssociationError: You have used the alias inputs_processes in two separate associations. Aliased associations must have unique aliases.
+    at new Association (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\base.js:13:13)
+    at new BelongsTo (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\belongs-to.js:25:5)
+    at ProductInputProcessModel.<anonymous> (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\mixin.js:70:25)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/associations.js:538:26
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2025-11-26 18:06:14 [[31MERROR[39M]: uncaughtException: You have used the alias product_process in two separate associations. Aliased associations must have unique aliases.
+SequelizeAssociationError: You have used the alias product_process in two separate associations. Aliased associations must have unique aliases.
+    at new Association (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\base.js:13:13)
+    at new BelongsTo (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\belongs-to.js:25:5)
+    at ProductInputProcessModel.<anonymous> (C:\Users\Dioba\Desktop\webshauProjects\erp\backend\node_modules\sequelize\lib\associations\mixin.js:70:25)
+    at file:///C:/Users/Dioba/Desktop/webshauProjects/erp/backend/dist/modules/associations.js:530:26
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)

@@ -6,7 +6,7 @@ interface IObjectSelectCustom<T> {
     value: T | null;
     options: T[];
     labelKey: keyof T;
-    onChange: (value: T) => void;
+    onChange: (value: T | null) => void;
     placeholder?: string;
     disabled?: boolean;
     initialOpen?: boolean;

@@ -1,77 +1,42 @@
-import StyleModule
-    from "./EditModal.module.css";
-import type {
-    IPartialPurchasedOrder
-} from "../../../../../../interfaces/purchasedOrder";
-import usePurchasedOrderById
-    from "../../../../../../modelos/purchased_orders/hooks/usePurchasedOrderById";
-import {
-    useEffect,
-    useRef
-} from "react";
-import Step1
-    from "./steps/step1/Step1";
-import Step2
-    from "./steps/step2/Step2";
-import Step3
-    from "./steps/step3/Step3";
-import {
-    useModalEditDispatch,
-    useModalEditState
-} from "./context/modalEditHooks";
-import Step4
-    from "./steps/step4/Step4";
-import {
-    set_purchase_order
-} from "./context/modalEditActions";
+import usePurchasedOrderById from "../../../../../../modelos/purchased_orders/hooks/usePurchasedOrderById";
+import type { IPartialPurchasedOrder } from "../../../../../../interfaces/purchasedOrder";
+import { useModalEditDispatch, useModalEditState } from "./context/modalEditHooks";
+import { set_purchase_order } from "./context/modalEditActions";
+import StyleModule from "./EditModal.module.css";
+import { useCallback, useEffect, useRef } from "react";
+import Step1 from "./steps/step1/Step1";
+import Step2 from "./steps/step2/Step2";
+import Step3 from "./steps/step3/Step3";
+import Step4 from "./steps/step4/Step4";
+
 interface IEditModal {
     record: IPartialPurchasedOrder;
     onClose: () => void;
-    onEdit: (
-        record: IPartialPurchasedOrder | null,
-        updateRecord: IPartialPurchasedOrder | null
-    ) => void;
+    onEdit: (({ original, update }: { original: IPartialPurchasedOrder; update: IPartialPurchasedOrder }) => Promise<boolean>),
     onDelete: () => void;
 }
 
-const EditModal = ({
-    record,
-    onClose,
-    onEdit,
-    onDelete
-}: IEditModal) => {
+const EditModal = ({ record, onClose, onEdit, onDelete }: IEditModal) => {
 
-    const dispatch =
-        useModalEditDispatch();
-    const state =
-        useModalEditState();
-    const isDataLoaded =
-        useRef(false);
+    const dispatch = useModalEditDispatch();
+    const state = useModalEditState();
+    const isDataLoaded = useRef(false);
 
-    const {
-        purchasedOrderById,
-        loadingPurchasedOrderById,
-        refetchPurchasedOrderById
-    } = usePurchasedOrderById(record.id);
+    const { purchasedOrderById, loadingPurchasedOrderById, refetchPurchasedOrderById } = usePurchasedOrderById(record.id as number);
 
     useEffect(() => {
         if (purchasedOrderById) {
-            dispatch(
-                set_purchase_order(
-                    structuredClone(purchasedOrderById)
-                )
-            );
+            dispatch(set_purchase_order(structuredClone(purchasedOrderById)));
             isDataLoaded.current = true;
         }
-    }, [purchasedOrderById]);
+    }, [purchasedOrderById, dispatch]);
 
-    const handleEdit = (
-        updateRecord: IPartialPurchasedOrder | null
-    ) => {
-        const processedPurchaseOrder =
-            structuredClone(purchasedOrderById);
-        onEdit(processedPurchaseOrder, updateRecord);
-    }
+    const handleEdit = useCallback((updateRecord: IPartialPurchasedOrder) => {
+        if (!purchasedOrderById) return;
+        const processedPurchaseOrder = structuredClone(purchasedOrderById);
+        onEdit({ original: processedPurchaseOrder, update: updateRecord });
+    }, [onEdit, purchasedOrderById]);
+
     return (
         <div
             role="dialog"

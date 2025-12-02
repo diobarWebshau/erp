@@ -1,17 +1,17 @@
-import InputTextCustom from "../../../../../../../comp/primitives/input/text/custom/InputTextCustom";
-import ObjectSelectCustomMemo from "../../../../../../../comp/primitives/select/object-select/base/base/ObjectSelectCustom";
-import useLocations from "../../../../../../../modelos/locations/hooks/useAllLocations";
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
+import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText"
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import UnderlineObjectSelectCustom from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectCustom"
+import type { ProductionLineAction, ProductionLineState, } from "../../../../../context/productionLineTypes";
 import { set_step, update_production_line } from "../../../../../context/productionLineActions";
+import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import useLocations from "../../../../../../../modelos/locations/hooks/useAllLocations";
 import type { ILocation } from "interfaces/locations";
-import { Bookmark, Text } from "lucide-react";
-import { memo, type Dispatch } from "react";
+import { Bookmark } from "lucide-react";
 import { useState, useCallback } from "react";
 import StyleModule from "./Step1.module.css";
-import type { ProductionLineAction, ProductionLineState, } from "../../../../../context/productionLineTypes";
+import { memo, type Dispatch } from "react";
 
 interface IStep3 {
     state: ProductionLineState,
@@ -19,16 +19,13 @@ interface IStep3 {
     onCancel: () => void;
 }
 
-const Step3 = memo(({
-    state,
-    dispatch,
-    onCancel
-}: IStep3) => {
+const Step3 = memo(({ state, dispatch, onCancel }: IStep3) => {
 
-    const [name, setName] = useState<string>(state.data?.name || "");
-    const [customId, setCustomId] = useState<string>(state.data?.custom_id || "");
+    const { locations } = useLocations({ like: "", conditionsExclude: { is_active: false } });
+    const [name, setName] = useState<string | null>(state.data?.name ?? null);
+    const [customId, setCustomId] = useState<string | null>(state.data?.custom_id ?? null);
 
-    const handleOnChangeLocation = useCallback((location: ILocation | null) => {
+    const handleOnChangeLocation = useCallback((location: ILocation | null | undefined) => {
         if (!location) return;
         dispatch(update_production_line({
             location_production_line: {
@@ -38,50 +35,38 @@ const Step3 = memo(({
         }));
     }, [dispatch]);
 
-    const { locations } = useLocations({
-        like: "",
-        conditionsExclude: {
-            is_active: false
-        }
-    });
-
     const handleOnClickNext = useCallback(() => {
-        if (name === "" || customId === "" || state.data?.location_production_line?.location === undefined) {
-            ToastMantine.feedBackForm({
-                message: "Debe completar todos los campos",
-            });
+        if (!name || name === "" || !customId || customId === "" || state.data?.location_production_line?.location === undefined) {
+            ToastMantine.feedBackForm({ message: "Debe completar todos los campos" });
             return;
         }
-        dispatch(update_production_line({
-            name: name,
-            custom_id: customId,
-        }));
+        dispatch(update_production_line({ name: name, custom_id: customId }));
         dispatch(set_step(1));
-    }, [state, name, customId, dispatch, ToastMantine]);
+    }, [state.data, name, customId, dispatch]);
 
     return <div className={StyleModule.containerStep}>
         <div className={StyleModule.containerContent}>
-            <InputTextCustom
-                value={name}
+            <UnderlineLabelInputText
+                value={name ?? ""}
                 onChange={setName}
-                icon={<Text />}
-                placeholder="Nombre de la línea"
+                label={"Nombre"}
                 withValidation
             />
             <div className={StyleModule.secondBlock}>
-                <InputTextCustom
+                <UnderlineLabelInputText
                     value={customId}
                     onChange={setCustomId}
-                    icon={<Text />}
-                    placeholder="Id único"
+                    label={"Id único"}
                     withValidation
                 />
-                <ObjectSelectCustomMemo
+                <UnderlineObjectSelectCustom
+                    label="Ubicación"
                     labelKey={'name'}
                     value={state.data.location_production_line?.location ?? null}
                     onChange={handleOnChangeLocation}
                     options={locations}
-
+                    maxHeight="150px"
+                    withValidation
                 />
             </div>
         </div>

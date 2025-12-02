@@ -114,56 +114,52 @@ const createInputInDB = async (
     }
 };
 
-
-const createCompleteInputInDB = async (
-    data: IPartialInput,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-
-        const formData = new FormData();
-
-        Object.entries(data).forEach(([key, value]) => {
-            if (value === null || value === undefined) {
-                // No hacemos append si el valor es null o undefined
-                return;
-            } else if (value instanceof File) {
-                formData.append(key, value);
-            } else if (typeof value === "object") {
-                formData.append(key, JSON.stringify(value));
-            } else {
-                formData.append(key, value.toString());
-            }
-        });
-        
-        const response = await fetch(API_URL + "/create-complete", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!response.ok) {
-            const errorText = await response.json();
-            console.log(errorText);
-            if (response.status >= 500) {
-                throw new Error(errorText);
-            }
-            dispatch(
-                setError({
-                    key: "createInputComplete",
-                    message: errorText
-                })
-            );
-            return null;
+const createCompleteInput = async ({ input }: { input: IPartialInput }): Promise<IPartialInput> => {
+    const formData = new FormData();
+    Object.entries(input).forEach(([key, value]) => {
+        if (value == null) return;
+        // Array de Files
+        if (Array.isArray(value) && value.every(v => v instanceof File)) {
+            value.forEach((file) => formData.append(key, file));
+            return;
         }
-        dispatch(
-            clearError("createInputComplete")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+        // Array NO de files → JSON
+        if (Array.isArray(value)) {
+            formData.append(key, JSON.stringify(value));
+            return;
+        }
+        // Un solo File
+        if (value instanceof File) {
+            formData.append(key, value);
+            return;
+        }
+        // Objetos → JSON
+        if (typeof value === "object") {
+            formData.append(key, JSON.stringify(value));
+            return;
+        }
+        // Primitivos
+        formData.append(key, value.toString());
+    });
+    const request = new Request(`${API_URL}/create-complete`, {
+        method: "POST",
+        body: formData
+    });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: unknown = null;
+        try {
+            errorBody = await response.json();
+        } catch {/**/ }
+        const message =
+            typeof errorBody === "string"
+                ? errorBody
+                : (errorBody as any)?.message
+                ?? `Request failed with status ${response.status}`;
+        throw new Error(message);
     }
-};
+    return await response.json();
+}
 
 const updateInputInDB = async (
     id: number,
@@ -301,6 +297,6 @@ export {
     updateInputInDB,
     deleteInputInDB,
     fetchInputWithTypeByIdFromDB,
-    createCompleteInputInDB,
+    createCompleteInput,
     updateCompleteInputInDB
 };

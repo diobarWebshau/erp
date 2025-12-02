@@ -17,7 +17,7 @@ interface MultiSelectCheckSearchTagCustomProps<T> {
     label?: string
 }
 
-const MultiSelectCheckSearchCustom = <T,>({
+const MultiSelectCheckSearchTagCustom = <T,>({
     options,
     selected,
     setSelected,
@@ -55,6 +55,6 @@ const MultiSelectCheckSearchCustom = <T,>({
     />
 };
 
-const MultiSelectCheckSearchCustomMemo = memo(MultiSelectCheckSearchCustom) as typeof MultiSelectCheckSearchCustom;
+const MultiSelectCheckSearchTagCustomMemo = memo(MultiSelectCheckSearchTagCustom) as typeof MultiSelectCheckSearchTagCustom;
 
-export default MultiSelectCheckSearchCustomMemo;
+export default MultiSelectCheckSearchTagCustomMemo;

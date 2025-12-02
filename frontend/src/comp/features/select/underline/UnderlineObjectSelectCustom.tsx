@@ -1,6 +1,6 @@
 import { memo } from "react";
 import StyleModule from "./UnderlineObjectSelectCustom.module.css";
-import ObjectSelectMemo from "./UnderlineObjectSelect";
+import UnderlineObjectSelectMemo from "./UnderlineObjectSelect";
 
 interface IUnderlineObjectSelectCustom<T> {
     value: T | null;
@@ -26,7 +26,7 @@ const UnderlineObjectSelectCustom = <T,>({
     maxHeight
 }: IUnderlineObjectSelectCustom<T>) => {
     return (
-        <ObjectSelectMemo
+        <UnderlineObjectSelectMemo
             value={value}
             options={options}
             labelKey={labelKey}

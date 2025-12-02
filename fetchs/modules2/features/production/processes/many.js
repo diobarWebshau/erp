@@ -1,9 +1,9 @@
 import fetch from 'node-fetch';
 
 const processes = [
-  { name: "Proceso A" },
-  { name: "Proceso B" },
-  { name: "Proceso C" }
+  { name: "Proceso A", description: "Descripcion Proceso A" },
+  { name: "Proceso B", description: "Descripcion Proceso B" },
+  { name: "Proceso C", description: "Descripcion Proceso C" }
 ];
 
 const sendProcess = async (process) => {

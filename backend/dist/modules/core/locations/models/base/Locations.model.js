@@ -6,14 +6,17 @@ class LocationModel extends Model {
             "name",
             "description",
             "phone",
-            "city",
-            "state",
-            "country",
-            "is_active",
             "street",
             "street_number",
             "neighborhood",
+            "city",
+            "state",
+            "country",
             "zip_code",
+            "production_capacity",
+            "location_manager",
+            "custom_id",
+            "is_active",
         ];
     };
     static getAllFields() {
@@ -22,16 +25,19 @@ class LocationModel extends Model {
             "name",
             "description",
             "phone",
-            "city",
-            "state",
-            "country",
-            "is_active",
-            "created_at",
-            "updated_at",
             "street",
             "street_number",
             "neighborhood",
+            "city",
+            "state",
+            "country",
             "zip_code",
+            "production_capacity",
+            "location_manager",
+            "custom_id",
+            "is_active",
+            "created_at",
+            "updated_at",
         ];
     }
 }
@@ -44,51 +50,63 @@ LocationModel.init({
     },
     name: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
         unique: true,
     },
     description: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
+    },
+    production_capacity: {
+        type: DataTypes.BIGINT,
+        allowNull: true
+    },
+    location_manager: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
+    custom_id: {
+        type: DataTypes.STRING(100),
+        allowNull: true
     },
     // contact
     phone: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     // address
     street: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     street_number: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     neighborhood: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     city: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     state: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     country: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
     },
     zip_code: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     // status
     is_active: {
         type: DataTypes.TINYINT,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 1,
     },
     created_at: {

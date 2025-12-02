@@ -3,6 +3,7 @@ import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/but
 import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
+import UnderlineStandardSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
 import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
 import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
@@ -29,7 +30,6 @@ import {
 } from "./../../../../../context/clientActions"
 import StyleModule from "./Step2.module.css";
 import { useDispatch } from "react-redux";
-import UnderlineStandardSelectCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -41,11 +41,7 @@ interface IStep2 {
     onCancel: () => void;
 }
 
-const Step2 = ({
-    state,
-    dispatch,
-    onCancel
-}: IStep2) => {
+const Step2 = ({ state, dispatch, onCancel }: IStep2) => {
 
     // * *********** Estados globales ************ 
 
@@ -84,7 +80,7 @@ const Step2 = ({
         const id = address.id;
         if (!id) return;
         dispatch(remove_client_addresses([id]));
-    }, [dispatch, state]);
+    }, [dispatch]);
 
     const handleAddDiscount = useCallback((products: IProduct[]) => {
         const newDiscount: IPartialProductDiscountClient[] = products.map((p) => ({
@@ -101,7 +97,7 @@ const Step2 = ({
         const id = discount.id;
         if (!id) return;
         dispatch(remove_client_product_discounts([id]));
-    }, [dispatch, state]);
+    }, [dispatch]);
 
     const handleAddAddress = useCallback((address: IPartialClientAddress) => {
         const newAddress = {
@@ -156,7 +152,7 @@ const Step2 = ({
             console.error("Error fetching products:", error);
             return [];
         }
-    }, [state.data?.product_discounts_client, dispatchRedux, excludeIds]);
+    }, [dispatchRedux, excludeIds]);
 
     // * *********** Funciones memoizadas para las tablas ************ 
 
@@ -166,14 +162,8 @@ const Step2 = ({
     const getRowIdDiscounts = useMemo(() => (row: IPartialProductDiscountClient, index: number) => row.id?.toString() ?? index.toString(), []);
 
     const handleChangeDiscount = useCallback((id: string, value: number) => {
-        dispatch(update_client_product_discounts({
-            id,
-            attributes: {
-                discount_percentage: value,
-            }
-        }));
-    }, [dispatch, state]);
-
+        dispatch(update_client_product_discounts({ id, attributes: { discount_percentage: value, } }));
+    }, [dispatch]);
 
     const columnsAddresses: ColumnDef<IPartialClientAddress>[] = useMemo(() => [
         {
@@ -275,7 +265,10 @@ const Step2 = ({
             },
             cell: ({ row }) => {
 
-                const onChange = useCallback((value: number) => handleChangeDiscount(row.original.id?.toString() ?? "", value), [handleChangeDiscount, row]);
+                const onChange = (value: number | null) => {
+                    if (!value) return null;
+                    return handleChangeDiscount(row.original.id?.toString() ?? "", value);
+                }
 
                 return <NumericInputCustom
                     value={row.original.discount_percentage ?? null}
@@ -287,7 +280,7 @@ const Step2 = ({
                 />;
             },
         },
-    ], [dispatch, handleChangeDiscount]);
+    ], [handleChangeDiscount]);
 
     const rowActionsAddresses: RowAction<IPartialClientAddress>[] = useMemo(() => [
         {

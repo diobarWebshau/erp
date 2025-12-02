@@ -8,15 +8,15 @@ import UnderlineStandardSelectCustom from "./../../../../../../../comp/features/
 import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
 import type { LocationState, LocationAction } from "../../../../context/locationTypes";
 import { next_step, update_location, add_location_location_type, remove_location_location_type } from "../../../../context/locationActions";
-import { useCallback, useMemo, useState, type Dispatch } from "react";
+import { useCallback, useState, type Dispatch } from "react";
 import { Bookmark } from "lucide-react";
 import StyleModule from "./Step1.module.css";
 import useLocationTypes from "../../../../../../../modelos/location_types/hooks/useLocationTypes";
 import UnderlineObjectSelectMultiCustomMemo from "../../../../../../../comp/features/select/underline/UnderlineObjectSelectMultiCustom";
 import type { ILocationType } from "interfaces/locationTypes";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
-import type { IPartialLocation } from "interfaces/locations";
-import type { IPartialLocationLocationType } from "interfaces/locationLocationType";
+import type { IPartialLocation } from "../../../../../../../interfaces/locations";
+import type { IPartialLocationLocationType } from "../../../../../../../interfaces/locationLocationType";
 
 interface IStep1Props {
     state: LocationState,
@@ -127,7 +127,7 @@ const Step1 = ({
     }, [
         dispatch, locationType, name, customId, locationManager,
         countryName, stateName, cityName, zipCode, phone, neighborhood,
-        street, streetNumber, ToastMantine, state.data.location_location_type
+        street, streetNumber, state.data.location_location_type
     ]);
 
     return (

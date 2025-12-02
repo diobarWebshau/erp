@@ -70,6 +70,12 @@ const update_product_process = (payload: IPartialProductProcess[]): ItemAction =
 });
 
 
+const update_product_process_id = (payload: { id: (number | string), attributes: IPartialProductProcess }): ItemAction => ({
+    type: itemActionsType.UPDATE_PRODUCT_PROCESS_ID,
+    payload
+});
+
+
 
 const add_discount_to_products = (payload: IPartialProductDiscountRange[]): ItemAction => ({
     type: itemActionsType.ADDS_DISCOUNT_TO_PRODUCTS,
@@ -160,6 +166,12 @@ const update_draft_product_process = (payload: IPartialProductProcess[]): ItemAc
     payload
 });
 
+const update_draft_product_process_id = (payload: { id: (number | string), attributes: IPartialProductProcess }): ItemAction => ({
+    type: itemActionsType.UPDATE_DRAFT_PRODUCT_PROCESS_ID,
+    payload
+});
+
+
 
 
 const add_discount_to_draft_products = (payload: IPartialProductDiscountRange[]): ItemAction => ({
@@ -232,6 +244,7 @@ export {
     add_product_process,
     remove_product_process,
     update_product_process,
+    update_product_process_id,
 
     add_discount_to_products,
     remove_discount_from_products,
@@ -254,6 +267,7 @@ export {
     add_draft_product_process,
     remove_draft_product_process,
     update_draft_product_process,
+    update_draft_product_process_id,
 
     add_discount_to_draft_products,
     remove_discount_from_draft_products,

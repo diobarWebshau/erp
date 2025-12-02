@@ -133,7 +133,7 @@ const UnderlineLabelInputNumeric = memo(({
             styleModule.label,
             "nunito-semibold",
             (focused || inputValue.length > 0) && styleModule.labelFloating,
-            (withValidation && errorActive) && styleModule.labelError
+            (withValidation && errorActive && (!inputValue || (typeof inputValue === "string" && inputValue.length === 0)) && focused) && styleModule.labelError
         );
 
         const inputClassNames = clsx(

@@ -1,5 +1,6 @@
-import type { IPartialLocationLocationType } from "./locationLocationType";
-import type { IPartialLocationProductionLine } from "./locationsProductionLines";
+import type { IInventoryLocationItemManager, IPartialInventoryLocationItem } from "./inventoriesLocationsItems";
+import type { IPartialLocationProductionLine, LocationProductionLineManager } from "./locationsProductionLines";
+import type { IPartialLocationLocationType, LocationLocationTypeManager } from "./locationLocationType";
 import type { ILocationType } from "./locationTypes";
 
 interface IInventoryRecord {
@@ -45,9 +46,13 @@ interface ILocation {
 
   // relations
   types?: ILocationType[],
-  location_production_line?: IPartialLocationProductionLine[]
-  location_location_type: IPartialLocationLocationType[]
-  inventory?: IInventoryRecord
+  location_production_line?: IPartialLocationProductionLine[],
+  location_location_type?: IPartialLocationLocationType[],
+  location_location_type_updated?: LocationLocationTypeManager,
+  inventory?: IInventoryRecord,
+  inventories_locations_items?: IPartialInventoryLocationItem[],
+  location_production_line_updated?: LocationProductionLineManager,
+  inventories_locations_items_updated?: IInventoryLocationItemManager
 }
 
 type IPartialLocation = Partial<ILocation>;

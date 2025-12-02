@@ -66,7 +66,7 @@ const ItemProvider = ({
                 if (!cancelled) {
                     dispatch(set_item(itemById));
                 }
-            } catch (e) { /* error ya manejado en el hook */ }
+            } catch{/**/}
         })();
 
         return () => {

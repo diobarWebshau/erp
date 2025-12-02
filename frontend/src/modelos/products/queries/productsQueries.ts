@@ -1,21 +1,11 @@
-import type {
-    IProduct, IPartialProduct
-} from "../../../interfaces/product";
-import type { IPartialProductDiscountRange } from "../../../interfaces/product-discounts-ranges";
-import type { IPartialProductInput } from "../../../interfaces/productsInputs";
-import type { IPartialProductProcess } from "../../../interfaces/productsProcesses";
-import {
-    setError, clearError,
-} from "../../../store/slicer/errorSlicer";
-import type {
-    AppDispatchRedux
-} from "../../../store/store";
-
+import type { IApiError } from "../../../interfaces/errorApi";
+import type { IProduct, IPartialProduct } from "../../../interfaces/product";
+import { setError, clearError } from "../../../store/slicer/errorSlicer";
+import type { AppDispatchRedux } from "../../../store/store";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-const RELATIVE_PATH = "products/products/";
+const RELATIVE_PATH = "production/products/";
 const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
-
 
 const fetchProductsFromDB = async (
     dispatch: AppDispatchRedux
@@ -83,40 +73,6 @@ const fetchProductDetails = async (
         throw error;
     }
 }
-
-const createProductInDB = async (
-    data: IPartialProduct,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            const errorText = await response.json();
-            console.log(errorText);
-            dispatch(
-                setError({
-                    key: "createProduct",
-                    message: errorText
-                })
-            );
-            throw new Error(
-                `${errorText}`
-            );
-        }
-        dispatch(
-            clearError("createProduct")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
-    }
-};
 
 const fetchProductLike = async (
     like: string,
@@ -211,188 +167,132 @@ const getProductsByIdsExclude = async (
     }
 }
 
-const createCompleteProductInDB = async (
-    product: IPartialProduct,
-    processes: IPartialProductProcess[],
-    inputs: IPartialProductInput[],
-    discounts: IPartialProductDiscountRange[],
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const formData = new FormData();
+// *************** POST *************** //
 
-        formData.append("name", product.name ?? "");
-        formData.append("description", product.description ?? "");
-        formData.append("type", product.type ?? "");
-        formData.append("sku", product.sku ?? "");
-        formData.append("sale_price", String(product.sale_price ?? ""));
-        formData.append("active", Number(product.active).toString());
-        formData.append("product_processes", JSON.stringify(processes ?? []));
-        console.log(inputs);
-        formData.append("products_inputs", JSON.stringify(inputs ?? []));
-        formData.append("product_discount_ranges", JSON.stringify(discounts ?? []));
+type ICreateProductDBProps = {
+    product: IPartialProduct
+}
 
-        if (product.photo instanceof File) {
-            formData.append("photo", product.photo);
+const createCompleteProductInDB = async ({ product }: ICreateProductDBProps): Promise<IPartialProduct> => {
+    const formData = new FormData();
+    Object.entries(product).forEach(([key, value]) => {
+        if (value == null) return;
+        // Array de Files
+        if (Array.isArray(value) && value.every(v => v instanceof File)) {
+            value.forEach((file) => formData.append(key, file));
+            return;
         }
-
-        console.log(formData);
-
-        // Enviar
-        const response = await fetch(`${API_URL}/create-complete`, {
-            method: "POST",
-            body: formData,
-        });
-
-        // Manejo de errores
-        if (!response.ok) {
-            const errorText = await response.json();
-            console.log(errorText);
-            dispatch(
-                setError({
-                    key: "createCompleteProduct",
-                    message: errorText,
-                })
-            );
-            throw new Error(`${errorText}`);
+        // Array NO de files → JSON
+        if (Array.isArray(value)) {
+            formData.append(key, JSON.stringify(value));
+            return;
         }
-
-        dispatch(clearError("createCompleteProduct"));
-        return await response.json();
-    } catch (error: unknown) {
-        throw error;
+        // Un solo File
+        if (value instanceof File) {
+            formData.append(key, value);
+            return;
+        }
+        // Objetos → JSON
+        if (typeof value === "object") {
+            formData.append(key, JSON.stringify(value));
+            return;
+        }
+        // Primitivos
+        formData.append(key, value.toString());
+    });
+    const url = new URL('create-complete', API_URL);
+    const request = new Request(url.toString(), { method: "POST", body: formData });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        throw apiError;
     }
+    return await response.json();
 };
 
-const updateCompleteProductInDB = async (
-    id: number,
-    data: IPartialProduct,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const formData = new FormData();
+// *************** PATCH *************** //
 
-        Object.entries(data).forEach(([key, value]) => {
-            if (value === null || value === undefined) {
-                // No hacemos append si el valor es null o undefined
-                return;
-            } else if (value instanceof File) {
-                formData.append(key, value);
-            } else if (typeof value === "object") {
-                formData.append(key, JSON.stringify(value));
-            } else {
-                formData.append(key, value.toString());
-            }
-        });
-
-        const response = await fetch(`${API_URL}/update-complete/${id}`, {
-            method: "PATCH",
-            body: formData,
-        });
-
-        if (!response.ok) {
-            const errorText = await response.json();
-            console.error(errorText);
-            if (response.status >= 500)
-                throw new Error(
-                    errorText
-                );
-            dispatch(
-                setError({
-                    key: "updateCompleteProduct",
-                    message: errorText,
-                })
-            );
-            throw new Error(`${errorText}`);
+const updateCompleteProductInDB = async ({ id, product }: { id: number | undefined, product: IPartialProduct, }): Promise<IPartialProduct> => {
+    if (!id) throw new Error("No id provided to updateCompleteProductInDB");
+    const formData = new FormData();
+    Object.entries(product).forEach(([key, value]) => {
+        if (value == null) return;
+        // Array de Files
+        if (Array.isArray(value) && value.every(v => v instanceof File)) {
+            value.forEach((file) => formData.append(key, file));
+            return;
         }
-        const respuesta = await response.json()
-        dispatch(clearError("updateCompleteProduct"));
-        return await respuesta;
-    } catch (error) {
-        console.error(error);
-        throw error;
+        // Array NO de files → JSON
+        if (Array.isArray(value)) {
+            formData.append(key, JSON.stringify(value));
+            return;
+        }
+        // Un solo File
+        if (value instanceof File) {
+            formData.append(key, value);
+            return;
+        }
+        // Objetos → JSON
+        if (typeof value === "object") {
+            formData.append(key, JSON.stringify(value));
+            return;
+        }
+        // Primitivos
+        formData.append(key, value.toString());
+    });
+    const url = new URL(`update-complete/${encodeURIComponent(id)}`, API_URL);
+    const request = new Request(url.toString(), { method: "PATCH", body: formData });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        console.log("APIERROR ", apiError);
+        throw apiError;
     }
+    return await response.json();
 };
 
-const updateProductInDB = async (
-    id: number,
-    data: IPartialProduct,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+// *************** DELETE *************** //
 
-        if (!response.ok) {
-            const errorText =
-                await response.json();
+const deleteProductInDB = async ({ id }: { id: number }): Promise<void> => {
+    const url = new URL(`${encodeURIComponent(id)}`, API_URL);
+    const request = new Request(url.toString(), {
+        method: "DELETE",
+    });
+    const response = await fetch(request);
 
-            if (response.status >= 500)
-                throw new Error(
-                    errorText
-                );
-            dispatch(
-                setError({
-                    key: "updateProduct",
-                    message: errorText
-                })
-            );
-            return null;
-        }
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
 
-        dispatch(
-            clearError("updateProduct")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        throw apiError;
     }
-};
-
-const deleteProductInDB = async (
-    id: number | undefined,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: "DELETE",
-        });
-
-        if (!response.ok) {
-            const errorText = await response.json();
-            dispatch(
-                setError({
-                    key: "deleteProduct",
-                    message: errorText
-                })
-            );
-            if (response.status >= 500) {
-                throw new Error(
-                    `${errorText}`
-                );
-            }
-            return null;
-        }
-
-        dispatch(
-            clearError("deleteProduct")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
-    }
+    // 204 → sin body, simplemente resolvemos
+    return;
 };
 
 export {
     fetchProductsFromDB,
     fetchProductDetails,
-    createProductInDB,
-    updateProductInDB,
     deleteProductInDB,
     createCompleteProductInDB,
     updateCompleteProductInDB,

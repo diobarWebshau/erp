@@ -1,7 +1,5 @@
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import { DataTypes, Model, Optional }
-    from "sequelize";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model } from "sequelize";
 
 interface LocationTypeAttributes {
     id: number,
@@ -10,26 +8,18 @@ interface LocationTypeAttributes {
     updated_at: Date,
 }
 
-interface LocationTypeCreateAttributes
-    extends Optional<
-        LocationTypeAttributes,
-        "id" | "updated_at" | "created_at"> { }
+type LocationTypeCreateAttributes = Partial<LocationTypeAttributes>;
 
-class LocationTypeModel
-    extends Model<
-        LocationTypeAttributes,
-        LocationTypeCreateAttributes> {
-    static getEditableFields = () => {
-        return [
-            "id", "name"
-        ];
-    }
-    static getAllFields() {
-        return [
-            "id", "name", "created_at",
-            "updated_at"
-        ];
-    }
+interface LocationTypeManager {
+    added: LocationTypeAttributes[];
+    deleted: LocationTypeAttributes[];
+    modified: LocationTypeAttributes[];
+}
+
+
+class LocationTypeModel extends Model<LocationTypeAttributes, LocationTypeCreateAttributes> {
+    static getEditableFields = () => ["id", "name"]
+    static getAllFields = () => ["id", "name", "created_at", "updated_at"]
 }
 
 LocationTypeModel.init(
@@ -63,7 +53,8 @@ LocationTypeModel.init(
 
 export type {
     LocationTypeAttributes,
-    LocationTypeCreateAttributes
+    LocationTypeCreateAttributes,
+    LocationTypeManager
 }
 
 export default LocationTypeModel;

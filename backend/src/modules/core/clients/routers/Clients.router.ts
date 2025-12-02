@@ -1,7 +1,5 @@
-import validateClientsMiddleware
-    from "../middleware/clients/validationMiddleware.js";
-import ClientController
-    from "../controllers/Clients.controller.js";
+import validateClientsMiddleware from "../middleware/clients/validationMiddleware.js";
+import ClientController from "../controllers/Clients.controller.js";
 import { Router } from "express";
 
 const createClientRouter = (): Router => {

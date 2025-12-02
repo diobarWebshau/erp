@@ -3,17 +3,17 @@ import { DataTypes, Model } from "sequelize";
 class ProductModel extends Model {
     static getEditableFields() {
         return [
-            "custom_id", "name", "description", "barcode", "type", "presentation",
-            "production_cost", "is_draft", "storage_conditions",
-            "sku", "active", "sale_price", "photo"
+            "name", "storage_conditions", "description", "unit_of_measure", "presentation",
+            "production_cost", "barcode", "type", "sku", "sale_price",
+            "active", "photo", "is_draft", "custom_id"
         ];
     }
     static getAllFields() {
         return [
-            "id", "custom_id", "name", "description", "barcode", "type",
-            "sku", "active", "sale_price", "photo", "presentation",
-            "production_cost", "is_draft", "storage_conditions",
-            "created_at", "updated_at"
+            "id", "updated_at", "created_at",
+            "name", "storage_conditions", "description", "unit_of_measure", "presentation",
+            "production_cost", "barcode", "type", "sku", "sale_price",
+            "active", "photo", "is_draft", "custom_id"
         ];
     }
 }
@@ -31,6 +31,10 @@ ProductModel.init({
     storage_conditions: {
         type: DataTypes.TEXT,
         allowNull: true,
+    },
+    unit_of_measure: {
+        type: DataTypes.STRING(100),
+        allowNull: true
     },
     name: {
         type: DataTypes.STRING(100),
@@ -53,7 +57,7 @@ ProductModel.init({
         type: DataTypes.TINYINT,
     },
     barcode: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         allowNull: true,
     },
     type: {

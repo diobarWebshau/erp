@@ -1,9 +1,5 @@
-import { Request, Response, NextFunction }
-    from "express";
-import { validatePartialSafeParseAsync, validateSafeParseAsync }
-    from "../../schemas/Input.schema.js";
-import ImageHandler
-    from "../../../../../classes/ImageHandler.js";
+import { Request, Response, NextFunction } from "express";
+import { validatePartialSafeParseAsync, validateSafeParseAsync } from "../../schemas/Input.schema.js";
 
 const validateInputsMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
@@ -16,9 +12,13 @@ const validateInputsMiddleware = async (req: Request, res: Response, next: NextF
             result = await validatePartialSafeParseAsync(body);
         }
         if (!result.success) {
-            await ImageHandler.removeImageIfExists(req.body.url);
-            const zod_errors = result.error.errors;
-            res.status(400).json({ zod_validation: zod_errors });
+            const formattedErrors = result.error.errors.map(err => ({
+                message: `${err.path}-${err.message}`
+            }));
+            res.status(400).json({
+                validation: formattedErrors.map(e => e.message)
+            });
+            return;
         } else {
             next();
         }

@@ -225,6 +225,16 @@
 
 /*2***************      ITEM DROPDOWN DEL NAV     *************** */
 
+    /* 🔥 Cuando un dropdown está activo (porque un hijo está activo) */
+.navItemDropdownActive {
+    background: var(--color-theme-primary-light);
+    border-bottom: 1px solid var(--color-theme-primary-light);
+}
+
+/* Para colapsado */
+/* .navItemDropdownActive .navItemContent label,
+.navItemDropdownActive .navItemContent {
+} */
 
 .navItemDropdown {
 

@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
-import ProductionLineProvider from "./productonLineProvider";
 import type { IPartialProductionLine } from "../../../interfaces/productionLines";
+import ProductionLineProvider from "./productonLineProvider";
+import type { ReactNode } from "react";
 
 interface IProductionLineModuleProvider {
     children: ReactNode;
@@ -18,7 +18,7 @@ const ProductionLineModuleProvider = ({
 
     return (
         <ProductionLineProvider
-            id={data?.id ?? null}
+            id={data?.id ? Number(data.id) : null}
             currentStep={initialStep}
             totalSteps={totalSteps}
             initialData={data}

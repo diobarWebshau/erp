@@ -17,6 +17,7 @@ const productSchema = zod.object({
     }, zod.boolean({ required_error: "Active is required", invalid_type_error: "Active must be a boolean" })).optional(),
     description: zod.string().min(1, "Description is required").optional(),
     sku: zod.string().min(1, "Part number is required").optional(),
+    unit_of_measure: zod.string().min(1, "Unit of measure is required").optional(),
     sale_price: zod.string().min(1, "Sale price must not be zodero")
         .transform((val) => parseFloat(val))
         .refine((val) => val >= 0, "Sale price must be greater than or equal to 0").optional(),

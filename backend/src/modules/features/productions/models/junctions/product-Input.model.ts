@@ -1,18 +1,15 @@
-import {
-    DataTypes, Model, Optional
-} from "sequelize";
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import {
-    InputCreateAttributes
-} from "../references/Inputs.model.js";
+import { ProductInputProcessCreateAttributes } from "./products_inputs_processes.model.js";
+import { InputCreateAttributes } from "../references/Inputs.model.js";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model, Optional } from "sequelize";
 
 interface ProductInputAttributes {
     id: number,
     product_id: number
     input_id: number,
     equivalence: number,
-    inputs?: InputCreateAttributes
+    inputs?: InputCreateAttributes,
+    product_input_process?: ProductInputProcessCreateAttributes[]
 }
 
 interface ProductInputCreateAttributes

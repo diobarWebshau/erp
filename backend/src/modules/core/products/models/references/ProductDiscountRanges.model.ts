@@ -13,9 +13,7 @@ interface ProductDiscountRangeAttributes {
     updated_at: Date
 }
 
-interface ProductDiscountRangeCreateAttributes
-    extends Optional<ProductDiscountRangeAttributes,
-        "id" | "created_at" | "updated_at"> { }
+type ProductDiscountRangeCreateAttributes = Partial<ProductDiscountRangeAttributes>;
 
 interface ProductDiscountRangeManager {
     added: ProductDiscountRangeCreateAttributes[];
@@ -29,8 +27,7 @@ class ProductDiscountRangeModel
         ProductDiscountRangeCreateAttributes> {
     static getEditableFields = () => {
         return [
-            "product_id", "unit_price",
-            "min_qty", "max_qty"
+            "product_id", "unit_price", "min_qty", "max_qty"
         ];
     }
     static getAllFields() {

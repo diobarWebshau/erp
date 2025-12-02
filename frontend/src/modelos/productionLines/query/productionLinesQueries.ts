@@ -1,10 +1,11 @@
 import type { IPartialProductionLine, IProductionLine } from "../../../interfaces/productionLines";
 import { setError, clearError } from "../../../store/slicer/errorSlicer";
 import type { AppDispatchRedux } from "../../../store/store";
+import type { IApiError } from "../../../interfaces/errorApi";
 
 
 const BASE_URL = import.meta.env.VITE_API_URL;
-const relativePath = "production/production-lines";
+const relativePath = "production/production-lines/";
 const API_URL = new URL(relativePath, BASE_URL);
 
 interface IFetchProductionLinesFromDB {
@@ -14,15 +15,11 @@ interface IFetchProductionLinesFromDB {
     signal: AbortSignal;
 }
 
-const fetchproductionLinesFromDB = async ({
-    dispatch, like, conditionsExclude, signal
-}: IFetchProductionLinesFromDB): Promise<IProductionLine[]> => {
+const fetchproductionLinesFromDB = async ({ dispatch, like, conditionsExclude, signal }: IFetchProductionLinesFromDB): Promise<IProductionLine[]> => {
     try {
-
         // Creamos el objeto params
         const params = new URLSearchParams();
         if (like) params.set("filter", like);
-
 
         // Agregamos los params de exclusion si se cumplen ciertas condiciones
         if (conditionsExclude && Object.keys(conditionsExclude).length > 0) {
@@ -148,203 +145,100 @@ const fetchProductionLineDetails = async (
     }
 };
 
+// *************** POST *************** //
 
-const createproductionLineInDB = async (
-    data: IPartialProductionLine,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/create-complete`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+type ICreateProductionLineDBProps = {
+    productionLine: IPartialProductionLine
+}
 
-        if (!response.ok) {
-            const errorText = await response.json();
-            if (response.status >= 500) {
-                throw new Error(errorText);
-            }
-            dispatch(
-                setError({
-                    key: "createProductionLine",
-                    message: errorText
-                })
-            );
-            return null;
-        }
-        dispatch(
-            clearError("createProductionLine")
-        );
-        const result =
-            await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+const createCompleteProductionLineInDB = async ({ productionLine }: ICreateProductionLineDBProps): Promise<IPartialProductionLine> => {
+    const url = new URL('create-complete', API_URL);
+    const request = new Request(url.toString(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productionLine)
+    });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        throw apiError;
     }
+    return await response.json();
 };
 
+// *************** PATCH *************** //
 
-const createCompleteproductionLineInDB = async (
-    data: IPartialProductionLine,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/complete`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            const errorText = await response.json();
-            console.log(errorText);
-            if (response.status >= 500) {
-                throw new Error(errorText);
-            }
-            dispatch(
-                setError({
-                    key: "createCompleteProductionLine",
-                    message: errorText
-                })
-            );
-            return null;
-        }
-        dispatch(
-            clearError("createCompleteProductionLine")
-        );
-        const result =
-            await response.json();
-        return result;
-    } catch (error: unknown) {
-        console.log(error);
-    }
-};
-
-
-const updateCompleteproductionLineInDB = async (
+interface IUpdateCompleteProductionLineInDBProps {
     id: number,
-    data: IPartialProductionLine,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/complete/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+    productionLine: IPartialProductionLine
+}
 
-        if (!response.ok) {
-            const errorText = await response.json();
-            console.log(errorText);
-            if (response.status >= 500) {
-                throw new Error(errorText);
-            }
-            dispatch(
-                setError({
-                    key: "updateCompleteProductionLine",
-                    message: errorText
-                })
-            );
-            return null;
-        }
-        dispatch(
-            clearError("updateCompleteProductionLine")
-        );
-        const result =
-            await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+const updateCompleteProductionLineInDB = async ({ id, productionLine }: IUpdateCompleteProductionLineInDBProps): Promise<IPartialProductionLine> => {
+    if (!id) throw new Error("No id provided to updateCompleteProductionLineInDB");
+    const url = new URL(`update-complete/${encodeURIComponent(id)}`, API_URL);
+    console.log('url', url)
+    const request = new Request(url.toString(), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productionLine)
+    });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        console.log("APIERROR ", apiError);
+        throw apiError;
     }
+    return await response.json();
 };
 
-const updateproductionLineInDB = async (
-    id: number,
-    data: IPartialProductionLine,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+// *************** DELETE *************** //
 
-        if (!response.ok) {
-            const errorText =
-                await response.json();
+interface IDeleteProductionLineInDBProps {
+    id: number
+}
 
-            if (response.status >= 500)
-                throw new Error(
-                    errorText
-                );
-            dispatch(
-                setError({
-                    key: "updateProductionLine",
-                    message: errorText
-                })
-            );
-            return null;
-        }
+const deleteproductionLineInDB = async ({ id }: IDeleteProductionLineInDBProps): Promise<void> => {
+    const url = new URL(`${encodeURIComponent(id)}`, API_URL);
+    const request = new Request(url.toString(), {
+        method: "DELETE",
+    });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
 
-        dispatch(
-            clearError("updateProductionLine")
-        );
-        const result =
-            await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        throw apiError;
     }
-};
-
-
-const deleteproductionLineInDB = async (
-    id: number,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: "DELETE",
-        });
-
-        if (!response.ok) {
-            const errorText = await response.json();
-            dispatch(
-                setError({
-                    key: "deleteproductionLine",
-                    message: errorText
-                })
-            );
-            if (response.status >= 500) {
-                throw new Error(
-                    `${errorText}`
-                );
-            }
-            return null;
-        }
-
-        dispatch(
-            clearError("deleteproductionLine")
-        );
-        const result =
-            await response.json();
-        return result;
-    } catch (error: unknown) {
-
-        throw error;
-    }
+    // 204 → sin body, simplemente resolvemos
+    return;
 };
 
 export {
     fetchproductionLinesFromDB,
-    createproductionLineInDB,
-    updateproductionLineInDB,
+    createCompleteProductionLineInDB,
     deleteproductionLineInDB,
-    createCompleteproductionLineInDB,
     fetchProductionLineDetails,
     fetchProductionLineById,
-    updateCompleteproductionLineInDB
+    updateCompleteProductionLineInDB
 
 };

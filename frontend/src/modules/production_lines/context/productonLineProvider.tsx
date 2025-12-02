@@ -1,16 +1,14 @@
+import { ProductionLineDispatchContext, ProductionLineCommandsContext, ProductionLineStateContext} from "./productionLineContext";
+import useProductionLineById from "../../../modelos/productionLines/hooks/useProductionLineById";
 import { useCallback, useEffect, useMemo, useReducer, type ReactNode } from "react";
 import type { IPartialProductionLine } from "../../../interfaces/productionLines";
 import { initialProductionLineState } from "./productionLineTypes";
 import type { ProductionLineState } from "./productionLineTypes";
-import {
-    ProductionLineDispatchContext, ProductionLineCommandsContext, ProductionLineStateContext
-} from "./productionLineContext";
-import useProductionLineById from "../../../modelos/productionLines/hooks/useProductionLineById";
-import productionLineReducer from "./productionLineReducer";
 import { set_production_line } from "./productionLineActions";
-import { useDispatch } from "react-redux";
-import type { AppDispatchRedux } from "../../../store/store";
 import { setError } from "../../../store/slicer/errorSlicer";
+import type { AppDispatchRedux } from "../../../store/store";
+import productionLineReducer from "./productionLineReducer";
+import { useDispatch } from "react-redux";
 
 interface IProductionLineModuleProvider {
     id: number | null;
@@ -29,9 +27,8 @@ const init = (arg: {
     current_step: arg.currentStep,
     total_steps: arg.totalSteps,
     data: { ...initialProductionLineState.data, ...(arg.baseData ?? {}) },
-    draft: { ...initialProductionLineState.draft},
+    draft: { ...initialProductionLineState.draft },
 });
-
 
 const ProductionLineProvider = ({
     id,
@@ -95,7 +92,7 @@ const ProductionLineProvider = ({
         return () => {
             cancelled = true;
         };
-    }, [id, productionLineById, dispatch]);
+    }, [id, productionLineById, dispatch, dispatchRedux]);
 
     return (
         <ProductionLineDispatchContext.Provider value={dispatch}>

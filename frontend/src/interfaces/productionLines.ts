@@ -5,7 +5,7 @@ import type { IPartialProductionLineProduct, IProductionLineProductManager } fro
 import type { IPartialProductionOrder } from "./productionOrder";
 
 interface IProductionLine {
-    id: number,
+    id: number | string,
     custom_id: string,
     name: string,
     is_active: boolean,

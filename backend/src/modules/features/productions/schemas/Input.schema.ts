@@ -20,10 +20,12 @@ const inputSchema = zod.object({
         .string()
         .min(1, "El tipo de entrada debe ser mayor o igual a 1")
         .transform((val) => parseInt(val, 10))  // Solo casteo a número
-        .refine((val) => val >= 1, "El tipo de entrada debe ser mayor o igual a 1"),  // Validación de restricción
+        .refine((val) => val >= 1, "El tipo de entrada debe ser mayor o igual a 1").optional(),  // Validación de restricción
     unit_cost: zod.string().min(1, "The unit cost must not be zero")
         .transform((val) => parseFloat(val)).optional(),  // Casteo de string a número
     supplier: zod.string().min(1, "Supplier is required").optional(),
+    unit_of_measure: zod.string().min(1,"Unit of measure is required").optional(),
+    sku: zod.string().min(1, "Sku is required").optional(),
     photo: zod.string().min(1, "Image is required").optional(),
     status: zod.preprocess(
         (val) => {

@@ -85,7 +85,7 @@ const LocationProvider = ({
         return () => {
             cancelled = true;
         };
-    }, [id, locationWithAllInformation, dispatch]);
+    }, [id, locationWithAllInformation, dispatch, dispatchRedux]);
 
     return (
         <LocationDispatchContext.Provider value={dispatch}>

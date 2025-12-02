@@ -9,7 +9,7 @@ interface IObjectSelect<T> {
     value: T | null;
     options: T[];
     labelKey: keyof T;
-    onChange: (value: T) => void;
+    onChange: (value: T | null) => void;
     placeholder?: string;
     disabled?: boolean;
     initialOpen?: boolean;
@@ -126,11 +126,7 @@ const SelectTrigger = ({
     classNameTriggerDisabled
 }: ISelectTrigger) => {
 
-    const iconWithClass = useMemo(
-        () => withClassName(
-            <ChevronDownIcon />, styles.icon,
-            { color: mainColor }), [mainColor]
-    );
+    const iconWithClass = useMemo(() => withClassName(<ChevronDownIcon />, styles.icon, { color: mainColor }), [mainColor]);
 
     const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
@@ -140,7 +136,8 @@ const SelectTrigger = ({
 
     const className = useMemo(() => {
         return clsx(
-            `${styles.fieldSelectContainer} ${classNameTrigger}`,
+            styles.fieldSelectContainer,
+            classNameTrigger,
             disabled ? classNameTriggerDisabled : "",
             (!disabled && withValidation) ? (
                 (placeholder === selectedLabel)
@@ -171,7 +168,7 @@ interface IFloatingComponent<T> {
     value: T | null;
     toggleOpen: () => void;
     labelKey: keyof T;
-    onChange: (value: T) => void;
+    onChange: (value: T | null) => void;
     classNameOption?: string;
     classNameOptionSelected?: string;
 }
@@ -190,47 +187,73 @@ const FloatingComponent = <T,>({
             className={styles.floatingComponent}
         >
             {
-                listOptions.map((option, index) => {
-
-                    const label = String(option[labelKey]);
-                    const isSelected = value?.[labelKey] === option[labelKey];
-
-                    const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        onChange(option);
-                        toggleOpen();
-                    }, [option, toggleOpen]);
-
-                    const handleOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            onChange(option);
-                            toggleOpen();
-                        }
-                    }, [option]);
-
-                    const className = useMemo(
-                        () => clsx
-                            (`${styles.option} ${isSelected ? `${styles.selected} ${classNameOptionSelected}` : ""}`, classNameOption),
-                        [styles.option, isSelected, classNameOption, classNameOptionSelected]
-                    );
-
-                    return (
-                        <div
-                            key={index}
-                            onClick={handleOnClick}
-                            onKeyDown={handleOnKeyDown}
-                            tabIndex={0}
-                            className={className}
-                        >
-                            {label}
-                        </div>
-                    )
-                })
+                listOptions.map((option) =>
+                    <OptionComponent
+                        option={option}
+                        value={value}
+                        labelKey={labelKey}
+                        onChange={onChange}
+                        toggleOpen={toggleOpen}
+                        classNameOption={classNameOption}
+                        classNameOptionSelected={classNameOptionSelected}
+                    />
+                )
             }
         </div>
     )
+}
+
+
+interface IOptionComponent<T> {
+    option: T,
+    labelKey: keyof T,
+    value: T | null,
+    toggleOpen: () => void,
+    onChange: (value: T | null) => void,
+    classNameOption?: string,
+    classNameOptionSelected?: string
+}
+
+const OptionComponent = <T,>({
+    option, labelKey, value, toggleOpen, onChange,
+    classNameOption, classNameOptionSelected
+}: IOptionComponent<T>) => {
+
+    const label = String(option[labelKey]);
+    const isSelected = value?.[labelKey] === option[labelKey];
+
+    const handleOnClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onChange(option);
+        toggleOpen();
+    }, [option, onChange, toggleOpen]);
+
+    const handleOnKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            onChange(option);
+            toggleOpen();
+        }
+    }, [option, toggleOpen, onChange]);
+
+    const className = useMemo(() => clsx(
+        styles.option,
+        isSelected ? `${styles.selected} ${classNameOptionSelected}` : "",
+        classNameOption
+    ), [isSelected, classNameOption, classNameOptionSelected]);
+
+    return (
+        <div
+            key={String(option[labelKey])}
+            onClick={handleOnClick}
+            onKeyDown={handleOnKeyDown}
+            tabIndex={0}
+            className={className}
+        >
+            {label}
+        </div>
+    );
 }
 
 const FloatingComponentMemo = memo(FloatingComponent) as typeof FloatingComponent;

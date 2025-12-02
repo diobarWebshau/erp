@@ -1,8 +1,6 @@
-// src/modules/features/items/controllers/Items.controller.ts
-
 import { Request, Response, NextFunction } from "express";
 import { Op, Sequelize } from "sequelize";
-import { ItemModel } from "../../../associations.js";
+import { InputModel, ItemModel, ProductModel } from "../../../associations.js";
 import { IPartialItem } from "../../../types.js";
 
 class ItemsController {
@@ -62,7 +60,6 @@ class ItemsController {
                 );
             }
 
-
             // -------------------------------------------
             // 3. WHERE final
             // -------------------------------------------
@@ -91,24 +88,58 @@ class ItemsController {
         }
     };
 
-    static getByID = async (req: Request, res: Response, next: NextFunction) => {
-        const { id } = req.params;
+    static getItemsByExcludeIds = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const items = await ItemModel.findOne({ where: { id }, attributes: ItemModel.getAllAttributes() });
-            if (!items) {
-                res.status(404).json(null);
-                return;
+            const filter = String(req.query.filter ?? "").trim().toLowerCase();
+            const type = req.query.type as "product" | "input" | undefined;
+
+            const rawExclude = req.query.excludeIds;
+            const arr = Array.isArray(rawExclude) ? rawExclude : rawExclude ? [rawExclude] : [];
+            const idsToExclude = arr.map(Number).filter(Number.isFinite);
+
+            // WHERE base
+            const where: any = {};
+
+            // Filtro por tipo SOLO si el desarrollador lo pide
+            if (type) where.item_type = type;
+
+            if (idsToExclude.length > 0) {
+                where.item_id = { [Op.notIn]: idsToExclude };
             }
-            res.status(200).json(items.toJSON());
-        } catch (error) {
-            if (error instanceof Error) {
-                next(error)
-            } else {
-                console.error(
-                    `An unexpected error occurred: ${error}`);
-            }
+
+            // Traemos items SIN includes → afterFind() resolverá producto/insumo
+            const rows = await ItemModel.findAll({
+                where,
+                attributes: ItemModel.getAllAttributes()
+            });
+
+            // Ahora rows[i].item ya existe
+            const items = rows.map(r => r.toJSON());
+
+            // FILTRO por atributos del PRODUCTO / INPUT real
+            const filtered = filter
+                ? items.filter(row => {
+                    const it: any = row.item;
+                    if (!it) return false;
+
+                    const f = filter.toLowerCase();
+
+                    return (
+                        it.name?.toLowerCase().includes(f) ||
+                        it.description?.toLowerCase().includes(f) ||
+                        it.sku?.toLowerCase().includes(f) ||
+                        it.custom_id?.toLowerCase?.().includes(f)
+                    );
+                })
+                : items;
+
+            res.status(200).json(filtered);
+        } catch (err) {
+            next(err);
         }
     };
+
+
 }
 
 export default ItemsController;

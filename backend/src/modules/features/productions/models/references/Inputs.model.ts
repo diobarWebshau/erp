@@ -1,20 +1,15 @@
-import {
-    DataTypes,
-    Model,
-    Optional
-} from "sequelize";
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import {
-    InputTypeAttributes
-} from "../base/InputTypes.model.js";
+import { InputTypeAttributes } from "../base/InputTypes.model.js";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model, Optional } from "sequelize";
 
 interface InputAttributes {
     id: number,
     custom_id?: string,
+    sku?: string,
     description?: string,
     presentation?: string,
-    storage_conditions: string,
+    unit_of_measure?: string,
+    storage_conditions?: string,
     is_draft?: boolean,
     barcode?: number,
     name?: string,
@@ -37,15 +32,15 @@ class InputModel extends
         InputAttributes, InputCreateAttributes> {
     static getEditableFields = () => {
         return [
-            "custom_id", "description", "barcode", "name", "input_types_id", "unit_cost",
-            "supplier", "photo", "status", "presentation", "storage_conditions", "is_draft"
+            "custom_id", "description", "barcode", "name", "input_types_id", "unit_cost", "sku",
+            "supplier", "photo", "status", "presentation", "storage_conditions", "is_draft", "unit_of_measure"
         ];
     }
     static getAllFields = () => {
         return [
             "id", "custom_id", "description", "barcode", "name", "input_types_id", "unit_cost",
-            "supplier", "photo", "status", "created_at", "presentation", "storage_conditions", "is_draft", 
-            "updated_at"
+            "supplier", "photo", "status", "created_at", "presentation", "storage_conditions", "is_draft",
+            "updated_at", "unit_of_measure", "sku"
         ];
     }
 }
@@ -65,25 +60,38 @@ InputModel.init(
             type: DataTypes.TEXT,
             allowNull: true
         },
-        is_draft: {
-            type: DataTypes.TINYINT,
+        sku: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+            unique: true
+        },
+        unit_of_measure: {
+            type: DataTypes.STRING(100),
             allowNull: true
         },
+        is_draft: {
+            type: DataTypes.TINYINT,
+            allowNull: true,
+            defaultValue: 0
+        },
         custom_id: {
-            type: DataTypes.STRING(50),
-            allowNull: true
+            type: DataTypes.STRING(100),
+            allowNull: true, 
+            unique: true
         },
         description: {
             type: DataTypes.TEXT,
             allowNull: true
         },
         barcode: {
-            type: DataTypes.INTEGER,
-            allowNull: true
+            type: DataTypes.BIGINT,
+            allowNull: true, 
+            unique: true
         },
         name: {
-            type: DataTypes.STRING(50),
-            allowNull: true
+            type: DataTypes.STRING(100),
+            allowNull: true,
+            unique: true
         },
         input_types_id: {
             type: DataTypes.INTEGER(),
@@ -98,7 +106,7 @@ InputModel.init(
             allowNull: true
         },
         supplier: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(100),
             allowNull: true,
         },
         photo: {

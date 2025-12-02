@@ -16,8 +16,8 @@ import {
 
 interface ProductionLineAttributes {
     id: number,
-    custom_id: string,
-    name: string,
+    custom_id: string | null,
+    name: string | null,
     is_active: boolean,
     created_at: Date,
     updated_at: Date,

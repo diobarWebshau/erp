@@ -1,0 +1,75 @@
+/* *************** Container *************** */
+
+.containerStep {
+    /* distirbucion flex respecto al padre*/
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.containerContent {
+    /* distribucion flex respecto al padre */
+    flex: 1;
+}
+
+.containerButtons {
+    /* distribucion flex respecto al padre */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+
+}
+
+/* ************** Container Content **************** */
+
+.containerContent {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+/* 
+.containerContent > * {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+} */
+
+.firstBlock{
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+.firstBlock>*{
+    /* distribucion flex respecto al padre */
+    flex: 1
+}
+
+
+.containerTextArea.containerTextArea{
+    min-height: 110px;
+}
+
+.textArea.textArea{
+    height: 100%;
+}
+
+
+/* *************** Container Buttons *************** */
+
+.containerButtons {
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}

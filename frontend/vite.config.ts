@@ -9,6 +9,15 @@ export default defineConfig({
     react(),
     svgr()
   ],
+  server: {
+    watch: {
+      usePolling: true,   // <-- fuerza monitoreo real
+      interval: 100       // <-- refresco rápido
+    },
+    hmr: {
+      overlay: true
+    }
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

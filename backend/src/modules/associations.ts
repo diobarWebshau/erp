@@ -57,7 +57,7 @@ import {
     InventoryMovementModel,
     ProductionLineQueueModel,
     ProductInputProcessModel,
-    ItemModel,  
+    ItemModel,
 } from "./features/associations.js"
 
 /*
@@ -86,14 +86,14 @@ ProductInputProcessModel.belongsTo(ProductProcessModel, {
 // Un product_input puede estar en muchas relaciones products_inputs_processes
 ProductInputModel.hasMany(ProductInputProcessModel, {
     foreignKey: "product_input_id",
-    as: "input_processes",
+    as: "product_input_process",
     onDelete: "CASCADE"
 });
 
 // Un product_process puede estar en muchas relaciones products_inputs_processes
 ProductProcessModel.hasMany(ProductInputProcessModel, {
     foreignKey: "product_process_id",
-    as: "process_inputs",
+    as: "product_input_process",
     onDelete: "CASCADE"
 });
 
@@ -158,13 +158,13 @@ InventoryLocationItemModel.belongsTo(
 LocationModel.hasMany(
     InventoryLocationItemModel, {
     foreignKey: "location_id",
-    as: "inventory_location_item"
+    as: "inventories_locations_items"
 });
 
 InventoryModel.hasOne(
     InventoryLocationItemModel, {
     foreignKey: "inventory_id",
-    as: "inventory_location_item"
+    as: "inventories_locations_items"
 });
 
 
@@ -427,16 +427,16 @@ ShippingOrderPurchaseOrderProductModel.belongsTo(
 
 ShippingOrderPurchaseOrderProductModel.belongsTo(
     LocationModel, {
-        foreignKey: "location_id",
-        as: "location"
-    }
+    foreignKey: "location_id",
+    as: "location"
+}
 )
 
 LocationModel.hasMany(
     ShippingOrderPurchaseOrderProductModel, {
-        foreignKey: "location_id",
-        as: "shipping_order_purchase_order_product"
-    }
+    foreignKey: "location_id",
+    as: "shipping_order_purchase_order_product"
+}
 )
 
 /* PurchasedOrderProduct-ProductionLines
@@ -752,6 +752,21 @@ LocationModel.hasMany(
     onDelete: "SET NULL",
     as: "scrap"
 });
+
+InventoryLocationItemModel.belongsTo(ItemModel, {
+    as: "item",
+    foreignKey: "item_id",
+    constraints: false,       // 🔥 No exige FK en DB
+});
+
+
+ItemModel.hasMany(InventoryLocationItemModel, {
+    as: "inventory_items",
+    foreignKey: "item_id",
+    constraints: false,
+});
+
+
 
 
 /****************************************

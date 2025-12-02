@@ -1076,6 +1076,8 @@ BEGIN
 					'city', l.city,
 					'zip_code', l.zip_code,
 					'country', l.country,
+					'custom_id', l.custom_id,
+					'location_manager', l.location_manager,
 					
 					-- contact
 					'phone', l.phone,
@@ -1139,6 +1141,8 @@ BEGIN
 		'city', l.city,
 		'zip_code', l.zip_code,
 		'country', l.country,
+		'custom_id', l.custom_id,
+		'location_manager', l.location_manager,
 		
 		-- contact
 		'phone', l.phone,
@@ -1797,13 +1801,20 @@ BEGIN
 					SELECT 
 						JSON_OBJECT(
 							'id', p.id,
+							'custom_id', p.custom_id,
 							'name', p.name,
-							'description', p.description,
 							'type', p.type,
+							'description', p.description,
+							'presentation', p.presentation,
+							'unit_of_measure', p.unit_of_measure,
+							'storage_conditions', p.storage_conditions,
+							'production_cost', p.production_cost,
+							'barcode', p.barcode,
 							'sku', p.sku,
 							'active', p.active,
 							'sale_price', p.sale_price,
 							'photo', p.photo,
+							'is_draft', p.is_draft,
 							'created_at', p.created_at,
 							'updated_at', p.updated_at,
 							'product_processes', (
@@ -1820,6 +1831,7 @@ BEGIN
 														JSON_OBJECT(
 															'id', pr.id,
 															'name', pr.name,
+															'description', pr.description,
 															'created_at', pr.created_at,
 															'updated_at', pr.updated_at
 														)
@@ -1937,13 +1949,20 @@ BEGIN
 												SELECT 
 													JSON_OBJECT(
 														'id', p.id,
+														'custom_id', p.custom_id,
 														'name', p.name,
-														'description', p.description,
 														'type', p.type,
+														'description', p.description,
+														'presentation', p.presentation,
+														'unit_of_measure', p.unit_of_measure,
+														'storage_conditions', p.storage_conditions,
+														'production_cost', p.production_cost,
+														'barcode', p.barcode,
 														'sku', p.sku,
 														'active', p.active,
 														'sale_price', p.sale_price,
 														'photo', p.photo,
+														'is_draft', p.is_draft,
 														'created_at', p.created_at,
 														'updated_at', p.updated_at,
 														'product_processes', (
@@ -1960,6 +1979,7 @@ BEGIN
 																					JSON_OBJECT(
 																						'id', pr.id,
 																						'name', pr.name,
+																						'description', pr.description,
 																						'created_at', pr.created_at,
 																						'updated_at', pr.updated_at
 																					)
@@ -1990,13 +2010,20 @@ BEGIN
 					SELECT 
 						JSON_OBJECT(
 							'id', p.id,
+							'custom_id', p.custom_id,
 							'name', p.name,
-							'description', p.description,
 							'type', p.type,
+							'description', p.description,
+							'presentation', p.presentation,
+							'unit_of_measure', p.unit_of_measure,
+							'storage_conditions', p.storage_conditions,
+							'production_cost', p.production_cost,
+							'barcode', p.barcode,
 							'sku', p.sku,
 							'active', p.active,
 							'sale_price', p.sale_price,
 							'photo', p.photo,
+							'is_draft', p.is_draft,
 							'created_at', p.created_at,
 							'updated_at', p.updated_at,
 							'product_processes', (
@@ -2013,6 +2040,7 @@ BEGIN
 														JSON_OBJECT(
 															'id', pr.id,
 															'name', pr.name,
+															'description', pr.description,
 															'created_at', pr.created_at,
 															'updated_at', pr.updated_at
 														)
@@ -2110,6 +2138,8 @@ BEGIN
 								'city', l.city,
 								'zip_code', l.zip_code,
 								'country', l.country,
+								'custom_id', l.custom_id,
+								'location_manager', l.location_manager,
 
 								-- contact
 								'phone', l.phone,
@@ -2141,9 +2171,13 @@ BEGIN
 						JSON_ARRAYAGG(
 							JSON_OBJECT(
 								'id', l.id,
+								'custom_id', l.custom_id,
+								'location_manager', l.location_manager,
 								'name', l.name,
 								'description', l.description,
 								'street', l.street,
+								'custom_id', l.custom_id,
+								'location_manager', l.location_manager,
 								'street_number', l.street_number,
 								'neighborhood', l.neighborhood,
 								'state', l.state,
@@ -2216,6 +2250,8 @@ BEGIN
 					 'state', l.state,
 					 'country', l.country,
 					 'zip_code', l.zip_code,
+					 'custom_id', l.custom_id,
+					 'location_manager', l.location_manager,
 					 
 					 -- contact
 					 'phone', l.phone,
@@ -2262,6 +2298,8 @@ BEGIN
 					 'state', l.state,
 					 'country', l.country,
 					 'zip_code', l.zip_code,
+					 'custom_id', l.custom_id,
+					 'location_manager', l.location_manager,
 					 
 					 -- contact
 					 'phone', l.phone,
@@ -2370,7 +2408,9 @@ BEGIN
 					 'state', l.state,
 					 'country', l.country,
 					 'zip_code', l.zip_code,
-					 
+					 'custom_id', l.custom_id,
+					 'location_manager', l.location_manager,
+
 					 -- contact
 					 'phone', l.phone,
 					 
@@ -2419,6 +2459,8 @@ BEGIN
 					 'state', l.state,
 					 'country', l.country,
 					 'zip_code', l.zip_code,
+					 'custom_id', l.custom_id,
+					 'location_manager', l.location_manager,
 					 
 					 -- contact
 					 'phone', l.phone,
@@ -2570,6 +2612,8 @@ BEGIN
                     'city', l.city,
                     'state', l.state,
                     'country', l.country,
+					'custom_id', l.custom_id,
+					'location_manager', l.location_manager,
 
                     -- contact
                     'phone', l.phone,
@@ -2721,13 +2765,20 @@ BEGIN
 										COALESCE(
 											JSON_OBJECT(
 												'id', prod.id,
+												'custom_id', prod.custom_id,
 												'name', prod.name,
 												'type', prod.type,
 												'description', prod.description,
+												'presentation', prod.presentation,
+												'unit_of_measure', prod.unit_of_measure,
+												'storage_conditions', prod.storage_conditions,
+												'production_cost', prod.production_cost,
+												'barcode', prod.barcode,
 												'sku', prod.sku,
 												'active', prod.active,
 												'sale_price', prod.sale_price,
 												'photo', prod.photo,
+												'is_draft', prod.is_draft,
 												'created_at', prod.created_at,
 												'updated_at', prod.updated_at,
 												'product_processes', (
@@ -2789,15 +2840,22 @@ BEGIN
 																			COALESCE(
 																				JSON_OBJECT(
 																					'id', inp_sub.id,
+																					'custom_id', inp_sub.custom_id,
 																					'name', inp_sub.name,
+																					'description', inp_sub.description,
+																					'sku', inp_sub.sku,
+																					'presentation', inp_sub.presentation,
+																					'unit_of_measure', inp_sub.unit_of_measure,
+																					'storage_conditions', inp_sub.storage_conditions,
+																					'barcode', inp_sub.barcode,
 																					'input_types_id', inp_sub.input_types_id,
 																					'unit_cost', inp_sub.unit_cost,
 																					'supplier', inp_sub.supplier,
+																					'is_draft', inp_sub.is_draft,
 																					'photo', inp_sub.photo,
 																					'status', inp_sub.status,
 																					'created_at', inp_sub.created_at,
 																					'updated_at', inp_sub.updated_at,
-
 																					'input_types', (
 																						SELECT 
 																							COALESCE(
@@ -2839,10 +2897,18 @@ BEGIN
 										COALESCE(
 											JSON_OBJECT(
 												'id', inp2.id,
+												'custom_id', inp2.custom_id,
 												'name', inp2.name,
+												'description', inp2.description,
+												'sku', inp2.sku,
+												'presentation', inp2.presentation,
+												'unit_of_measure', inp2.unit_of_measure,
+												'storage_conditions', inp2.storage_conditions,
+												'barcode', inp2.barcode,
 												'input_types_id', inp2.input_types_id,
 												'unit_cost', inp2.unit_cost,
 												'supplier', inp2.supplier,
+												'is_draft', inp2.is_draft,
 												'photo', inp2.photo,
 												'status', inp2.status,
 												'created_at', inp2.created_at,

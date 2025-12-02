@@ -1,137 +1,122 @@
-import GenericTableMemo from "../../../comp/primitives/table/tableContext/GenericTable";
-import type { RowAction } from "../../../components/ui/table/types";
-import type { IClient, IPartialClient } from "../../../interfaces/clients";
-import type { AppDispatchRedux } from "../../../store/store";
-import { useDispatch } from "react-redux";
-import { useCallback, useMemo, useState } from "react";
-import { defaultValueClient } from "../../../interfaces/clients";
-import ColumnsClients from "./structure/columns";
-import { Search, Download, Eraser, PlusIcon, Trash2 } from "lucide-react";
-import InputTextCustom from "../../../comp/primitives/input/text/custom/InputTextCustom";
-import SecundaryActionButtonCustom from "../../../comp/primitives/button/custom-button/secundary-action/SecundaryActionButtonCustom";
-import { useTableDispatch, useTableState } from "../../../comp/primitives/table/tableContext/tableHooks";
-import { reset_column_filters } from "../../../comp/primitives/table/tableContext/tableActions";
-import StyleModule from "./ClientsModel.module.css";
-import MainActionButtonCustom from "../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import useClients from "../../../modelos/clients/react-hooks/useClients";
-import DeleteModal from "../../../comp/primitives/modal/deleteModal/DeleteModal"
-import ClientModuleProvider from "../context/clientModuleProvider";
-import AddWizardClients from "./wizards/add/AddWizardClients";
-import { createCompleteClientInDB, updateCompleteClientInDB } from "../../../modelos/clients/queries/clientsQueries";
-import EditWizardClients from "./wizards/edit/EditWizardClients";
+import { createCompleteClientInDB, updateCompleteClientInDB, deleteClientInDB } from "../../../modelos/clients/queries/clientsQueries";
 import type { IPartialProductDiscountClient, IProductDiscountClientManager } from "../../../interfaces/product-discounts-clients";
+import SecundaryActionButtonCustom from "../../../comp/primitives/button/custom-button/secundary-action/SecundaryActionButtonCustom";
+import MainActionButtonCustom from "../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
+import { useTableDispatch, useTableState } from "../../../comp/primitives/table/tableContext/tableHooks";
 import type { IClientAddressesManager, IPartialClientAddress } from "../../../interfaces/clientAddress";
 import { diffObjectArrays, diffObjects } from "../../../utils/validation-on-update/ValidationOnUpdate2";
-import { deleteClientInDB } from "../../../modelos/clients/queries/clientsQueries";
+import FeedBackModal from "../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal";
+import { deepNormalizeDecimals } from "../../../utils/fromatted_decimals_mysql/deepNormalizeDecimals";
+import { reset_column_filters } from "../../../comp/primitives/table/tableContext/tableActions";
+import InputTextCustom from "../../../comp/primitives/input/text/custom/InputTextCustom";
+import GenericTableMemo from "../../../comp/primitives/table/tableContext/GenericTable";
+import DeleteModal from "../../../comp/primitives/modal/deleteModal/DeleteModal"
+import type { IClient, IPartialClient } from "../../../interfaces/clients";
+import { Search, Download, Eraser, PlusIcon, Trash2, CircleCheck } from "lucide-react";
+import ToastMantine from "../../../comp/external/mantine/toast/base/ToastMantine";
+import useClients from "../../../modelos/clients/react-hooks/useClients";
+import type { RowAction } from "../../../components/ui/table/types";
+import ClientModuleProvider from "../context/clientModuleProvider";
+import EditWizardClients from "./wizards/edit/EditWizardClients";
+import { defaultValueClient } from "../../../interfaces/clients";
+import AddWizardClients from "./wizards/add/AddWizardClients";
+import type { IApiError } from "../../../interfaces/errorApi";
+import { setError } from "../../../store/slicer/errorSlicer";
+import type { AppDispatchRedux } from "../../../store/store";
+import { memo, useCallback, useMemo, useState } from "react";
+import StyleModule from "./ClientsModel.module.css";
+import ColumnsClients from "./structure/columns";
+import { useDispatch } from "react-redux";
 
 const ClientsModel = () => {
 
-    const dispatch: AppDispatchRedux = useDispatch();
-    const [loading, setLoading] = useState<boolean>(false);
-    const [serverError, setServerError] = useState<string | null>(null);
+    const dispatchRedux: AppDispatchRedux = useDispatch();
+
     const [clientsRecord, setClientsRecord] = useState<IClient>(defaultValueClient);
     const [isActiveAddModal, setIsActiveAddModal] = useState<boolean>(false);
     const [isActiveEditModal, setIsActiveEditModal] = useState<boolean>(false);
     const [isActiveDeleteModal, setIsActiveDeleteModal] = useState<boolean>(false);
-    const [search, setSearch] = useState<string>("");
+    const [isActiveFeedBackModal, setIsActiveFeedBackModal] = useState<boolean>(false);
+    const [search, setSearch] = useState<string | null>(null);
     const getRowId = useMemo(() => (row: IClient) => row?.id.toString(), [])
-    const { clients, loadingClients, refetchClients } = useClients({ like: search, debounce: 500 })
+    const { clients, loadingClients, refetchClients } = useClients({ like: search ?? "", debounce: 500 })
 
     const toggleActiveEditModalSetup = useCallback((record: IClient) => {
-        setServerError(null);
         setClientsRecord(record);
         setIsActiveEditModal(prev => !prev);
     }, []);
-
-    const toggleActiveEditModal = useCallback(() => {
-        setServerError(null);
-        setIsActiveEditModal(prev => !prev);
-    }, []);
-
-    const toggleActiveDeleteModal = useCallback(() => {
-        setServerError(null);
-        setIsActiveDeleteModal(prev => !prev);
-    }, []);
-
     const toggleActiveDeleteModalSetup = useCallback((record: IClient) => {
-        setServerError(null);
         setClientsRecord(record);
         setIsActiveDeleteModal(true);
     }, []);
 
-    const toggleActiveAddModal = useCallback(() => {
-        setServerError(null);
-        setIsActiveAddModal(prev => !prev);
-    }, []);
+    const toggleIsActiveFeedBackModal = useCallback(() => setIsActiveFeedBackModal(prev => !prev), []);
+    const toggleActiveEditModal = useCallback(() => setIsActiveEditModal(prev => !prev), []);
+    const toggleActiveAddModal = useCallback(() => setIsActiveAddModal(prev => !prev), []);
+    const toggleActiveDeleteModal = useCallback(() => setIsActiveDeleteModal(prev => !prev), []);
 
-    const rowActions: RowAction<IClient>[] = [
-        {
-            label: "Eliminar",
-            onClick: toggleActiveDeleteModalSetup,
-            icon: <Trash2 className={StyleModule.iconRowDeleteAction} />
-        },
-    ];
+    const rowActions: RowAction<IClient>[] = [{
+        label: "Eliminar",
+        onClick: toggleActiveDeleteModalSetup,
+        icon: <Trash2 className={StyleModule.iconRowDeleteAction} />
+    }];
 
-    const handleDelete = useCallback(async () => {
-        if (!clientsRecord?.id) {
-            return;
-        }
-        setLoading(true);
+    const handleDelete = useCallback(async (): Promise<boolean> => {
+        if (!clientsRecord?.id) return false;
         try {
-            const response = await deleteClientInDB(
-                clientsRecord?.id,
-                dispatch
-            );
-            if (!response) {
-                return;
-            }
-            setServerError(null);
+            await deleteClientInDB({ id: clientsRecord?.id as number });
             refetchClients();
-            toggleActiveDeleteModal();
-        } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
-        } finally {
-            setLoading(false);
+            setIsActiveFeedBackModal(prev => !prev);
+            return true;
+        } catch (err: unknown) {
+            if (err instanceof Error)
+                ToastMantine.feedBackForm({ message: err.message || "Ocurrió un error inesperado" });
+            else {
+                const error = err as IApiError;
+                if (error.validation) {
+                    error.validation.forEach((msg: string) => {
+                        dispatchRedux(setError({ key: "deleteLocation", message: { validation: msg } }));
+                        ToastMantine.error({ message: msg });
+                    });
+                }
+            }
+            return false;
         }
-    }, [clientsRecord, refetchClients, dispatch]);
-
+    }, [clientsRecord, refetchClients, dispatchRedux]);
 
     const handleCreate = useCallback(async (record: IPartialClient) => {
-        setLoading(true);
         try {
-            const response = await createCompleteClientInDB(record, dispatch);
-            if (!response) {
-                return;
-            }
-            setServerError(null);
+            await createCompleteClientInDB({ client: record });
             refetchClients();
-        } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
-        } finally {
-            setLoading(false);
+            return true;
+        } catch (err: unknown) {
+            if (err instanceof Error)
+                ToastMantine.feedBackForm({ message: err.message || "Ocurrió un error inesperado" });
+            else {
+                const error = err as IApiError;
+                if (error.validation) {
+                    error.validation.forEach((msg: string) => {
+                        dispatchRedux(setError({ key: "deleteLocation", message: { validation: msg } }));
+                        ToastMantine.error({ message: msg });
+                    });
+                }
+            }
+            return false;
         }
-    }, [dispatch, refetchClients]);
-
+    }, [refetchClients, dispatchRedux]);
 
     const handleUpdate = useCallback(async ({ original, updated }: { original: IPartialClient, updated: IPartialClient }) => {
-        setLoading(true);
+        if (!clientsRecord?.id) return false;
         try {
-
             // obtenemos la entidad base original y la entidad base actualizada
-            const baseOriginal = { ...original, };
-            const baseUpdated = { ...updated };
+            const baseOriginal = deepNormalizeDecimals(structuredClone(original), ["discount_percentage"]);
+            const baseUpdated = deepNormalizeDecimals(structuredClone(updated), ["discount_percentage"]);
 
             // obtenemos las relaciones de la entidad base original y la entidad base actualizada
-            const original_pdc: IPartialProductDiscountClient[] =
-                baseOriginal.product_discounts_client?.map(it => ({ ...it, discount_percentage: Number(it.discount_percentage) })) ?? [];
-            const updated_pdc: IPartialProductDiscountClient[] =
-                baseUpdated.product_discounts_client?.map(it => ({ ...it, discount_percentage: Number(it.discount_percentage) })) ?? [];
-            const original_addresses: IPartialClientAddress[] =
-                baseOriginal.addresses ?? [];
-            const updated_addresses: IPartialClientAddress[] =
-                baseUpdated.addresses ?? [];
+            const original_pdc: IPartialProductDiscountClient[] = baseOriginal.product_discounts_client ?? [];
+            const updated_pdc: IPartialProductDiscountClient[] = baseUpdated.product_discounts_client ?? [];
+            const original_addresses: IPartialClientAddress[] = baseOriginal.addresses ?? [];
+            const updated_addresses: IPartialClientAddress[] = baseUpdated.addresses ?? [];
 
             // eliminamos las relaciones de la entidad base(original y actualizada)
             delete baseOriginal.product_discounts_client;
@@ -143,10 +128,8 @@ const ClientsModel = () => {
             const diffObject = await diffObjects(baseOriginal, baseUpdated);
 
             // Obtenemos las diferencias entre las relaciones de la entidad base con respecto a sus demas relaciones
-            const diffObjectPDC: IProductDiscountClientManager =
-                await diffObjectArrays(original_pdc, updated_pdc);
-            const diffObjectAddresses: IClientAddressesManager =
-                await diffObjectArrays(original_addresses, updated_addresses);
+            const diffObjectPDC: IProductDiscountClientManager = await diffObjectArrays(original_pdc, updated_pdc);
+            const diffObjectAddresses: IClientAddressesManager = await diffObjectArrays(original_addresses, updated_addresses);
 
             // verificamos si existe cambios tanto en la entidad base como en sus relaciones 
 
@@ -166,80 +149,35 @@ const ClientsModel = () => {
 
             // Si existen cambios, se ejecuta la siguiente logica
             if (hasChangesBase || hasChangesPDC || hasChangesAddresses) {
-
                 // creamos el objeto de actualizacion
-                const object_update: IPartialClient = {
+                const update_values: IPartialClient = {
                     ...diffObject,
                     product_discounts_client_manager: diffObjectPDC,
                     addresses_update: diffObjectAddresses
                 }
-
                 // actualizamos el cliente en la base de datos
-                const response = await updateCompleteClientInDB(
-                    clientsRecord?.id,
-                    object_update,
-                    dispatch
-                );
-
-                // verificamos si la actualizacion fue exitosa
-                if (!response) {
-                    return;
-                }
-
+                await updateCompleteClientInDB({ id: clientsRecord.id, client: update_values });
                 // refrescamos la lista de clientes
                 refetchClients();
             }
-            setServerError(null);
-        } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
-        } finally {
-            setLoading(false);
+            return true;
+        } catch (err: unknown) {
+            if (err instanceof Error)
+                ToastMantine.feedBackForm({ message: err.message || "Ocurrió un error inesperado" });
+            else {
+                const error = err as IApiError;
+                if (error.validation) {
+                    error.validation.forEach((msg: string) => {
+                        dispatchRedux(setError({ key: "deleteLocation", message: { validation: msg } }));
+                        ToastMantine.error({ message: msg });
+                    });
+                }
+            }
+            return false;
         }
-    }, [dispatch, refetchClients, clientsRecord]);
+    }, [dispatchRedux, clientsRecord, refetchClients]);
 
-    const ExtraComponents = useCallback(() => {
-        const state = useTableState();
-        const dispatch = useTableDispatch();
-
-        const handleClearFilters = useCallback(() => {
-            dispatch(reset_column_filters());
-        }, [dispatch]);
-
-        const handleExportTable = useCallback(() => {
-            console.log("exporting table")
-        }, []);
-
-        return (
-            <div className={StyleModule.containerExtraComponents}>
-                <div className={StyleModule.searchSection}>
-                    <InputTextCustom
-                        value={search}
-                        onChange={setSearch}
-                        placeholder="Buscar"
-                        icon={<Search />}
-                        classNameInput={StyleModule.inputTextCustom}
-                        classNameContainer={StyleModule.containerInputSearch}
-                        withValidation={false}
-                    />
-                </div>
-                <div className={StyleModule.containerButtons}>
-                    <SecundaryActionButtonCustom
-                        label="Limpiar filtros"
-                        onClick={handleClearFilters}
-                        icon={<Eraser />}
-                        disabled={state.columnFiltersState.length === 0}
-                    />
-                    <SecundaryActionButtonCustom
-                        label="Exportar tabla"
-                        onClick={handleExportTable}
-                        icon={<Download />}
-                        disabled={Object.keys(state.rowSelectionState).length === 0}
-                    />
-                </div>
-            </div>
-        );
-    }, [search]);
+    const ExtraComponents = useCallback(() => <ExtraComponent search={search ?? ""} setSearch={setSearch} />, [search]);
 
     return (
         <div className={StyleModule.clientsModelContainer}>
@@ -281,43 +219,84 @@ const ClientsModel = () => {
 
                 classNameGenericTableContainer={StyleModule.genericTableContainer}
             />
-            {
-                isActiveDeleteModal && (
-                    <DeleteModal
-                        title="¿Estás seguro de eliminar este cliente?"
-                        message="Esta acción no se puede deshacer."
-                        onClose={toggleActiveDeleteModal}
-                        onDelete={handleDelete}
-                    />
-                )
+            {isActiveDeleteModal && (
+                <DeleteModal
+                    title="¿Estás seguro de eliminar este cliente?"
+                    message="Esta acción no se puede deshacer."
+                    onClose={toggleActiveDeleteModal}
+                    onDelete={handleDelete}
+                />)
             }
-            {
-                isActiveAddModal && (
-                    <ClientModuleProvider totalSteps={3} currentStep={0} >
-                        <AddWizardClients onClose={toggleActiveAddModal} onCreate={handleCreate} />
-                    </ClientModuleProvider>
-                )
-            }
-            {
-                isActiveEditModal && (
-                    <ClientModuleProvider totalSteps={3} currentStep={2} data={clientsRecord}>
-                        <EditWizardClients onClose={toggleActiveEditModal} onUpdate={handleUpdate} />
-                    </ClientModuleProvider>
-                )
-            }
-            {
-                isActiveDeleteModal && (
-                    <DeleteModal
-                        title="¿Estás seguro de eliminar este cliente?"
-                        message="Esta acción no se puede deshacer."
-                        onClose={toggleActiveDeleteModal}
-                        onDelete={handleDelete}
-                    />
-                )
-            }
+            {isActiveAddModal && (
+                <ClientModuleProvider totalSteps={3} currentStep={0} >
+                    <AddWizardClients onClose={toggleActiveAddModal} onCreate={handleCreate} />
+                </ClientModuleProvider>
+            )}
+            {isActiveEditModal && (
+                <ClientModuleProvider totalSteps={3} currentStep={2} data={clientsRecord}>
+                    <EditWizardClients onClose={toggleActiveEditModal} onUpdate={handleUpdate} />
+                </ClientModuleProvider>
+            )}
+            {isActiveDeleteModal && (
+                <DeleteModal
+                    title="¿Estás seguro de eliminar este cliente?"
+                    message="Esta acción no se puede deshacer."
+                    onClose={toggleActiveDeleteModal}
+                    onDelete={handleDelete}
+                />
+            )}
+            {isActiveFeedBackModal && <FeedBackModal
+                onClose={toggleIsActiveFeedBackModal}
+                title={"El cliente se ha eliminado correctamente"}
+                icon={<CircleCheck className={StyleModule.iconFeedBackModal} />}
+
+            />}
         </div>
     );
 
 };
 
 export default ClientsModel;
+
+interface IExtraComponentProp {
+    search: string,
+    setSearch: (value: string) => void
+}
+
+const ExtraComponent = memo(({ search, setSearch }: IExtraComponentProp) => {
+
+    const state = useTableState();
+    const dispatch = useTableDispatch();
+    const handleClearFilters = useCallback(() => dispatch(reset_column_filters()), [dispatch]);
+    const handleExportTable = useCallback(() => console.log("exporting table"), []);
+
+    return (
+        <div className={StyleModule.containerExtraComponents}>
+            <div className={StyleModule.searchSection}>
+                <InputTextCustom
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Buscar"
+                    icon={<Search />}
+                    classNameInput={StyleModule.inputTextCustom}
+                    classNameContainer={StyleModule.containerInputSearch}
+                    withValidation={false}
+                />
+            </div>
+            <div className={StyleModule.containerButtons}>
+                <SecundaryActionButtonCustom
+                    label="Limpiar filtros"
+                    onClick={handleClearFilters}
+                    icon={<Eraser />}
+                    disabled={state.columnFiltersState.length === 0}
+                />
+                <SecundaryActionButtonCustom
+                    label="Exportar tabla"
+                    onClick={handleExportTable}
+                    icon={<Download />}
+                    disabled={Object.keys(state.rowSelectionState).length === 0}
+                />
+            </div>
+        </div>
+    );
+});

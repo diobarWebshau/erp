@@ -1,35 +1,36 @@
-import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
-import { memo, useCallback, useEffect, useMemo, useState, type Dispatch } from "react";
+import UnderlineLabelInputNumeric from "../../../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
+import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import { Bookmark, ChevronLeft, Plus, Trash2 } from "lucide-react";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import StyleModule from "./Step2.module.css";
-import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
-import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
+import UnderlineStandardSelectCustom from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
+import FeedBackModal from "../../../../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal";
+import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
+import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
+import SelectProductsModal from "./../../../../../../../comp/features/modal-product2/SelectProductsModal"
+import { memo, useCallback, useEffect, useMemo, useState, type Dispatch, type ReactNode } from "react";
+import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
+import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import { useCountryStateCitySeparated } from "../../../../../../../hooks/useCountryStateCity";
+import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
+import { clearError, setError } from "../../../../../../../store/slicer/errorSlicer";
+import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
+import { formatCurrency } from "./../../../../../../../helpers/formttersNumeric";
+import { Bookmark, ChevronLeft, CircleCheck, Plus, Trash2 } from "lucide-react";
+import type { IPartialClient } from "../../../../../../../interfaces/clients";
+import type { RowAction } from "../../../../../../../interfaces/tableTypes";
+import { generateRandomIds } from "./../../../../../../../helpers/nanoId";
+import type { IProduct } from "../../../../../../../interfaces/product";
 import AddressModal from "../../../../modals/address/AddressModal";
+import type { AppDispatchRedux, RootState } from "store/store";
+import { useDispatch, useSelector } from "react-redux";
+import type { ColumnDef } from "@tanstack/react-table";
+import StyleModule from "./Step2.module.css";
 import {
     add_draft_client_addresses, remove_draft_client_addresses, add_draft_client_product_discounts, next_step,
     remove_draft_client_product_discounts, update_draft_client_product_discounts, back_step
 } from "./../../../../../context/clientActions"
-import type { RowAction } from "interfaces/tableTypes";
-import { generateRandomIds } from "./../../../../../../../helpers/nanoId";
-import { formatCurrency } from "./../../../../../../../helpers/formttersNumeric";
-import SelectProductsModal from "./../../../../../../../comp/features/modal-product2/SelectProductsModal"
-import type { IProduct } from "interfaces/product";
-import type { AppDispatchRedux, RootState } from "store/store";
-import { useDispatch, useSelector } from "react-redux";
-import { clearError, setError } from "../../../../../../../store/slicer/errorSlicer";
-import NumericInputCustom from "../../../../../../../comp/primitives/input/numeric/custom/NumericInputCustom";
-import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
-import StandarTextAreaCustom from "../../../../../../../comp/primitives/text-area/custom/StandarTextAreaCustom";
-import type { IPartialClient } from "../../../../../../../interfaces/clients";
-import UnderlineLabelInputText from "../../../../../../../comp/primitives/input/layouts/underline-label/text/UnderlineLabelInputText";
-import UnderlineLabelInputNumeric from "../../../../../../../comp/primitives/input/layouts/underline-label/numeric/UnderlineLabelInputNumeric";
-import UnderlineStandardSelectCustom from "../../../../../../../comp/features/select/underline/UnderlineStandardSelectCustom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -39,7 +40,7 @@ interface IStep2 {
     state: ClientState;
     dispatch: Dispatch<ClientAction>;
     onDiscard: () => void;
-    onUpdate: ({ original, updated }: { original: IPartialClient, updated: IPartialClient }) => Promise<void>
+    onUpdate: ({ original, updated }: { original: IPartialClient, updated: IPartialClient }) => (Promise<boolean> | boolean)
     refetch: () => void;
 }
 
@@ -50,9 +51,6 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
 
     const dispatchRedux: AppDispatchRedux = useDispatch<AppDispatchRedux>();
     const errorRedux = useSelector((state: RootState) => state.error);
-
-    // * *********** Estado contextual del cliente ************ 
-
 
     // * *********** Estados logicos locales ************ 
 
@@ -69,6 +67,13 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
 
     const [isActiveAddressModal, setIsActiveAddressModal] = useState<boolean>(false);
     const [isActiveDiscountModal, setIsActiveDiscountModal] = useState<boolean>(false);
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+    const [customMessageConfirmModal, setCustomMessageConfirmModal] = useState<ReactNode | null>(null);
+
+    const handleOnCloseConfirmModal = useCallback(() => {
+        setShowConfirmModal(prev => !prev);
+        dispatch(next_step());
+    }, [dispatch]);
     const toggleIsActiveAddressModal = useCallback(() => setIsActiveAddressModal(prev => !prev), []);
     const toggleIsActiveDiscountModal = useCallback(() => setIsActiveDiscountModal(prev => !prev), []);
 
@@ -88,7 +93,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
         const id = address.id;
         if (!id) return;
         dispatch(remove_draft_client_addresses([id]));
-    }, [dispatch, state]);
+    }, [dispatch]);
 
     const handleAddDiscount = useCallback((products: IProduct[]) => {
         const newDiscount: IPartialProductDiscountClient[] = products.map((p) => ({
@@ -105,7 +110,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
         const id = discount.id;
         if (!id) return;
         dispatch(remove_draft_client_product_discounts([id]));
-    }, [dispatch, state]);
+    }, [dispatch]);
 
     const handleAddAddress = useCallback((address: IPartialClientAddress) => {
         const newAddress = {
@@ -114,13 +119,11 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
         };
         dispatch(add_draft_client_addresses([newAddress]));
         toggleIsActiveAddressModal();
-    }, [dispatch, toggleIsActiveAddressModal, generateRandomIds]);
+    }, [dispatch, toggleIsActiveAddressModal]);
 
     const excludeIds = useMemo<number[]>(
-        () =>
-            state.draft?.product_discounts_client
-                ?.map(p => p.product_id)
-                .filter((id): id is number => id != null) ?? [],
+        () => state.draft?.product_discounts_client?.map(p => p.product_id)
+            .filter((id): id is number => id != null) ?? [],
         [state.draft?.product_discounts_client]
     );
 
@@ -161,15 +164,15 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
             console.error("Error fetching products:", error);
             return [];
         }
-    }, [state.draft?.product_discounts_client, dispatchRedux, excludeIds]);
+    }, [dispatchRedux, excludeIds]);
 
     // * *********** Funciones memoizadas para las tablas ************ 
 
     const getRowIdAddresses = useMemo(() => (row: IPartialClientAddress, index: number) => row.id?.toString() ?? index.toString(), []);
     const getRowIdDiscounts = useMemo(() => (row: IPartialProductDiscountClient, index: number) => row.id?.toString() ?? index.toString(), []);
 
-    const handleChangeDiscount = useCallback((id: string, value: number) => {
-        dispatch(update_draft_client_product_discounts({ id: id, attributes: { discount_percentage: value } }));
+    const handleChangeDiscount = useCallback((id: string, value: number | null) => {
+        dispatch(update_draft_client_product_discounts({ id: id, attributes: { discount_percentage: value ?? undefined } }));
     }, [dispatch]);
 
     const columnsAddresses: ColumnDef<IPartialClientAddress>[] = useMemo(() => [
@@ -272,9 +275,9 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
             },
             cell: ({ row }) => {
 
-                const value = Number(row.original.discount_percentage) ?? 0;
+                const value = Number(row.original.discount_percentage ?? 0);
 
-                const onChange = useCallback((value: number) => handleChangeDiscount(row.original.id?.toString() ?? "", value), [handleChangeDiscount, row]);
+                const onChange = (value: number | null) => handleChangeDiscount(row.original.id?.toString() ?? "", value);
 
                 return <NumericInputCustom
                     value={value}
@@ -286,7 +289,7 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
                 />;
             },
         },
-    ], [dispatch, handleChangeDiscount]);
+    ], [handleChangeDiscount]);
 
     const rowActionsAddresses: RowAction<IPartialClientAddress>[] = useMemo(() => [
         {
@@ -373,32 +376,25 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
             ...(paymentTerms !== null && paymentTerms !== "" ? { payment_terms: paymentTerms } : {})
         };
 
-        try {
-            // 1) Persistir
-            await onUpdate({ original: state.data, updated: updatedData });
-
-            //  Nota: leer errorRedux aquí puede no reflejar el último dispatch.
-            if (Object.keys(errorRedux).length > 0) {
-                Object.entries(errorRedux).forEach(([_, value]) => {
-                    ToastMantine.feedBackForm({ message: value as string });
-                });
-                return;
-            }
-
-            // 2) Refrescar y esperar a que el contexto quede actualizado por el Provider
-            await refetch();
-
-            // 3) Avanzar con datos ya refrescados
-            dispatch(next_step());
-        } catch (e: any) {
-            ToastMantine.feedBackForm({ message: e?.message ?? "No se pudo guardar los cambios" });
+        const ok = await onUpdate({ original: state.data, updated: updatedData });
+        if (!ok) {
+            const errorsEntries = Object.entries(errorRedux);
+            const errors = errorsEntries.map(([value]) => value);
+            errors.forEach(error => ToastMantine.error({ message: error as string }));
             return;
         }
+        const customMessage: ReactNode = (
+            <span className={`nunito-bold ${StyleModule.customMessageConfirmModal}`}>
+                El cliente {` `} <span>{state.data.company_name}</span> {` `} se ha actualizado correctamente.
+            </span>
+        );
+        setCustomMessageConfirmModal(customMessage);
+        await refetch();
+        setShowConfirmModal(prev => !prev);
     }, [
         street, streetNumber, neighborhood, countryName, stateName, cityName, zipCode,
-        paymentTerms, state, onUpdate, refetch, dispatch, errorRedux
+        paymentTerms, state, onUpdate, refetch, errorRedux
     ]);
-
 
     const handleOnChangePaymentTerms = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => (() => setPaymentTerms(e.target.value))(), []);
 
@@ -538,6 +534,11 @@ const Step2 = ({ state, dispatch, onDiscard, onUpdate, refetch }: IStep2) => {
                     loadOptions={fetchLoadProducts}
                 />
             )}
+            {showConfirmModal && (<FeedBackModal
+                onClose={handleOnCloseConfirmModal}
+                messageCustom={customMessageConfirmModal}
+                icon={<CircleCheck className={StyleModule.iconConfirmModal} />}
+            />)}
         </div>
     );
 };

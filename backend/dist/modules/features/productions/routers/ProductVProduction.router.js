@@ -1,3 +1,4 @@
+import { normalizeFormDataBody } from "../../../../helpers/normalizedObjectFromFormData.js";
 import validateProductMiddleware from "../middleware/products/validationMiddleware.js";
 import ProductVProductionController from "../controllers/ProductsVProduction.controller.js";
 import uploadImageMiddleware from "../../../../middlewares/multer/multerMiddleware.js";
@@ -9,10 +10,10 @@ const createProductVProductionController = () => {
     productRouter.get("/id/:id", ProductVProductionController.getById);
     productRouter.get("/name/:name", ProductVProductionController.getByName);
     productRouter.post("/", uploadImageMiddleware, validateProductMiddleware, ProductVProductionController.create);
-    productRouter.post("/create-complete", uploadImageMiddleware, validateProductMiddleware, ProductVProductionController.
+    productRouter.post("/create-complete", uploadImageMiddleware, normalizeFormDataBody(), validateProductMiddleware, ProductVProductionController.
         createCompleteProduct);
     productRouter.patch("/:id", uploadImageMiddleware, validateProductMiddleware, ProductVProductionController.update);
-    productRouter.patch("/update-complete/:id", uploadImageMiddleware, validateProductMiddleware, ProductVProductionController.updateCompleteProduct);
+    productRouter.patch("/update-complete/:id", uploadImageMiddleware, normalizeFormDataBody(), validateProductMiddleware, ProductVProductionController.updateCompleteProduct);
     productRouter.delete("/:id", ProductVProductionController.delete);
     productRouter.get("/product-discounts-ranges/:id", ProductVProductionController
         .getDiscountsRanges);

@@ -1,29 +1,31 @@
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import { DataTypes, Model, Optional }
-    from "sequelize";
-import {
-    InventoryCreationAttributes
-} from "../base/Inventories.model.js";
+import { InventoryCreationAttributes } from "../base/Inventories.model.js";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model } from "sequelize";
+import { InputCreateAttributes, IPartialItem, LocationCreateAttributes, ProductAttributes, ProductCreateAttributes } from "src/modules/types.js";
+import { ItemModel } from "../../../../associations.js";
 
 interface InventoryLocationItemAttributes {
     id: number,
     inventory_id: number,
     item_type: 'product' | 'input',
     item_id: number,
+    item?: IPartialItem,
     location_id: number,
     created_at: Date,
     updated_at: Date,
+    location?: LocationCreateAttributes,
     inventory?: InventoryCreationAttributes,
 }
 
-interface InventoryLocationItemCreationAttributes
-    extends Optional<InventoryLocationItemAttributes,
-        "id" | "created_at" | "updated_at"> { }
+type InventoryLocationItemCreationAttributes = Partial<InventoryLocationItemAttributes>;
 
-class InventoryLocationItemModel extends
-    Model<InventoryLocationItemAttributes,
-        InventoryLocationItemCreationAttributes> {
+type InventoryLocationItemManager = {
+    added: InventoryLocationItemCreationAttributes[],
+    deleted: InventoryLocationItemCreationAttributes[],
+    modified: InventoryLocationItemCreationAttributes[]
+}
+
+class InventoryLocationItemModel extends Model<InventoryLocationItemAttributes, InventoryLocationItemCreationAttributes> {
     static getAllFields(): string[] {
         return [
             "id", "inventory_id",
@@ -92,7 +94,8 @@ InventoryLocationItemModel.init({
 
 export type {
     InventoryLocationItemAttributes,
-    InventoryLocationItemCreationAttributes
+    InventoryLocationItemCreationAttributes,
+    InventoryLocationItemManager
 }
 
 export default InventoryLocationItemModel;

@@ -1,6 +1,11 @@
+import { Loader } from "@mantine/core";
+import StyleModule from "./Loading.module.css"
+
 const Loading = () => {
     return (
-        <h1>Loading...</h1>
+        <div className={StyleModule.containerLoading}>
+            <Loader type="oval" color="var(--color-theme-primary)" />
+        </div>
     );
 }
 

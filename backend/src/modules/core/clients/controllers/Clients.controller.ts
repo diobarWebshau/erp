@@ -1,11 +1,12 @@
-import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
+import { ClientCreateAttributes, ClientAddressesManager, ClientAddressesCreateAttributes, ClientAddressesAttributes } from "../types.js";
+import { normalizeValidationArray } from "../../../../helpers/normalizeValidationArray.js";
 import { ClientModel, ClientAddressesModel, ProductModel } from "../../associations.js";
+import { ProductDiscountClientModel } from "../../../../modules/associations.js";
+import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
+import { ProductDiscountClientManager } from "../../../types.js";
+import sequelize from "../../../../mysql/configSequelize.js";
 import { Request, Response, NextFunction } from "express";
 import { Op, QueryTypes, Transaction } from "sequelize";
-import { ClientCreateAttributes, ClientAddressesManager, ClientAddressesCreateAttributes, ClientAddressesAttributes } from "../types.js";
-import sequelize from "../../../../mysql/configSequelize.js";
-import { ProductDiscountClientModel } from "../../../../modules/associations.js";
-import { ProductDiscountClientCreateAttributes, ProductDiscountClientManager } from "../../../types.js";
 
 class ClientController {
     static getAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -256,19 +257,11 @@ class ClientController {
             }
         }
 
-    static createComplete = async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ) => {
+    static createComplete = async (req: Request, res: Response, next: NextFunction) => {
 
-        const transaction =
-            await sequelize.transaction({
-                isolationLevel:
-                    Transaction
-                        .ISOLATION_LEVELS
-                        .REPEATABLE_READ
-            });
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
+        });
 
         const {
             company_name, tax_id, email,
@@ -281,211 +274,162 @@ class ClientController {
 
         try {
 
-            const validateName: ClientModel | null =
-                await ClientModel.findOne({
-                    where: { company_name: company_name }
-                });
+            const validateName: ClientModel | null = await ClientModel.findOne({
+                where: { company_name: company_name }
+            });
 
             if (validateName) {
                 await transaction.rollback();
                 res.status(409).json({
-                    validation:
-                        `The name is already used in `
-                        + `a client`
+                    validation: normalizeValidationArray([
+                        `The name is already used in a client`
+                    ])
                 });
                 return;
             }
 
-            const validateTaxId: ClientModel | null =
-                await ClientModel.findOne({
-                    where: { tax_id: tax_id }
-                });
+            const validateTaxId: ClientModel | null = await ClientModel.findOne({
+                where: { tax_id: tax_id }
+            });
 
             if (validateTaxId) {
                 await transaction.rollback();
                 res.status(409).json({
-                    validation:
-                        `The tax id is already used in `
-                        + `a client`
+                    validation: normalizeValidationArray([
+                        `The tax id is already used in a client`
+                    ])
                 });
                 return;
             }
 
-            const responseClient: ClientModel | null =
-                await ClientModel.create({
-                    company_name, tax_id, email,
-                    phone, city, state, country,
-                    street, street_number, neighborhood,
-                    payment_terms, credit_limit,
-                    zip_code, tax_regimen, cfdi, payment_method,
-                    is_active: Number(is_active) || 1,
-                }, { transaction });
-
+            const responseClient: ClientModel | null = await ClientModel.create({
+                company_name, tax_id, email,
+                phone, city, state, country,
+                street, street_number, neighborhood,
+                payment_terms, credit_limit,
+                zip_code, tax_regimen, cfdi, payment_method,
+                is_active: Number(is_active) || 1,
+            }, { transaction });
             if (!responseClient) {
                 await transaction.rollback();
-                res.status(409).json({
-                    validation:
+                res.status(500).json({
+                    validation: normalizeValidationArray([
                         `The client could not be created`
+                    ])
                 });
                 return;
             }
-
             const client_id = responseClient.toJSON().id;
+            if (addresses && addresses.length) {
 
-            if (addresses && addresses.length > 0) {
+                const newAddress = addresses.map((a) => {
+                    const { id: _, ...rest } = a;
+                    return { ...rest, client_id: client_id };
+                });
 
-                const newAddress = addresses.map(
-                    (a) => {
-                        const { id: _, ...rest } = a;
-                        return { ...rest, client_id: client_id };
-                    }
+                const addressesCreated: ClientAddressesModel[] | null = await ClientAddressesModel.bulkCreate(
+                    newAddress, { transaction, individualHooks: true }
                 );
 
-                const addressesCreated: ClientAddressesModel[] | null =
-                    await ClientAddressesModel
-                        .bulkCreate(newAddress, { transaction });
-
-                if (addressesCreated.length
-                    !== addresses.length) {
+                if (addressesCreated.length !== addresses.length) {
                     await transaction.rollback();
-                    res.status(409).json({
-                        validation:
+                    res.status(500).json({
+                        validation: normalizeValidationArray([
                             `Some addresses could not be created`
+                        ])
                     });
                     return;
                 }
             }
-
-            if (product_discounts_client && product_discounts_client?.length > 0) {
+            if (product_discounts_client && product_discounts_client?.length) {
 
                 const discountsClients = product_discounts_client.map((p) => {
                     const { id: _, ...rest } = p;
                     return { ...rest, client_id: client_id };
                 });
 
-                const discountsClientsCreated: ProductDiscountClientModel[] | null =
-                    await ProductDiscountClientModel
-                        .bulkCreate(discountsClients, { transaction });
+                const discountsClientsCreated: ProductDiscountClientModel[] | null = await ProductDiscountClientModel.bulkCreate(
+                    discountsClients, { transaction, individualHooks: true }
+                );
 
-                if (discountsClientsCreated.length
-                    !== product_discounts_client.length) {
+                if (discountsClientsCreated.length !== product_discounts_client.length) {
                     await transaction.rollback();
-                    res.status(409).json({
-                        validation:
+                    res.status(500).json({
+                        validation: normalizeValidationArray([
                             `Some discounts could not be created`
+                        ])
                     });
                     return;
                 }
             }
-
             await transaction.commit();
-
-            res.status(201).json({
-                message:
-                    "Client created successfully"
-            });
-
+            res.status(201).json({});
         } catch (error: unknown) {
             await transaction.rollback();
-            if (error instanceof Error) {
-                next(error);
-            } else {
-                console.error(
-                    `An unexpected error occurred: ${error}`
-                );
-            }
+            if (error instanceof Error) next(error);
+            else console.error(`An unexpected error occurred: ${error}`);
         }
     }
 
-    static updateComplete = async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ) => {
+    static updateComplete = async (req: Request, res: Response, next: NextFunction) => {
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
+        });
         const { id } = req.params;
-
         const completeBody = req.body as ClientCreateAttributes;
-
-        const transaction =
-            await sequelize.transaction({
-                isolationLevel:
-                    Transaction
-                        .ISOLATION_LEVELS
-                        .REPEATABLE_READ
-            });
-
         try {
-
-            const validateClient =
-                await ClientModel.findByPk(id);
-
+            const validateClient = await ClientModel.findByPk(id);
             if (!validateClient) {
                 await transaction.rollback();
                 res.status(404).json({
-                    validation:
+                    validation: normalizeValidationArray([
                         "Client not found for update"
+                    ])
                 });
                 return;
             }
-
-            const editableFields: string[] =
-                ClientModel.getEditableFields();
-            const update_values =
-                collectorUpdateFields(
-                    editableFields,
-                    completeBody
-                ) as ClientCreateAttributes;
-
+            const editableFields: string[] = ClientModel.getEditableFields();
+            const update_values = collectorUpdateFields(editableFields, completeBody) as ClientCreateAttributes;
 
             if (Object.keys(update_values).length > 0) {
 
                 if (update_values?.company_name) {
-
-                    const validateCompanyName =
-                        await ClientModel.findOne({
-                            where: {
-                                [Op.and]: [
-                                    {
-                                        company_name:
-                                            update_values
-                                                .company_name
-                                    },
-                                    { id: { [Op.ne]: id } }
-                                ]
-                            }
-                        });
+                    const validateCompanyName = await ClientModel.findOne({
+                        where: {
+                            [Op.and]: [
+                                { company_name: update_values.company_name },
+                                { id: { [Op.ne]: id } }
+                            ]
+                        }
+                    });
                     if (validateCompanyName) {
                         await transaction.rollback();
-                        res.status(200).json({
-                            validation:
+                        res.status(409).json({
+                            validation: normalizeValidationArray([
                                 `The company name is already `
                                 + `currently in use by a client`
+                            ])
                         });
                         return;
                     }
                 }
 
                 if (update_values?.tax_id) {
-
-                    const validateTaxId =
-                        await ClientModel.findOne({
-                            where: {
-                                [Op.and]: [
-                                    {
-                                        tax_id:
-                                            update_values
-                                                .tax_id
-                                    },
-                                    { id: { [Op.ne]: id } }
-                                ]
-                            }
-                        });
+                    const validateTaxId = await ClientModel.findOne({
+                        where: {
+                            [Op.and]: [
+                                { tax_id: update_values.tax_id },
+                                { id: { [Op.ne]: id } }
+                            ]
+                        }
+                    });
                     if (validateTaxId) {
                         await transaction.rollback();
-                        res.status(200).json({
-                            validation:
+                        res.status(409).json({
+                            validation: normalizeValidationArray([
                                 `The tax id is already `
                                 + `currently in use by a client`
+                            ])
                         });
                         return;
                     }
@@ -493,40 +437,36 @@ class ClientController {
 
                 if (update_values?.email) {
 
-                    const validateEmail =
-                        await ClientModel.findOne({
-                            where: {
-                                [Op.and]: [
-                                    {
-                                        email:
-                                            update_values
-                                                .email
-                                    },
-                                    { id: { [Op.ne]: id } }
-                                ]
-                            }
-                        });
+                    const validateEmail = await ClientModel.findOne({
+                        where: {
+                            [Op.and]: [
+                                { email: update_values.email },
+                                { id: { [Op.ne]: id } }
+                            ]
+                        }
+                    });
                     if (validateEmail) {
                         await transaction.rollback();
-                        res.status(200).json({
-                            validation:
+                        res.status(409).json({
+                            validation: normalizeValidationArray([
                                 `The email is already `
                                 + `currently in use by a client`
+                            ])
                         });
                         return;
                     }
                 }
 
-                const responseUpdate = await ClientModel.update(
-                    update_values,
+                const responseUpdate = await ClientModel.update(update_values,
                     { where: { id: id }, transaction }
                 );
 
                 if (responseUpdate[0] === 0) {
                     await transaction.rollback();
-                    res.status(200).json({
-                        validation:
+                    res.status(404).json({
+                        validation: normalizeValidationArray([
                             "Client not found for update"
+                        ])
                     });
                     return;
                 }
@@ -534,8 +474,7 @@ class ClientController {
 
             if (completeBody?.addresses_update) {
 
-                const addressesManager =
-                    completeBody.addresses_update as ClientAddressesManager;;
+                const addressesManager = completeBody.addresses_update as ClientAddressesManager;
 
                 const flagAddressesUpdate: boolean = [
                     addressesManager.added,
@@ -545,49 +484,45 @@ class ClientController {
 
                 if (flagAddressesUpdate) {
 
-                    const add: ClientAddressesCreateAttributes[] =
-                        addressesManager.added;
-                    const deletes: ClientAddressesAttributes[] =
-                        addressesManager.deleted;
-                    const modified: ClientAddressesCreateAttributes[] =
-                        addressesManager.modified;
+                    const add: ClientAddressesCreateAttributes[] = addressesManager.added;
+                    const deletes: ClientAddressesAttributes[] = addressesManager.deleted;
+                    const modified: ClientAddressesCreateAttributes[] = addressesManager.modified;
 
-                    if (add.length > 0) {
+                    if (add.length) {
 
-                        const newAddress = add.map(
-                            (a) => {
-                                const { id: _, ...rest } = a;
-                                return { ...rest, client_id: Number(id) };
-                            }
+                        const newAddress = add.map((a) => {
+                            const { id: _, ...rest } = a;
+                            return { ...rest, client_id: Number(id) };
+                        });
+
+                        const responseAdd = await ClientAddressesModel.bulkCreate(newAddress,
+                            { transaction, individualHooks: true }
                         );
-
-                        const responseAdd =
-                            await ClientAddressesModel.bulkCreate(
-                                newAddress, { transaction }
-                            );
 
                         if (responseAdd.length !== add.length) {
                             await transaction.rollback();
-                            res.status(409).json({
-                                validation:
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
                                     `Some addresses could not be created`
+                                ])
                             });
                             return;
                         }
                     }
 
                     if (deletes.length > 0) {
-                        const responseDelete =
-                            await ClientAddressesModel.destroy({
-                                where: { id: { [Op.in]: deletes.map(d => d.id) } },
-                                transaction
-                            });
+
+                        const responseDelete = await ClientAddressesModel.destroy({
+                            where: { id: { [Op.in]: deletes.map(d => d.id) } },
+                            transaction, individualHooks: true
+                        });
 
                         if (!responseDelete) {
                             await transaction.rollback();
-                            res.status(409).json({
-                                validation:
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
                                     `Some addresses could not be deleted`
+                                ])
                             });
                             return;
                         }
@@ -595,24 +530,21 @@ class ClientController {
 
                     if (modified.length > 0) {
 
-                        const modifiedFiltered: number[] =
-                            modified.filter(p => p.id !== undefined)
-                                .map((p) => p.id!);
+                        const modifiedFiltered: number[] = modified.filter(p => p.id !== undefined).map((p) => p.id!);
 
-                        const validateAddresses =
-                            await ClientAddressesModel.findAll({
-                                where: { id: { [Op.in]: modifiedFiltered } },
-                                transaction,
-                                lock: transaction.LOCK.SHARE,
-                            });
+                        const validateAddresses = await ClientAddressesModel.findAll({
+                            where: { id: { [Op.in]: modifiedFiltered } },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
 
-                        if (validateAddresses.length
-                            !== modifiedFiltered.length) {
+                        if (validateAddresses.length !== modifiedFiltered.length) {
                             await transaction.rollback();
                             res.status(404).json({
-                                validation:
+                                validation: normalizeValidationArray([
                                     `Some of the assigned addresses do`
                                     + ` not exist`,
+                                ])
                             });
                             return;
                         }
@@ -622,26 +554,22 @@ class ClientController {
                         for (const p of modified) {
                             const addressId: number = p.id!;
                             const { id: _, ...rest } = p;
-                            const result =
-                                await ClientAddressesModel
-                                    .update(rest, {
-                                        where: { id: addressId },
-                                        transaction,
-                                    });
+                            const result = await ClientAddressesModel.update(rest, {
+                                where: { id: addressId },
+                                transaction,
+                            });
                             results.push(result);
                         }
 
-                        const allUpdated =
-                            results.every(
-                                ([affectedCount]) => affectedCount > 0
-                            );
+                        const allUpdated = results.every(([affectedCount]) => affectedCount > 0);
 
                         if (!allUpdated) {
                             await transaction.rollback();
-                            res.status(400).json({
-                                validation:
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
                                     `The addresses could not be `
                                     + `modified for the client`
+                                ])
                             });
                             return;
                         }
@@ -649,11 +577,9 @@ class ClientController {
 
                 }
             }
-
             if (completeBody?.product_discounts_client_manager) {
 
-                const discountsClientsManager =
-                    completeBody.product_discounts_client_manager as ProductDiscountClientManager;
+                const discountsClientsManager = completeBody.product_discounts_client_manager as ProductDiscountClientManager;
 
                 const flagDiscountsClientsUpdate: boolean = [
                     discountsClientsManager.added,
@@ -667,7 +593,7 @@ class ClientController {
                     const deleted = discountsClientsManager.deleted;
                     const modified = discountsClientsManager.modified;
 
-                    if (added.length > 0) {
+                    if (added.length) {
 
                         const newDiscountsClients = added.map((p) => {
                             const { id: _, ...rest } = p;
@@ -675,60 +601,52 @@ class ClientController {
                         });
 
                         const discountsClientsCreated: ProductDiscountClientModel[] | null =
-                            await ProductDiscountClientModel
-                                .bulkCreate(newDiscountsClients, { transaction });
+                            await ProductDiscountClientModel.bulkCreate(newDiscountsClients,
+                                { transaction, individualHooks: true }
+                            );
 
-                        if (discountsClientsCreated.length
-                            !== added.length) {
+                        if (discountsClientsCreated.length !== added.length) {
                             await transaction.rollback();
                             res.status(500).json({
-                                validation:
+                                validation: normalizeValidationArray([
                                     `Some discounts could not be created`
+                                ])
                             });
                             return;
                         }
-
                     }
 
                     if (deleted.length > 0) {
-
-                        const discountsClientsDeleted: number | null =
-                            await ProductDiscountClientModel
-                                .destroy({
-                                    where: { id: { [Op.in]: deleted.map(d => d.id) } },
-                                    transaction
-                                });
-
+                        const discountsClientsDeleted: number | null = await ProductDiscountClientModel.destroy({
+                            where: { id: { [Op.in]: deleted.map(d => d.id) } },
+                            transaction, individualHooks: true
+                        });
                         if (!discountsClientsDeleted) {
                             await transaction.rollback();
                             res.status(500).json({
-                                validation:
+                                validation: normalizeValidationArray([
                                     `Some discounts could not be deleted`
+                                ])
                             });
                             return;
                         }
-
                     }
 
-                    if (modified.length > 0) {
+                    if (modified.length) {
 
-                        const modifiedFiltered: number[] =
-                            modified.filter(p => p.id !== undefined)
-                                .map(p => p.id!);
+                        const modifiedFiltered: number[] = modified.filter(p => p.id !== undefined).map(p => p.id!);
+                        const validateDiscountsClients = await ProductDiscountClientModel.findAll({
+                            where: { id: { [Op.in]: modifiedFiltered } },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
 
-                        const validateDiscountsClients =
-                            await ProductDiscountClientModel.findAll({
-                                where: { id: { [Op.in]: modifiedFiltered } },
-                                transaction,
-                                lock: transaction.LOCK.SHARE,
-                            });
-
-                        if (validateDiscountsClients.length
-                            !== modifiedFiltered.length) {
+                        if (validateDiscountsClients.length !== modifiedFiltered.length) {
                             await transaction.rollback();
-                            res.status(500).json({
-                                validation:
-                                    `Some discounts could not be updated`
+                            res.status(404).json({
+                                validation: normalizeValidationArray([
+                                    `Algunos descuentos que deseas actualizar no existen para este cliente`
+                                ])
                             });
                             return;
                         }
@@ -738,19 +656,14 @@ class ClientController {
                         for (const p of modified) {
                             const discountClientId: number = p.id!;
                             const { id: _, ...rest } = p;
-                            const result =
-                                await ProductDiscountClientModel
-                                    .update(rest, {
-                                        where: { id: discountClientId },
-                                        transaction,
-                                    });
+                            const result = await ProductDiscountClientModel.update(rest, {
+                                where: { id: discountClientId },
+                                transaction,
+                            });
                             results.push(result);
                         }
 
-                        const allUpdated =
-                            results.every(
-                                ([affectedCount]) => affectedCount > 0
-                            );
+                        const allUpdated = results.every(([affectedCount]) => affectedCount > 0);
 
                         if (!allUpdated) {
                             await transaction.rollback();
@@ -764,24 +677,12 @@ class ClientController {
                     }
                 }
             }
-
             await transaction.commit();
-
-            res.status(200).json({
-                message:
-                    "Client updated successfully"
-            });
-
+            res.status(200).json({});
         } catch (error: unknown) {
             await transaction.rollback();
-            if (error instanceof Error) {
-                next(error);
-            } else {
-                console.error(
-                    `An unexpected error occurred: `
-                    + `${error}`
-                );
-            }
+            if (error instanceof Error) next(error);
+            else console.error(`An unexpected error occurred: ${error}`);
         }
     }
 
@@ -862,10 +763,7 @@ class ClientController {
                     });
                     return;
                 }
-                res.status(200).json({
-                    message:
-                        "Client updated succefally"
-                });
+                res.status(200).json({});
             } catch (error: unknown) {
                 if (error instanceof Error) {
                     next(error);
@@ -874,65 +772,56 @@ class ClientController {
                 }
             }
         }
-    static delete =
-        async (req: Request, res: Response, next: NextFunction) => {
-            const { id } = req.params;
-            try {
+    static delete = async (req: Request, res: Response, next: NextFunction) => {
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
+        });
+        const { id } = req.params;
+        try {
 
-                interface PurchasedOrdersActiveResponse {
-                    has_pos_active: number;
-                }
+            interface PurchasedOrdersActiveResponse { has_pos_active: number; }
 
-                const purchasedOrdersActiveResponse:
-                    PurchasedOrdersActiveResponse[] =
-                    await sequelize.query(
-                        `SELECT funct_client_has_pos_active(${id})`
-                        + ` AS has_pos_active`,
-                        {
-                            replacements: { id },
-                            type: QueryTypes.SELECT
-                        }
-                    );
+            const purchasedOrdersActiveResponse: PurchasedOrdersActiveResponse[] = await sequelize.query(
+                `SELECT funct_client_has_pos_active(:id) AS has_pos_active`, {
+                replacements: { id: id },
+                type: QueryTypes.SELECT,
+                transaction
+            });
 
-                const hasPosActive: PurchasedOrdersActiveResponse =
-                    purchasedOrdersActiveResponse
-                        .shift() as PurchasedOrdersActiveResponse;
+            const hasPosActive: PurchasedOrdersActiveResponse =
+                purchasedOrdersActiveResponse.shift() as PurchasedOrdersActiveResponse;
 
-
-                if (hasPosActive.has_pos_active > 0) {
-                    res.status(400).json({
-                        validation:
-                            `The client can't be deleted because `
-                            + `has active purchased orders`
-                    });
-                    return;
-                }
-
-                const response = await ClientModel.destroy({
-                    where: { id: id },
-                    individualHooks: true
+            if (hasPosActive.has_pos_active > 0) {
+                transaction.rollback();
+                res.status(409).json({
+                    validation: normalizeValidationArray([
+                        `The client can't be deleted because `
+                        + `has active purchased orders`
+                    ])
                 });
-                if (!(response > 0)) {
-                    res.status(404).json({
-                        validation: "Client not found for deleted"
-                    });
-                    return;
-                }
-                res.status(200).json({
-                    message:
-                        "Client deleted successfully"
-                });
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    next(error);
-                } else {
-                    console.error(
-                        `An unexpected error occurred:`
-                        + ` ${error}`
-                    );
-                }
+                return;
             }
+
+            const response = await ClientModel.destroy({
+                where: { id: id }, individualHooks: true, transaction
+            });
+
+            if (!(response > 0)) {
+                transaction.rollback();
+                res.status(404).json({
+                    validation: "Client not found for deleted"
+                });
+                return;
+            }
+            transaction.commit();
+            res.status(200).json({});
+        } catch (error: unknown) {
+            transaction.rollback();
+            if (error instanceof Error) next(error);
+            else console.error(`An unexpected error occurred: ${error}`);
         }
+    }
+
     static getAddresses =
         async (req: Request, res: Response, next: NextFunction) => {
             const { id } = req.params;

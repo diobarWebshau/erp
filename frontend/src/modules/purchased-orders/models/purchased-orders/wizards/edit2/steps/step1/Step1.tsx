@@ -9,11 +9,7 @@ import useClientById from "./../../../../../../../../modelos/clients/react-hooks
 import { useEffect, useState } from "react"
 import StyleModule from "./Step1.module.css"
 
-interface Step1Props {
-}
-
-const Step1 = ({
-}: Step1Props) => {
+const Step1 = () => {
 
     // ? ************ Hooks ************/
 
@@ -125,7 +121,7 @@ const Step1 = ({
             setSelectedSingle(clientById);
             setSearchSingle(clientById.company_name ?? "");
         }
-    }, [clientById]);
+    }, [clientById, selectedSingle]);
 
 
     const handleOnClickBack = () => {

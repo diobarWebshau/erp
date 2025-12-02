@@ -1,6 +1,6 @@
-import { produce, type Draft } from "immer";
 import type { LocationState, LocationAction } from "./locationTypes";
 import { locationActonsType } from "./locationTypes";
+import { produce, type Draft } from "immer";
 
 const locationReducer = produce((draft: Draft<LocationState>, action: LocationAction) => {
     switch (action.type) {
@@ -31,14 +31,34 @@ const locationReducer = produce((draft: Draft<LocationState>, action: LocationAc
             break;
         }
         case locationActonsType.ADD_LOCATION_PRODUCTION_LINE: {
-            draft.data.location_production_line?.push(...action.payload);
+            if (!draft.data.location_production_line) {
+                draft.data.location_production_line = [];
+            }
+            draft.data.location_production_line.push(...action.payload);
             break;
         }
         case locationActonsType.REMOVE_LOCATION_PRODUCTION_LINE: {
             if (!draft.data.location_production_line) return;
             const idsToRemove = new Set<string | number>(action.payload);
             draft.data.location_production_line = draft.data.location_production_line.filter(it => {
-                const id = it?.production_line_id;
+                const id = it?.id;
+                return id == null ? true : !idsToRemove.has(id);
+            });
+            break;
+        }
+        case locationActonsType.ADD_INVENTORY_LOCATION_ITEM: {
+            if (!draft.data.inventories_locations_items) {
+                draft.data.inventories_locations_items = [];
+            }
+            draft.data.inventories_locations_items.push(...action.payload);
+            break;
+        }
+
+        case locationActonsType.REMOVE_INVENTORY_LOCATION_ITEM: {
+            if (!draft.data.inventories_locations_items) return;
+            const idsToRemove = new Set<string | number>(action.payload);
+            draft.data.inventories_locations_items = draft.data.inventories_locations_items.filter(it => {
+                const id = it?.id;
                 return id == null ? true : !idsToRemove.has(id);
             });
             break;
@@ -72,8 +92,25 @@ const locationReducer = produce((draft: Draft<LocationState>, action: LocationAc
         case locationActonsType.REMOVE_DRAFT_LOCATION_PRODUCTION_LINE: {
             if (!draft.draft.location_production_line) return;
             const idsToRemove = new Set<string | number>(action.payload);
-            draft.draft.location_production_line = draft.draft.location_production_line.filter(it => {
-                const id = it?.production_line_id;
+            draft.draft.location_production_line =
+                draft.draft.location_production_line.filter(it => {
+                    const id = it?.id;
+                    return id == null ? true : !idsToRemove.has(id);
+                });
+            break;
+        }
+        case locationActonsType.ADD_DRAFT_INVENTORY_LOCATION_ITEM: {
+            if (!draft.draft.inventories_locations_items) {
+                draft.draft.inventories_locations_items = [];
+            }
+            draft.draft.inventories_locations_items.push(...action.payload);
+            break;
+        }
+        case locationActonsType.REMOVE_DRAFT_INVENTORY_LOCATION_ITEM: {
+            if (!draft.draft.inventories_locations_items) return;
+            const idsToRemove = new Set<string | number>(action.payload);
+            draft.draft.inventories_locations_items = draft.draft.inventories_locations_items.filter(it => {
+                const id = it?.id;
                 return id == null ? true : !idsToRemove.has(id);
             });
             break;

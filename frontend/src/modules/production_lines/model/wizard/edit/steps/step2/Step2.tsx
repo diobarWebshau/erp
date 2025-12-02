@@ -1,33 +1,32 @@
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
-import { Bookmark, Check, ChevronLeft, Plus, Trash2, X } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import type { Dispatch } from "react";
-import StyleModule from "./Step2.module.css"
-import type { ColumnDef } from "@tanstack/react-table";
-import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import type { IPartialProductionLineProduct } from "../../../../../../../interfaces/productionLinesProducts";
-import type { RowAction } from "./../../../../../../../comp/primitives/table/tableContext/tableTypes"
+import FeedBackModal from "./../../../../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal"
 import SwitchMantineCustom from "../../../../../../../comp/external/mantine/switch/custom/SwitchMantineCustom";
+import type { IPartialProductionLineProduct } from "../../../../../../../interfaces/productionLinesProducts";
+import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
 import SelectObjectsModal from "../../../../../../../comp/features/modal-product2/SelectProductsModal";
+import type { RowAction } from "./../../../../../../../comp/primitives/table/tableContext/tableTypes"
+import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
+import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import type { IPartialProductionLine } from "../../../../../../../interfaces/productionLines";
+import type { AppDispatchRedux, RootState } from "../../../../../../../store/store";
+import { Bookmark, Check, ChevronLeft, Plus, Trash2, X } from "lucide-react";
+import { clearError } from "../../../../../../../store/slicer/errorSlicer";
+import { setError } from "../../../../../../../store/slicer/errorSlicer";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import type { IProduct } from "../../../../../../../interfaces/product";
+import { generateRandomIds } from "../../../../../../../helpers/nanoId";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useDispatch, useSelector } from "react-redux";
+import StyleModule from "./Step2.module.css"
 import { Divider } from "@mantine/core";
-import type { IProduct } from "interfaces/product";
+import type { Dispatch } from "react";
 import {
     back_step, add_draft_production_line_products,
     remove_draft_production_line_products,
     update_draft_production_line, next_step
 } from "../../../../../context/productionLineActions";
-import { useProductionLineCommand } from "./../../../../../context/productionLineHooks"
-import { generateRandomIds } from "../../../../../../../helpers/nanoId";
-import { clearError } from "../../../../../../../store/slicer/errorSlicer";
-import { setError } from "../../../../../../../store/slicer/errorSlicer";
-import type { AppDispatchRedux, RootState } from "../../../../../../../store/store";
-import { useDispatch, useSelector } from "react-redux";
-import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
-import type { IPartialProductionLine } from "../../../../../../../interfaces/productionLines";
-import FeedBackModal from "./../../../../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -35,22 +34,25 @@ const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
 
 interface IStep2 {
     onCancel: () => void,
-    onEdit: (original: IPartialProductionLine, updated: IPartialProductionLine) => Promise<void>,
+    onUpdate: ({ original, update }: { original: IPartialProductionLine, update: IPartialProductionLine }) => (Promise<boolean> | boolean),
     state: ProductionLineState,
-    dispatch: Dispatch<ProductionLineAction>
+    dispatch: Dispatch<ProductionLineAction>,
+    onRefetch: () => Promise<void>
 }
 
 const Step2 = memo(({
     onCancel,
-    onEdit,
+    onUpdate,
     state,
+    onRefetch,
     dispatch
 }: IStep2) => {
 
     const dispatchRedux: AppDispatchRedux = useDispatch<AppDispatchRedux>();
-    const getRowId = useMemo(() => (row: IPartialProductionLineProduct) => row.id?.toString()!, []);
-    const errorRedux = useSelector((state: RootState) => state.error);
     const [isActiveModalAddProduct, setIsActiveModalAddProduct] = useState<boolean>(false);
+    const errorRedux = useSelector((state: RootState) => state.error);
+
+    const getRowId = useMemo(() => (row: IPartialProductionLineProduct, index: number) => row.id?.toString() ?? index.toString(), []);
     const [isActiveFeedBackModal, setIsActiveFeedBackModal] = useState<boolean>(false);
 
     const columns: ColumnDef<IPartialProductionLineProduct>[] = useMemo(() => [
@@ -68,33 +70,16 @@ const Step2 = memo(({
         }
     ], []);
 
+    const handleOnChangeActive = useCallback((value: boolean) => dispatch(update_draft_production_line({ is_active: value })), [dispatch]);
+    const toggleIsActiveModalAddProduct = useCallback(() => setIsActiveModalAddProduct(v => !v), []);
+    const toggleIsActiveFeedBackModal = useCallback(() => setIsActiveFeedBackModal(v => !v), []);
+    const handleOnClickBack = useCallback(() => dispatch(back_step()), [dispatch]);
+
     const getRowAttr = useMemo(() => (data: IProduct) => data.name || "", []);
-
-    const handleOnClickBack = useCallback(() => {
-        dispatch(back_step());
-    }, [dispatch]);
-
-    const toggleIsActiveModalAddProduct = useCallback(() => {
-        setIsActiveModalAddProduct(v => !v);
-    }, []);
-
-    const toggleIsActiveFeedBackModal = useCallback(() => {
-        setIsActiveFeedBackModal(v => !v);
-    }, []);
-
-    const handleOnChangeActive = useCallback((value: boolean) => {
-        dispatch(update_draft_production_line({
-            is_active: value
-        }))
-    }, [dispatch]);
-
-    const excludeIds = useMemo<number[]>(
-        () =>
-            state.draft?.production_lines_products
-                ?.map(p => p.product_id)
-                .filter((id): id is number => id != null) ?? [],
-        [state.draft?.production_lines_products]
-    );
+    const excludeIds = useMemo<number[]>(() => {
+        return state.draft?.production_lines_products?.map(
+            p => p.product_id).filter((id): id is number => id != null) ?? []
+    }, [state.draft?.production_lines_products]);
 
     const handleOnClickAddProduct = useCallback((products: IProduct[]) => {
         const productionLinesProducts: IPartialProductionLineProduct[] = products.map(
@@ -107,10 +92,9 @@ const Step2 = memo(({
                 return productionLineProduct;
             }
         )
-
         dispatch(add_draft_production_line_products(productionLinesProducts));
         toggleIsActiveModalAddProduct();
-    }, [state.draft?.production_lines_products, toggleIsActiveModalAddProduct, dispatch]);
+    }, [toggleIsActiveModalAddProduct, dispatch]);
 
     const handleOnClickDeleteProduct = useCallback((product: IPartialProductionLineProduct) => {
         if (!product.id) return;
@@ -124,7 +108,7 @@ const Step2 = memo(({
             onClick: handleOnClickDeleteProduct,
             icon: <Trash2 className={StyleModule.iconTrash} />
         }
-    ], []);
+    ], [handleOnClickDeleteProduct]);
 
     const fetchLoadProducts = useCallback(async (query: string | number): Promise<IProduct[]> => {
         try {
@@ -162,9 +146,7 @@ const Step2 = memo(({
             console.error("Error fetching products:", error);
             return [];
         }
-    }, [state.draft?.production_lines_products, dispatchRedux, excludeIds]);
-
-    const { refetch } = useProductionLineCommand();
+    }, [dispatchRedux, excludeIds]);
 
     const handleOnClickSave = useCallback(async () => {
         if (state.draft?.production_lines_products?.length === 0) {
@@ -173,9 +155,9 @@ const Step2 = memo(({
             });
             return;
         }
-        await onEdit(state.data, state.draft);
+        await onUpdate({ original: state.data, update: state.draft });
         if (Object.keys(errorRedux).length > 0) {
-            Object.entries(errorRedux).forEach(([_, value]) => {
+            Object.entries(errorRedux).forEach(([value]) => {
                 ToastMantine.feedBackForm({
                     message: value,
                 });
@@ -183,12 +165,12 @@ const Step2 = memo(({
             return;
         }
         toggleIsActiveFeedBackModal();
-    }, [state.draft, dispatch, onEdit, errorRedux]);
+    }, [state.draft, state.data, onUpdate, errorRedux, toggleIsActiveFeedBackModal]);
 
     const handleOnClickConfirm = useCallback(() => {
-        refetch();
+        onRefetch();
         dispatch(next_step());
-    }, [dispatch]);
+    }, [dispatch, onRefetch]);
 
     const ExtraComponent = useCallback(() => {
         return (
@@ -250,29 +232,25 @@ const Step2 = memo(({
                 icon={<Bookmark />}
             />
         </div>
-        {
-            isActiveModalAddProduct && (
-                <SelectObjectsModal
-                    onClose={toggleIsActiveModalAddProduct}
-                    onClick={handleOnClickAddProduct}
-                    placeholder="Buscar productos"
-                    labelOnClick="Asignar productos"
-                    headerTitle="Asignar productos"
-                    emptyMessage="No hay productos que coincidan con la búsqueda"
-                    getRowAttr={getRowAttr}
-                    loadOptions={fetchLoadProducts}
-                />
-            )
-        }
-        {
-            isActiveFeedBackModal && (
-                <FeedBackModal
-                    onClose={handleOnClickConfirm}
-                    title="Línea de producción actualizada correctamente"
-                    icon={<Check />}
-                />
-            )
-        }
+        {isActiveModalAddProduct && (
+            <SelectObjectsModal
+                onClose={toggleIsActiveModalAddProduct}
+                onClick={handleOnClickAddProduct}
+                placeholder="Buscar productos"
+                labelOnClick="Asignar productos"
+                headerTitle="Asignar productos"
+                emptyMessage="No hay productos que coincidan con la búsqueda"
+                getRowAttr={getRowAttr}
+                loadOptions={fetchLoadProducts}
+            />
+        )}
+        {isActiveFeedBackModal && (
+            <FeedBackModal
+                onClose={handleOnClickConfirm}
+                title="Línea de producción actualizada correctamente"
+                icon={<Check />}
+            />
+        )}
     </div >
 })
 
@@ -293,7 +271,6 @@ function ExtraComponentsBase({
 
     useEffect(() => {
         let cancelled = false;
-
         (async () => {
             try {
                 const res = await fetchLoadProducts("");
@@ -304,7 +281,6 @@ function ExtraComponentsBase({
                 if (!cancelled) setLoading(false);
             }
         })();
-
         return () => { cancelled = true; };
     }, [fetchLoadProducts]);
 

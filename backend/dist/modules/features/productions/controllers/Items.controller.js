@@ -1,4 +1,3 @@
-// src/modules/features/items/controllers/Items.controller.ts
 import { Op, Sequelize } from "sequelize";
 import { ItemModel } from "../../../associations.js";
 class ItemsController {
@@ -73,23 +72,45 @@ class ItemsController {
             }
         }
     };
-    static getByID = async (req, res, next) => {
-        const { id } = req.params;
+    static getItemsByExcludeIds = async (req, res, next) => {
         try {
-            const items = await ItemModel.findOne({ where: { id }, attributes: ItemModel.getAllAttributes() });
-            if (!items) {
-                res.status(404).json(null);
-                return;
+            const filter = String(req.query.filter ?? "").trim().toLowerCase();
+            const type = req.query.type;
+            const rawExclude = req.query.excludeIds;
+            const arr = Array.isArray(rawExclude) ? rawExclude : rawExclude ? [rawExclude] : [];
+            const idsToExclude = arr.map(Number).filter(Number.isFinite);
+            // WHERE base
+            const where = {};
+            // Filtro por tipo SOLO si el desarrollador lo pide
+            if (type)
+                where.item_type = type;
+            if (idsToExclude.length > 0) {
+                where.item_id = { [Op.notIn]: idsToExclude };
             }
-            res.status(200).json(items.toJSON());
+            // Traemos items SIN includes → afterFind() resolverá producto/insumo
+            const rows = await ItemModel.findAll({
+                where,
+                attributes: ItemModel.getAllAttributes()
+            });
+            // Ahora rows[i].item ya existe
+            const items = rows.map(r => r.toJSON());
+            // FILTRO por atributos del PRODUCTO / INPUT real
+            const filtered = filter
+                ? items.filter(row => {
+                    const it = row.item;
+                    if (!it)
+                        return false;
+                    const f = filter.toLowerCase();
+                    return (it.name?.toLowerCase().includes(f) ||
+                        it.description?.toLowerCase().includes(f) ||
+                        it.sku?.toLowerCase().includes(f) ||
+                        it.custom_id?.toLowerCase?.().includes(f));
+                })
+                : items;
+            res.status(200).json(filtered);
         }
-        catch (error) {
-            if (error instanceof Error) {
-                next(error);
-            }
-            else {
-                console.error(`An unexpected error occurred: ${error}`);
-            }
+        catch (err) {
+            next(err);
         }
     };
 }

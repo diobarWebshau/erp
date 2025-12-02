@@ -48,13 +48,13 @@ ProductInputProcessModel.belongsTo(ProductProcessModel, {
 // Un product_input puede estar en muchas relaciones products_inputs_processes
 ProductInputModel.hasMany(ProductInputProcessModel, {
     foreignKey: "product_input_id",
-    as: "input_processes",
+    as: "product_input_process",
     onDelete: "CASCADE"
 });
 // Un product_process puede estar en muchas relaciones products_inputs_processes
 ProductProcessModel.hasMany(ProductInputProcessModel, {
     foreignKey: "product_process_id",
-    as: "process_inputs",
+    as: "product_input_process",
     onDelete: "CASCADE"
 });
 // production_line_queue → production_line (FK está aquí)
@@ -104,11 +104,11 @@ InventoryLocationItemModel.belongsTo(LocationModel, {
 });
 LocationModel.hasMany(InventoryLocationItemModel, {
     foreignKey: "location_id",
-    as: "inventory_location_item"
+    as: "inventories_locations_items"
 });
 InventoryModel.hasOne(InventoryLocationItemModel, {
     foreignKey: "inventory_id",
-    as: "inventory_location_item"
+    as: "inventories_locations_items"
 });
 /* InventoryTransfers-Locations
 * Un inventoryTransfers tiene dos locations(source, destionation)
@@ -526,6 +526,16 @@ LocationModel.hasMany(ScrapModel, {
     foreignKey: "location_id",
     onDelete: "SET NULL",
     as: "scrap"
+});
+InventoryLocationItemModel.belongsTo(ItemModel, {
+    as: "item",
+    foreignKey: "item_id",
+    constraints: false, // 🔥 No exige FK en DB
+});
+ItemModel.hasMany(InventoryLocationItemModel, {
+    as: "inventory_items",
+    foreignKey: "item_id",
+    constraints: false,
 });
 /* Client Module */
 ClientModel.addHook("afterUpdate", async (instance, options) => {

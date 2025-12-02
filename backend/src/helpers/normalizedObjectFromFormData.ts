@@ -13,21 +13,25 @@ const looksLikeJson = (s: string) => {
 };
 
 /**
- * ¿Es un número válido para coerción? Evita parsear "" u otras cosas.
- * Si quieres ser más estricto, usa regex: /^-?\d+(\.\d+)?$/
- */
-const isNumeric = (s: string) => s !== "" && !isNaN(Number(s));
-
-/**
- * Intenta coaccionar un valor string a boolean/number/JSON.
- * - Desempaqueta una sola capa de comillas exteriores (p.ej. '"foo"' → 'foo').
- * - Para arrays de strings, aplica recursivamente.
+ * Intenta coaccionar un valor string a boolean/JSON.
+ *
+ * 🔹 IMPORTANTE:
+ *   En esta versión **NO** se hace conversión automática de string numérico a number.
+ *   Es decir:
+ *     "123"   → "123"   (string)
+ *     "2.50"  → "2.50"  (string)
+ *
+ *   Solo se manejan:
+ *     - "true"/"false" → boolean
+ *     - Strings que "parecen" JSON (objeto/arreglo) → se parsean y normalizan recursivamente.
  */
 export function coerceValue(value: unknown): any {
+  // Arrays: aplica recursivamente
   if (Array.isArray(value)) {
     return value.map(coerceValue);
   }
 
+  // No-string: se devuelve tal cual
   if (typeof value !== "string") return value;
 
   // 1) Quita una capa de comillas exteriores si existen (e.g. '"foo"' -> 'foo' / "'foo'" -> 'foo')
@@ -43,40 +47,50 @@ export function coerceValue(value: unknown): any {
   if (s === "true") return true;
   if (s === "false") return false;
 
-  // 3) number
-  if (isNumeric(s)) return Number(s);
-
-  // 4) (opcional) detectar ISO 8601 y devolver Date
-  // Descomenta si deseas convertir automáticamente cadenas ISO a Date:
+  // 3) (opcional) detectar ISO 8601 y devolver Date
+  // Si en algún momento quieres que ciertas fechas ISO se conviertan a Date,
+  // puedes descomentar este bloque:
+  //
   // const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
   // if (ISO_DATE_RE.test(s)) {
   //   const d = new Date(s);
   //   if (!isNaN(d.getTime())) return d;
   // }
 
-  // 5) JSON embebido (objeto o arreglo)
+  // 4) JSON embebido (objeto o arreglo)
   if (looksLikeJson(s)) {
     try {
       const parsed = JSON.parse(s);
-      return normalizeObjectFromFormData(parsed); // parseo recursivo
+      // Parseo recursivo para coaccionar internamente también
+      return normalizeObjectFromFormData(parsed);
     } catch {
-      // no era JSON válido → deja el string "desenvolvido"
+      // no era JSON válido → deja el string "desenvuelto"
       return s;
     }
   }
 
-  // 6) string plano (ya sin comillas dobles externas)
+  // 5) string plano (ya sin comillas dobles externas)
   return s;
 }
 
 /**
  * Normaliza recursivamente un objeto/arreglo: coacciona tipos y parsea JSON stringificado.
  * Útil si recibes objetos desde FormData o payloads anidados.
+ *
+ * NOTA:
+ *  - Todos los valores pasan por coerceValue, por lo que:
+ *      - "true"/"false"    → boolean
+ *      - "{...}"/"[...]"   → objeto/arreglo parseado
+ *      - "123"/"2.50"      → se mantienen como string (NO se convierten a number aquí).
+ *
+ *  Si quieres convertir ciertos campos numéricos (equivalence, qty, etc.),
+ *  es mejor hacerlo en un paso posterior especializado (como tu deepNormalizeDecimals).
  */
 export function normalizeObjectFromFormData<T = any>(obj: T): T {
   if (Array.isArray(obj)) {
     return obj.map((v) => normalizeObjectFromFormData(v)) as unknown as T;
   }
+
   if (obj && typeof obj === "object") {
     const out: Record<string, any> = {};
     for (const [k, v] of Object.entries(obj)) {
@@ -85,6 +99,8 @@ export function normalizeObjectFromFormData<T = any>(obj: T): T {
     }
     return out as T;
   }
+
+  // Caso raíz no-objeto: se coacciona igual (por consistencia).
   return coerceValue(obj) as T;
 }
 

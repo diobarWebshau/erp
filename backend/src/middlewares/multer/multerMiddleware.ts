@@ -39,7 +39,8 @@ const uploadImageMiddleware = async (
           { name: 'load_evidence', maxCount: 50 }
         ])(req, res, (err: any) => {
           console.log("entro a multer");
-          console.log(req.files);
+          console.log(req.body);
+          console.log(`dsda`,req.files);
           if (err) return reject(err);
 
           // 📂 Ruta base para archivos estáticos
@@ -71,6 +72,7 @@ const uploadImageMiddleware = async (
     };
 
     await handleUpload();
+    console.log('salgo de multer')
     next();
   } catch (error) {
     next(error);

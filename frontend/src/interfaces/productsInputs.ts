@@ -4,6 +4,7 @@ import type {
 import type {
     IInput
 } from "./inputs";
+import type { IPartialProductInputProcess } from "./productInpustProcesses";
 
 interface IProductInput {
     id: number | string,
@@ -12,6 +13,7 @@ interface IProductInput {
     equivalence: number,
     product?: IProduct,
     inputs?: IInput,
+    product_input_process?: IPartialProductInputProcess[]
 }
 
 type IPartialProductInput =

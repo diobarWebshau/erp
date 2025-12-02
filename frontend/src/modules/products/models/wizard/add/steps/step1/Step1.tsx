@@ -17,7 +17,6 @@ import { useCallback, useState } from "react";
 import { Bookmark} from "lucide-react";
 import StyleModule from "./Step1.module.css"
 
-
 interface Step1Prop {
     state: ItemState,
     dispatch: Dispatch<ItemAction>,

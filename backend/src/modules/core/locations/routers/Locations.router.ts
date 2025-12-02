@@ -4,6 +4,7 @@ import LocationController
     from "../controllers/Locations.controller.js";
 import { Router }
     from "express";
+import { normalizeFormDataBody } from "src/helpers/normalizedObjectFromFormData.js";
 
 const createLocationsRouter = (): Router => {
     const locationRouter = Router();

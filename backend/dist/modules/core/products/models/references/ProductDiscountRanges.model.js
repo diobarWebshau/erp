@@ -3,8 +3,7 @@ import sequelize from "../../../../../mysql/configSequelize.js";
 class ProductDiscountRangeModel extends Model {
     static getEditableFields = () => {
         return [
-            "product_id", "unit_price",
-            "min_qty", "max_qty"
+            "product_id", "unit_price", "min_qty", "max_qty"
         ];
     };
     static getAllFields() {

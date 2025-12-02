@@ -12,21 +12,15 @@ import type { IPartialProcess, IProcess } from "../../../interfaces/processes";
 import type { IPartialProductInput } from "../../../interfaces/productsInputs";
 import type { IPartialProductProcess } from "interfaces/productsProcesses";
 import ToastMantine from "../../external/mantine/toast/base/ToastMantine";
-import { clearError, setError } from "../../../store/slicer/errorSlicer";
 import StyleModule from "./AssignInputsToProcessModal.module.css"
-import { useDispatch as useDispatchRedux } from "react-redux";
 import { useCallback, useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { generateRandomIds } from "../../../helpers/nanoId";
 import { Plus, Trash2 } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-const RELATIVE_PATH = "production/processes/exclude";
-const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
-
 interface IAssignInputsToProcessModalProps {
     mode: "new" | "asingn",
-    selectedProcessProductBase: IPartialProductProcess[],
+    fetchLoadProcess: (query: string | number) => Promise<IPartialProcess[]>,
     validInputs?: IPartialProductInput[],
     onClose: () => void,
     onClick: (values: IPartialProductProcess[]) => void
@@ -35,14 +29,10 @@ interface IAssignInputsToProcessModalProps {
 const AssignInputsToProcessModal = ({
     onClose,
     onClick,
-    selectedProcessProductBase,
     validInputs,
-    mode
+    mode,
+    fetchLoadProcess
 }: IAssignInputsToProcessModalProps) => {
-
-    // ***************  Hook redux ***************
-
-    const dispatchRedux = useDispatchRedux();
 
     // ***************  States ***************
 
@@ -53,17 +43,10 @@ const AssignInputsToProcessModal = ({
 
     // ***************  Variables memoizadas ***************
 
-    const selectedProcessBase: IPartialProcess[] = useMemo(() => {
-        return selectedProcessProductBase.map((item) => item.process as IPartialProcess);
-    }, [selectedProcessProductBase]);
-
-    const excludeIdsProcess: number[] = useMemo(() => {
-        return selectedProcessBase.map((item) => item.id as number);
-    }, [selectedProcessBase]);
-
     const productInputProcess: IPartialProductInputProcess[] = useMemo(() => {
         return validInputs?.map((item: IPartialProductInput): IPartialProductInputProcess => ({
             product_input: item,
+            product_input_id: Number(item.id)
         })) ?? [];
     }, [validInputs]);
 
@@ -73,36 +56,6 @@ const AssignInputsToProcessModal = ({
 
     // *************** Fetches ***************
 
-    const fetchLoadProcess = useCallback(async (query: string | number): Promise<IProcess[]> => {
-        try {
-            // Anexamos el query
-            const params = new URLSearchParams();
-            params.append("filter", query.toString());
-            // Anexamos los ids a excluir
-            excludeIdsProcess.forEach((id) => params.append("excludeIds", id.toString()));
-            // Generamos la url
-            const url = new URL(API_URL.toString());
-            // Adjuntamos los params a la url
-            url.search = params.toString();
-            // Realizamos la peticion
-            const response = await fetch(url.toString(), { method: "GET" });
-            // Validamos la respuesta
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const message = errorData?.message ?? "Error al cargar inputs";
-                if (response.status >= 500) throw new Error(message);
-                dispatchRedux(setError({ key: "likeWithExludeToInput", message }));
-                return [];
-            }
-            dispatchRedux(clearError("likeWithExludeToInput"));
-            const data: IProcess[] = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error fetching products:", error);
-            return [];
-        }
-    }, [dispatchRedux, excludeIdsProcess]);
-
     // *************** Funciones ***************
 
     const handleOnSelectProductInputProcess = useCallback((value: IPartialProductInputProcess[]) => {
@@ -110,8 +63,8 @@ const AssignInputsToProcessModal = ({
             ...item,
             product_input: {
                 ...item.product_input,
-                equivalence: 1,
             },
+            qty: 1
         }));
         setSelectedProductInputProcess(valueFinal);
     }, []);
@@ -121,7 +74,7 @@ const AssignInputsToProcessModal = ({
         if (mode === "asingn") {
             if (productInputProcess && productInputProcess.length > 0) {
                 const productInputProcessValidation = selectedProductInputProcess.every(
-                    (item) => ((item.product_input?.equivalence) && Number(item.product_input?.equivalence) > 0)
+                    (item) => ((item.qty) && Number(item.qty) > 0)
                 );
                 if (!productInputProcessValidation) {
                     ToastMantine.feedBackForm({
@@ -139,10 +92,12 @@ const AssignInputsToProcessModal = ({
                 return;
             }
             selectedProductInputProcessWithProcess = {
+                id: generateRandomIds(),
+                ...(selectedProcessAux.id && { process_id: selectedProcessAux.id as number }),
                 process: {
                     ...selectedProcessAux,
-                    product_input_processes: selectedProductInputProcess,
                 } as IProcess,
+                product_input_process: selectedProductInputProcess,
             };
         } else {
             if (!nameProcess || nameProcess.trim() === "") {
@@ -153,7 +108,7 @@ const AssignInputsToProcessModal = ({
             }
             if (productInputProcess && productInputProcess.length > 0) {
                 const productInputProcessValidation = selectedProductInputProcess.every(
-                    (item) => Number(item.product_input?.equivalence) > 0
+                    (item) => Number(item.qty) > 0
                 );
                 if (!productInputProcessValidation) {
                     ToastMantine.feedBackForm({
@@ -165,12 +120,12 @@ const AssignInputsToProcessModal = ({
                 }
             }
             selectedProductInputProcessWithProcess = {
+                id: generateRandomIds(),
                 process: {
-                    id: generateRandomIds(),
                     name: nameProcess,
                     description: descriptionProcess,
-                    product_input_processes: selectedProductInputProcess,
-                } as IProcess,
+                } as IPartialProcess,
+                product_input_process: selectedProductInputProcess,
             };
         }
         onClick([selectedProductInputProcessWithProcess]);
@@ -187,22 +142,24 @@ const AssignInputsToProcessModal = ({
                 const index = prev.findIndex(
                     i => i.product_input?.inputs?.id.toString() === id
                 );
-                // si no existe, regresamos el estado previo tal cual (no disparará re-render)
+
+                // si no existe, regresamos el estado previo tal cual
                 if (index === -1) return prev;
+
                 // clon superficial del array
                 const newArr = [...prev];
-                // clon profundo del elemento modificado
+
+                // clon del elemento modificado
                 const item = { ...newArr[index] };
-                if (item.product_input) {
-                    item.product_input = {
-                        ...item.product_input,
-                        equivalence: value,
-                    };
-                }
+
+                // 🔹 aquí actualizas qty en lugar de equivalence
+                item.qty = value ?? item.qty; // o value ?? 0, según quieras
+
                 newArr[index] = item;
                 return newArr;
             });
-        }, []
+        },
+        []
     );
 
     // *************** Table Components ***************
@@ -242,7 +199,7 @@ const AssignInputsToProcessModal = ({
             },
             cell: ({ row }) => {
                 const rowOriginal = row.original;
-                const value = rowOriginal.product_input?.equivalence;
+                const value = Number(rowOriginal.qty);
                 const onChange = (value: number | null) => {
                     updateQtyIPartialProductInputProcess({
                         id: row.original.product_input?.inputs?.id.toString() as string,
@@ -263,7 +220,7 @@ const AssignInputsToProcessModal = ({
 
     const handleOnClickDeleteProductInputProcess = useCallback((row: IPartialProductInputProcess) => {
         setSelectedProductInputProcess((prev) => prev.filter(item => item.product_input?.inputs?.id !== row.product_input?.inputs?.id));
-    },[])
+    }, [])
 
     const actionsRowProductInputProcess: RowAction<IPartialProductInputProcess>[] = useMemo(() => [
         {

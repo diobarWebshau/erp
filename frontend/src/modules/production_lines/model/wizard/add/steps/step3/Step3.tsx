@@ -1,26 +1,26 @@
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import { Bookmark, ChevronLeft, CircleCheck } from "lucide-react";
-import { memo, useCallback, useMemo, useState } from "react";
-import StyleModule from "./Step3.module.css"
-import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
-import type { Dispatch } from "react";
-import { back_step } from "../../../../../context/productionLineActions";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { IPartialProductionLineProduct } from "interfaces/productionLinesProducts";
-import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import { Divider } from "@mantine/core";
-import Tag from "../../../../../../../comp/primitives/tag/Tag";
-import type { IPartialProductionLine } from "../../../../../../../interfaces/productionLines";
 import FeedBackModal from "../../../../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../../../../../store/store";
+import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
+import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
+import type { IPartialProductionLine } from "../../../../../../../interfaces/productionLines";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import type { IPartialProductionLineProduct } from "interfaces/productionLinesProducts";
+import { back_step } from "../../../../../context/productionLineActions";
+import { Bookmark, ChevronLeft, CircleCheck } from "lucide-react";
+import type { RootState } from "../../../../../../../store/store";
+import Tag from "../../../../../../../comp/primitives/tag/Tag";
+import { memo, useCallback, useMemo, useState } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+import StyleModule from "./Step3.module.css"
+import { useSelector } from "react-redux";
+import type { Dispatch } from "react";
+import { Divider } from "@mantine/core";
 
 interface IStep3 {
     onCancel: () => void;
-    onCreate: (data: IPartialProductionLine) => Promise<void>;
+    onCreate: (data: IPartialProductionLine) => (Promise<boolean> | boolean);
     onClose: () => void;
     state: ProductionLineState,
     dispatch: Dispatch<ProductionLineAction>
@@ -32,7 +32,7 @@ const Step3 = memo(({
 }: IStep3) => {
 
     const errorRedux = useSelector((state: RootState) => state.error);
-    const getRowId = useMemo(() => (row: IPartialProductionLineProduct) => row.id?.toString()!, []);
+    const getRowId = useMemo(() => (row: IPartialProductionLineProduct, index: number) => row.id?.toString() ?? index.toString(), []);
     const [isActiveFeedBackModal, setIsActiveFeedBackModal] = useState<boolean>(false);
 
     const customMessageNode = useMemo(() => {
@@ -63,26 +63,23 @@ const Step3 = memo(({
         }
     ], []);
 
-    const handleOnClickBack = useCallback(() => {
-        dispatch(back_step());
-    }, [dispatch]);
-
-    const handleOnSaveAndExit = useCallback(() => {
-        console.log("Guardar y continuar");
-    }, []);
+    const handleOnClickBack = useCallback(() => dispatch(back_step()), [dispatch]);
+    const handleOnSaveAndExit = useCallback(() => console.log("Guardar y continuar"), []);
 
     const handleOnSaveAndFinish = useCallback(async () => {
-        await onCreate(state.data);
-        if (Object.keys(errorRedux).length > 0) {
-            Object.entries(errorRedux).forEach((_, entry) => {
-                ToastMantine.error({
-                    message: entry,
+        const ok = await onCreate(state.data);
+        if (!ok) {
+            if (Object.keys(errorRedux).length > 0) {
+                Object.entries(errorRedux).forEach((_, entry) => {
+                    ToastMantine.error({
+                        message: entry,
+                    });
                 });
-            });
-            return;
+                return;
+            }
         }
         setIsActiveFeedBackModal(true);
-    }, [state.data, onCreate, errorRedux, ToastMantine]);
+    }, [state.data, onCreate, errorRedux]);
 
     const handleOnCloseFeedBackModal = useCallback(() => {
         onClose();
@@ -117,19 +114,19 @@ const Step3 = memo(({
                     columns={columns}
                     data={state.data?.production_lines_products || []}
                 />
-                <div className={StyleModule.statusBlock}>
-                    <dl className={StyleModule.dlStatus}>
-                        <dt className={`nunito-bold`}>Estado de la línea:</dt>
-                        <dd>
-                            <Tag
-                                label={state.data?.is_active ? "Activa" : "Inactiva"}
-                                className={state.data?.is_active ? StyleModule.tagActive : StyleModule.tagInactive}
-                            />
-                        </dd>
-                    </dl>
-                </div>
-                <Divider color="var(--color-theme-primary-light)" />
             </div>
+            <div className={StyleModule.statusBlock}>
+                <dl className={StyleModule.dlStatus}>
+                    <dt className={`nunito-bold`}>Estado de la línea:</dt>
+                    <dd>
+                        <Tag
+                            label={state.data?.is_active ? "Activa" : "Inactiva"}
+                            className={state.data?.is_active ? StyleModule.tagActive : StyleModule.tagInactive}
+                        />
+                    </dd>
+                </dl>
+            </div>
+            <Divider color="var(--color-theme-primary-light)" />
         </div>
         <div className={StyleModule.containerButtons}>
             <CriticalActionButton
@@ -152,15 +149,11 @@ const Step3 = memo(({
                 icon={<Bookmark />}
             />
         </div>
-        {
-            isActiveFeedBackModal && (
-                <FeedBackModal
-                    onClose={handleOnCloseFeedBackModal}
-                    icon={<CircleCheck />}
-                    messageCustom={customMessageNode}
-                />
-            )
-        }
+        {isActiveFeedBackModal && (<FeedBackModal
+            onClose={handleOnCloseFeedBackModal}
+            icon={<CircleCheck />}
+            messageCustom={customMessageNode}
+        />)}
     </div>;
 })
 

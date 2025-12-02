@@ -2,17 +2,22 @@ import sequelize
     from "../../../../../mysql/configSequelize.js";
 import { DataTypes, Model, Optional }
     from "sequelize";
+import { LocationTypeCreateAttributes } from "../base/LocationTypes.model.js";
 
 interface LocationLocationTypeAttributes {
     id: number,
     location_id: number,
     location_type_id: number
-    
+    location_type?: LocationTypeCreateAttributes
 }
 
-interface LocationLocationTypeCreateAttributes
-    extends Optional<
-        LocationLocationTypeAttributes, "id"> { }
+type LocationLocationTypeCreateAttributes = Partial<LocationLocationTypeAttributes>;
+
+interface LocationLocationTypeManager {
+    added: LocationLocationTypeCreateAttributes[],
+    modified: LocationLocationTypeCreateAttributes[],
+    deleted: LocationLocationTypeCreateAttributes[]
+}
 
 class LocationLocationTypeModel
     extends Model<
@@ -61,7 +66,8 @@ LocationLocationTypeModel.init(
 
 export type {
     LocationLocationTypeAttributes,
-    LocationLocationTypeCreateAttributes
+    LocationLocationTypeCreateAttributes,
+    LocationLocationTypeManager
 }
 
 export default LocationLocationTypeModel;

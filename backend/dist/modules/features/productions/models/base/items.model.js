@@ -2,6 +2,7 @@
 import { ProductModel, InputModel } from "../../../../associations.js";
 import sequelize from "../../../../../mysql/configSequelize.js";
 import { DataTypes, Model } from "sequelize";
+import { formatImagesDeepRecursive } from "../../../../../scripts/formatWithBase64.js";
 class ItemModel extends Model {
     /*
         Obtenemos los nombres de las propiedades del modelo
@@ -25,25 +26,84 @@ class ItemModel extends Model {
         // Si el item es un producto
         if (this.item_type === "product") {
             // Buscamos el producto por su id, junto con sus relaciones
-            return await ProductModel.findByPk(this.item_id, {
+            const productResponse = await ProductModel.findByPk(this.item_id, {
                 include: [
-                    { association: "product_processes" },
+                    {
+                        association: "product_processes",
+                        include: [
+                            {
+                                association: "product_input_process",
+                                separate: true,
+                                required: false,
+                                where: { product_id: this.item_id },
+                                include: [
+                                    {
+                                        association: "product_input",
+                                        include: [{
+                                                association: "inputs",
+                                                include: [{
+                                                        association: "input_types"
+                                                    }]
+                                            }]
+                                    },
+                                    {
+                                        association: "product_process",
+                                        include: [{ association: "process" }]
+                                    }
+                                ]
+                            },
+                            { association: "process" }
+                        ]
+                    },
                     { association: "product_discount_ranges" },
                     {
                         association: "products_inputs",
                         include: [
-                            { association: "inputs" },
+                            {
+                                association: "inputs",
+                                include: [{ association: "input_types" }]
+                            },
+                            {
+                                association: "product_input_process",
+                                separate: true,
+                                required: false,
+                                where: { product_id: this.item_id },
+                                include: [
+                                    {
+                                        association: "product_input",
+                                        include: [{
+                                                association: "inputs",
+                                                include: [{
+                                                        association: "input_types"
+                                                    }]
+                                            }]
+                                    },
+                                    {
+                                        association: "product_process",
+                                        include: [{ association: "process" }]
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]
             });
+            if (!productResponse) {
+                return null;
+            }
+            const [formattedProducts] = await formatImagesDeepRecursive([productResponse], ["photo"]);
+            return formattedProducts;
         }
         // Si el item es un insumo
         if (this.item_type === "input") {
             // Buscamos el insumo por su id, junto con sus relaciones
-            return await InputModel.findByPk(this.item_id, {
+            const responseInput = await InputModel.findByPk(this.item_id, {
                 include: [{ association: "input_types" }]
             });
+            if (!responseInput)
+                return null;
+            const [formattedInputs] = await formatImagesDeepRecursive([responseInput], ["photo"]);
+            return formattedInputs;
         }
         return null;
     }

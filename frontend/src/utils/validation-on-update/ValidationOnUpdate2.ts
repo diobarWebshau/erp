@@ -344,3 +344,403 @@ async function deepDiff(obj1: any, obj2: any): Promise<Record<string, any>> {
 }
 
 export { diffObjects, diffObjectArrays, deepDiff };
+
+
+// **************************************************************************
+// COMÚN A AMBAS VERSIONES
+// **************************************************************************
+
+// Diff genérico para cualquier array
+export type ArrayDiff<T> = {
+  added: T[];
+  deleted: T[];
+  modified: T[];
+};
+
+// Helper: extrae el tipo del hijo desde la propiedad del padre (si es array)
+type ChildOfParent<TParent, TChildKey extends keyof TParent> =
+  TParent[TChildKey] extends (infer U)[] ? U : never;
+
+// --------------------------------------------------------------------------
+// Normalizador local de ArrayDiff por id
+// --------------------------------------------------------------------------
+// Regla: si un id está en modified, ese mismo id NO debe estar en added ni deleted.
+// No cambia el id, solo limpia buckets incoherentes.
+// --------------------------------------------------------------------------
+
+function normalizeArrayDiffById<T extends { id?: any }>(
+  diff: ArrayDiff<T>
+): ArrayDiff<T> {
+  const getId = (item: T): string | null => {
+    const id = (item as any)?.id;
+    if (id === null || id === undefined) return null;
+    return String(id);
+  };
+
+  const modifiedIds = new Set<string>();
+  for (const m of diff.modified) {
+    const id = getId(m);
+    if (id != null) modifiedIds.add(id);
+  }
+
+  if (modifiedIds.size === 0) {
+    return diff;
+  }
+
+  const keepIfNotModified = (item: T) => {
+    const id = getId(item);
+    if (id == null) return true;           // sin id → no lo tocamos
+    return !modifiedIds.has(id);           // si el id está en modified → se quita del bucket
+  };
+
+  return {
+    added: diff.added.filter(keepIfNotModified),
+    modified: diff.modified,
+    deleted: diff.deleted.filter(keepIfNotModified),
+  };
+}
+
+
+
+// **************************************************************************
+// 🔵 VERSIÓN A — MODELO "FULL vs PARTIAL"
+// --------------------------------------------------------------------------
+// - TFull  = tipo completo del padre (modelo de dominio, típicamente el de BD).
+// - TPartial = versión parcial que quieres usar en added/modified.
+// - `deleted` usa TFull (el modelo completo).
+// - Úsala cuando quieras distinguir explícitamente "modelo completo" vs "DTO parcial".
+// **************************************************************************
+
+export type ParentWithChildDiffFull<
+  TFull,                          // tipo completo del padre
+  TPartial extends Partial<TFull>,// tipo parcial para added/modified
+  TChild,                         // tipo del hijo
+  ManagerKey extends string       // nombre de la propiedad del manager hijo
+> = {
+  added: (
+    TPartial & {
+      [K in ManagerKey]?: ArrayDiff<TChild>;
+    }
+  )[];
+  deleted: TFull[];               // ⬅️ aquí se sigue usando el tipo "full"
+  modified: (
+    TPartial & {
+      [K in ManagerKey]?: ArrayDiff<TChild>;
+    }
+  )[];
+};
+
+// ============================================================
+//  DIFF DE ARREGLOS CON MANAGER HIJO — FULL vs PARTIAL
+// ============================================================
+// - Usa TParent como "full" (debe tener id obligatorio).
+// - Requiere que existan en el archivo:
+//     * diffObjectArrays
+//     * DiffOpts
+//     * defaultDiffOpts
+// **************************************************************************
+
+export async function diffObjectArraysWithChildFull<
+  TParent extends { id: any },          // id obligatorio (modelo completo)
+  TChildKey extends keyof TParent,
+  TManagerKey extends string
+>(
+  arr1: TParent[],
+  arr2: TParent[],
+  options: {
+    childKey: TChildKey;         // p.ej. "product_input_process"
+    managerKey: TManagerKey;     // p.ej. "productInputProcessManager"
+    parentDiffOpts?: DiffOpts;
+    childDiffOpts?: DiffOpts;
+  }
+): Promise<
+  ParentWithChildDiffFull<
+    TParent,                         // TFull
+    Partial<TParent>,                // TPartial (para added/modified)
+    ChildOfParent<TParent, TChildKey>, // TChild
+    TManagerKey
+  >
+> {
+  const {
+    childKey,
+    managerKey,
+    parentDiffOpts = defaultDiffOpts,
+    childDiffOpts = defaultDiffOpts,
+  } = options;
+
+  const base = await diffObjectArrays(arr1, arr2, parentDiffOpts);
+
+  if (!base) {
+    return {
+      added: [],
+      deleted: [],
+      modified: [],
+    } as any;
+  }
+
+  const { added, deleted, modified } = base;
+
+  const resultAdded: any[] = [];
+  const resultModified: any[] = [];
+
+  const toArray = (v: any) => (Array.isArray(v) ? v : []);
+
+  // ADDED: padre nuevo ⇒ todos los hijos se consideran "added"
+  for (const a of added as TParent[]) {
+    const id = (a as any).id;
+    const fullUpdated = arr2.find((p) => String((p as any).id) === String(id));
+
+    const parentPartial: any = { ...a }; // se usa como "partial" en el manager
+
+    if (fullUpdated) {
+      const childArr = toArray((fullUpdated as any)[childKey]);
+
+      if (childArr.length > 0) {
+        parentPartial[managerKey] = {
+          added: childArr,
+          deleted: [],
+          modified: [],
+        } as ArrayDiff<ChildOfParent<TParent, TChildKey>>;
+      }
+    }
+
+    resultAdded.push(parentPartial);
+  }
+
+  // MODIFIED: padre existente ⇒ diff de hijos
+  for (const m of modified as any[]) {
+    const id = m.id;
+    const origFull = arr1.find((p) => String((p as any).id) === String(id));
+    const updFull = arr2.find((p) => String((p as any).id) === String(id));
+
+    const parentPartial: any = { ...m };
+
+    if (origFull && updFull) {
+      const childArr1 = toArray((origFull as any)[childKey]);
+      const childArr2 = toArray((updFull as any)[childKey]);
+
+      let childDiff = await diffObjectArrays(
+        childArr1,
+        childArr2,
+        childDiffOpts
+      );
+
+      // 🔧 Aquí corregimos el caso:
+      // si un hijo tiene el mismo id en added y modified, se queda SOLO en modified.
+      childDiff = normalizeArrayDiffById(childDiff as ArrayDiff<any>);
+
+      if (
+        childDiff &&
+        (childDiff.added.length > 0 ||
+          childDiff.modified.length > 0 ||
+          childDiff.deleted.length > 0)
+      ) {
+        parentPartial[managerKey] = childDiff;
+      }
+    }
+
+    resultModified.push(parentPartial);
+  }
+
+  // DELETED: padres completos (TFull / TParent)
+  return {
+    added: resultAdded,
+    deleted: deleted as TParent[],
+    modified: resultModified,
+  };
+}
+
+
+
+// **************************************************************************
+// 🟢 VERSIÓN B — MODELO "UN SOLO TIPO DE PADRE" (NORMALMENTE PARTIAL)
+// --------------------------------------------------------------------------
+// - Solo hay un tipo de padre TParent (por ejemplo IPartialProductProcess).
+// - `added`, `deleted` y `modified` usan SIEMPRE TParent.
+// - TParent puede ser full o partial, tú decides al usarlo.
+// - Esta es la que encaja con tu idea de trabajar todo con partials en el diff.
+// **************************************************************************
+
+export type ParentWithChildDiffSingle<
+  TParent,                // tipo de padre (full o partial)
+  TChild,                 // tipo del hijo
+  ManagerKey extends string
+> = {
+  added: (
+    TParent & {
+      [K in ManagerKey]?: ArrayDiff<TChild>;
+    }
+  )[];
+  deleted: TParent[];
+  modified: (
+    TParent & {
+      [K in ManagerKey]?: ArrayDiff<TChild>;
+    }
+  )[];
+};
+
+// ============================================================
+//  DIFF DE ARREGLOS CON MANAGER HIJO — SINGLE PARENT
+// ============================================================
+// - Aquí TParent puede ser Partial<Modelo>, por eso id se permite opcional.
+// **************************************************************************
+
+export async function diffObjectArraysWithChildSingle<
+  TParent extends { id?: any },        // id opcional → compatible con Partial<>
+  TChildKey extends keyof TParent,
+  TManagerKey extends string
+>(
+  arr1: TParent[],
+  arr2: TParent[],
+  options: {
+    childKey: TChildKey;
+    managerKey: TManagerKey;
+    parentDiffOpts?: DiffOpts;
+    childDiffOpts?: DiffOpts;
+  }
+): Promise<
+  ParentWithChildDiffSingle<
+    TParent,
+    ChildOfParent<TParent, TChildKey>,
+    TManagerKey
+  >
+> {
+  const {
+    childKey,
+    managerKey,
+    parentDiffOpts = defaultDiffOpts,
+    childDiffOpts = defaultDiffOpts,
+  } = options;
+
+  const base = await diffObjectArrays(arr1, arr2, parentDiffOpts);
+
+  if (!base) {
+    return {
+      added: [],
+      deleted: [],
+      modified: [],
+    } as any;
+  }
+
+  const { added, deleted, modified } = base;
+
+  const resultAdded: any[] = [];
+  const resultModified: any[] = [];
+
+  const toArray = (v: any) => (Array.isArray(v) ? v : []);
+
+  // ADDED: padre nuevo ⇒ todos los hijos actuales son "added"
+  for (const a of added as TParent[]) {
+    const id = (a as any).id;
+    const fullUpdated = arr2.find((p) => String((p as any).id) === String(id));
+
+    const parentCopy: any = { ...a }; // TParent (puede ser partial)
+
+    if (fullUpdated) {
+      const childArr = toArray((fullUpdated as any)[childKey]);
+
+      if (childArr.length > 0) {
+        parentCopy[managerKey] = {
+          added: childArr,
+          deleted: [],
+          modified: [],
+        } as ArrayDiff<ChildOfParent<TParent, TChildKey>>;
+      }
+    }
+
+    resultAdded.push(parentCopy);
+  }
+
+  // MODIFIED: padre existente ⇒ diff de hijos
+  for (const m of modified as any[]) {
+    const id = m.id;
+    const origFull = arr1.find((p) => String((p as any).id) === String(id));
+    const updFull = arr2.find((p) => String((p as any).id) === String(id));
+
+    const parentCopy: any = { ...m };
+
+    if (origFull && updFull) {
+      const childArr1 = toArray((origFull as any)[childKey]);
+      const childArr2 = toArray((updFull as any)[childKey]);
+
+      let childDiff = await diffObjectArrays(
+        childArr1,
+        childArr2,
+        childDiffOpts
+      );
+
+      // 🔧 Misma corrección aquí para la versión "single"
+      childDiff = normalizeArrayDiffById(childDiff as ArrayDiff<any>);
+
+      if (
+        childDiff &&
+        (childDiff.added.length > 0 ||
+          childDiff.modified.length > 0 ||
+          childDiff.deleted.length > 0)
+      ) {
+        parentCopy[managerKey] = childDiff;
+      }
+    }
+
+    resultModified.push(parentCopy);
+  }
+
+  // DELETED: mismos TParent que maneja diffObjectArrays
+  return {
+    added: resultAdded,
+    deleted: deleted as TParent[],
+    modified: resultModified,
+  };
+}
+
+
+/* 
+
+
+
+
+
+    Cómo usarlas sin confundirte
+
+    Si quieres distinguir “modelo completo” vs “partial” y que deleted sea full:
+
+    type ProductProcessManager = ParentWithChildDiffFull<
+      IProductProcess,
+      IPartialProductProcess,
+      IPartialProductInputProcess,
+      "productInputProcessManager"
+    >;
+
+    const diff = await diffObjectArraysWithChildFull<IProductProcess, "product_input_process", "productInputProcessManager">(
+      original,
+      updated,
+      { childKey: "product_input_process", managerKey: "productInputProcessManager" }
+    );
+
+
+    Si quieres que todo (added/modified/deleted) sea IPartialProductProcess:
+
+    type ProductProcessManager = ParentWithChildDiffSingle<
+      IPartialProductProcess,
+      IPartialProductInputProcess,
+      "productInputProcessManager"
+    >;
+
+    const diff = await diffObjectArraysWithChildSingle<IPartialProductProcess, "product_input_process", "productInputProcessManager">(
+      originalPartial,
+      updatedPartial,
+      { childKey: "product_input_process", managerKey: "productInputProcessManager" }
+    );
+
+
+*/
+
+
+
+
+
+
+
+
+
+

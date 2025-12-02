@@ -1,21 +1,21 @@
+import TransparentButtonCustom from "../../../../../comp/primitives/button/custom-button/transparent/TransparentButtonCustom";
 import { useClientCommand, useClientDispatch, useClientState } from "../../../../clients/context/clientHooks";
+import StepperMantineCustom from "../../../../../comp/external/mantine/stepper/custom/StepperMantineCustom";
+import WarningModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/warning/WarningModal";
+import DiscardModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/discard/DiscardModal";
+import FullContainerModal from "../../../../../comp/primitives/modal/full-container/FullContainerModal";
+import { ChevronLeft, FileCheck, MapPinned, UserPen } from "lucide-react";
+import type { IPartialClient } from "../../../../../interfaces/clients";
+import { set_step } from "../../../context/clientActions";
 import StyleModule from "./EditWizardClients.module.css";
 import { useMemo, useState } from "react";
 import Step1 from "./steps/step1/Step1";
 import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";
-import { ChevronLeft, FileCheck, MapPinned, UserPen } from "lucide-react";
-import FullContainerModal from "../../../../../comp/primitives/modal/full-container/FullContainerModal";
-import StepperMantineCustom from "../../../../../comp/external/mantine/stepper/custom/StepperMantineCustom";
-import TransparentButtonCustom from "../../../../../comp/primitives/button/custom-button/transparent/TransparentButtonCustom";
-import WarningModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/warning/WarningModal";
-import type { IPartialClient } from "../../../../../interfaces/clients";
-import DiscardModal from "../../../../../comp/primitives/modal2/dialog-modal/custom/discard/DiscardModal";
-import { set_step } from "../../../context/clientActions";
 
 interface IEditWizardClients {
     onClose: () => void;
-    onUpdate: ({ original, updated }: { original: IPartialClient, updated: IPartialClient }) => Promise<void>;
+    onUpdate: ({ original, updated }: { original: IPartialClient, updated: IPartialClient }) => (Promise<boolean> | boolean);
 }
 
 const EditWizardClients = ({ onClose, onUpdate }: IEditWizardClients) => {
@@ -23,9 +23,10 @@ const EditWizardClients = ({ onClose, onUpdate }: IEditWizardClients) => {
     const state = useClientState();
     const dispatch = useClientDispatch();
     const { refetch } = useClientCommand();
-    
+
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [isActiveDiscardModal, setIsActiveDiscardModal] = useState(false);
+
     const toggleWarningModal = useMemo(() => () => setShowWarningModal(prev => !prev), []);
     const toggleDiscardModal = useMemo(() => () => setIsActiveDiscardModal(prev => !prev), []);
 
@@ -45,7 +46,7 @@ const EditWizardClients = ({ onClose, onUpdate }: IEditWizardClients) => {
             content: <Step3 state={state} dispatch={dispatch} onClose={onClose} />,
             icon: <FileCheck />
         }
-    ], [state, dispatch, toggleWarningModal, toggleDiscardModal, onClose, onUpdate, refetch]);
+    ], [state, dispatch, toggleDiscardModal, onClose, onUpdate, refetch]);
 
     const handleDiscard = useMemo(() => () => {
         dispatch(set_step(2));

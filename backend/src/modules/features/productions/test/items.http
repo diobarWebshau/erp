@@ -1,5 +1,47 @@
 ###  GET ALL
 GET http://localhost:3003/production/items HTTP/1.1
 
-###  GET BY ID
-GET http://localhost:3003/production/items/1 HTTP/1.1
+
+
+### 1. Obtener productos E insumos (sin filtro, sin exclude)
+GET http://localhost:3003/production/items/exclude HTTP/1.1
+
+
+
+### 2. Obtener productos E insumos aplicando filtro
+GET http://localhost:3003/production/items/exclude?filter=Insu HTTP/1.1
+
+
+
+### 3. Excluir IDs específicos (products e inputs)
+GET http://localhost:3003/production/items/exclude?excludeIds=1&excludeIds=4&excludeIds=7 HTTP/1.1
+
+
+
+### 4. Obtener SOLO productos
+GET http://localhost:3003/production/items/exclude?type=product HTTP/1.1
+
+
+
+### 5. Obtener SOLO productos aplicando filtro
+GET http://localhost:3003/production/items/exclude?type=product&filter=Producto A HTTP/1.1
+
+
+
+### 6. Obtener SOLO productos y excluir IDs
+GET http://localhost:3003/production/items/exclude?type=product&excludeIds=1&excludeIds=3 HTTP/1.1
+
+
+
+### 7. Obtener SOLO inputs aplicando filtro
+GET http://localhost:3003/production/items/exclude?type=input&filter=harina HTTP/1.1
+
+
+
+### 8. Obtener TODO (productos + insumos) SIN FILTRO explicito
+GET http://localhost:3003/production/items/exclude?filter= HTTP/1.1
+
+
+
+### 8B. Versión equivalente (sin filter=)
+GET http://localhost:3003/production/items/exclude HTTP/1.1

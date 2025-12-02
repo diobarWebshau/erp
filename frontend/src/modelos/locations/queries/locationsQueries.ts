@@ -1,12 +1,12 @@
-import type { IInventoryInput } from "../../../interfaces/inventoryInputs";
 import type { IPartialLocation, ILocation } from "../../../interfaces/locations";
-import type { ILocationType } from "../../../interfaces/locationTypes";
+import type { IInventoryInput } from "../../../interfaces/inventoryInputs";
 import type { IProductionLine } from "../../../interfaces/productionLines";
 import { setError, clearError } from "../../../store/slicer/errorSlicer";
 import type { AppDispatchRedux } from "../../../store/store";
+import type { IApiError } from "interfaces/errorApi";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
-const relativePath = "locations/locations";
+const relativePath = "locations/locations/";
 const API_URL = new URL(relativePath, BASE_URL);
 
 const fetchLocationsFromDB = async (
@@ -313,206 +313,102 @@ const getInventoryInputsOfProductInOneLocation = async (
     }
 }
 
-const createLocationInDB = async (
-    data: IPartialLocation,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+// *************** POST *************** //
 
-        if (!response.ok) {
-            const errorText = await response.json();
-            if (response.status >= 500) {
-                throw new Error(errorText);
-            }
-            dispatch(
-                setError({
-                    key: "createLocation",
-                    message: errorText
-                })
-            );
-            return null;
-        }
-        dispatch(
-            clearError("createLocation")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+type ICreateLocationDBProps = {
+    location: IPartialLocation
+}
+
+const createCompleteLocationInDB = async ({ location }: ICreateLocationDBProps): Promise<IPartialLocation> => {
+    const url = new URL('create-complete', API_URL);
+    const request = new Request(url.toString(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(location)
+    });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        throw apiError;
     }
+    return await response.json();
 };
 
 
-const createCompleteLocationInDB = async (
-    data: IPartialLocation,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/create-complete`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+// *************** PATCH *************** //
 
-        if (!response.ok) {
-            const errorText = await response.json();
-            if (response.status >= 500) {
-                throw new Error(errorText);
-            }
-            dispatch(
-                setError({
-                    key: "createCompleteLocation",
-                    message: errorText
-                })
-            );
-            return null;
-        }
-        dispatch(
-            clearError("createCompleteLocation")
-        );
-        const result =
-            await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
-    }
-};
-
-const updateLocationInDB = async (
+interface IUpdateCompleteProductInDBProps {
     id: number,
-    data: IPartialLocation,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+    location: IPartialLocation
+}
 
-        if (!response.ok) {
-            const errorText =
-                await response.json();
-
-            if (response.status >= 500)
-                throw new Error(
-                    errorText
-                );
-            dispatch(
-                setError({
-                    key: "updateLocation",
-                    message: errorText
-                })
-            );
-            return null;
-        }
-
-        dispatch(
-            clearError("updateLocation")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+const updateCompleteLocationInDB = async ({ id, location }: IUpdateCompleteProductInDBProps): Promise<IPartialLocation> => {
+    if (!id) throw new Error("No id provided to updateCompleteLocationInDB");
+    const url = new URL(`update-complete/${encodeURIComponent(id)}`, API_URL);
+    console.log('url', url)
+    const request = new Request(url.toString(), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(location)
+    });
+    const response = await fetch(request);
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        console.log("APIERROR ", apiError);
+        throw apiError;
     }
+    return await response.json();
 };
 
+// *************** DELETE *************** //
 
-const updateCompleteLocationInDB = async (
-    id: number,
-    data: {
-        update_fields: IPartialLocation,
-        update_types: {
-            added: ILocationType[],
-            modified: ILocationType[],
-            deleted: ILocationType[]
-        }
-    },
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/update-complete/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
+interface IDeleteLocationInDBProps {
+    id: number
+}
 
-        if (!response.ok) {
-            const errorText =
-                await response.json();
+const deleteLocationInDB = async ({ id }: IDeleteLocationInDBProps): Promise<void> => {
+    const url = new URL(`${encodeURIComponent(id)}`, API_URL);
+    const request = new Request(url.toString(), {
+        method: "DELETE",
+    });
+    const response = await fetch(request);
 
-            if (response.status >= 500)
-                throw new Error(
-                    errorText
-                );
-            dispatch(
-                setError({
-                    key: "updateCompleteLocation",
-                    message: errorText
-                })
-            );
-            return null;
-        }
+    if (!response.ok) {
+        let errorBody: any = null;
+        try { errorBody = await response.json(); } catch {/**/ }
 
-        dispatch(
-            clearError("updateCompleteLocation")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
+        const apiError: IApiError = {
+            status: response.status,
+            message: errorBody?.message,
+            validation: errorBody?.validation,
+            code: errorBody?.code,
+        };
+        throw apiError;
     }
-};
-
-const deleteLocationInDB = async (
-    id: number,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: "DELETE",
-        });
-
-        if (!response.ok) {
-            const errorText = await response.json();
-            dispatch(
-                setError({
-                    key: "deleteLocation",
-                    message: errorText
-                })
-            );
-            if (response.status >= 500) {
-                throw new Error(
-                    `${errorText}`
-                );
-            }
-            return null;
-        }
-
-        dispatch(
-            clearError("deleteLocation")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-
-        throw error;
-    }
+    // 204 → sin body, simplemente resolvemos
+    return;
 };
 
 export {
     fetchLocationsFromDB,
-    createLocationInDB,
-    updateLocationInDB,
+    updateCompleteLocationInDB,
     deleteLocationInDB,
     createCompleteLocationInDB,
     getTypesOfLocationFromDB,
-    updateCompleteLocationInDB,
     fetchLocationsWithTypesFromDB,
     getLocationsProducedOneProduct,
     getInventoryInputsOfProductInOneLocation,

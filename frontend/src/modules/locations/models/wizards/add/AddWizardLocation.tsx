@@ -9,19 +9,20 @@ import Step2 from "./steps/step2/Step2";
 import Step3 from "./steps/step3/Step3";
 import { useMemo, useState } from "react";
 import StyleModule from "./AddWizardLocation,.module.css";
+import type { IPartialLocation } from "interfaces/locations";
 
 
 interface IAddWizardLocationProps {
     onClose: () => void,
+    onCreate: (location: IPartialLocation) => (boolean | Promise<boolean>)
 }
 
-const AddWizardLocaton = ({ onClose }: IAddWizardLocationProps) => {
+const AddWizardLocaton = ({ onClose, onCreate}: IAddWizardLocationProps) => {
 
     // ********* Hooks *********
 
     const state = useLocationState();
     const dispatch = useLocationDispatch();
-    // const command = useLocationCommand();
 
     // ********* States *********
 
@@ -43,10 +44,10 @@ const AddWizardLocaton = ({ onClose }: IAddWizardLocationProps) => {
         },
         {
             title: "Resumen y finalización",
-            content: <Step3 />,
+            content: <Step3 state={state} dispatch={dispatch} onCancel={toggleWarningModal} onCreate={onCreate} onClose={onClose} />,
             icon: <FileCheck />
         }
-    ], [state, dispatch, toggleWarningModal]);
+    ], [state, dispatch, toggleWarningModal, onCreate, onClose]);
 
     return (
         <FullContainerModal>

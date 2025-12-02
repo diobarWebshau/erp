@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../../../mysql/configSequelize.js";
 import { ProductInputCreateAttributes } from "./product-Input.model.js";
-import { ProductProcessAttributes } from "./products-processes.model.js";
+import { ProductProcessCreateAttributes } from "./products-processes.model.js";
 
 interface ProductInputProcessAttributes {
   id: number,
@@ -10,11 +10,10 @@ interface ProductInputProcessAttributes {
   product_process_id: number,
   qty: string | number,
   product_input?: ProductInputCreateAttributes,
-  product_process?: ProductProcessAttributes
+  product_process?: ProductProcessCreateAttributes[]
 }
 
-interface ProductInputProcessCreateAttributes
-  extends Optional<ProductInputProcessAttributes, "id"> {}
+type ProductInputProcessCreateAttributes = Partial<ProductInputProcessAttributes>;
 
 class ProductInputProcessModel
   extends Model<ProductInputProcessAttributes, ProductInputProcessCreateAttributes> {

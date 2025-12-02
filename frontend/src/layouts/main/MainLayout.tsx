@@ -1,5 +1,5 @@
 import { Bell, BookText, Boxes, ChartNoAxesCombined, ChevronDown, ChevronsLeft, ChevronsRight, ChevronUp, ClockAlert, FileBadge, FileText, FileWarning, LogOut, MapPinned, Package, Settings, User, UserPen } from "lucide-react";
-import { memo, useCallback, useState, type ReactElement, type ReactNode } from "react";
+import { memo, useCallback, useEffect, useMemo, useState, type MouseEvent, type ReactElement, type ReactNode } from "react";
 import ShippingIcon from "../../components/icons/ShippingIcon";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import withClassName from "../../utils/withClassName";
@@ -12,7 +12,8 @@ import { Indicator } from "@mantine/core";
 import ProfileIcon from "../../components/icons/ProfileIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { removeAuth } from "../../store/indexActions";
-import type { RootState } from "store/store";
+import type { RootState } from "../../store/store";
+import clsx from "clsx";
 
 interface MenuItem {
     label: string;
@@ -186,36 +187,25 @@ interface NavItemProps {
     isSidebarCollapsed: boolean;
 }
 
-const NavItem = ({
+const NavItem = memo(({
     isActive,
     parent,
     iconWithClassParent,
     isSidebarCollapsed
 }: NavItemProps) => {
+    const navItemClassNames = clsx(stylesModules.navItem, isActive ? stylesModules.navItemActive : '');
+    const navItemLabelClassNames = clsx(isSidebarCollapsed ? stylesModules.navItemLabelCollapsed : stylesModules.navItemLabel)
     return (
-        <Link
-            to={parent.path}
-            key={parent.label}
-            className={
-                `${stylesModules.navItem} ` +
-                `${isActive ? stylesModules.navItemActive : ''}`
-            }
-        >
+        <Link to={parent.path} key={parent.label} className={navItemClassNames}>
             <div className={stylesModules.navLink}>
-                <label className={stylesModules.navItemIcon}>
-                    {iconWithClassParent}
-                </label>
-                <label className={isSidebarCollapsed
-                    ? stylesModules.navItemLabelCollapsed
-                    : stylesModules.navItemLabel
-                }>{parent.label}</label>
+                <label className={stylesModules.navItemIcon}>{iconWithClassParent}</label>
+                <label className={navItemLabelClassNames}>{parent.label}</label>
             </div>
         </Link>
     )
+});
 
-}
-
-// ***************      EXTRA ITEM DEL NAV    *************** 
+// ***************  EXTRA ITEM DEL NAV  *************** 
 
 interface NavItemExtraProps {
     parent: MenuItem;
@@ -223,7 +213,7 @@ interface NavItemExtraProps {
     isSidebarCollapsed: boolean;
 }
 
-const NavItemExtra = ({
+const NavItemExtra = memo(({
     parent,
     iconWithClassParent,
     isSidebarCollapsed
@@ -231,29 +221,27 @@ const NavItemExtra = ({
 
     const isActive = location.pathname === parent.path;
 
+    const navItemExtraClassName = clsx(isSidebarCollapsed ? stylesModules.navItemCollapsed : stylesModules.navItem, isActive ? stylesModules.navItemActive : '');
+    const classNameItemLabel = clsx(isSidebarCollapsed ? stylesModules.navItemLabelCollapsed : stylesModules.navItemLabel);
+
+
     return (
         <Link
             to={parent.path}
             key={parent.label}
-            className={
-                `${isSidebarCollapsed ? stylesModules.navItemCollapsed : stylesModules.navItem} ` +
-                `${isActive ? stylesModules.navItemActive : ''}`
-            }
+            className={navItemExtraClassName}
         >
             <div className={stylesModules.navLink}>
-                <label className={isSidebarCollapsed
+                <div className={isSidebarCollapsed
                     ? stylesModules.navItemIconCollapsed
                     : stylesModules.navItemIcon
-                }>{iconWithClassParent}</label>
-                <label className={isSidebarCollapsed
-                    ? stylesModules.navItemLabelCollapsed
-                    : stylesModules.navItemLabel
-                }>{parent.label}</label>
+                }>{iconWithClassParent}</div>
+                <label className={classNameItemLabel}>{parent.label}</label>
             </div>
         </Link>
     )
 
-}
+});
 
 
 // ***************      ITEM DROPDOWN DEL NAV     *************** 
@@ -272,97 +260,134 @@ const NavItemDropdown = memo(({
     isSidebarCollapsed
 }: NavItemDropdownProps) => {
 
-    const internalLocation = useLocation();
+    const { pathname } = useLocation();
 
-    const [isExpanded, setIsExpanded] = useState(
-        parent.children?.some((item) => item.path === internalLocation.pathname) ?? false
+    // 🔥 Se recalcula SIEMPRE que cambie pathname o children
+    const hasActiveChild = parent.children?.some(
+        (item) => item.path === pathname
+    ) ?? false;
+
+    const [isExpanded, setIsExpanded] = useState(hasActiveChild);
+
+    const toggleExpand = useCallback(() => {
+        setIsExpanded(prev => !prev);
+    }, []);
+
+    // 🔥 Auto expandir si un hijo está activo
+    useEffect(() => {
+        if (hasActiveChild) {
+            setIsExpanded(true);
+        }
+    }, [hasActiveChild]);
+
+    // 🔥 Clase del item padre
+    const navItemDropDownClassName = clsx(
+        stylesModules.navItemDropdown,
+        isExpanded && stylesModules.navItemDropdownIsExpanded,
+        (isActive || hasActiveChild)
+            ? stylesModules.navItemDropdownActive
+            : stylesModules.navItemDropdownIsNotActive
     );
 
-    const toggleExpand = () => {
-        setIsExpanded(!isExpanded);
-    };
+    const iconDropDown = useMemo(() => {
+        return isExpanded
+            ? <ChevronUp className={stylesModules.iconDropdownItem} />
+            : <ChevronDown className={stylesModules.iconDropdownItem} />
+    }, [isExpanded]);
+
+    const classNameWrapperItemDropdown = clsx(
+        isSidebarCollapsed
+            ? stylesModules.wrapperItemDropdownCollapsed
+            : stylesModules.wrapperItemDropdown
+    );
+
+    const classNameNavItemLabel = clsx(
+        isSidebarCollapsed ? stylesModules.navItemLabelCollapsed : stylesModules.navItemLabel
+    );
+
+    const classNameIconNavItemDropdownContainer = clsx(
+        isSidebarCollapsed
+            ? stylesModules.iconNavItemDropdownContainerCollapsed
+            : stylesModules.iconNavItemDropdownContainer
+    );
+
+    const classNameNavListChildrenDropdown = clsx(
+        isSidebarCollapsed
+            ? stylesModules.navListChildrenDropdownCollapsed
+            : stylesModules.navListChildrenDropdown
+    );
 
     return (
-        <li
-            key={parent.label}
-            className={
-                `${stylesModules.navItemDropdown} ` +
-                `${isExpanded ? stylesModules.navItemDropdownIsExpanded : ""} ` +
-                `${!isActive && !isExpanded ? stylesModules.navItemDropdownIsNotActive : ""}`
-            }
-            onClick={toggleExpand}
-        >
-            <div
-                className={` ${isSidebarCollapsed ? stylesModules.wrapperItemDropdownCollapsed : stylesModules.wrapperItemDropdown} `}
-            >
+        <li className={navItemDropDownClassName}>
+            <div className={classNameWrapperItemDropdown} onClick={toggleExpand}>
                 <div className={stylesModules.navItemContent}>
-                    <label
-                        className={stylesModules.navItemIcon
-                        }
-                    >
+                    <label className={stylesModules.navItemIcon}>
                         {iconWithClassParent}
                     </label>
-                    <label
-                        className={isSidebarCollapsed
-                            ? stylesModules.navItemLabelCollapsed
-                            : stylesModules.navItemLabel
-                        }
-                    >
+                    <label className={classNameNavItemLabel}>
                         {parent.label}
                     </label>
                 </div>
-                <div
-                    className={
-                        isSidebarCollapsed ? stylesModules.iconNavItemDropdownContainerCollapsed : stylesModules.iconNavItemDropdownContainer
-                    }
-                >
-                    {
-                        isExpanded ? (
-                            <ChevronUp className={stylesModules.iconDropdownItem} />
-                        ) : (
-                            <ChevronDown className={stylesModules.iconDropdownItem} />
-                        )
-                    }
+                <div className={classNameIconNavItemDropdownContainer}>
+                    {iconDropDown}
                 </div>
             </div>
-            {
-                isExpanded && (
-                    <div
-                        className={`${isSidebarCollapsed ? stylesModules.navListChildrenDropdownCollapsed : stylesModules.navListChildrenDropdown}`}
-                    >
-                        {
-                            parent.children?.map((item) => {
-                                const isActive = location.pathname === item.path;
-                                const iconWithClassChildren = withClassName(item.icon as ReactElement, `${isActive ? stylesModules.navItemIconActive : ""} ` +
-                                    `${isSidebarCollapsed ? stylesModules.navItemIconCollapsed : stylesModules.navItemIcon} `);
-                                return (
-                                    <Link
-                                        to={item.path}
-                                        key={item.label}
-                                        className={
-                                            `${stylesModules.navItem} ` +
-                                            `${isActive ? stylesModules.navItemActive : ''}`
-                                        }
-                                    >
-                                        <div className={stylesModules.navLink}>
-                                            <label className={stylesModules.navItemIcon}>
-                                                {iconWithClassChildren}
-                                            </label>
-                                            <label className={isSidebarCollapsed
-                                                ? stylesModules.navItemLabelCollapsed
-                                                : stylesModules.navItemLabel
-                                            }>{item.label}</label>
-                                        </div>
-                                    </Link>
-                                );
-                            })
-                        }
-                    </div>
-                )
-            }
+
+            {isExpanded && (
+                <div className={classNameNavListChildrenDropdown}>
+                    {parent.children?.map((item) => (
+                        <NavItemChildren
+                            key={item.path}
+                            item={item}
+                            isSidebarCollapsed={isSidebarCollapsed}
+                        />
+                    ))}
+                </div>
+            )}
         </li>
-    )
+    );
 });
+
+
+interface INavItemChildrenProps {
+    item: MenuItem,
+    isSidebarCollapsed: boolean
+}
+
+const NavItemChildren = memo(({ item, isSidebarCollapsed }: INavItemChildrenProps) => {
+
+    const { pathname } = useLocation();
+    const isActive = pathname === item.path;
+
+    const iconWithClassChildren = useMemo(() => {
+        return withClassName(
+            item.icon as ReactElement,
+            clsx(
+                isActive ? stylesModules.navItemIconActive : "",
+                isSidebarCollapsed ? stylesModules.navItemIconCollapsed : stylesModules.navItemIcon
+            )
+        );
+    }, [isActive, isSidebarCollapsed, item.icon]);
+
+    const classNameItemLabel = clsx(
+        isSidebarCollapsed ? stylesModules.navItemLabelCollapsed : stylesModules.navItemLabel
+    );
+
+    const classNameNavItem = clsx(
+        stylesModules.navItem,
+        isActive ? stylesModules.navItemActive : ''
+    );
+
+    return (
+        <Link to={item.path} className={classNameNavItem}>
+            <div className={stylesModules.navLink}>
+                <label className={stylesModules.navItemIcon}>{iconWithClassChildren}</label>
+                <label className={classNameItemLabel}>{item.label}</label>
+            </div>
+        </Link>
+    );
+});
+
 
 // ***************      ITEM NOTIFICATION     *************** 
 
@@ -390,7 +415,8 @@ const ItemNotification = memo(({
         ? stylesModules.iconNotificationAlert
         : type === "warning"
             ? stylesModules.iconNotificationWarning
-            : stylesModules.iconNotificationInfo}`
+            : stylesModules.iconNotificationInfo
+        } `
     );
     return (
         <div
@@ -419,10 +445,10 @@ const ItemNotification = memo(({
                 }
             </div>
             <div className={stylesModules.itemNotificationContent}>
-                <span className={`nunito-bold`}>
+                <span className={`nunito - bold`}>
                     {title}
                 </span>
-                <p className={`nunito-regular`}>
+                <p className={`nunito - regular`}>
                     {description}
                 </p>
             </div>
@@ -443,16 +469,18 @@ const NotificationPopover = ({
 
     const [isExpandPopover, setIsExpandPopover] = useState<boolean>(false);
 
-    const handleExpandPopover = useCallback(() => {
+    const handleExpandPopover = useCallback((e: MouseEvent<HTMLDivElement>) => () => {
+        e.stopPropagation();
         setIsExpandPopover(prev => !prev);
     }, []);
+
     return (
-        <div className={`${stylesModules.popoverNotification}   ${isExpandPopover ? stylesModules.popoverNotificationExpand : stylesModules.popoverNotificationNotExpand}`}>
+        <div className={`${stylesModules.popoverNotification}   ${isExpandPopover ? stylesModules.popoverNotificationExpand : stylesModules.popoverNotificationNotExpand} `}>
             <div className={stylesModules.popoverHeaderNotification}>
-                <span className={`${stylesModules.popoverHeaderNotificationTitle} nunito-bold`}>Notificaciones</span>
-                <span className={`${stylesModules.popoverHeaderNotificationLabel} nunito-semibold`}>Marcar como leídas</span>
+                <span className={`${stylesModules.popoverHeaderNotificationTitle} nunito - bold`}>Notificaciones</span>
+                <span className={`${stylesModules.popoverHeaderNotificationLabel} nunito - semibold`}>Marcar como leídas</span>
             </div>
-            <div className={`${stylesModules.popoverBodyNotification} ${isExpandPopover ? stylesModules.popoverBodyNotificationExpand : stylesModules.popoverBodyNotificationNotExpand}`}>
+            <div className={`${stylesModules.popoverBodyNotification} ${isExpandPopover ? stylesModules.popoverBodyNotificationExpand : stylesModules.popoverBodyNotificationNotExpand} `}>
                 {
                     isExpandPopover ? (notifications.map(
                         (notification) =>
@@ -483,7 +511,7 @@ const NotificationPopover = ({
                 onClick={handleExpandPopover}
             >
                 <span
-                    className={`nunito-semibold`}
+                    className={`nunito - semibold`}
                 >
                     {isExpandPopover ? "Ver menos" : "Ver todas"}
                 </span>
@@ -503,7 +531,6 @@ interface NotificationComponentProps {
 const NotificationComponent = memo(({
     notifications
 }: NotificationComponentProps) => {
-
     return (
         <div>
             <PopoverFloating
@@ -540,7 +567,7 @@ const NotificationComponent = memo(({
 
 // ***************    ProfilePopoverComponent     *************** */
 
-const ProfilePopoverComponent = () => {
+const ProfilePopoverComponent = memo(() => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -571,10 +598,10 @@ const ProfilePopoverComponent = () => {
             childrenTrigger={
                 <div className={stylesModules.profileContainer}>
                     <div className={stylesModules.profileInfoContainer}>
-                        <p className={`nunito-bold ${stylesModules.userName}`}>
-                            {`Hola, ${userAuth.username}`}
+                        <p className={`nunito - bold ${stylesModules.userName} `}>
+                            {`Hola, ${userAuth.username} `}
                         </p>
-                        <p className={`nunito-semibold ${stylesModules.userRole}`}>
+                        <p className={`nunito - semibold ${stylesModules.userRole} `}>
                             {"Project Manager"}
                         </p>
                     </div>
@@ -587,21 +614,21 @@ const ProfilePopoverComponent = () => {
                 <div className={stylesModules.popoverProfile}>
                     <div className={stylesModules.popoverProfileInfoContainer}>
                         <ProfileIcon className={stylesModules.avatarProfile} />
-                        <p className={`nunito-bold ${stylesModules.userNameProfile}`}>
-                            {`Hola, ${userAuth.username}`}
+                        <p className={`nunito - bold ${stylesModules.userNameProfile} `}>
+                            {`Hola, ${userAuth.username} `}
                         </p>
-                        <p className={`nunito-semibold ${stylesModules.userRoleProfile}`}>
+                        <p className={`nunito - semibold ${stylesModules.userRoleProfile} `}>
                             {"Project Manager"}
                         </p>
                     </div>
                     <div className={stylesModules.popoverProfileItemsContainer}>
                         <Link className={stylesModules.popoverProfileItem} to="/profile">
                             <User className={stylesModules.iconPopoverProfile} />
-                            <span className={`nunito-semibold`}>Mi perfil</span>
+                            <span className={`nunito - semibold`}>Mi perfil</span>
                         </Link>
                         <Link className={stylesModules.popoverProfileItem} to="/config">
                             <Settings className={stylesModules.iconPopoverProfile} />
-                            <span className={`nunito-semibold`}>Configuración</span>
+                            <span className={`nunito - semibold`}>Configuración</span>
                         </Link>
                         <Divider
                             className={stylesModules.popoverProfileDivider}
@@ -611,7 +638,7 @@ const ProfilePopoverComponent = () => {
                             onClick={logOutApp}
                         >
                             <LogOut className={stylesModules.iconPopoverProfile} />
-                            <span className={`nunito-semibold`}>Cerrar sesión</span>
+                            <span className={`nunito - semibold`}>Cerrar sesión</span>
                         </div>
                     </div>
                 </div>
@@ -619,46 +646,17 @@ const ProfilePopoverComponent = () => {
         />
 
     );
-}
+});
 
 const MainLayout = () => {
 
-    const location = useLocation();
 
-    const [isSidebarCollapsed, setIsSidebarCollapsed] =
-        useState(true);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
     const handleDesktopToggle = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         setIsSidebarCollapsed(prev => !prev);
     }, []);
-
-
-    const NavItemRenderer = memo((children: MenuItem) => {
-        const isActive = location.pathname === children.path;
-        const iconWithClassParent = withClassName(children.icon as ReactElement, `${isActive ? stylesModules.navItemIconActive : ""} ` +
-            `${isSidebarCollapsed ? stylesModules.navItemIconCollapsed : stylesModules.navItemIcon} `);
-
-        if (children?.children?.length && children?.children.length > 0) {
-            return (
-                <NavItemDropdown
-                    isActive={isActive}
-                    parent={children}
-                    iconWithClassParent={iconWithClassParent}
-                    isSidebarCollapsed={isSidebarCollapsed}
-                />
-            );
-        } else {
-            return (
-                <NavItem
-                    isActive={isActive}
-                    parent={children}
-                    iconWithClassParent={iconWithClassParent}
-                    isSidebarCollapsed={isSidebarCollapsed}
-                />
-            );
-        }
-    })
 
     return (
         <div
@@ -666,19 +664,23 @@ const MainLayout = () => {
                 `${isSidebarCollapsed
                     ? stylesModules.gridContainerCollapsed
                     : stylesModules.gridContainer
-                }`
+                } `
             }
         >
             <aside
                 className={
-                    `nunito-medium ${isSidebarCollapsed
+                    `nunito - medium ${isSidebarCollapsed
                         ? stylesModules.asideCollapsed
-                        : stylesModules.aside}`
+                        : stylesModules.aside
+                    } `
                 }
             >
                 <div
                     className={`${stylesModules.logoWrapper} `}
-                    onClick={handleDesktopToggle}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleDesktopToggle(e);
+                    }}
                 >
                     <LogoComponent classNameLogo={stylesModules.navLogoIcon} />
                 </div>
@@ -688,17 +690,16 @@ const MainLayout = () => {
                         {
                             menuItems.map((item, index) => (
                                 <NavItemRenderer
+                                    isSidebarCollapsed={isSidebarCollapsed}
                                     key={index}
-                                    {...item}
-                                />
+                                >
+                                    {item}
+                                </NavItemRenderer>
                             ))
                         }
                     </div>
                 </div>
-                <div className={`${isSidebarCollapsed
-                    ? stylesModules.footerSectionCollapsed
-                    : stylesModules.footerSection
-                    } `}>
+                <div className={`${isSidebarCollapsed ? stylesModules.footerSectionCollapsed : stylesModules.footerSection} `}>
                     {
                         MenuExtra.map((item, index) => (
                             <NavItemExtra
@@ -714,7 +715,7 @@ const MainLayout = () => {
                             `${isSidebarCollapsed
                                 ? stylesModules.iconExpandButtonContainerCollapsed
                                 : stylesModules.iconExpandButtonContainer
-                            }`
+                            } `
                         }
                     >
                         <button
@@ -722,7 +723,10 @@ const MainLayout = () => {
                                 ? stylesModules.expandButtonCollapsed
                                 : stylesModules.expandButton
                                 } `}
-                            onClick={handleDesktopToggle}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDesktopToggle(e);
+                            }}
                         >
                             {
                                 isSidebarCollapsed
@@ -749,5 +753,40 @@ const MainLayout = () => {
         </div>
     )
 };
+
+interface INavItemRendererProps {
+    children: MenuItem;
+    isSidebarCollapsed: boolean;
+}
+
+const NavItemRenderer = memo(({
+    children,
+    isSidebarCollapsed,
+}: INavItemRendererProps) => {
+    const { pathname } = useLocation();   // ← el correcto
+    const isActive = pathname === children.path;
+    const iconWithClassParent = withClassName(children.icon as ReactElement, `${isActive ? stylesModules.navItemIconActive : ""} ` +
+        `${isSidebarCollapsed ? stylesModules.navItemIconCollapsed : stylesModules.navItemIcon} `);
+
+    if (children?.children?.length && children?.children.length > 0) {
+        return (
+            <NavItemDropdown
+                isActive={isActive}
+                parent={children}
+                iconWithClassParent={iconWithClassParent}
+                isSidebarCollapsed={isSidebarCollapsed}
+            />
+        );
+    } else {
+        return (
+            <NavItem
+                isActive={isActive}
+                parent={children}
+                iconWithClassParent={iconWithClassParent}
+                isSidebarCollapsed={isSidebarCollapsed}
+            />
+        );
+    }
+})
 
 export default MainLayout;

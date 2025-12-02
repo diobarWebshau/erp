@@ -69,7 +69,7 @@ const SingleSelectCheckSearch = <T,>({
     maxHeight,
 }: SingleSelectCheckSearchProps<T>) => {
     // estado de búsqueda
-    const [search, setSearch] = useState<string>("");
+    const [search, setSearch] = useState<string>(selected ? rowId(selected) : "");
     const debouncedSearch = useDebounceBasic({ value: search, delay: 300 });
 
     // datos + UI
@@ -158,11 +158,13 @@ const SingleSelectCheckSearch = <T,>({
             // SINGLE-SELECT real
             if (isItemSelected(item)) {
                 setSelected(null); // permite deseleccionar
+                setSearch("");
             } else {
                 setSelected(item);
+                setSearch(rowId(item));
             }
         },
-        [isItemSelected, setSelected]
+        [isItemSelected, setSelected, rowId]
     );
 
     // todos menos el seleccionado
@@ -373,8 +375,8 @@ const CheckBoxItem = <T,>({
     setOpen,
     classNameLabel,
     classNameCheckBoxItemSelected,
-    classNameCheckBox,
-    setSearch
+    // classNameCheckBox,
+    // setSearch
 }: ICheckBoxItemProps<T>) => {
     const value = useMemo(() => String(rowId(item) ?? ""), [item, rowId]);
 
@@ -384,7 +386,6 @@ const CheckBoxItem = <T,>({
                 e.preventDefault();
                 e.stopPropagation();
                 toggleItem(item);
-                setSearch(rowId(item));
                 setOpen(false);
             }
         },
@@ -396,7 +397,6 @@ const CheckBoxItem = <T,>({
             e.preventDefault();
             e.stopPropagation();
             toggleItem(item);
-            setSearch(rowId(item));
             setOpen(false);
         },
         [item, toggleItem]

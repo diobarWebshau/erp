@@ -1,28 +1,23 @@
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import { DataTypes, Model, Optional }
-    from "sequelize";
+import { ProductInputProcessAttributes } from "../junctions/products_inputs_processes.model.js";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model, Optional } from "sequelize";
 
 interface ProcessAttributes {
     id: number,
-    name: string,
+    name: string | null,
+    description: string | null,
     created_at: Date,
     updated_at: Date,
 }
 
-interface ProcessCreateAttributes
-    extends Optional<ProcessAttributes,
-        "id" | "created_at" | "updated_at"> { }
+type ProcessCreateAttributes = Partial<ProcessAttributes>;
 
-class ProcessModel
-    extends Model<
-        ProcessAttributes,
-        ProcessCreateAttributes> {
+class ProcessModel extends Model<ProcessAttributes, ProcessCreateAttributes> {
     static getEditableFields = (): string[] => {
-        return ["name"];
+        return ["name", "description"];
     }
     static getAllFields(): string[] {
-        return ["id", "name"];
+        return ["id", "name", "description"];
     }
 }
 
@@ -35,7 +30,12 @@ ProcessModel.init(
         },
         name: {
             type: DataTypes.STRING(50),
-            allowNull: false
+            allowNull: true,
+            unique: true
+        },
+        description: {
+            type: DataTypes.TEXT,
+            allowNull: true,
         },
         created_at: {
             type: DataTypes.DATE,

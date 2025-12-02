@@ -1,27 +1,27 @@
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
+import { add_production_line_products, remove_production_line_products, next_step } from "../../../../../context/productionLineActions";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
-import { back_step, update_production_line } from "../../../../../context/productionLineActions";
-import { Bookmark, Check, ChevronLeft, Plus, Trash2, X } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import type { Dispatch } from "react";
-import StyleModule from "./Step2.module.css"
-import type { ColumnDef } from "@tanstack/react-table";
-import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import type { IPartialProductionLineProduct } from "../../../../../../../interfaces/productionLinesProducts";
-import type { RowAction } from "./../../../../../../../comp/primitives/table/tableContext/tableTypes"
 import SwitchMantineCustom from "../../../../../../../comp/external/mantine/switch/custom/SwitchMantineCustom";
+import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
+import type { IPartialProductionLineProduct } from "../../../../../../../interfaces/productionLinesProducts";
 import SelectObjectsModal from "../../../../../../../comp/features/modal-product2/SelectProductsModal";
-import { Divider } from "@mantine/core";
-import type { IProduct } from "interfaces/product";
-import { add_production_line_products, remove_production_line_products, next_step } from "../../../../../context/productionLineActions";
-import { generateRandomIds } from "../../../../../../../helpers/nanoId";
+import type { RowAction } from "./../../../../../../../comp/primitives/table/tableContext/tableTypes"
+import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
+import { back_step, update_production_line } from "../../../../../context/productionLineActions";
+import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import { Bookmark, Check, ChevronLeft, Plus, Trash2, X } from "lucide-react";
 import { clearError } from "../../../../../../../store/slicer/errorSlicer";
+import { generateRandomIds } from "../../../../../../../helpers/nanoId";
 import { setError } from "../../../../../../../store/slicer/errorSlicer";
 import type { AppDispatchRedux } from "../../../../../../../store/store";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import type { IProduct } from "../../../../../../../interfaces/product";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useDispatch } from "react-redux";
-import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
+import { Divider } from "@mantine/core";
+import type { Dispatch } from "react";
+import StyleModule from "./Step2.module.css"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "products/products/exclude/";
@@ -33,14 +33,10 @@ interface IStep2 {
     dispatch: Dispatch<ProductionLineAction>
 }
 
-const Step2 = memo(({
-    onCancel,
-    state,
-    dispatch
-}: IStep2) => {
+const Step2 = memo(({ onCancel, state, dispatch }: IStep2) => {
 
     const dispatchRedux: AppDispatchRedux = useDispatch<AppDispatchRedux>();
-    const getRowId = useMemo(() => (row: IPartialProductionLineProduct) => row.id?.toString()!, []);
+    const getRowId = useMemo(() => (row: IPartialProductionLineProduct, index: number) => row.id?.toString() ?? index.toString(), []);
     const [isActiveModalAddProduct, setIsActiveModalAddProduct] = useState<boolean>(false);
 
     const columns: ColumnDef<IPartialProductionLineProduct>[] = useMemo(() => [
@@ -72,45 +68,26 @@ const Step2 = memo(({
         }
     ], []);
 
-    const handleOnClickBack = useCallback(() => {
-        dispatch(back_step());
-    }, [dispatch]);
+    const handleOnClickBack = useCallback(() => dispatch(back_step()), [dispatch]);
+    const toggleIsActiveModalAddProduct = useCallback(() => setIsActiveModalAddProduct(v => !v), []);
 
-    const toggleIsActiveModalAddProduct = useCallback(() => {
-        setIsActiveModalAddProduct(v => !v);
-    }, []);
+    const handleOnChangeActive = useCallback((value: boolean) => dispatch(update_production_line({ is_active: value })), [dispatch]);
+    const getRowAttr = useMemo(() => (data: IProduct) => data.name, []);
 
-    const handleOnChangeActive = useCallback((value: boolean) => {
-        dispatch(update_production_line({
-            is_active: value
-        }))
-    }, [dispatch]);
-
-    const getRowAttr = useMemo(() => (data: IProduct) => data.name || "", []);
-
-    const excludeIds = useMemo<number[]>(
-        () =>
-            state.data?.production_lines_products
-                ?.map(p => p.product_id)
-                .filter((id): id is number => id != null) ?? [],
-        [state.data?.production_lines_products]
-    );
+    const excludeIds = useMemo<number[]>(() => state.data?.production_lines_products?.map(p => p.product_id as number) ?? [], [state.data?.production_lines_products]);
 
     const handleOnClickAddProduct = useCallback((products: IProduct[]) => {
-        const productionLinesProducts: IPartialProductionLineProduct[] = products.map(
-            (p) => {
-                const productionLineProduct: IPartialProductionLineProduct = {
-                    id: generateRandomIds(),
-                    product_id: p.id,
-                    products: p
-                }
-                return productionLineProduct;
+        const productionLinesProducts: IPartialProductionLineProduct[] = products.map((p) => {
+            const productionLineProduct: IPartialProductionLineProduct = {
+                id: generateRandomIds(),
+                product_id: p.id,
+                products: p
             }
-        )
-
+            return productionLineProduct;
+        });
         dispatch(add_production_line_products(productionLinesProducts));
         toggleIsActiveModalAddProduct();
-    }, [state.data.production_lines_products, toggleIsActiveModalAddProduct, dispatch]);
+    }, [toggleIsActiveModalAddProduct, dispatch]);
 
     const handleOnClickDeleteProduct = useCallback((product: IPartialProductionLineProduct) => {
         if (!product.id) return;
@@ -124,7 +101,7 @@ const Step2 = memo(({
             onClick: handleOnClickDeleteProduct,
             icon: <Trash2 className={StyleModule.iconTrash} />
         }
-    ], []);
+    ], [handleOnClickDeleteProduct]);
 
     const fetchLoadProducts = useCallback(
         async (query: string | number, signal?: AbortSignal): Promise<IProduct[]> => {
@@ -161,9 +138,8 @@ const Step2 = memo(({
                 return [];
             }
         },
-        [dispatchRedux, excludeIds, API_URL] // elimina deps que no se usan
+        [dispatchRedux, excludeIds] // elimina deps que no se usan
     );
-
 
     const handleOnClickSaveAndNext = useCallback(() => {
         if (state.data?.production_lines_products?.length === 0) {
@@ -175,15 +151,10 @@ const Step2 = memo(({
         dispatch(next_step());
     }, [state.data, dispatch]);
 
-
-    const ExtraComponent = useCallback(() => {
-        return (
-            <ExtraComponents
-                fetchLoadProducts={fetchLoadProducts}
-                toggleIsActiveModalAddProduct={toggleIsActiveModalAddProduct}
-            />
-        );
-    }, [fetchLoadProducts, toggleIsActiveModalAddProduct]);
+    const ExtraComponent = useCallback(() => <ExtraComponents
+        fetchLoadProducts={fetchLoadProducts}
+        toggleIsActiveModalAddProduct={toggleIsActiveModalAddProduct}
+    />, [fetchLoadProducts, toggleIsActiveModalAddProduct]);
 
     return <div className={StyleModule.containerStep} >
         <div className={StyleModule.containerContent}>
@@ -252,6 +223,7 @@ const Step2 = memo(({
                     emptyMessage="No hay productos que coincidan con la búsqueda"
                     getRowAttr={getRowAttr}
                     loadOptions={fetchLoadProducts}
+                    label="Productos"
                 />
             )
         }

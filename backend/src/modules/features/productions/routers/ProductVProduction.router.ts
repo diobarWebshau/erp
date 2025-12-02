@@ -1,11 +1,8 @@
-import validateProductMiddleware
-    from "../middleware/products/validationMiddleware.js";
-import ProductVProductionController
-    from "../controllers/ProductsVProduction.controller.js";
-import uploadImageMiddleware
-    from "../../../../middlewares/multer/multerMiddleware.js";
-import { Router }
-    from "express";
+import { normalizeFormDataBody } from "../../../../helpers/normalizedObjectFromFormData.js";
+import validateProductMiddleware from "../middleware/products/validationMiddleware.js";
+import ProductVProductionController from "../controllers/ProductsVProduction.controller.js";
+import uploadImageMiddleware from "../../../../middlewares/multer/multerMiddleware.js";
+import { Router } from "express";
 
 const createProductVProductionController = (): Router => {
     const productRouter = Router();
@@ -24,6 +21,7 @@ const createProductVProductionController = (): Router => {
         ProductVProductionController.create);
     productRouter.post("/create-complete",
         uploadImageMiddleware,
+        normalizeFormDataBody(),
         validateProductMiddleware,
         ProductVProductionController.
             createCompleteProduct);
@@ -33,6 +31,7 @@ const createProductVProductionController = (): Router => {
         ProductVProductionController.update);
     productRouter.patch("/update-complete/:id",
         uploadImageMiddleware,
+        normalizeFormDataBody(),
         validateProductMiddleware,
         ProductVProductionController.updateCompleteProduct);
     productRouter.delete("/:id",

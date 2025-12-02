@@ -1,19 +1,10 @@
-import {
-    memo,
-    useCallback,
-    useEffect,
-    useMemo, useState,
-} from "react";
-import type {
-    FormEvent, MouseEvent
-} from "react";
-import {
-    useModalEditDispatch,
-    useModalEditState
-} from "../../context/modalEditHooks";
+import { memo, useCallback, useEffect, useMemo, useState, } from "react";
+import type { FormEvent, MouseEvent } from "react";
+import { useModalEditDispatch, useModalEditState } from "../../context/modalEditHooks";
 import {
     update_purchase_order,
-    back_step, set_step,
+    // back_step
+    set_step,
     remove_purchase_order_products,
     set_purchase_order_products_qty,
     set_purchase_order_products_price,
@@ -125,7 +116,7 @@ const InputConditionalIconMemorizado = memo(
 );
 
 interface Step3Props {
-    onEdit: (updateRecord: IPartialPurchasedOrder | null) => void;
+    onEdit: (updateRecord: IPartialPurchasedOrder) => void;
     refetch: () => void;
 }
 
@@ -190,9 +181,7 @@ const Step3 = ({
                 header: "Precio unitario",
                 cell: ({ row }) => {
                     const productId = row.original.product?.id;
-                    let recorded_price =
-                        Number(row.original.recorded_price)
-                        ?? Number(row.original.product?.sale_price) ?? 0;
+                    const recorded_price = row.original?.recorded_price ? Number(row.original?.recorded_price) : row.original.product?.sale_price ? Number(row.original.product?.sale_price) : 0;
 
                     const onChangeRecordedPrice = (value: number) => {
                         handleChangeRecordedPrice(productId ?? 0, value);
@@ -232,7 +221,7 @@ const Step3 = ({
                 header: "Cantidad",
                 cell: ({ row }) => {
                     const productId = row.original.product?.id;
-                    const qty = Number(Number(row.original.qty).toFixed(2)) ?? 0;
+                    const qty = Number(Number(row.original.qty).toFixed(2) ?? 0)
 
                     const onChangeQty = (value: number) => {
                         handleChangeQty(productId ?? 0, value);
@@ -261,7 +250,7 @@ const Step3 = ({
                     const minStock = row.original.stock_available?.minimum_stock ?? 0;
 
                     let className = styleModule.unavailable;
-                    
+
                     if (available >= qty) {
                         if ((available - qty) >= minStock) {
                             className = styleModule.highStock;
@@ -360,7 +349,7 @@ const Step3 = ({
                 }
             },
             {
-                accessorFn: (row) => { },
+                id: "dsdas",
                 header: "Total",
                 cell: ({ row }) => {
                     const recorded_price =
@@ -372,7 +361,7 @@ const Step3 = ({
                 }
             }
         ],
-        []
+        [handleChangeQty, handleChangeRecordedPrice, dispatch]
     );
 
 
@@ -382,11 +371,11 @@ const Step3 = ({
         useState<IPartialClientAddress | null>(
             {
                 street: state.updated.shipping_street ?? "",
-                street_number: state.updated.shipping_street_number ?? "",
+                street_number: Number(state.updated.shipping_street_number),
                 neighborhood: state.updated.shipping_neighborhood ?? "",
                 city: state.updated.shipping_city ?? "",
                 state: state.updated.shipping_state ?? "",
-                zip_code: state.updated.shipping_zip_code ?? "",
+                zip_code: state.updated.shipping_zip_code,
                 country: state.updated.shipping_country ?? "",
             }
         );
@@ -562,12 +551,12 @@ const Step3 = ({
         }
     }
 
-    const handleOnClickBack = (
-        e: MouseEvent<HTMLButtonElement>
-    ) => {
-        e.preventDefault();
-        dispatch(back_step());
-    }
+    // const handleOnClickBack = (
+    //     e: MouseEvent<HTMLButtonElement>
+    // ) => {
+    //     e.preventDefault();
+    //     dispatch(back_step());
+    // }
 
     const handleOnClickEditClient = (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();

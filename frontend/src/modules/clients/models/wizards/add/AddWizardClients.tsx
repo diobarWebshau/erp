@@ -13,13 +13,14 @@ import StyleModule from "./AddWizardClients.module.css";
 
 interface IAddWizardClients {
     onClose: () => void;
-    onCreate: (record: IPartialClient) => Promise<void>;
+    onCreate: (record: IPartialClient) => (Promise<boolean> | boolean);
 }
 
 const AddWizardClients = ({ onClose, onCreate }: IAddWizardClients) => {
 
     const state = useClientState();
     const dispatch = useClientDispatch();
+
     const [showWarningModal, setShowWarningModal] = useState(false);
     const toggleWarningModal = useMemo(() => () => setShowWarningModal(prev => !prev), []);
 

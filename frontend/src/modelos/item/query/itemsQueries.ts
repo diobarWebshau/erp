@@ -28,9 +28,7 @@ const fetchItemsByIdFromDB = async ({
         let errorBody: unknown = null;
         try {
             errorBody = await response.json();
-        } catch {
-            // si no hay JSON, lo ignoramos
-        }
+        } catch {/**/}
         const message =
             typeof errorBody === "string"
                 ? errorBody

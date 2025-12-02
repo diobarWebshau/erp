@@ -5,6 +5,7 @@ import { Op, QueryTypes } from "sequelize";
 import { formatWithBase64 } from "../../../../scripts/formatWithBase64.js";
 import sequelize from "../../../../mysql/configSequelize.js";
 import sequelize2 from "sequelize";
+import { normalizeValidationArray } from "../../../../helpers/normalizeValidationArray.js";
 class ProductController {
     static getAll = async (req, res, next) => {
         try {
@@ -201,7 +202,7 @@ class ProductController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, description, type, sku, active, sale_price, photo, custom_id, barcode, presentation, is_draft, storage_conditions, production_cost } = req.body;
+        const { name, description, type, sku, active, sale_price, photo, custom_id, barcode, presentation, is_draft, storage_conditions, production_cost, unit_of_measure, } = req.body;
         try {
             const validateName = await ProductModel.findOne({ where: { name: name } });
             if (validateName) {
@@ -224,7 +225,8 @@ class ProductController {
                 sale_price: sale_price ?? null,
                 photo: photo ?? null,
                 barcode: barcode ?? null,
-                storage_conditions: storage_conditions ?? null
+                storage_conditions: storage_conditions ?? null,
+                unit_of_measure: unit_of_measure ?? null
             });
             if (!response) {
                 await ImageHandler.removeImageIfExists(photo);
@@ -306,14 +308,18 @@ class ProductController {
     };
     static delete = async (req, res, next) => {
         const { id } = req.params;
+        console.log(`id`, id);
         try {
             const validateProduct = await ProductModel.findByPk(id);
             if (!validateProduct) {
-                res.status(200).json({
-                    validation: "Product not found"
+                res.status(404).json({
+                    validation: normalizeValidationArray([
+                        "Product not found"
+                    ])
                 });
                 return;
             }
+            const productAux = validateProduct.toJSON();
             const validateDeleteProduct = await sequelize.query(`SELECT func_validate_delete_product(:id) `
                 + `AS validate_delete_product;`, {
                 replacements: { id: id },
@@ -322,28 +328,29 @@ class ProductController {
             const validateDeleteProductInfo = validateDeleteProduct.shift();
             const { pending_production_qty, inventory_qty } = validateDeleteProductInfo.validate_delete_product;
             if (pending_production_qty > 0 || inventory_qty > 0) {
-                res.status(400).json({
-                    validation: `This product cannot be deleted because it ` +
-                        `has pending production orders or existing `
-                        + ` inventory in one or more locations.`
+                res.status(409).json({
+                    validation: normalizeValidationArray([
+                        `This product cannot be deleted because it ` +
+                            `has pending production orders or existing `
+                            + ` inventory in one or more locations.`
+                    ])
                 });
                 return;
             }
             const response = await ProductModel.destroy({ where: { id: id } });
-            if (!(response > 0)) {
-                res.status(200).json({
-                    validation: "Product not found for deleted"
+            if (!response) {
+                res.status(409).json({
+                    validation: normalizeValidationArray([
+                        "Product not found for deleted"
+                    ])
                 });
                 return;
             }
-            const productAux = validateProduct.toJSON();
             if (productAux.photo) {
                 await ImageHandler.removeImageIfExists(productAux.photo);
             }
             ;
-            res.status(200).json({
-                message: "Product deleted successfully"
-            });
+            res.status(202).json({});
         }
         catch (error) {
             if (error instanceof Error) {

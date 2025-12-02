@@ -16,26 +16,25 @@ CREATE TABLE location_types(
 CREATE TABLE locations(
     -- info
     id INT AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    description VARCHAR(100) NOT NULL,
+    custom_id VARCHAR(100) NULL UNIQUE,
+    name VARCHAR(100) NULL UNIQUE,
+    description VARCHAR(100) NULL,
     
     -- address
-    street VARCHAR(100) NOT NULL,
-    street_number INT NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    state VARCHAR(100) NOT NULL,
-    country VARCHAR(100) NOT NULL,
-    neighborhood VARCHAR(100) NOT NULL,
-    zip_code INT NOT NULL,
-
-    -- contact
-    phone VARCHAR(100) NOT NULL,
-    
+    street VARCHAR(100) NULL,
+    street_number INT NULL,
+    neighborhood VARCHAR(100) NULL,
+    city VARCHAR(100) NULL,
+    state VARCHAR(100) NULL,
+    country VARCHAR(100) NULL,
+    zip_code INT NULL,
+    production_capacity BIGINT NULL,
+    phone VARCHAR(100) NULL,
+    location_manager VARCHAR(100) NULL,
     -- state
-    is_active TINYINT DEFAULT 1 NOT NULL,
+    is_active TINYINT DEFAULT 1 NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
     PRIMARY KEY(id)
 );
 
@@ -99,11 +98,12 @@ CREATE TABLE products(
     custom_id VARCHAR(100) NULL UNIQUE,
     name VARCHAR(100) NULL UNIQUE,
     type VARCHAR(100) NULL,
-    description TEXT NOT NULL,
+    description TEXT NULL,
     presentation VARCHAR(100) NULL,
+    unit_of_measure VARCHAR(100) NULL,
     production_cost DECIMAL(14, 4) NULL,
     storage_conditions TEXT NULL,
-    barcode INT NULL UNIQUE,
+    barcode BIGINT NULL UNIQUE,
     sku VARCHAR(100) NULL UNIQUE,
     active TINYINT NULL,
     sale_price DECIMAL(14, 4) NULL,
@@ -111,8 +111,7 @@ CREATE TABLE products(
     is_draft TINYINT NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY(id),
-    INDEX idx_products_name(name)
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE product_discounts_ranges (
@@ -398,14 +397,16 @@ CREATE TABLE inputs(
     custom_id VARCHAR(100) NULL UNIQUE,
     name VARCHAR(100) NULL UNIQUE,
     description TEXT NULL,
+    sku VARCHAR(100) NULL UNIQUE,
     presentation VARCHAR(100) NULL,
+    unit_of_measure VARCHAR(100) NULL,
     storage_conditions TEXT NULL,
-    barcode INT NULL UNIQUE,
+    barcode BIGINT NULL UNIQUE,
     input_types_id INT NULL,
     unit_cost DECIMAL(14, 4) NULL,
     supplier VARCHAR(100) NULL,
     photo VARCHAR(200) NULL,
-    is_draft TINYINT NOT NULL DEFAULT 0,
+    is_draft TINYINT DEFAULT 0,
     status TINYINT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -414,7 +415,8 @@ CREATE TABLE inputs(
 );
 CREATE TABLE processes(
     id INT AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NULL UNIQUE,
+    description TEXT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id)

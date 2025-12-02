@@ -133,7 +133,7 @@ class ProcessesController {
     }
 
     static create = async (req: Request, res: Response, next: NextFunction) => {
-        const { name } = req.body;
+        const { name, description } = req.body;
         try {
             const validateName =
                 await ProcessModel.findOne({ where: { name: name } });
@@ -144,7 +144,7 @@ class ProcessesController {
                 });
                 return;
             }
-            const response = await ProcessModel.create({ name });
+            const response = await ProcessModel.create({ name, description });
             if (!response) {
                 res.status(200).json({
                     validation: "The process could not be created"

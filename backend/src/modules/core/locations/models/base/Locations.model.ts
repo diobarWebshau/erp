@@ -1,7 +1,10 @@
-import sequelize from "../../../../../mysql/configSequelize.js";
-import { DataTypes, Model, Optional } from "sequelize";
+import { InventoryLocationItemCreationAttributes, LocationLocationTypeAttributes, LocationsProductionLinesAttributes } from "../../../../../modules/types.js";
+import { InventoryLocationItemManager } from "src/modules/services/inventories/models/references/inventories_locations_items.model.js";
+import { LocationsProductionLinesManager } from "src/modules/features/productions/models/junctions/locations-production-lines.model.js";
+import { LocationLocationTypeManager } from "../junctions/locations-location-types.model.js";
 import { LocationTypeCreateAttributes } from "./LocationTypes.model.js";
-import { InventoryLocationItemCreationAttributes, LocationLocationTypeAttributes } from "../../../../../modules/types.js";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { DataTypes, Model } from "sequelize";
 
 interface IInventory {
     stock: number;
@@ -22,6 +25,7 @@ interface LocationAttributes {
     // info
     id: number;
     name: string;
+    custom_id: string,
     description: string;
 
     // contact
@@ -35,7 +39,8 @@ interface LocationAttributes {
     state: string;
     country: string;
     zip_code: number;
-    location_location_type?: LocationLocationTypeAttributes[];
+    production_capacity: number,
+    location_manager: string,
 
     // status
     is_active: number;
@@ -43,37 +48,40 @@ interface LocationAttributes {
     updated_at: Date;
 
     // relationships
-    inventory_location_item?: InventoryLocationItemCreationAttributes[];
+    location_production_line?: LocationsProductionLinesAttributes[]
+    location_location_type?: LocationLocationTypeAttributes[];
+    inventories_locations_items?: InventoryLocationItemCreationAttributes[];
     types?: LocationTypeCreateAttributes[];
     inventory?: IInventory;
+
+    // managers
+    location_location_type_updated?: LocationLocationTypeManager,
+    inventories_locations_items_updated?: InventoryLocationItemManager,
+    location_production_line_updated?: LocationsProductionLinesManager
 }
 
-interface LocationCreateAttributes
-    extends Optional<
-        LocationAttributes,
-        | "id"
-        | "created_at"
-        | "updated_at"
-        | "is_active"
-        | "inventory_location_item"
-        | "types"
-        | "inventory"
-    > { }
+type LocationCreateAttributes = Partial<LocationAttributes>;
 
 class LocationModel extends Model<LocationAttributes, LocationCreateAttributes> {
     static getEditableFields = (): string[] => {
         return [
             "name",
             "description",
+
             "phone",
-            "city",
-            "state",
-            "country",
-            "is_active",
+
             "street",
             "street_number",
             "neighborhood",
+            "city",
+            "state",
+            "country",
             "zip_code",
+            "production_capacity",
+            "location_manager",
+            "custom_id",
+
+            "is_active",
         ];
     };
 
@@ -82,17 +90,23 @@ class LocationModel extends Model<LocationAttributes, LocationCreateAttributes> 
             "id",
             "name",
             "description",
+
             "phone",
-            "city",
-            "state",
-            "country",
-            "is_active",
-            "created_at",
-            "updated_at",
+
             "street",
             "street_number",
             "neighborhood",
+            "city",
+            "state",
+            "country",
             "zip_code",
+            "production_capacity",
+            "location_manager",
+            "custom_id",
+
+            "is_active",
+            "created_at",
+            "updated_at",
         ];
     }
 }
@@ -107,51 +121,63 @@ LocationModel.init(
         },
         name: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
             unique: true,
         },
         description: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
+        },
+        production_capacity: {
+            type: DataTypes.BIGINT,
+            allowNull: true
+        },
+        location_manager: {
+            type: DataTypes.STRING(100),
+            allowNull: true
+        },
+        custom_id: {
+            type: DataTypes.STRING(100),
+            allowNull: true
         },
         // contact
         phone: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         // address
         street: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         street_number: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
         },
         neighborhood: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         city: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         state: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         country: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         zip_code: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
         },
         // status
         is_active: {
             type: DataTypes.TINYINT,
-            allowNull: false,
+            allowNull: true,
             defaultValue: 1,
         },
         created_at: {

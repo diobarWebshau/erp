@@ -7,7 +7,8 @@ interface IProductInputProcess {
     product_input_id: number,
     product_process_id: number,
     product_input?: IPartialProductInput,
-    product_process?: IPartialProductProcess
+    product_process?: IPartialProductProcess,
+    qty: number,
 }
 
 interface IProductInputProcessManager {

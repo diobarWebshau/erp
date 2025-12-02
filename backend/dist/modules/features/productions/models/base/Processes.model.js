@@ -2,10 +2,10 @@ import sequelize from "../../../../../mysql/configSequelize.js";
 import { DataTypes, Model } from "sequelize";
 class ProcessModel extends Model {
     static getEditableFields = () => {
-        return ["name"];
+        return ["name", "description"];
     };
     static getAllFields() {
-        return ["id", "name"];
+        return ["id", "name", "description"];
     }
 }
 ProcessModel.init({
@@ -16,7 +16,12 @@ ProcessModel.init({
     },
     name: {
         type: DataTypes.STRING(50),
-        allowNull: false
+        allowNull: true,
+        unique: true
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
     },
     created_at: {
         type: DataTypes.DATE,

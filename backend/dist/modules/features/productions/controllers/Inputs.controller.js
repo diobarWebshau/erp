@@ -1,9 +1,10 @@
+import { normalizeValidationArray } from "../../../../helpers/normalizeValidationArray.js";
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
-import ImageHandler from "../../../../classes/ImageHandler.js";
-import { InputModel, InputTypeModel } from "../../../associations.js";
-import { Op, QueryTypes, Transaction } from "sequelize";
 import { formatWithBase64 } from "../../../../scripts/formatWithBase64.js";
+import { InputModel, InputTypeModel } from "../../../associations.js";
+import ImageHandler from "../../../../classes/ImageHandler.js";
 import sequelize from "../../../../mysql/configSequelize.js";
+import { Op, QueryTypes, Transaction } from "sequelize";
 import toBoolean from "../../../../scripts/toBolean.js";
 class InputController {
     static getAll = async (req, res, next) => {
@@ -140,14 +141,15 @@ class InputController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, custom_id, input_types_id, unit_cost, supplier, photo, status, description, barcode, storage_conditions } = req.body;
+        const { name, custom_id, input_types_id, unit_cost, supplier, photo, status, description, barcode, storage_conditions, sku, unit_of_measure } = req.body;
         try {
             const validateName = await InputModel.findOne({
                 where: { name: name }
             });
             if (validateName) {
-                await ImageHandler.removeImageIfExists(photo);
-                res.status(200).json({
+                if (photo)
+                    await ImageHandler.removeImageIfExists(photo);
+                res.status(409).json({
                     validation: "The name is already currently in use by a input"
                 });
                 return;
@@ -156,7 +158,8 @@ class InputController {
                 where: { photo: photo }
             });
             if (validatePhoto) {
-                await ImageHandler.removeImageIfExists(photo);
+                if (photo)
+                    await ImageHandler.removeImageIfExists(photo);
                 res.status(200).json({
                     validation: "This path already exists and is currently referencing an image"
                 });
@@ -166,7 +169,8 @@ class InputController {
                 where: { id: input_types_id }
             });
             if (!validateType) {
-                await ImageHandler.removeImageIfExists(photo);
+                if (photo)
+                    await ImageHandler.removeImageIfExists(photo);
                 res.status(200).json({
                     validation: "The assigned type does not exist"
                 });
@@ -182,10 +186,13 @@ class InputController {
                 photo: photo ?? null,
                 status: status ?? null,
                 barcode: barcode ?? null,
-                storage_conditions: storage_conditions ?? null
+                storage_conditions: storage_conditions ?? null,
+                sku: sku ?? null,
+                unit_of_measure: unit_of_measure ?? null
             });
             if (!response) {
-                await ImageHandler.removeImageIfExists(photo);
+                if (photo)
+                    await ImageHandler.removeImageIfExists(photo);
                 res.status(200).json({
                     validation: "The input could not be created"
                 });
@@ -206,65 +213,66 @@ class InputController {
     };
     static createComplete = async (req, res, next) => {
         const transaction = await sequelize.transaction({
-            isolationLevel: Transaction
-                .ISOLATION_LEVELS
-                .REPEATABLE_READ
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
         });
-        const { name, custom_id, input_types_id, unit_cost, supplier, storage_conditions, photo, status, description, barcode } = req.body;
+        const { name, custom_id, input_types_id, unit_cost, supplier, storage_conditions, photo, status, presentation, description, is_draft, barcode, unit_of_measure, sku } = req.body;
         try {
-            const validateName = await InputModel.findOne({
-                where: { name: name }
-            });
+            const validateName = await InputModel.
+                findOne({ where: { name: name } });
             if (validateName) {
-                await ImageHandler
-                    .removeImageIfExists(photo);
-                res.status(400).json({
-                    validation: `The name is already`
-                        + ` currently in use by a input`
+                if (photo)
+                    await ImageHandler.removeImageIfExists(photo);
+                res.status(409).json({
+                    validation: normalizeValidationArray([
+                        `The name is already`
+                            + ` currently in use by a input`
+                    ])
                 });
                 return;
             }
             const responseInput = await InputModel.create({
+                presentation: presentation ?? null,
                 name: name ?? null,
                 description: description ?? null,
                 custom_id: custom_id ?? null,
-                input_types_id: custom_id ?? null,
-                unit_cost: custom_id ?? null,
-                supplier: custom_id ?? null,
-                photo: custom_id ?? null,
-                status: custom_id ?? null,
+                input_types_id: input_types_id ?? null,
+                unit_cost: unit_cost ?? null,
+                supplier: supplier ?? null,
+                photo: photo ?? null,
+                status: status ?? null,
                 barcode: barcode ?? null,
-                storage_conditions: storage_conditions ?? null
+                storage_conditions: storage_conditions ?? null,
+                sku: sku ?? null,
+                unit_of_measure: unit_of_measure ?? null,
+                is_draft: is_draft ?? 0
             }, { transaction });
             if (!responseInput) {
-                await ImageHandler
-                    .removeImageIfExists(photo);
-                res.status(400).json({
-                    validation: "The input could not be created"
+                if (photo)
+                    await ImageHandler.removeImageIfExists(photo);
+                res.status(500).json({
+                    validation: normalizeValidationArray([
+                        "The input could not be created"
+                    ])
                 });
                 return;
             }
+            const product = responseInput.toJSON();
             await transaction.commit();
-            res.status(201).json({
-                message: "Input created successfully"
-            });
+            res.status(201).send(product);
         }
         catch (error) {
             await transaction.rollback();
-            if (error instanceof Error) {
+            if (photo)
+                await ImageHandler.removeImageIfExists(photo);
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
-                console.error(`An unexpected error ocurred ` +
-                    `${error}`);
-            }
+            else
+                console.error(`An unexpected error ocurred ${error}`);
         }
     };
     static updateComplete = async (req, res, next) => {
         const transaction = await sequelize.transaction({
-            isolationLevel: Transaction
-                .ISOLATION_LEVELS
-                .REPEATABLE_READ
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
         });
         const { id } = req.params;
         const completeBody = req.body;
@@ -274,20 +282,20 @@ class InputController {
         try {
             const editableFields = InputModel.getEditableFields();
             const update_values = collectorUpdateFields(editableFields, completeBody);
-            const validateInput = await InputModel.findByPk(id);
+            const validateInput = await InputModel.findByPk(id, { transaction });
             if (!validateInput) {
                 await transaction.rollback();
-                if (completeBody.photo) {
-                    await ImageHandler
-                        .removeImageIfExists(completeBody.photo);
-                }
+                if (completeBody.photo)
+                    await ImageHandler.removeImageIfExists(completeBody.photo);
                 res.status(404).json({
-                    validation: "Input not found"
+                    validation: normalizeValidationArray([
+                        "Input not found"
+                    ])
                 });
                 return;
             }
             const input = validateInput.toJSON();
-            if (Object.keys(update_values).length > 0) {
+            if (Object.keys(update_values).length) {
                 if (update_values?.name) {
                     const validateName = await InputModel.findOne({
                         where: {
@@ -299,45 +307,41 @@ class InputController {
                     });
                     if (validateName) {
                         await transaction.rollback();
-                        if (completeBody?.photo) {
-                            await ImageHandler
-                                .removeImageIfExists(completeBody.photo);
-                        }
-                        res.status(404).json({
-                            validation: `The name is already currently`
-                                + ` in use by a input`
+                        if (completeBody?.photo)
+                            await ImageHandler.removeImageIfExists(completeBody.photo);
+                        res.status(409).json({
+                            validation: normalizeValidationArray([
+                                `The name is already currently`
+                                    + ` in use by a input`
+                            ])
                         });
                         return;
                     }
                 }
                 if (update_values?.photo) {
                     IsupdateImage = true;
-                    // console.log(typeof input.photo);
-                    // console.log(update_values.photo);
                     urlImageOld = input.photo;
                 }
-                if (update_values?.status) {
-                    update_values.status =
-                        toBoolean(update_values.status);
-                }
+                if (update_values?.status)
+                    update_values.status = toBoolean(update_values.status);
                 if (update_values?.input_types_id) {
-                    const validateInputType = await InputTypeModel
-                        .findByPk(update_values.input_types_id);
+                    const validateInputType = await InputTypeModel.findByPk(update_values.input_types_id);
                     if (!validateInputType) {
                         await transaction.rollback();
-                        if (completeBody?.photo) {
-                            await ImageHandler
-                                .removeImageIfExists(completeBody.photo);
-                        }
+                        if (completeBody?.photo)
+                            await ImageHandler.removeImageIfExists(completeBody.photo);
                         res.status(404).json({
-                            validation: "Input type not found"
+                            validation: normalizeValidationArray([
+                                "Input type not found"
+                            ])
                         });
                         return;
                     }
                 }
                 const responseInput = await InputModel.update(update_values, {
                     where: { id },
-                    transaction: transaction
+                    transaction: transaction,
+                    individualHooks: true
                 });
                 if (!responseInput) {
                     await transaction.rollback();
@@ -345,36 +349,30 @@ class InputController {
                         await ImageHandler
                             .removeImageIfExists(completeBody.photo);
                     }
-                    res.status(400).json({
-                        validation: "The input could not be updated"
+                    res.status(500).json({
+                        validation: normalizeValidationArray([
+                            "The input could not be updated"
+                        ])
                     });
                     return;
                 }
             }
             await transaction.commit();
             isSuccessFully = !isSuccessFully;
-            res.status(201).json({
-                message: "Input updated successfully"
-            });
+            res.status(204).send({});
         }
         catch (error) {
             await transaction.rollback();
-            if (error instanceof Error) {
+            if (completeBody?.photo)
+                await ImageHandler.removeImageIfExists(completeBody.photo);
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
-                console.error(`An unexpected error ocurred ` +
-                    `${error}`);
-            }
+            else
+                console.error(`An unexpected error ocurred ` + `${error}`);
         }
         finally {
-            if (isSuccessFully && IsupdateImage &&
-                urlImageOld !== '' && urlImageOld !== undefined) {
-                // console.log("Eliminando imagen vieja");
-                // console.log(urlImageOld);
-                await ImageHandler
-                    .removeImageIfExists(urlImageOld);
-            }
+            if (isSuccessFully && IsupdateImage && urlImageOld !== '' && urlImageOld !== undefined)
+                await ImageHandler.removeImageIfExists(urlImageOld);
         }
     };
     static update = async (req, res, next) => {
@@ -409,7 +407,7 @@ class InputController {
                         await ImageHandler
                             .removeImageIfExists(update_values.photo);
                     }
-                    res.status(200).json({
+                    res.status(409).json({
                         validation: `The name is already currently ` +
                             `in use by a Input`
                     });
@@ -425,7 +423,7 @@ class InputController {
                         await ImageHandler
                             .removeImageIfExists(update_values.photo);
                     }
-                    res.status(200).json({
+                    res.status(404).json({
                         validation: "The assigned type does not exist"
                     });
                     return;
@@ -437,7 +435,7 @@ class InputController {
                     await ImageHandler
                         .removeImageIfExists(update_values.photo);
                 }
-                res.status(200).json({
+                res.status(500).json({
                     validation: `Input no found or no `
                         + `changes were made`
                 });
@@ -449,9 +447,7 @@ class InputController {
                     await ImageHandler.removeImageIfExists(inputAux.photo);
                 }
             }
-            res.status(200).json({
-                message: "Input updated succefally"
-            });
+            res.status(204).send({});
         }
         catch (error) {
             if (error instanceof Error) {
@@ -464,55 +460,62 @@ class InputController {
         }
     };
     static delete = async (req, res, next) => {
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
+        });
         const { id } = req.params;
         try {
-            const valiadDelete = await InputModel.findByPk(id);
+            const valiadDelete = await InputModel.findByPk(id, { transaction });
             if (!valiadDelete) {
-                res.status(200).json({
-                    validation: "Input not found for deleted"
+                transaction.rollback();
+                res.status(404).json({
+                    validation: normalizeValidationArray([
+                        "Input not found for deleted"
+                    ])
                 });
                 return;
             }
             const inputDelete = valiadDelete.toJSON();
-            const validateDelete = await sequelize.query(`SELECT func_input_is_asigned_product(:id)` +
-                ` AS is_asigned`, {
+            const validateDelete = await sequelize.query(`SELECT func_input_is_asigned_product(:id) AS is_asigned`, {
                 type: QueryTypes.SELECT,
                 replacements: {
                     id: id
                 }
             });
             const responseValidation = validateDelete.shift();
-            if (responseValidation.is_asigned > 0) {
-                res.status(400).json({
-                    validation: `The input is currently assigned `
-                        + `to a product, you cannot delete it`
+            if (responseValidation.is_asigned) {
+                transaction.rollback();
+                res.status(409).json({
+                    validation: normalizeValidationArray([
+                        `The input is currently assigned `
+                            + `to a product, you cannot delete it`
+                    ])
                 });
                 return;
             }
             const response = await InputModel.destroy({
                 where: { id: id }, individualHooks: true
             });
-            if (!(response > 0)) {
-                res.status(200).json({
-                    validation: "Input not found for deleted"
+            if (!response) {
+                transaction.rollback();
+                res.status(404).json({
+                    validation: normalizeValidationArray([
+                        "Input not found for deleted"
+                    ])
                 });
                 return;
             }
-            if (inputDelete.photo) {
+            transaction.commit();
+            if (inputDelete.photo)
                 await ImageHandler.removeImageIfExists(inputDelete.photo);
-            }
-            res.status(200).json({
-                message: "Input deleted successfully"
-            });
+            res.status(204).send({});
         }
         catch (error) {
-            if (error instanceof Error) {
+            transaction.rollback();
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
-                console.error(`An unexpected error ocurred ` +
-                    `${error}`);
-            }
+            else
+                console.error(`An unexpected error ocurred: ${error} `);
         }
     };
 }

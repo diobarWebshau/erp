@@ -55,11 +55,11 @@ interface Step4Props {
     onDelete: () => void;
 }
 
-interface Validation {
-    dateCreation?: string;
-    dateDeliver?: string;
-    purchaseOrderProducts?: IPartialPurchasedOrderProduct[];
-}
+// interface Validation {
+//     dateCreation?: string;
+//     dateDeliver?: string;
+//     purchaseOrderProducts?: IPartialPurchasedOrderProduct[];
+// }
 
 const Step4 = ({
     onCloseAddModal,
@@ -90,7 +90,7 @@ const Step4 = ({
                 accessorFn: (row) => row.recorded_price,
                 header: "Precio unitario",
                 cell: ({ row }) => {
-                    let recorded_price =
+                    const recorded_price =
                         row.original.recorded_price
                         ?? row.original.product?.sale_price ?? 0;
                     return (
@@ -131,7 +131,7 @@ const Step4 = ({
 
                     const qty = row.original.qty ?? 0;
                     const available_stock = row.original.stock_available?.available ?? 0;
-                    const committed = row.original.inventory_commited?.qty ?? 0;
+                    // const committed = row.original.inventory_commited?.qty ?? 0;
                     // const production = row.original?.production_order?.production_breakdown?.finished ?? 0;
                     const available = available_stock > 0 ? available_stock : 0;
 
@@ -218,7 +218,8 @@ const Step4 = ({
                 }
             },
             {
-                accessorFn: (row) => { },
+                // accessorFn: (row) => { },
+                id: "Asdsad",
                 header: "Total",
                 cell: ({ row }) => {
                     const recorded_price =
@@ -427,10 +428,10 @@ const Step4 = ({
                             classNameLabel={styleModule.sendByEmailButtonLabel}
                             classNameSpan={styleModule.sendByEmailButtonSpan}
                             icon={<FileCheck2 className={styleModule.sendByEmailButtonIcon} />}
-                            onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                                // e.preventDefault();
-                                console.log("Evento enviar por correo");
-                            }}
+                        // onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                        //     // e.preventDefault();
+                        //     console.log("Evento enviar por correo");
+                        // }}
                         />
                         <FadeButton
                             label="Imprimir"
@@ -440,12 +441,12 @@ const Step4 = ({
                             classNameLabel={styleModule.printButtonLabel}
                             classNameSpan={styleModule.printButtonSpan}
                             icon={<Printer className={styleModule.printButtonIcon} />}
-                            onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                                // e.preventDefault();
-                                console.log(
-                                    state.data
-                                );
-                            }}
+                        // onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                        //     // e.preventDefault();
+                        //     console.log(
+                        //         state.data
+                        //     );
+                        // }}
                         />
                     </div>
                     <div>

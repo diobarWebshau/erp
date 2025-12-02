@@ -181,3 +181,22 @@
     align-items: center;
     gap: 1rem;
 }
+
+/* *************** ConfirmModal ************** */
+
+.customMessageConfirmModal{
+    /* estilos */
+    font-size: 24px;
+}
+
+.customMessageConfirmModal > span{
+    /* estilos */
+    color: var(--color-theme-primary);
+}
+
+.iconConfirmModal{
+    /* estilos svg  */
+    width: 40px;
+    height: 40px;
+    stroke: var(--color-theme-primary);
+}

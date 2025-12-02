@@ -1,5 +1,6 @@
 import {
-    LocationAttributes, LocationCreateAttributes
+    LocationAttributes, LocationCreateAttributes,
+    ProductionLineCreationAttributes
 } from "./../../../../../modules/types.js";
 import sequelize
     from "../../../../../mysql/configSequelize.js";
@@ -11,6 +12,7 @@ interface LocationsProductionLinesAttributes {
     production_line_id: number,
     location_id: number,
     location?: LocationCreateAttributes
+    production_line?: ProductionLineCreationAttributes
 }
 
 interface LocationsProductionLinesCreateAttributes

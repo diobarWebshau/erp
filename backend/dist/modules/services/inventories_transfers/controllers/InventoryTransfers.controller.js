@@ -218,12 +218,12 @@ class InventoryTransfersController {
                 return;
             }
             const sourceInventoryItem = sourceLocationInventoryItem
-                ?.inventory_location_item
+                ?.inventories_locations_items
                 ?.shift();
             const sourceInventory = sourceInventoryItem
                 ?.inventory;
             const destinationInventoryItem = destinationLocationInventoryItem
-                ?.inventory_location_item
+                ?.inventories_locations_items
                 ?.shift();
             const destinationInventory = destinationInventoryItem
                 ?.inventory;

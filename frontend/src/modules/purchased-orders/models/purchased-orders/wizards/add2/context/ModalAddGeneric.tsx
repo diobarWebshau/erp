@@ -1,18 +1,10 @@
-import type {
-    Dispatch,
-    SetStateAction
-} from "react";
-import ProviderModalAdd
-    from "./modalAddProvider"
-import ModalAdd
-    from "../ModalAdd";
-import type {
-    IPartialPurchasedOrder
-} from "../../../../../../../interfaces/purchasedOrder";
+import type { IPartialPurchasedOrder } from "../../../../../../../interfaces/purchasedOrder";
+import ProviderModalAdd from "./modalAddProvider"
+import ModalAdd from "../ModalAdd";
 
 interface IModalAddGeneric {
     onClose: () => void;
-    onCreate: (data: IPartialPurchasedOrder) => void;
+    onCreate: (data: IPartialPurchasedOrder) => (Promise<void> | void);
     onEdit: () => void;
 }
 

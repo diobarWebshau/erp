@@ -1,7 +1,9 @@
 import collectorUpdateFields from "../../../../scripts/collectorUpdateField.js";
 import sequelize from "../../../../mysql/configSequelize.js";
-import { LocationModel, LocationTypeModel, LocationLocationTypeModel, ProductionLineModel, LocationsProductionLinesModel, ProductionLineProductModel, ProductModel, ProductProcessModel, ProcessModel, ProductionLineQueueModel, ProductionOrderModel, ProductionModel } from "../../../associations.js";
+import { LocationModel, LocationTypeModel, LocationLocationTypeModel, ProductionLineModel, LocationsProductionLinesModel, ProductionLineProductModel, ProductModel, ProductProcessModel, ProcessModel, ProductionLineQueueModel, ProductionOrderModel, ProductionModel, InventoryModel, ItemModel } from "../../../associations.js";
 import { Op, QueryTypes, Transaction } from "sequelize";
+import { normalizeValidationArray } from "../../../../helpers/normalizeValidationArray.js";
+import InventoryLocationItemModel from "../../../../modules/services/inventories/models/references/inventories_locations_items.model.js";
 class LocationController {
     static getAll = async (req, res, next) => {
         try {
@@ -200,13 +202,9 @@ class LocationController {
                                         as: "production_line_queue",
                                         required: false,
                                         attributes: ProductionLineQueueModel.getAllFields(),
-                                        separate: true, // 👈 esto permite que order funcione dentro del include
+                                        separate: true,
                                         order: [["position", "ASC"]],
-                                        where: {
-                                            position: {
-                                                [Op.ne]: null
-                                            }
-                                        },
+                                        where: { position: { [Op.ne]: null } },
                                         include: [
                                             {
                                                 model: ProductionOrderModel,
@@ -215,9 +213,7 @@ class LocationController {
                                                 attributes: [
                                                     ...ProductionOrderModel.getAllFields(),
                                                     [
-                                                        sequelize.fn("func_get_order_of_production_order", sequelize.col("production_order.id"), // ✅ usa alias local
-                                                        sequelize.col("production_order.order_id"), // ✅ usa alias local
-                                                        sequelize.col("production_order.order_type")),
+                                                        sequelize.fn("func_get_order_of_production_order", sequelize.col("production_order.id"), sequelize.col("production_order.order_id"), sequelize.col("production_order.order_type")),
                                                         "order"
                                                     ],
                                                     [
@@ -255,7 +251,7 @@ class LocationController {
                                                         ]
                                                     }
                                                 ]
-                                            },
+                                            }
                                         ]
                                     },
                                     {
@@ -274,7 +270,7 @@ class LocationController {
                                     }
                                 ]
                             }
-                        ],
+                        ]
                     },
                     {
                         model: LocationLocationTypeModel,
@@ -289,23 +285,60 @@ class LocationController {
                                 attributes: LocationTypeModel.getAllFields(),
                             }
                         ]
-                    }
+                    },
+                    {
+                        model: InventoryLocationItemModel,
+                        attributes: InventoryLocationItemModel.getAllFields(),
+                        as: "inventories_locations_items",
+                        include: [
+                            {
+                                model: InventoryModel,
+                                attributes: InventoryModel.getAllFields(),
+                                as: "inventory",
+                            },
+                            // 🔵 ITEM POLIMÓRFICO
+                            {
+                                model: ItemModel,
+                                as: "item",
+                                required: false,
+                                on: {
+                                    item_id: {
+                                        [Op.col]: "inventories_locations_items.item_id",
+                                    },
+                                    item_type: {
+                                        [Op.col]: "inventories_locations_items.item_type",
+                                    },
+                                },
+                            },
+                        ],
+                    },
                 ],
             });
             if (!response) {
                 res.status(200).json([]);
                 return;
             }
+            // Convertimos a JSON (Item aún NO tiene item.item)
             const data = response.toJSON();
+            // 🔵 Resolver productos/insumos polimórficos dentro de inventories_locations_items
+            if (data.inventories_locations_items) {
+                for (const ili of data.inventories_locations_items) {
+                    if (ili.item) {
+                        const instance = ItemModel.build(ili.item);
+                        ili.item = {
+                            ...ili.item,
+                            item: await instance.resolveItem(), // ⬅️ aquí se trae el product/input real
+                        };
+                    }
+                }
+            }
             res.status(200).json(data);
         }
         catch (error) {
-            if (error instanceof Error) {
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
-                console.error(`An unexpected error ocurred ${error}`);
-            }
+            else
+                console.error("Unexpected error", error);
         }
     };
     static getAllWithTypes = async (req, res, next) => {
@@ -396,12 +429,95 @@ class LocationController {
     static getById = async (req, res, next) => {
         const { id } = req.params;
         try {
-            const response = await LocationModel.findOne({ where: { id: id } });
+            const response = await LocationModel.findByPk(id, {
+                attributes: LocationModel.getAllFields(),
+                include: [
+                    {
+                        model: LocationsProductionLinesModel,
+                        attributes: LocationsProductionLinesModel.getAllFields(),
+                        as: "location_production_line",
+                        include: [
+                            {
+                                model: ProductionLineModel,
+                                attributes: ProductionLineModel.getAllFields(),
+                                as: "production_line",
+                                include: [
+                                    {
+                                        model: ProductionLineProductModel,
+                                        attributes: ProductionLineProductModel.getAllFields(),
+                                        as: "production_lines_products",
+                                    },
+                                ],
+                            },
+                            {
+                                model: LocationModel,
+                                attributes: LocationModel.getAllFields(),
+                                as: "location",
+                            },
+                        ],
+                    },
+                    {
+                        model: LocationLocationTypeModel,
+                        attributes: LocationLocationTypeModel.getAllFields(),
+                        as: "location_location_type",
+                        include: [
+                            {
+                                model: LocationTypeModel,
+                                attributes: LocationTypeModel.getAllFields(),
+                                as: "location_type",
+                            },
+                        ],
+                    },
+                    {
+                        model: InventoryLocationItemModel,
+                        attributes: InventoryLocationItemModel.getAllFields(),
+                        as: "inventories_locations_items",
+                        include: [
+                            {
+                                model: InventoryModel,
+                                attributes: InventoryModel.getAllFields(),
+                                as: "inventory",
+                            },
+                            // 🔵 ITEM POLIMÓRFICO
+                            {
+                                model: ItemModel,
+                                as: "item",
+                                required: false,
+                                on: {
+                                    item_id: {
+                                        [Op.col]: "inventories_locations_items.item_id",
+                                    },
+                                    item_type: {
+                                        [Op.col]: "inventories_locations_items.item_type",
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                ],
+            });
             if (!response) {
-                res.status(200).json({ validation: "Location no found" });
+                res.status(404).json({
+                    validation: "Location not found",
+                });
                 return;
             }
+            // Convertimos a JSON (pero item todavía NO está resuelto)
             const location = response.toJSON();
+            // ⬇️⬇️⬇️ CORRECCIÓN CRÍTICA: resolver polimorfismo ⬇️⬇️⬇️
+            if (location.inventories_locations_items) {
+                for (const ili of location.inventories_locations_items) {
+                    if (ili.item) {
+                        // Forzamos la instancia para disparar resolveItem()
+                        const instance = ItemModel.build(ili.item);
+                        ili.item = {
+                            ...ili.item,
+                            item: await instance.resolveItem(),
+                        };
+                    }
+                }
+            }
+            // ⬆️⬆️⬆️ SIN ESTO item.item NUNCA APARECERÁ ⬆️⬆️⬆️
             res.status(200).json(location);
         }
         catch (error) {
@@ -409,7 +525,7 @@ class LocationController {
                 next(error);
             }
             else {
-                console.error(`An unexpected error ocurred ${error}`);
+                console.error(`An unexpected error occurred ${error}`);
             }
         }
     };
@@ -508,7 +624,7 @@ class LocationController {
         }
     };
     static create = async (req, res, next) => {
-        const { name, description, street, street_number, neighborhood, city, state, country, zip_code, is_active, phone } = req.body;
+        const { name, description, phone, city, state, country, is_active, street, street_number, neighborhood, zip_code, production_capacity, custom_id, location_manager } = req.body;
         try {
             const validateName = await LocationModel.findOne({ where: { name: name } });
             if (validateName) {
@@ -518,17 +634,20 @@ class LocationController {
                 return;
             }
             const response = await LocationModel.create({
-                name,
-                description,
-                street,
-                street_number,
-                neighborhood,
-                city,
-                state,
-                country,
-                zip_code,
-                phone,
-                is_active: is_active || 1,
+                name: name ?? null,
+                description: description ?? null,
+                street: street ?? null,
+                street_number: street_number ?? null,
+                neighborhood: neighborhood ?? null,
+                zip_code: zip_code ?? null,
+                phone: phone ?? null,
+                city: city ?? null,
+                state: state ?? null,
+                country: country ?? null,
+                is_active: is_active ?? 1,
+                production_capacity: production_capacity ?? null,
+                custom_id: custom_id ?? null,
+                location_manager: location_manager ?? null
             });
             if (!response) {
                 res.status(200).json({ message: "The location could not be created" });
@@ -603,49 +722,11 @@ class LocationController {
             }
         }
     };
-    static delete = async (req, res, next) => {
-        const { id } = req.params;
-        try {
-            const validationinventory = await sequelize.query(`SELECT func_is_location_has_inventory(:id) AS has_inventory;`, {
-                replacements: { id: id },
-                type: QueryTypes.SELECT
-            });
-            const { has_inventory } = validationinventory[0];
-            if (has_inventory) {
-                res.status(400).json({
-                    validation: "The location cannot be deleted because "
-                        + "it has inventory assigned"
-                });
-                return;
-            }
-            const response = await LocationModel.destroy({
-                where: { id: id },
-                individualHooks: true
-            });
-            if (!(response > 0)) {
-                res.status(200).json({
-                    validation: "Location not found for deleted"
-                });
-                return;
-            }
-            res.status(200).json({
-                message: "Location deleted successfully"
-            });
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                next(error);
-            }
-            else {
-                console.error(`An unexpected error ocurred ${error}`);
-            }
-        }
-    };
     static createComplete = async (req, res, next) => {
         const transaction = await sequelize.transaction({
-            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
+            isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,
         });
-        const { name, description, types, phone, city, state, country, is_active, street, street_number, neighborhood, zip_code } = req.body;
+        const { name, description, types, phone, city, state, country, is_active, street, street_number, neighborhood, zip_code, production_capacity, inventories_locations_items, location_location_type, location_production_line, custom_id, location_manager } = req.body;
         try {
             // Validar nombre único de ubicación
             const validateName = await LocationModel.findOne({
@@ -655,120 +736,279 @@ class LocationController {
             });
             if (validateName) {
                 await transaction.rollback();
-                res.status(404).json({
-                    validation: "The name is already currently in use by a location"
+                res.status(409).json({
+                    validation: normalizeValidationArray([
+                        "The name is already currently in use by a location"
+                    ])
                 });
                 return;
             }
             // Crear ubicación
             const response = await LocationModel.create({
-                name,
-                description,
-                street,
-                street_number,
-                neighborhood,
-                zip_code,
-                phone,
-                city,
-                state,
-                country,
-                is_active: is_active ? 1 : 0
+                name: name ?? null,
+                description: description ?? null,
+                street: street ?? null,
+                street_number: street_number ?? null,
+                neighborhood: neighborhood ?? null,
+                zip_code: zip_code ?? null,
+                phone: phone ?? null,
+                city: city ?? null,
+                state: state ?? null,
+                country: country ?? null,
+                is_active: is_active ?? 1,
+                production_capacity: production_capacity ?? null,
+                custom_id: custom_id ?? null,
+                location_manager: location_manager ?? null
             }, { transaction });
             if (!response) {
                 await transaction.rollback();
-                res.status(400).json({
-                    message: "The location could not be created"
+                res.status(500).json({
+                    message: normalizeValidationArray([
+                        "The location could not be created"
+                    ])
                 });
                 return;
             }
             const location = response.toJSON();
-            if (!types || types.length === 0) {
-                await transaction.rollback();
-                res.status(400).json({
-                    message: "Location types are required for location creation"
-                });
-                return;
+            if (location_production_line && location_production_line?.length) {
+                const productionLineAssigned = location_production_line.filter((lpl) => lpl.production_line_id);
+                const productionLineNew = location_production_line.filter((lpl) => !lpl.production_line_id);
+                const locationProductionLineBulk = [];
+                if (productionLineAssigned.length) {
+                    const locations_production_lines = productionLineAssigned.map((lpl) => ({
+                        location_id: location.id,
+                        production_line_id: lpl.production_line_id,
+                    }));
+                    locationProductionLineBulk.push(...locations_production_lines);
+                }
+                if (productionLineNew.length) {
+                    for (const lpl of productionLineNew) {
+                        const productionLines = ({
+                            name: lpl.production_line?.name ?? null,
+                            custom_id: lpl.production_line?.custom_id ?? null,
+                            is_active: lpl.production_line?.is_active ?? true
+                        });
+                        const validateProductionLineName = await ProductionLineModel.findOne({
+                            where: { name: productionLines.name },
+                            transaction
+                        });
+                        if (validateProductionLineName) {
+                            transaction.rollback();
+                            res.status(409).json({
+                                validation: normalizeValidationArray([
+                                    "Una de las nuevas lineas, tiene un nombre ya usado por otra línea."
+                                ])
+                            });
+                        }
+                        const responseProductionLine = await ProductionLineModel.create(productionLines, { transaction });
+                        if (!responseProductionLine) {
+                            transaction.rollback();
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
+                                    "No se pudo crear las lineas de producción para la ubicación"
+                                ])
+                            });
+                        }
+                        const production_line_db = responseProductionLine.toJSON();
+                        const locations_production_lines = {
+                            location_id: location.id,
+                            production_line_id: production_line_db.id,
+                        };
+                        const production_line_products = lpl.production_line?.production_lines_products ?? [];
+                        if (production_line_products && production_line_products.length) {
+                            const production_lines_products_news = production_line_products.map((r) => ({
+                                production_line_id: production_line_db.id,
+                                product_id: r.product_id
+                            }));
+                            const responseProductionLineProducts = await ProductionLineProductModel.bulkCreate(production_lines_products_news, {
+                                transaction,
+                                individualHooks: true
+                            });
+                            if (responseProductionLineProducts.length !== production_lines_products_news.length) {
+                                transaction.rollback();
+                                res.status(500).json({
+                                    validation: normalizeValidationArray([
+                                        "No se pudo crear la asignacion de los productos a la linea de producción nueva para la ubiacion."
+                                    ])
+                                });
+                            }
+                        }
+                        locationProductionLineBulk.push(locations_production_lines);
+                    }
+                }
+                const responseLocationProductionLine = await LocationsProductionLinesModel.bulkCreate(locationProductionLineBulk, { transaction });
+                if (responseLocationProductionLine.length !== locationProductionLineBulk.length) {
+                    transaction.rollback();
+                    res.status(500).json({
+                        validation: normalizeValidationArray([
+                            "No se pudo crear la asignacion de la nueva línea de producción a la nueva ubicación"
+                        ])
+                    });
+                }
             }
-            // Validar que todos los location_types existen (una sola consulta)
-            const typeIds = types.filter((t) => t?.id !== undefined)
-                .map((t) => t.id);
-            const existingTypes = await LocationTypeModel.findAll({
-                where: { id: { [Op.in]: typeIds } },
-                transaction,
-                lock: transaction.LOCK.UPDATE,
-            });
-            if (existingTypes.length !== types.length) {
-                await transaction.rollback();
-                res.status(404).json({
-                    validation: "Some of the assigned location types do not exist"
-                });
-                return;
+            if (inventories_locations_items && inventories_locations_items?.length) {
+                const inventoriesLocationsItems = inventories_locations_items;
+                for (const ili of inventoriesLocationsItems) {
+                    const responseGetItem = await ItemModel.findOne({
+                        where: {
+                            item_type: ili.item?.item_type,
+                            item_id: ili.item?.item?.id,
+                        },
+                        transaction
+                    });
+                    const itemRecord = responseGetItem?.toJSON();
+                    const inventories_locations_items_aux = {
+                        location_id: ili.location_id,
+                        location: ili.location,
+                        item_id: itemRecord?.id,
+                        item: ili.item?.item,
+                        item_type: itemRecord?.item_type,
+                    };
+                    const validateExist = await InventoryLocationItemModel.findOne({
+                        where: {
+                            location_id: location.id,
+                            item_type: inventories_locations_items_aux.item_type,
+                            item_id: inventories_locations_items_aux.item_id
+                        },
+                        transaction: transaction
+                    });
+                    if (validateExist) {
+                        await transaction.rollback();
+                        res.status(409).json({
+                            message: normalizeValidationArray([
+                                "Uno de los productos ya fue previamente asignado"
+                            ])
+                        });
+                        return;
+                    }
+                    const responseCreateInventory = await InventoryModel.create({
+                        stock: 0,
+                        maximum_stock: 10000,
+                        minimum_stock: 100,
+                        lead_time: 100,
+                    }, { transaction: transaction });
+                    if (!responseCreateInventory) {
+                        await transaction.rollback();
+                        res.status(500).json({
+                            message: normalizeValidationArray([
+                                "No se pudo crear el registro del inventario para inventories-location-item"
+                            ])
+                        });
+                        return;
+                    }
+                    const inventory = responseCreateInventory.toJSON();
+                    const newInventoryLocationItem = {
+                        inventory_id: inventory.id,
+                        item_id: inventories_locations_items_aux.item_id,
+                        item_type: inventories_locations_items_aux.item_type,
+                        location_id: location.id,
+                    };
+                    const responseCreateInventoryLocationItem = await InventoryLocationItemModel.create(newInventoryLocationItem, {
+                        transaction: transaction,
+                        individualHooks: true
+                    });
+                    if (!responseCreateInventoryLocationItem) {
+                        await transaction.rollback();
+                        res.status(500).json({
+                            message: normalizeValidationArray([
+                                "No se pudo crear el registro de inventories-location-item"
+                            ])
+                        });
+                        return;
+                    }
+                }
             }
-            // Verificar si alguno ya está asignado a esa ubicación
-            const existingAssignments = await LocationLocationTypeModel.findAll({
-                where: {
+            if (location_location_type && location_location_type?.length) {
+                // Validar que todos los location_types existen (una sola consulta)
+                const typeIds = location_location_type.filter((t) => t?.location_type_id !== undefined)
+                    .map((t) => t.location_type_id);
+                const existingTypes = await LocationTypeModel.findAll({
+                    where: { id: { [Op.in]: typeIds } },
+                    transaction,
+                    lock: transaction.LOCK.UPDATE,
+                });
+                if (existingTypes.length !== location_location_type.length) {
+                    await transaction.rollback();
+                    res.status(409).json({
+                        validation: normalizeValidationArray([
+                            "Some of the assigned location types do not exist"
+                        ])
+                    });
+                    return;
+                }
+                // Verificar si alguno ya está asignado a esa ubicación
+                const existingAssignments = await LocationLocationTypeModel.findAll({
+                    where: {
+                        location_id: location.id,
+                        location_type_id: {
+                            [Op.in]: typeIds
+                        },
+                    },
+                    transaction,
+                    lock: transaction.LOCK.UPDATE,
+                });
+                if (existingAssignments.length > 0) {
+                    await transaction.rollback();
+                    res.status(409).json({
+                        validation: normalizeValidationArray([
+                            "Some types have already been assigned to the location"
+                        ])
+                    });
+                    return;
+                }
+                // Crear las asignaciones en bulk
+                const typesToCreate = location_location_type.map((type) => ({
+                    location_type_id: type.location_type_id,
                     location_id: location.id,
-                    location_type_id: typeIds,
-                },
-                transaction,
-                lock: transaction.LOCK.UPDATE,
-            });
-            if (existingAssignments.length > 0) {
-                await transaction.rollback();
-                res.status(409).json({
-                    validation: "Some types have already been assigned to the location"
+                }));
+                const created = await LocationLocationTypeModel.bulkCreate(typesToCreate, {
+                    transaction,
+                    individualHooks: true
                 });
-                return;
-            }
-            // Crear las asignaciones en bulk
-            const typesToCreate = types.map(type => ({
-                location_type_id: type.id,
-                location_id: location.id
-            }));
-            const created = await LocationLocationTypeModel.bulkCreate(typesToCreate, { transaction });
-            if (!created || created.length === 0) {
-                await transaction.rollback();
-                res.status(500).json({
-                    validation: "The types could not be assigned to the location"
-                });
-                return;
+                if (!created || created.length === 0) {
+                    await transaction.rollback();
+                    res.status(500).json({
+                        validation: normalizeValidationArray([
+                            "The types could not be assigned to the location"
+                        ])
+                    });
+                    return;
+                }
             }
             await transaction.commit();
-            res.status(201).json({
-                message: "Location created successfully"
-            });
+            res.status(201).json({});
         }
         catch (error) {
             await transaction.rollback();
-            if (error instanceof Error) {
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
+            else
                 console.error(`An unexpected error occurred: ${error}`);
-                res.status(500).json({
-                    message: "Unexpected error occurred"
-                });
-            }
         }
     };
     static updateComplete = async (req, res, next) => {
         const transaction = await sequelize.transaction({
-            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
+            isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,
         });
-        const { update_fields, update_types } = req.body;
         const { id } = req.params;
+        const completeBody = req.body;
         try {
             const validatedLocation = await LocationModel.findOne({ where: { id: id } });
             if (!validatedLocation) {
                 await transaction.rollback();
                 res.status(404).json({
-                    validation: "Location not found"
+                    validation: normalizeValidationArray([
+                        "Location not found"
+                    ])
                 });
                 return;
             }
+            const location = validatedLocation.toJSON();
             const editableFields = LocationModel.getEditableFields();
-            const update_values = collectorUpdateFields(editableFields, update_fields);
+            const update_values = collectorUpdateFields(editableFields, completeBody);
+            console.log('update_values', update_values);
             if (Object.keys(update_values).length > 0) {
+                console.log('entro a actualizar object');
                 if (update_values?.name) {
                     const validateName = await LocationModel.findOne({
                         where: {
@@ -781,8 +1021,10 @@ class LocationController {
                     if (validateName) {
                         await transaction.rollback();
                         res.status(409).json({
-                            validation: `The name is already currently `
-                                + `in use by a location`
+                            validation: normalizeValidationArray([
+                                `The name is already currently `
+                                    + `in use by a location`
+                            ])
                         });
                         return;
                     }
@@ -800,87 +1042,520 @@ class LocationController {
                     return;
                 }
             }
-            const flagTypesUpdate = (update_types.added.length > 0
-                || update_types.deleted.length > 0
-                || update_types.modified.length > 0);
-            if (flagTypesUpdate) {
-                if (update_types.added.length > 0) {
-                    const typeIds = update_types.added.map(t => t.id);
-                    const validTypes = await LocationTypeModel.findAll({
-                        where: { id: typeIds },
-                        transaction,
-                        lock: transaction.LOCK.UPDATE,
-                    });
-                    if (validTypes.length !== typeIds.length) {
-                        await transaction.rollback();
-                        res.status(404).json({
-                            validation: `Some of the assigned location types do`
-                                + ` not exist`,
-                        });
-                        return;
+            if (completeBody?.inventories_locations_items_updated) {
+                const inventoriesLocationsItemsObject = completeBody.inventories_locations_items_updated;
+                const flagProductsInputsUpdate = [
+                    inventoriesLocationsItemsObject.added,
+                    inventoriesLocationsItemsObject.deleted,
+                    inventoriesLocationsItemsObject.modified
+                ].some((p) => p.length);
+                if (flagProductsInputsUpdate) {
+                    const adds = inventoriesLocationsItemsObject.added;
+                    const deletes = inventoriesLocationsItemsObject.deleted;
+                    const modifies = inventoriesLocationsItemsObject.modified;
+                    if (adds.length) {
+                        const inventoriesLocationsItems = adds;
+                        for (const ili of inventoriesLocationsItems) {
+                            const responseGetItem = await ItemModel.findOne({
+                                where: {
+                                    item_type: ili.item?.item_type,
+                                    item_id: ili.item?.item?.id,
+                                },
+                                transaction
+                            });
+                            const itemRecord = responseGetItem?.toJSON();
+                            const inventories_locations_items_aux = {
+                                location_id: ili.location_id,
+                                location: ili.location,
+                                item_id: itemRecord?.id,
+                                item: ili.item?.item,
+                                item_type: itemRecord?.item_type,
+                            };
+                            const validateExist = await InventoryLocationItemModel.findOne({
+                                where: {
+                                    location_id: location.id,
+                                    item_type: inventories_locations_items_aux.item_type,
+                                    item_id: inventories_locations_items_aux.item_id
+                                },
+                                transaction: transaction
+                            });
+                            if (validateExist) {
+                                await transaction.rollback();
+                                res.status(409).json({
+                                    message: normalizeValidationArray([
+                                        "Uno de los productos ya fue previamente asignado"
+                                    ])
+                                });
+                                return;
+                            }
+                            const responseCreateInventory = await InventoryModel.create({
+                                stock: 0,
+                                maximum_stock: 10000,
+                                minimum_stock: 100,
+                                lead_time: 100,
+                            }, { transaction: transaction });
+                            if (!responseCreateInventory) {
+                                await transaction.rollback();
+                                res.status(500).json({
+                                    message: normalizeValidationArray([
+                                        "No se pudo crear el registro del inventario para inventories-location-item"
+                                    ])
+                                });
+                                return;
+                            }
+                            const inventory = responseCreateInventory.toJSON();
+                            const newInventoryLocationItem = {
+                                inventory_id: inventory.id,
+                                item_id: inventories_locations_items_aux.item_id,
+                                item_type: inventories_locations_items_aux.item_type,
+                                location_id: location.id,
+                            };
+                            const responseCreateInventoryLocationItem = await InventoryLocationItemModel.create(newInventoryLocationItem, {
+                                transaction: transaction,
+                                individualHooks: true
+                            });
+                            if (!responseCreateInventoryLocationItem) {
+                                await transaction.rollback();
+                                res.status(500).json({
+                                    message: normalizeValidationArray([
+                                        "No se pudo crear el registro de inventories-location-item"
+                                    ])
+                                });
+                                return;
+                            }
+                        }
                     }
-                    const alreadyAssigned = await LocationLocationTypeModel.findAll({
-                        where: {
-                            location_id: id,
-                            location_type_id: typeIds,
-                        },
-                        transaction,
-                        lock: transaction.LOCK.UPDATE,
-                    });
-                    if (alreadyAssigned.length > 0) {
-                        await transaction.rollback();
-                        res.status(409).json({
-                            validation: `Some types have already been assigned `
-                                + `to the location`,
+                    if (modifies.length) {
+                        const modifiesFiltered = modifies.filter(p => p.id !== undefined);
+                        const modifyIds = modifiesFiltered.map(m => m.id);
+                        const existingInventoryLocationItem = await InventoryLocationItemModel.findAll({
+                            where: { id: modifyIds },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
                         });
-                        return;
-                    }
-                    const assignments = typeIds.map((typeId) => ({
-                        location_id: Number(id),
-                        location_type_id: typeId,
-                    }));
-                    await LocationLocationTypeModel.bulkCreate(assignments, { transaction });
-                }
-                if (update_types.deleted.length > 0) {
-                    const storedTypesPresent = update_types.deleted.find((p) => p.name === "Store");
-                    const deletedTypeIds = update_types.deleted.map(t => t.id);
-                    if (storedTypesPresent) {
-                        const validationinventory = await sequelize.query(`SELECT func_is_location_has_inventory(:id) AS has_inventory;`, {
-                            replacements: { id: id },
-                            type: QueryTypes.SELECT
-                        });
-                        const { has_inventory } = validationinventory[0];
-                        if (has_inventory) {
+                        if (existingInventoryLocationItem.length !== modifyIds.length) {
                             await transaction.rollback();
-                            res.status(400).json({
-                                validation: "The location cannot have the Store type "
-                                    + "deleted because it has inventory assigned"
+                            res.status(404).json({
+                                validation: normalizeValidationArray([
+                                    `Algunos registros de inventory-location-item que se intenta actualiazar no existe`
+                                ])
+                            });
+                            return;
+                        }
+                        for (const ili of modifiesFiltered) {
+                            const editableFields = InventoryLocationItemModel.getEditableFields();
+                            const update_values = collectorUpdateFields(editableFields, ili);
+                            if (Object.keys(update_values).length) {
+                                const responseUpdateInventoryLocationItem = await InventoryLocationItemModel.update(update_values, {
+                                    where: { id: ili.id },
+                                    transaction: transaction,
+                                    individualHooks: true
+                                });
+                                if (!responseUpdateInventoryLocationItem) {
+                                    await transaction.rollback();
+                                    res.status(500).json({
+                                        validation: normalizeValidationArray([
+                                            `No se pudo actualizar un registro de inventory-location-item`
+                                        ])
+                                    });
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    if (deletes.length) {
+                        const deletesFiltered = deletes.filter(p => p.id !== undefined);
+                        const deleteIds = deletesFiltered.map(p => p.id);
+                        const validateInventoryLocationItem = await InventoryLocationItemModel.findAll({
+                            where: { id: deleteIds },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
+                        if (validateInventoryLocationItem.length !== deleteIds.length) {
+                            await transaction.rollback();
+                            res.status(404).json({
+                                validation: normalizeValidationArray([
+                                    "Alguno de los registros inventoryLocationItem que se intenta eliminar no existe"
+                                ])
+                            });
+                            return;
+                        }
+                        const deletedCount = await InventoryLocationItemModel.destroy({
+                            where: { id: deleteIds },
+                            transaction,
+                            individualHooks: true
+                        });
+                        const allDeleted = deletedCount === deleteIds.length;
+                        if (!allDeleted) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
+                                    `No se pudo eliminar los registros inventoryLocationItem`
+                                ])
                             });
                             return;
                         }
                     }
-                    await LocationLocationTypeModel.destroy({
-                        where: {
-                            location_id: id,
-                            location_type_id: deletedTypeIds,
-                        },
-                        transaction,
-                    });
+                }
+            }
+            if (completeBody?.location_production_line_updated) {
+                const locationProductionLineObject = completeBody?.location_production_line_updated ?? [];
+                const flagLocationProductionLineUpdate = [
+                    locationProductionLineObject.added,
+                    locationProductionLineObject.deleted,
+                    locationProductionLineObject.modified
+                ].some((p) => p.length);
+                if (flagLocationProductionLineUpdate) {
+                    const adds = locationProductionLineObject.added;
+                    const deletes = locationProductionLineObject.deleted;
+                    const modifies = locationProductionLineObject.modified;
+                    if (adds.length) {
+                        const productionLineAssigned = adds.filter((lpl) => lpl.production_line_id);
+                        const productionLineNew = adds.filter((lpl) => !lpl.production_line_id);
+                        const locationProductionLineBulk = [];
+                        if (productionLineAssigned.length) {
+                            const locations_production_lines = productionLineAssigned.map((lpl) => ({
+                                location_id: location.id,
+                                production_line_id: lpl.production_line_id,
+                            }));
+                            locationProductionLineBulk.push(...locations_production_lines);
+                        }
+                        if (productionLineNew.length) {
+                            for (const lpl of productionLineNew) {
+                                const productionLines = ({
+                                    name: lpl.production_line?.name ?? null,
+                                    custom_id: lpl.production_line?.custom_id ?? null,
+                                    is_active: lpl.production_line?.is_active ?? true
+                                });
+                                const validateProductionLineName = await ProductionLineModel.findOne({
+                                    where: { name: productionLines.name },
+                                    transaction
+                                });
+                                if (validateProductionLineName) {
+                                    transaction.rollback();
+                                    res.status(409).json({
+                                        validation: normalizeValidationArray([
+                                            "Una de las nuevas lineas, tiene un nombre ya usado por otra línea."
+                                        ])
+                                    });
+                                }
+                                const responseProductionLine = await ProductionLineModel.create(productionLines, { transaction });
+                                if (!responseProductionLine) {
+                                    transaction.rollback();
+                                    res.status(500).json({
+                                        validation: normalizeValidationArray([
+                                            "No se pudo crear las lineas de producción para la ubicación"
+                                        ])
+                                    });
+                                }
+                                const production_line_db = responseProductionLine.toJSON();
+                                const locations_production_lines = {
+                                    location_id: location.id,
+                                    production_line_id: production_line_db.id,
+                                };
+                                const production_line_products = lpl.production_line?.production_lines_products ?? [];
+                                if (production_line_products && production_line_products.length) {
+                                    const production_lines_products_news = production_line_products.map((r) => ({
+                                        production_line_id: production_line_db.id,
+                                        product_id: r.product_id
+                                    }));
+                                    const responseProductionLineProducts = await ProductionLineProductModel.bulkCreate(production_lines_products_news, {
+                                        transaction,
+                                        individualHooks: true
+                                    });
+                                    if (responseProductionLineProducts.length !== production_lines_products_news.length) {
+                                        transaction.rollback();
+                                        res.status(500).json({
+                                            validation: normalizeValidationArray([
+                                                "No se pudo crear la asignacion de los productos a la linea de producción nueva para la ubiacion."
+                                            ])
+                                        });
+                                    }
+                                }
+                                locationProductionLineBulk.push(locations_production_lines);
+                            }
+                        }
+                        const responseLocationProductionLine = await LocationsProductionLinesModel.bulkCreate(locationProductionLineBulk, { transaction });
+                        if (responseLocationProductionLine.length !== locationProductionLineBulk.length) {
+                            transaction.rollback();
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
+                                    "No se pudo crear la asignacion de la nueva línea de producción a la nueva ubicación"
+                                ])
+                            });
+                        }
+                    }
+                    if (modifies.length) {
+                        const modifiesFiltered = modifies.filter(p => p.id !== undefined);
+                        const modifyIds = modifiesFiltered.map(m => m.id);
+                        const existingLocationProductionLine = await InventoryLocationItemModel.findAll({
+                            where: { id: modifyIds },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
+                        if (existingLocationProductionLine.length !== modifyIds.length) {
+                            await transaction.rollback();
+                            res.status(404).json({
+                                validation: normalizeValidationArray([
+                                    `Algunos registros de LocationProductionLine que se intenta actualiazar no existe`
+                                ])
+                            });
+                            return;
+                        }
+                        for (const lpl of modifiesFiltered) {
+                            const editableFields = InventoryLocationItemModel.getEditableFields();
+                            const update_values = collectorUpdateFields(editableFields, lpl);
+                            if (Object.keys(update_values).length) {
+                                const responseUpdateLocationProductionLine = await LocationsProductionLinesModel.update(update_values, {
+                                    where: { id: lpl.id },
+                                    transaction: transaction,
+                                    individualHooks: true
+                                });
+                                if (!responseUpdateLocationProductionLine) {
+                                    await transaction.rollback();
+                                    res.status(500).json({
+                                        validation: normalizeValidationArray([
+                                            `No se pudo actualizar un registro de LocationProductionLine`
+                                        ])
+                                    });
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    if (deletes.length) {
+                        const deletesFiltered = deletes.filter(p => p.id !== undefined);
+                        const deleteIds = deletesFiltered.map(p => p.id);
+                        const validateLocationProductionLine = await LocationsProductionLinesModel.findAll({
+                            where: { id: deleteIds },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
+                        if (validateLocationProductionLine.length !== deleteIds.length) {
+                            await transaction.rollback();
+                            res.status(404).json({
+                                validation: normalizeValidationArray([
+                                    "Alguno de los registros LocationProductionLine que se intenta eliminar no existe"
+                                ])
+                            });
+                            return;
+                        }
+                        const deletedCount = await LocationsProductionLinesModel.destroy({
+                            where: { id: deleteIds },
+                            transaction,
+                            individualHooks: true
+                        });
+                        const allDeleted = deletedCount === deleteIds.length;
+                        if (!allDeleted) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
+                                    `No se pudo eliminar los registros LocationsProductionLines`
+                                ])
+                            });
+                            return;
+                        }
+                    }
+                }
+            }
+            if (completeBody?.location_location_type_updated) {
+                const locationLocationTypeObject = completeBody.location_production_line_updated;
+                const flagProductsInputsUpdate = [
+                    locationLocationTypeObject.added,
+                    locationLocationTypeObject.deleted,
+                    locationLocationTypeObject.modified
+                ].some((p) => p.length);
+                if (flagProductsInputsUpdate) {
+                    const adds = locationLocationTypeObject.added;
+                    const deletes = locationLocationTypeObject.deleted;
+                    const modifies = locationLocationTypeObject.modified;
+                    if (adds.length) {
+                        // Validar que todos los location_types existen (una sola consulta)
+                        const typeIds = adds.filter((t) => t?.location_type_id !== undefined)
+                            .map((t) => t.location_type_id);
+                        const existingTypes = await LocationTypeModel.findAll({
+                            where: { id: { [Op.in]: typeIds } },
+                            transaction,
+                            lock: transaction.LOCK.UPDATE,
+                        });
+                        if (existingTypes.length !== adds.length) {
+                            await transaction.rollback();
+                            res.status(409).json({
+                                validation: normalizeValidationArray([
+                                    "Some of the assigned location types do not exist"
+                                ])
+                            });
+                            return;
+                        }
+                        // Verificar si alguno ya está asignado a esa ubicación
+                        const existingAssignments = await LocationLocationTypeModel.findAll({
+                            where: {
+                                location_id: location.id,
+                                location_type_id: {
+                                    [Op.in]: typeIds
+                                },
+                            },
+                            transaction,
+                            lock: transaction.LOCK.UPDATE,
+                        });
+                        if (existingAssignments.length > 0) {
+                            await transaction.rollback();
+                            res.status(409).json({
+                                validation: normalizeValidationArray([
+                                    "Some types have already been assigned to the location"
+                                ])
+                            });
+                            return;
+                        }
+                        // Crear las asignaciones en bulk
+                        const typesToCreate = adds.map((type) => ({
+                            location_type_id: type.id,
+                            location_id: location.id,
+                        }));
+                        const responseCreateLocationLocationType = await LocationLocationTypeModel.bulkCreate(typesToCreate, {
+                            transaction,
+                            individualHooks: true
+                        });
+                        if (!responseCreateLocationLocationType || responseCreateLocationLocationType.length) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
+                                    "The types could not be assigned to the location"
+                                ])
+                            });
+                            return;
+                        }
+                    }
+                    if (modifies.length) {
+                        const modifiesFiltered = modifies.filter(p => p.id !== undefined);
+                        const modifyIds = modifiesFiltered.map(m => m.id);
+                        const existingLocationLocationType = await LocationLocationTypeModel.findAll({
+                            where: { id: modifyIds },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
+                        if (existingLocationLocationType.length !== modifyIds.length) {
+                            await transaction.rollback();
+                            res.status(404).json({
+                                validation: normalizeValidationArray([
+                                    `Algunos registros de LocationLocationType que se intenta actualiazar no existe`
+                                ])
+                            });
+                            return;
+                        }
+                        for (const ili of modifiesFiltered) {
+                            const editableFields = LocationLocationTypeModel.getEditableFields();
+                            const update_values = collectorUpdateFields(editableFields, ili);
+                            if (Object.keys(update_values).length) {
+                                const responseUpdateInventoryLocationItem = await LocationLocationTypeModel.update(update_values, {
+                                    where: { id: ili.id },
+                                    transaction: transaction,
+                                    individualHooks: true
+                                });
+                                if (responseUpdateInventoryLocationItem) {
+                                    await transaction.rollback();
+                                    res.status(500).json({
+                                        validation: normalizeValidationArray([
+                                            `No se pudo actualizar un registro de LocationLocationType`
+                                        ])
+                                    });
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    if (deletes.length) {
+                        console.log(`location_location_types`, deletes);
+                        const deletesFiltered = deletes.filter(p => p.id !== undefined);
+                        const deleteIds = deletesFiltered.map(p => p.id);
+                        const validateLocationLocationType = await LocationLocationTypeModel.findAll({
+                            where: { id: deleteIds },
+                            transaction,
+                            lock: transaction.LOCK.SHARE,
+                        });
+                        if (validateLocationLocationType.length !== deleteIds.length) {
+                            await transaction.rollback();
+                            res.status(404).json({
+                                validation: normalizeValidationArray([
+                                    "Alguno de los registros LocationLocationType que se intenta eliminar no existe"
+                                ])
+                            });
+                            return;
+                        }
+                        const deletedCount = await InventoryLocationItemModel.destroy({
+                            where: { id: deleteIds },
+                            transaction,
+                            individualHooks: true
+                        });
+                        const allDeleted = deletedCount === deleteIds.length;
+                        if (!allDeleted) {
+                            await transaction.rollback();
+                            res.status(500).json({
+                                validation: normalizeValidationArray([
+                                    `No se pudo eliminar los registros LocationLocationType`
+                                ])
+                            });
+                            return;
+                        }
+                    }
                 }
             }
             await transaction.commit();
-            res.status(200).json({
-                message: "Location updated successfully"
-            });
+            res.status(200).json({});
         }
         catch (error) {
             await transaction.rollback();
-            if (error instanceof Error) {
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
+            else
                 console.error(`An unexpected error ocurred ${error}`);
+        }
+    };
+    static delete = async (req, res, next) => {
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
+        });
+        const { id } = req.params;
+        try {
+            const validationinventory = await sequelize.query(`SELECT func_is_location_has_inventory(:id) AS has_inventory;`, {
+                replacements: { id: id },
+                type: QueryTypes.SELECT,
+                transaction: transaction
+            });
+            const { has_inventory } = validationinventory[0];
+            if (has_inventory) {
+                transaction.rollback();
+                res.status(400).json({
+                    validation: normalizeValidationArray([
+                        "The location cannot be deleted because "
+                            + "it has inventory assigned"
+                    ])
+                });
+                return;
             }
+            const response = await LocationModel.destroy({
+                where: { id: id },
+                individualHooks: true,
+                transaction
+            });
+            if (!(response > 0)) {
+                transaction.rollback();
+                res.status(200).json({
+                    validation: normalizeValidationArray([
+                        "Location not found for deleted"
+                    ])
+                });
+                return;
+            }
+            transaction.commit();
+            res.status(200).json({});
+        }
+        catch (error) {
+            transaction.rollback();
+            if (error instanceof Error)
+                next(error);
+            else
+                console.error(`An unexpected error ocurred: ${error} `);
         }
     };
 }

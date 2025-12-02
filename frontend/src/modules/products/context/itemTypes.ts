@@ -39,14 +39,17 @@ const itemActionsType = {
     ADDS_INPUTS_TO_PRODUCTS: "ADDS_INPUTS_TO_PRODUCTS",
     REMOVE_INPUTS_FROM_PRODUCTS: "REMOVE_INPUTS_FROM_PRODUCTS",
     UPDATE_INPUTS_FROM_PRODUCTS: "UPDATE_INPUTS_FROM_PRODUCTS",
+    UPDATE_PRODUCT_PROCESS_ID: "UPDATE_PRODUCT_PROCESS_ID",
 
     ADDS_PRODUCT_PROCESS: "ADDS_PRODUCT_PROCESS",
     REMOVE_PRODUCT_PROCESS: "REMOVE_PRODUCT_PROCESS",
     UPDATE_PRODUCT_PROCESS: "UPDATE_PRODUCT_PROCESS",
 
+
     ADDS_DISCOUNT_TO_PRODUCTS: "ADDS_DISCOUNT_TO_PRODUCTS",
     REMOVE_DISCOUNT_FROM_PRODUCTS: "REMOVE_DISCOUNT_FROM_PRODUCTS",
     UPDATE_DISCOUNT_FROM_PRODUCTS: "UPDATE_DISCOUNT_FROM_PRODUCTS",
+
 
     // ?  data --> item == input
 
@@ -70,6 +73,8 @@ const itemActionsType = {
     ADDS_DRAFT_PRODUCT_PROCESS: "ADDS_DRAFT_PRODUCT_PROCESS",
     REMOVE_DRAFT_PRODUCT_PROCESS: "REMOVE_DRAFT_PRODUCT_PROCESS",
     UPDATE_DRAFT_PRODUCT_PROCESS: "UPDATE_DRAFT_PRODUCT_PROCESS",
+    UPDATE_DRAFT_PRODUCT_PROCESS_ID: "UPDATE_DRAFT_PRODUCT_PROCESS_ID",
+
 
     ADDS_DISCOUNT_TO_DRAFT_PRODUCTS: "ADDS_DISCOUNT_TO_DRAFT_PRODUCTS",
     REMOVE_DISCOUNT_FROM_DRAFT_PRODUCTS: "REMOVE_DISCOUNT_FROM_DRAFT_PRODUCTS",
@@ -114,6 +119,7 @@ type ItemAction =
     | { type: typeof itemActionsType.ADDS_PRODUCT_PROCESS, payload: IPartialProductProcess[] }
     | { type: typeof itemActionsType.REMOVE_PRODUCT_PROCESS, payload: (number | string)[] }
     | { type: typeof itemActionsType.UPDATE_PRODUCT_PROCESS, payload: IPartialProductProcess[] }
+    | { type: typeof itemActionsType.UPDATE_PRODUCT_PROCESS_ID, payload: { id: (number | string), attributes: IPartialProductProcess } }
 
     | { type: typeof itemActionsType.ADDS_DISCOUNT_TO_PRODUCTS, payload: IPartialProductDiscountRange[] }
     | { type: typeof itemActionsType.REMOVE_DISCOUNT_FROM_PRODUCTS, payload: (number | string)[] }
@@ -141,6 +147,8 @@ type ItemAction =
     | { type: typeof itemActionsType.ADDS_DRAFT_PRODUCT_PROCESS, payload: IPartialProductProcess[] }
     | { type: typeof itemActionsType.REMOVE_DRAFT_PRODUCT_PROCESS, payload: (number | string)[] }
     | { type: typeof itemActionsType.UPDATE_DRAFT_PRODUCT_PROCESS, payload: IPartialProductProcess[] }
+    | { type: typeof itemActionsType.UPDATE_DRAFT_PRODUCT_PROCESS_ID, payload: { id: (number | string), attributes: IPartialProductProcess } }
+
 
     | { type: typeof itemActionsType.ADDS_DISCOUNT_TO_DRAFT_PRODUCTS, payload: IPartialProductDiscountRange[] }
     | { type: typeof itemActionsType.REMOVE_DISCOUNT_FROM_DRAFT_PRODUCTS, payload: (number | string)[] }

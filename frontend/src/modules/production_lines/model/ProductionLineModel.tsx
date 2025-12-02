@@ -1,134 +1,114 @@
-
-import MainActionButtonCustom from '../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom'
-import GenericTableMemo from '../../../comp/primitives/table/tableContext/GenericTable'
-import type { ColumnDef } from '@tanstack/react-table'
-import type { IPartialProductionLine, IProductionLine } from 'interfaces/productionLines'
-import { CircleCheck, PlusIcon, Trash2 } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
-import StyleModule from './ProductionLineModel.module.css'
-import { useTableDispatch, useTableState } from '../../../comp/primitives/table/tableContext/tableHooks'
-import { reset_column_filters } from '../../../comp/primitives/table/tableContext/tableActions'
-import InputTextCustom from '../../../comp/primitives/input/text/custom/InputTextCustom'
+import { deleteproductionLineInDB, createCompleteProductionLineInDB, updateCompleteProductionLineInDB } from '../../../modelos/productionLines/query/productionLinesQueries'
 import SecundaryActionButtonCustom from '../../../comp/primitives/button/custom-button/secundary-action/SecundaryActionButtonCustom'
-import { Search, Eraser, Download } from 'lucide-react'
-import useProductionLines from '../../../modelos/productionLines/hooks/useProductionLines'
-import Tag from '../../../comp/primitives/tag/Tag'
-import type { RowAction } from '../../../comp/primitives/table/types'
-import DeleteModal from '../../../comp/primitives/modal/deleteModal/DeleteModal'
-import { createCompleteproductionLineInDB, deleteproductionLineInDB, updateCompleteproductionLineInDB } from '../../../modelos/productionLines/query/productionLinesQueries'
-import { useDispatch } from 'react-redux';
-import AddWizardProductionLine from './wizard/add/AddWizardProductionLine'
-import EditWizardProductionLine from './wizard/edit/EditWizardProductionLine'
-import ProductionLineModuleProvider from '../context/productionLineModuleProvider'
 import type { IPartialProductionLineProduct, IProductionLineProductManager } from 'interfaces/productionLinesProducts'
+import MainActionButtonCustom from '../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom'
 import { diffObjects, diffObjectArrays } from "./../../../utils/validation-on-update/ValidationOnUpdate2"
+import { useTableDispatch, useTableState } from '../../../comp/primitives/table/tableContext/tableHooks'
 import FeedBackModal from '../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal'
+import { reset_column_filters } from '../../../comp/primitives/table/tableContext/tableActions'
+import useProductionLines from '../../../modelos/productionLines/hooks/useProductionLines'
+import type { IPartialProductionLine, IProductionLine } from 'interfaces/productionLines'
+import InputTextCustom from '../../../comp/primitives/input/text/custom/InputTextCustom'
+import GenericTableMemo from '../../../comp/primitives/table/tableContext/GenericTable'
+import ProductionLineModuleProvider from '../context/productionLineModuleProvider'
 import ToastMantine from '../../../comp/external/mantine/toast/base/ToastMantine'
+import DeleteModal from '../../../comp/primitives/modal/deleteModal/DeleteModal'
+import EditWizardProductionLine from './wizard/edit/EditWizardProductionLine'
+import AddWizardProductionLine from './wizard/add/AddWizardProductionLine'
+import type { RowAction } from '../../../comp/primitives/table/types'
+import { setError } from '../../../store/slicer/errorSlicer'
+import { CircleCheck, PlusIcon, Trash2 } from 'lucide-react'
+import type { IApiError } from '../../../interfaces/errorApi'
+import { memo, useCallback, useMemo, useState } from 'react'
+import { Search, Eraser, Download } from 'lucide-react'
+import type { ColumnDef } from '@tanstack/react-table'
+import Tag from '../../../comp/primitives/tag/Tag'
+import { useDispatch } from 'react-redux';
+import StyleModule from './ProductionLineModel.module.css'
 
 const ProductionLineModel = () => {
 
     const dispatchRedux = useDispatch();
+
     const [search, setSearch] = useState<string>("");
     const [isActiveDeleteModal, setIsActiveDeleteModal] = useState<boolean>(false);
     const [isAcviveAddModal, setIsAcviveAddModal] = useState<boolean>(false);
     const [isAcviveEditModal, setIsAcviveEditModal] = useState<boolean>(false);
     const [isActiveFeedBackModal, setIsActiveFeedBackModal] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [serverError, setServerError] = useState<string | null>(null);
     const [selectedProductionLineRecord, setSelectedProductionLineRecord] = useState<IProductionLine | null>(null);
     const { productionLines, loadingProductionLines, refetchProductionLines } = useProductionLines({ like: search, debounce: 500 })
 
-    const toggleIsActiveDeleteModal = useCallback(() => {
-        setIsActiveDeleteModal(v => !v);
-    }, []);
+    const toggleIsActiveDeleteModal = useCallback(() => setIsActiveDeleteModal(v => !v), []);
+    const toggleIsActiveFeedBackModal = useCallback(() => setIsActiveFeedBackModal(v => !v), []);
+    const toggleIsActiveEditModal = useCallback(() => setIsAcviveEditModal(v => !v), []);
+    const toggleIsActiveAddModal = useCallback(() => setIsAcviveAddModal(v => !v), []);
 
     const toggleIsActiveDeleteModalSetup = useCallback((value: IProductionLine | null) => {
         setSelectedProductionLineRecord(value);
         setIsActiveDeleteModal(v => !v);
     }, []);
-
     const toggleIsActiveEditModalSetup = useCallback((value: IProductionLine | null) => {
         setSelectedProductionLineRecord(value);
         setIsAcviveEditModal(v => !v);
     }, []);
 
-    const toggleIsActiveEditModal = useCallback(() => {
-        setIsAcviveEditModal(v => !v);
-    }, []);
-
-    const toggleIsActiveAddModal = useCallback(() => {
-        setIsAcviveAddModal(v => !v);
-    }, []);
-
-    const toggleIsActiveFeedBackModal = useCallback(() => {
-        setIsActiveFeedBackModal(v => !v);
-    }, []);
-
-    const handleDelete = useCallback(async () => {
-        if (!selectedProductionLineRecord?.id) {
-            return;
-        }
-        setLoading(true);
+    const handleDelete = useCallback(async (): Promise<boolean> => {
+        if (!selectedProductionLineRecord?.id) return false;
         try {
-            const response = await deleteproductionLineInDB(
-                selectedProductionLineRecord?.id,
-                dispatchRedux
-            );
-            if (!response) {
-                ToastMantine.error({
-                    message: response?.validation
-                });
-                return;
-            }
-            setServerError(null);
+            await deleteproductionLineInDB({ id: selectedProductionLineRecord?.id as number });
             refetchProductionLines();
-            toggleIsActiveFeedBackModal();
-            toggleIsActiveDeleteModal();
-        } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
-        } finally {
-            setLoading(false);
+            setIsActiveFeedBackModal(prev => !prev);
+            return true;
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                ToastMantine.feedBackForm({ message: err.message || "Ocurrió un error inesperado" });
+            } else {
+                const error = err as IApiError;
+                if (error.validation)
+                    error.validation.forEach((msg: string) => {
+                        dispatchRedux(setError({ key: "deleteProductionLine", message: { validation: msg } }));
+                        ToastMantine.error({ message: msg });
+                    });
+            }
+            return false;
         }
     }, [selectedProductionLineRecord, refetchProductionLines, dispatchRedux]);
 
-    const handleCreate = useCallback(async (data: IPartialProductionLine) => {
-        setLoading(true);
+    const handleCreate = useCallback(async (data: IPartialProductionLine): Promise<boolean> => {
         try {
-            const response = await createCompleteproductionLineInDB(data,
-                dispatchRedux
-            );
-            if (!response) {
-                return;
-            }
-            setServerError(null);
+            await createCompleteProductionLineInDB({ productionLine: data });
             refetchProductionLines();
-        } catch (error) {
-            if (error instanceof Error)
-                setServerError(error.message);
-        } finally {
-            setLoading(false);
+            return true;
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                ToastMantine.feedBackForm({ message: err.message || "Ocurrió un error inesperado" });
+            } else {
+                const error = err as IApiError;
+                if (error.validation) {
+                    error.validation.forEach((msg: string) => {
+                        dispatchRedux(setError({ key: "createCompleteProductionLine", message: { validation: msg } }));
+                        ToastMantine.error({ message: msg });
+                    });
+                }
+            }
+            return false;
         }
     }, [dispatchRedux, refetchProductionLines]);
 
-    const handleUpdate = useCallback(async (original: IPartialProductionLine, updated: IPartialProductionLine) => {
-        if (!selectedProductionLineRecord?.id) return;
-        setLoading(true);
+    const handleUpdate = useCallback(async ({ original, update }: { original: IPartialProductionLine, update: IPartialProductionLine }): Promise<boolean> => {
+        if (!selectedProductionLineRecord?.id) return false;
         try {
-            const baseOriginal: IPartialProductionLine = { ...original };
-            const baseUpdated: IPartialProductionLine = { ...updated };
+            const baseOriginal: IPartialProductionLine = structuredClone(original);
+            const baseUpdated: IPartialProductionLine = structuredClone(update);
 
-            const base_original_plp: IPartialProductionLineProduct[] =
-                baseOriginal.production_lines_products ?? [];
-            const base_updated_plp: IPartialProductionLineProduct[] =
-                baseUpdated.production_lines_products ?? [];
+            const base_original_plp: IPartialProductionLineProduct[] = baseOriginal.production_lines_products ?? [];
+            const base_updated_plp: IPartialProductionLineProduct[] = baseUpdated.production_lines_products ?? [];
 
             delete baseOriginal.production_lines_products;
             delete baseUpdated.production_lines_products;
 
-            const diffObject = await diffObjects(baseOriginal, baseUpdated);
-            const diffObjectPLP: IProductionLineProductManager =
-                await diffObjectArrays(base_original_plp, base_updated_plp);
+            const diffObject: IPartialProductionLine = await diffObjects(baseOriginal, baseUpdated);
+            const diffObjectPLP: IProductionLineProductManager = await diffObjectArrays(base_original_plp, base_updated_plp);
 
             const hasChangesPLP: boolean = [
                 diffObjectPLP.added,
@@ -141,23 +121,22 @@ const ProductionLineModel = () => {
                     ...diffObject,
                     production_lines_products_updated: diffObjectPLP
                 };
-                const response = await updateCompleteproductionLineInDB(
-                    selectedProductionLineRecord?.id,
-                    object_update, dispatchRedux
-                );
-
-                if (!response) {
-                    return;
-                }
+                await updateCompleteProductionLineInDB({ id: selectedProductionLineRecord?.id as number, productionLine: object_update });
                 refetchProductionLines();
             }
-            setServerError(null);
-        } catch (error) {
-            console.log('error', error);
-            if (error instanceof Error)
-                setServerError(error.message);
-        } finally {
-            setLoading(false);
+            return true;
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                ToastMantine.feedBackForm({ message: err.message || "Ocurrió un error inesperado" });
+            } else {
+                const error = err as IApiError;
+                if (error.validation)
+                    error.validation.forEach((msg: string) => {
+                        dispatchRedux(setError({ key: "updateLocation", message: { validation: msg } }));
+                        ToastMantine.error({ message: msg });
+                    });
+            }
+            return false;
         }
     }, [dispatchRedux, refetchProductionLines, selectedProductionLineRecord]);
 
@@ -227,50 +206,9 @@ const ProductionLineModel = () => {
             onClick: toggleIsActiveDeleteModalSetup,
             icon: <Trash2 className={StyleModule.iconTrash} />
         }
-    ], []);
+    ], [toggleIsActiveDeleteModalSetup]);
 
-    const ExtraComponents = useCallback(() => {
-        const state = useTableState();
-        const dispatch = useTableDispatch();
-
-        const handleClearFilters = useCallback(() => {
-            dispatch(reset_column_filters());
-        }, [dispatch]);
-
-        const handleExportTable = useCallback(() => {
-            console.log("exporting table")
-        }, []);
-
-        return (
-            <div className={StyleModule.containerExtraComponents}>
-                <div className={StyleModule.searchSection}>
-                    <InputTextCustom
-                        value={search}
-                        onChange={setSearch}
-                        placeholder="Buscar"
-                        icon={<Search />}
-                        classNameInput={StyleModule.inputTextCustom}
-                        classNameContainer={StyleModule.containerInputSearch}
-                        withValidation={false}
-                    />
-                </div>
-                <div className={StyleModule.containerButtons}>
-                    <SecundaryActionButtonCustom
-                        label="Limpiar filtros"
-                        onClick={handleClearFilters}
-                        icon={<Eraser />}
-                        disabled={state.columnFiltersState.length === 0}
-                    />
-                    <SecundaryActionButtonCustom
-                        label="Exportar tabla"
-                        onClick={handleExportTable}
-                        icon={<Download />}
-                        disabled={Object.keys(state.rowSelectionState).length === 0}
-                    />
-                </div>
-            </div>
-        );
-    }, [search]);
+    const ExtraComponents = useCallback(() => <ExtraComponent search={search} setSearch={setSearch} />, [search, setSearch]);
 
     return (
         <div className={StyleModule.productionLineModelContainer}>
@@ -312,41 +250,77 @@ const ProductionLineModel = () => {
                 /* estilos */
                 classNameGenericTableContainer={StyleModule.genericTableContainer}
             />
-            {
-                isActiveDeleteModal && (
-                    <DeleteModal
-                        title="¿Estás seguro de eliminar esta línea de producción?"
-                        message="Esta acción no se puede deshacer."
-                        onClose={toggleIsActiveDeleteModal}
-                        onDelete={handleDelete}
-                    />
-                )
-            }
-            {
-                isAcviveAddModal && (
-                    <ProductionLineModuleProvider initialStep={0} totalSteps={3}>
-                        <AddWizardProductionLine onClose={toggleIsActiveAddModal} onCreate={handleCreate} />
-                    </ProductionLineModuleProvider>
-                )
-            }
-            {
-                isAcviveEditModal && (
-                    <ProductionLineModuleProvider initialStep={2} totalSteps={3} data={selectedProductionLineRecord ?? undefined}>
-                        <EditWizardProductionLine onClose={toggleIsActiveEditModal} onUpdate={handleUpdate} />
-                    </ProductionLineModuleProvider>
-                )
-            }
-            {
-                isActiveFeedBackModal && (
-                    <FeedBackModal
-                        title="Se ha eliminado la línea de producción"
-                        onClose={toggleIsActiveFeedBackModal}
-                        icon={<CircleCheck />}
-                    />
-                )
-            }
+            {isActiveDeleteModal && (
+                <DeleteModal
+                    title="¿Estás seguro de eliminar esta línea de producción?"
+                    message="Esta acción no se puede deshacer."
+                    onClose={toggleIsActiveDeleteModal}
+                    onDelete={handleDelete}
+                />
+            )}
+            {isAcviveAddModal && (
+                <ProductionLineModuleProvider initialStep={0} totalSteps={3}>
+                    <AddWizardProductionLine onClose={toggleIsActiveAddModal} onCreate={handleCreate} />
+                </ProductionLineModuleProvider>
+            )}
+            {isAcviveEditModal && (
+                <ProductionLineModuleProvider initialStep={2} totalSteps={3} data={selectedProductionLineRecord ?? undefined}>
+                    <EditWizardProductionLine onClose={toggleIsActiveEditModal} onUpdate={handleUpdate} />
+                </ProductionLineModuleProvider>
+            )}
+            {isActiveFeedBackModal && (
+                <FeedBackModal
+                    title="Se ha eliminado la línea de producción"
+                    onClose={toggleIsActiveFeedBackModal}
+                    icon={<CircleCheck />}
+                />
+            )}
         </div>
     )
 }
 
 export default ProductionLineModel
+
+interface IExtraComponentProp {
+    search: string,
+    setSearch: (value: string) => void
+}
+
+const ExtraComponent = memo(({ search, setSearch }: IExtraComponentProp) => {
+
+    const state = useTableState();
+    const dispatch = useTableDispatch();
+
+    const handleClearFilters = useCallback(() => dispatch(reset_column_filters()), [dispatch]);
+    const handleExportTable = useCallback(() => console.log("exporting table"), []);
+
+    return (
+        <div className={StyleModule.containerExtraComponents}>
+            <div className={StyleModule.searchSection}>
+                <InputTextCustom
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Buscar"
+                    icon={<Search />}
+                    classNameInput={StyleModule.inputTextCustom}
+                    classNameContainer={StyleModule.containerInputSearch}
+                    withValidation={false}
+                />
+            </div>
+            <div className={StyleModule.containerButtons}>
+                <SecundaryActionButtonCustom
+                    label="Limpiar filtros"
+                    onClick={handleClearFilters}
+                    icon={<Eraser />}
+                    disabled={!state.columnFiltersState.length}
+                />
+                <SecundaryActionButtonCustom
+                    label="Exportar tabla"
+                    onClick={handleExportTable}
+                    icon={<Download />}
+                    disabled={!Object.keys(state.rowSelectionState).length}
+                />
+            </div>
+        </div>
+    );
+});

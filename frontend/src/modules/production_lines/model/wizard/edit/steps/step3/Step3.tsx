@@ -1,18 +1,17 @@
+import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
-import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
-import { ChevronLeft, CircleCheck, Pencil } from "lucide-react";
-import { memo, useCallback, useMemo, useState } from "react";
-import StyleModule from "./Step3.module.css"
 import type { ProductionLineAction, ProductionLineState } from "../../../../../context/productionLineTypes";
-import type { Dispatch } from "react";
-import { set_step, set_draft_production_line } from "../../../../../context/productionLineActions";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { IPartialProductionLineProduct } from "interfaces/productionLinesProducts";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
-import { Divider } from "@mantine/core";
+import { set_step, set_draft_production_line } from "../../../../../context/productionLineActions";
+import type { IPartialProductionLineProduct } from "interfaces/productionLinesProducts";
 import Tag from "../../../../../../../comp/primitives/tag/Tag";
-import FeedBackModal from "../../../../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal";
+import type { ColumnDef } from "@tanstack/react-table";
+import { ChevronLeft, Pencil } from "lucide-react";
+import { memo, useCallback, useMemo } from "react";
+import StyleModule from "./Step3.module.css"
+import { Divider } from "@mantine/core";
+import type { Dispatch } from "react";
 
 interface IStep3 {
     onClose: () => void;
@@ -20,26 +19,9 @@ interface IStep3 {
     dispatch: Dispatch<ProductionLineAction>
 }
 
-const Step3 = memo(({
-    onClose,
-    state, dispatch
-}: IStep3) => {
+const Step3 = memo(({ onClose, state, dispatch }: IStep3) => {
 
-    const getRowId = useMemo(() => (row: IPartialProductionLineProduct) => row.id?.toString()!, []);
-    const [isActiveFeedBackModal, setIsActiveFeedBackModal] = useState<boolean>(false);
-
-    const customMessageNode = useMemo(() => {
-        return (
-            <div className={StyleModule.containerCustomMessageNode}>
-                <span className={`nunito-bold ${StyleModule.titleCustomMessageNode}`}>
-                    La  <span>{` ${state.data?.name} `}</span> se ha agregado correctamente
-                </span>
-                <span className={`nunito-semibold ${StyleModule.messageCustomMessageNode}`}>
-                    Ya puedes visualizar su estado desde el panel principal de líneas de producción.
-                </span>
-            </div>
-        );
-    }, [state.data]);
+    const getRowId = useMemo(() => (row: IPartialProductionLineProduct, index: number) => row.id?.toString() ?? index.toString(), []);
 
     const columns: ColumnDef<IPartialProductionLineProduct>[] = useMemo(() => [
         {
@@ -60,11 +42,6 @@ const Step3 = memo(({
         dispatch(set_draft_production_line(state.data));
         dispatch(set_step(0));
     }, [dispatch, state.data]);
-
-    const handleOnCloseFeedBackModal = useCallback(() => {
-        onClose();
-        setIsActiveFeedBackModal(false);
-    }, [onClose]);
 
     return <div className={StyleModule.containerStep}>
         <div className={StyleModule.containerContent}>
@@ -110,7 +87,7 @@ const Step3 = memo(({
         </div>
         <div className={StyleModule.containerButtons}>
             <CriticalActionButton
-                onClick={()=>console.log("Eliminar")}
+                onClick={() => console.log("Eliminar")}
                 label="Eliminar"
             />
             <TertiaryActionButtonCustom
@@ -124,15 +101,6 @@ const Step3 = memo(({
                 icon={<Pencil />}
             />
         </div>
-        {
-            isActiveFeedBackModal && (
-                <FeedBackModal
-                    onClose={handleOnCloseFeedBackModal}
-                    icon={<CircleCheck />}
-                    messageCustom={customMessageNode}
-                />
-            )
-        }
     </div>;
 })
 

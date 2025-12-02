@@ -1,15 +1,11 @@
-import ProviderModalAdd
-    from "./modalEditProvider"
-import EditModal
-    from "../EditModal";
-import type {
-    IPartialPurchasedOrder
-} from "../../../../../../../interfaces/purchasedOrder";
+import ProviderModalAdd from "./modalEditProvider"
+import EditModal from "../EditModal";
+import type { IPartialPurchasedOrder } from "../../../../../../../interfaces/purchasedOrder";
 
 interface IModalAddGeneric {
-    record: IPartialPurchasedOrder;
-    onClose: () => void;
-    onEdit: (record: IPartialPurchasedOrder | null, updateRecord: IPartialPurchasedOrder | null) => void;
+    record: IPartialPurchasedOrder,
+    onClose: () => void,
+    onEdit: (({ original, update }: { original: IPartialPurchasedOrder; update: IPartialPurchasedOrder }) => Promise<boolean>),
     onDelete: () => void;
 }
 

@@ -191,39 +191,12 @@ const updatePurchasedOrderInDB = async (
     }
 };
 
-const deletePurchasedOrderInDB = async (
-    id: number | undefined,
-    dispatch: AppDispatchRedux
-): Promise<any> => {
-    try {
-        const response = await fetch(`${API_URL}/delete-secure/${id}`, {
-            method: "DELETE",
-        });
-        if (!response.ok) {
-            const errorText = await response.json();
-            console.log(errorText);
-            dispatch(
-                setError({
-                    key: "deletePurchasedOrder",
-                    message: errorText
-                })
-            );
-            if (response.status >= 500) {
-                throw new Error(
-                    `${errorText}`
-                );
-            }
-            return null;
-        }
+// **************** DELETE ***************** // 
 
-        dispatch(
-            clearError("deletePurchasedOrder")
-        );
-        const result = await response.json();
-        return result;
-    } catch (error: unknown) {
-        throw error;
-    }
+const deletePurchasedOrderInDB = async (id: number): Promise<any> => {
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+    });
 };
 
 export {

@@ -1,6 +1,10 @@
 /* *************** Container *************** */
 
 .containerStep {
+    /* dimension */
+    min-width: 0;
+    min-height: 0;
+
     /* distirbucion flex respecto al padre*/
     flex: 1;
 
@@ -9,6 +13,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
+    gap: 1rem;
 
 }
 
@@ -28,6 +33,10 @@
 /* *************** Container Content *************** */
 
 .containerContent {
+    /* dimension */
+    min-width: 0;
+    min-height: 0;
+    
     /* distribucion flex */
     display: flex;
     flex-direction: column;
@@ -35,12 +44,30 @@
     align-items: stretch;
     gap: 1rem;
 
+    padding-top: 1rem;
+
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-theme-primary) transparent;
+
+}
+
+.containerContent > *{
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
 }
 
 .subTitleSpan {
     /* estilos */
     font-size: 16px;
     color: var(--color-theme-font-black);
+}
+
+.iconTrash {
+    stroke: var(--color-alert);
+    width: 16px;
+    height: 16px;
 }
 
 /* ? ************* Production Block ************* */
@@ -68,12 +95,37 @@
     gap: 1rem;
 }
 
+.inventoryBlockButtonContainer{
+    /* distirbucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
 
 .productionBlockButtonContainer>div {
     /* distirbucion flex */
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
+}
+
+
+.containerProductionLineProducts{
+    flex: 1;
+
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.containerProductionLineProducts > *{
+    background-color: var(--color-theme-neutral-background);
+    padding-inline: 0.5rem;
+    padding-block: 0.5rem;
+    border-radius: 15px;
+    border: 1px solid var(--color-theme-primary);
 }
 
 

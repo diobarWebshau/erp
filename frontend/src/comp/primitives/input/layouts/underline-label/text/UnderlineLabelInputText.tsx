@@ -41,7 +41,7 @@ const UnderlineLabelInputText = ({
             StyleModule.label,
             "nunito-semibold",
             (focused || (value && value.length > 0)) && StyleModule.labelFloating,
-            (errorActive && (!value || (typeof value === "string" && value.length === 0)) && focused) && StyleModule.labelError
+            (withValidation && errorActive && (!value || (typeof value === "string" && value.length === 0)) && focused) && StyleModule.labelError
         );
         const inputC = clsx(
             StyleModule.input,
@@ -53,7 +53,7 @@ const UnderlineLabelInputText = ({
             errorActive && StyleModule.error
         );
         return [labelC, inputC, containerC];
-    }, [focused, value, errorActive]);
+    }, [focused, value, errorActive, withValidation]);
 
     // ************** Manejo de eventos **************
 

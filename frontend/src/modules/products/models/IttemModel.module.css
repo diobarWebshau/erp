@@ -106,3 +106,9 @@
     width: 16px;
     height: 16px;
 }
+
+.iconFeedBackModal{
+    stroke: var(--color-theme-primary);
+    width: 40px;
+    height: 40px;
+}

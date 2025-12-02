@@ -39,6 +39,10 @@ const FeedBackModal = ({
             </div>
             <div className={stylesModules.content}>
                 {
+                    messageCustom &&
+                    messageCustom
+                }
+                {
                     title &&
                     <h2 className={`nunito-bold ${stylesModules.title}`}>
                         {title}
@@ -50,10 +54,7 @@ const FeedBackModal = ({
                         {message}
                     </p>
                 }
-                {
-                    messageCustom &&
-                    messageCustom
-                }
+
             </div>
         </DialogModal>
     );

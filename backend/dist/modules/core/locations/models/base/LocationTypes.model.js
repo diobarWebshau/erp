@@ -1,17 +1,8 @@
 import sequelize from "../../../../../mysql/configSequelize.js";
 import { DataTypes, Model } from "sequelize";
 class LocationTypeModel extends Model {
-    static getEditableFields = () => {
-        return [
-            "id", "name"
-        ];
-    };
-    static getAllFields() {
-        return [
-            "id", "name", "created_at",
-            "updated_at"
-        ];
-    }
+    static getEditableFields = () => ["id", "name"];
+    static getAllFields = () => ["id", "name", "created_at", "updated_at"];
 }
 LocationTypeModel.init({
     id: {

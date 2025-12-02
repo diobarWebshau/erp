@@ -191,7 +191,7 @@ class ProductionLineQueueController {
             const updateData = {
                 ...update_values,
                 position: (maxPosition ? (Number(maxPosition) + 10) : 10)
-            } 
+            }
 
             const response = await ProductionLineQueueModel.update(
                 updateData,
@@ -224,7 +224,7 @@ class ProductionLineQueueController {
             }
         }
     }
-    
+
 
     static reorderProductionLineQueue = async (
         req: Request,

@@ -1,18 +1,19 @@
 import TertiaryActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/tertiary-action/TertiaryActionButtonCustom";
 import MainActionButtonCustom from "../../../../../../../comp/primitives/button/custom-button/main-action/MainActionButtonCustom";
 import CriticalActionButton from "../../../../../../../comp/primitives/button/custom-button/critical-action/CriticalActionButton";
+import FeedBackModal from "../../../../../../../comp/primitives/modal2/dialog-modal/custom/feedback/FeedBackModal";
 import type { IPartialProductDiscountClient } from "../../../../../../../interfaces/product-discounts-clients";
 import { formatCurrency, formatPercentage1_100 } from "../../../../../../../helpers/formttersNumeric";
 import GenericTableMemo from "../../../../../../../comp/primitives/table/tableContext/GenericTable";
 import ToastMantine from "../../../../../../../comp/external/mantine/toast/base/ToastMantine";
 import type { IPartialClientAddress } from "../../../../../../../interfaces/clientAddress";
+import { useCallback, useMemo, useState, type Dispatch, type ReactNode } from "react";
 import type { ClientState, ClientAction } from "../../../../../context/clientTypes"
 import type { IPartialClient } from "../../../../../../../interfaces/clients";
+import { Bookmark, ChevronLeft, CircleCheck } from "lucide-react";
 import type { RootState } from "../../../../../../../store/store";
 import { back_step } from "../../../../../context/clientActions";
-import { useCallback, useMemo, type Dispatch } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Bookmark, ChevronLeft } from "lucide-react";
 import StyleModule from "./Step3.module.css";
 import { useSelector } from "react-redux";
 
@@ -20,18 +21,20 @@ interface IStep3 {
     state: ClientState;
     dispatch: Dispatch<ClientAction>;
     onCancel: () => void;
-    onCreate: (record: IPartialClient) => Promise<void>;
+    onCreate: (record: IPartialClient) => (Promise<boolean> | boolean);
     onClose: () => void;
 }
-const Step3 = ({
-    state,
-    dispatch,
-    onCancel,
-    onCreate,
-    onClose
-}: IStep3) => {
+const Step3 = ({ state, dispatch, onCancel, onCreate, onClose }: IStep3) => {
 
     const errorRedux = useSelector((state: RootState) => state.error);
+
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+    const [customMessageConfirmModal, setCustomMessageConfirmModal] = useState<ReactNode | null>(null);
+
+    const toggleShowConfirmModal = useCallback(() => setShowConfirmModal(prev => !prev), [])
+    const handleOnCloseConfirmModal = useCallback(() => {
+        toggleShowConfirmModal(); onClose();
+    }, [toggleShowConfirmModal, onClose]);
 
     // * *********** Funciones memoizadas para las tablas ************ 
 
@@ -138,22 +141,24 @@ const Step3 = ({
         },
     ], []);
 
-    const handleOnClickBackStep = useCallback(() => {
-        dispatch(back_step());
-    }, [dispatch]);
+    const handleOnClickBackStep = useCallback(() => dispatch(back_step()), [dispatch]);
 
-    const handleOnClickCreate = useCallback(() => {
-        onCreate(state?.data ?? {});
-        if (Object.keys(errorRedux).length > 0) {
-            Object.entries(errorRedux).forEach(([_, value]) => {
-                ToastMantine.error({
-                    message: value,
-                });
-            })
+    const handleOnClickCreate = useCallback(async () => {
+        const ok = await onCreate(state?.data);
+        if (!ok) {
+            const errorsEntries = Object.entries(errorRedux);
+            const errors = errorsEntries.map(([value]) => value);
+            errors.forEach(error => ToastMantine.error({ message: error as string }));
             return;
         }
-        onClose();
-    }, [onCreate, state.data, errorRedux, ToastMantine, onClose]);
+        const customMessage: ReactNode = (
+            <span className={`nunito-bold ${StyleModule.customMessageConfirmModal}`}>
+                El cliente {` `} <span>{state.data.company_name}</span> {` `} se ha creado correctamente.
+            </span>
+        );
+        setCustomMessageConfirmModal(customMessage);
+        setShowConfirmModal(prev => !prev);
+    }, [onCreate, state.data, errorRedux]);
 
     return (
         <div className={StyleModule.containerStep}>
@@ -219,7 +224,7 @@ const Step3 = ({
                         </div>
                     </div>
                 </div>
-                {(state?.data?.addresses?.length ?? 0) > 0 &&
+                {state?.data?.addresses?.length &&
                     <div className={StyleModule.addressesContainer}>
                         <h2 className={StyleModule.subTitle}>Direcciones</h2>
 
@@ -232,7 +237,7 @@ const Step3 = ({
                         />
                     </div>
                 }
-                {(state?.data?.product_discounts_client?.length ?? 0) > 0 &&
+                {state?.data?.addresses?.length &&
                     <div className={StyleModule.discountsContainer}>
                         <h2 className={StyleModule.subTitle}>Descuentos</h2>
                         <GenericTableMemo
@@ -261,6 +266,12 @@ const Step3 = ({
                     icon={<Bookmark />}
                 />
             </div>
+            {showConfirmModal && (<FeedBackModal
+                message="Ya lo puedes visualizar en panel principal de productos."
+                onClose={handleOnCloseConfirmModal}
+                messageCustom={customMessageConfirmModal}
+                icon={<CircleCheck className={StyleModule.iconConfirmModal} />}
+            />)}
         </div>
     );
 };

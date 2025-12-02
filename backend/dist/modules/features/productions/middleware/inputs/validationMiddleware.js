@@ -1,5 +1,4 @@
 import { validatePartialSafeParseAsync, validateSafeParseAsync } from "../../schemas/Input.schema.js";
-import ImageHandler from "../../../../../classes/ImageHandler.js";
 const validateInputsMiddleware = async (req, res, next) => {
     const body = req.body;
     const method = req.method;
@@ -12,9 +11,13 @@ const validateInputsMiddleware = async (req, res, next) => {
             result = await validatePartialSafeParseAsync(body);
         }
         if (!result.success) {
-            await ImageHandler.removeImageIfExists(req.body.url);
-            const zod_errors = result.error.errors;
-            res.status(400).json({ zod_validation: zod_errors });
+            const formattedErrors = result.error.errors.map(err => ({
+                message: `${err.path}-${err.message}`
+            }));
+            res.status(400).json({
+                validation: formattedErrors.map(e => e.message)
+            });
+            return;
         }
         else {
             next();
