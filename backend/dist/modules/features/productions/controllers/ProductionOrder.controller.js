@@ -152,12 +152,10 @@ class ProductionOrdersController {
             let orderModel;
             switch (order_type) {
                 case "internal":
-                    orderModel =
-                        InternalProductProductionOrderModel;
+                    orderModel = InternalProductProductionOrderModel;
                     break;
                 case "client":
-                    orderModel =
-                        PurchaseOrderProductModel;
+                    orderModel = PurchaseOrderProductModel;
                     break;
                 default:
                     res.status(400).json({
@@ -165,7 +163,6 @@ class ProductionOrdersController {
                     });
                     return;
             }
-            // Aqui no afecta el tipado porque no se acceden a las propiedades
             if (order_type === "internal" && location && product) {
                 const responseCreateInternalOrder = await InternalProductProductionOrderModel.create({
                     product_name: product_name,
@@ -202,7 +199,6 @@ class ProductionOrdersController {
                     });
                     return;
                 }
-                // Aqui si afecta el tipado porque se acceden a las propiedades
                 const order = validateOrder.toJSON();
                 const order_product_id = order.product_id;
                 if (order_product_id !== product_id) {
@@ -233,7 +229,7 @@ class ProductionOrdersController {
                         order_type: order_type
                     },
                     type: QueryTypes.SELECT,
-                    transaction: transaction
+                    transaction
                 });
                 const result = validateQtyProduction.shift();
                 const resultArray = Object.values(result).map((entry) => entry.result);
@@ -261,11 +257,11 @@ class ProductionOrdersController {
                             validation: `Cannot create the production order. This `
                                 + `productionproduct order has already been completed.`
                         });
+                        return;
                     }
                 }
             }
             if (production_line) {
-                console.log("Si tiene linea de produccion");
                 const responseProductionLine = await ProductionLineModel.findByPk(production_line.id);
                 if (!responseProductionLine) {
                     await transaction.rollback();
@@ -275,7 +271,6 @@ class ProductionOrdersController {
                     return;
                 }
                 if (order_type === "internal") {
-                    console.log("asigno la linea de produccion a la orden de produccion interna");
                     const responseInternalProductionOrderLineProduct = await InternalProductionOrderLineProductModel.create({
                         internal_product_production_order_id: orderId,
                         production_line_id: production_line.id
@@ -283,14 +278,12 @@ class ProductionOrdersController {
                     if (!responseInternalProductionOrderLineProduct) {
                         await transaction.rollback();
                         res.status(500).json({
-                            validation: `No se pudo asignar la orden de produccion` +
-                                ` interna a la linea de produccion`
+                            validation: `No se pudo asignar la orden de produccion interna a la linea de produccion`
                         });
                         return;
                     }
                 }
                 else {
-                    console.log("asigno la linea de produccion a la orden de produccion interna");
                     const responsePurchasedOrdersProductsLocationsProductionLines = await PurchasedOrdersProductsLocationsProductionLinesModel.create({
                         purchase_order_product_id: orderId,
                         production_line_id: production_line.id
@@ -298,9 +291,8 @@ class ProductionOrdersController {
                     if (!responsePurchasedOrdersProductsLocationsProductionLines) {
                         await transaction.rollback();
                         res.status(500).json({
-                            validation: `No se pudo asignar la orden de produccion` +
-                                ` asociado a una orden de compra a la linea `
-                                + `de produccion`
+                            validation: `No se pudo asignar la orden de produccion asociada a una orden de compra`
+                                + ` a la linea de produccion`
                         });
                         return;
                     }
@@ -324,23 +316,10 @@ class ProductionOrdersController {
             const po = response.toJSON();
             isSucessfull = true;
             po_id = po.id;
-            transaction.commit();
+            // FIX 🟢 Commit con await
+            await transaction.commit();
             console.log('Termino la creacion de la orden de produccion');
-            res.status(201).json(po);
-        }
-        catch (error) {
-            await transaction.rollback();
-            if (error instanceof Error) {
-                console.error(`
-                    An unexpected error ocurred ${error}`);
-                next(error);
-            }
-            else {
-                console.error(`
-                        An unexpected error ocurred ${error}`);
-            }
-        }
-        finally {
+            // FIX: 🟢 Ejecutar SP SOLO después del commit, y solo si todo está OK
             if (po_id && product && isSucessfull) {
                 console.log('Se empieza a ejecutar el stored procedure');
                 await sequelize.query(`CALL handle_production_order_after_insert(:id, :order_id, :order_type, :product_id, :product_name, :qty)`, {
@@ -351,9 +330,20 @@ class ProductionOrdersController {
                         product_id: product_id,
                         product_name: product.name,
                         qty: qty
-                    },
+                    }
                 });
                 console.log('Se termino de ejecutar el stored procedure');
+            }
+            res.status(201).json(po);
+        }
+        catch (error) {
+            await transaction.rollback();
+            if (error instanceof Error) {
+                console.error(`An unexpected error ocurred ${error}`);
+                next(error);
+            }
+            else {
+                console.error(`An unexpected error ocurred ${error}`);
             }
         }
     };
@@ -535,10 +525,316 @@ class ProductionOrdersController {
             }
         }
     };
+    // static update = async (
+    //     req: Request,
+    //     res: Response,
+    //     next: NextFunction
+    // ) => {
+    //     const transaction = await sequelize.transaction({
+    //         isolationLevel:
+    //             Transaction
+    //                 .ISOLATION_LEVELS.REPEATABLE_READ
+    //     });
+    //     const { id } = req.params;
+    //     const { production_line, location, product, qty }: {
+    //         production_line: ProductionLineAttributes,
+    //         location: LocationAttributes,
+    //         product: ProductAttributes,
+    //         qty: number
+    //     } = req.body;
+    //     const body = req.body as ProductionOrderAttributes;
+    //     console.log("******************************************************************************");
+    //     console.log(body);
+    //     console.log("******************************************************************************");
+    //     let isSuccessfully = false;
+    //     let orderType = "";
+    //     try {
+    //         const validatedProduction:
+    //             ProductionOrderModel | null =
+    //             await ProductionOrderModel.findByPk(id, { transaction });
+    //         if (!validatedProduction) {
+    //             await transaction.rollback();
+    //             res.status(404).json({
+    //                 validation: "Production order not found"
+    //             });
+    //             return;
+    //         }
+    //         const relationship: ProductionOrderAttributes =
+    //             validatedProduction.toJSON();
+    //         const editableFields: string[] =
+    //             ProductionOrderModel.getEditableFields();
+    //         const update_values =
+    //             collectorUpdateFields(editableFields, body);
+    //         if (!(Object.keys(update_values).length > 0)) {
+    //             await transaction.rollback();
+    //             res.status(200).json({
+    //                 validation:
+    //                     "No valid fields were provided to"
+    //                     + " update the production order"
+    //             });
+    //             return;
+    //         }
+    //         if (update_values?.qty) {
+    //             if (update_values.qty <= 0) {
+    //                 await transaction.rollback();
+    //                 res.status(400).json({
+    //                     validation:
+    //                         "The production order quantity must be"
+    //                         + "greater than 0"
+    //                 });
+    //                 return;
+    //             }
+    //             if (relationship.order_type === 'client') {
+    //                 const validateQtyProduction: object[] = await sequelize.query(
+    //                     "CALL get_order_summary_by_pop(:order_id, :order_type);", {
+    //                     replacements: {
+    //                         order_id: relationship.order_id,
+    //                         order_type: relationship.order_type
+    //                     },
+    //                     type: QueryTypes.SELECT,
+    //                     transaction
+    //                 });
+    //                 const result: Summary =
+    //                     validateQtyProduction.shift() as Summary;
+    //                 const resultArray =
+    //                     Object.values(result).map((entry) => entry.result);
+    //                 const summary: SummaryItem = resultArray[0];
+    //                 const new_qty: number = summary.qty + Number(relationship.qty);
+    //                 if (new_qty === 0) {
+    //                     await transaction.rollback();
+    //                     res.status(400).json({
+    //                         validation:
+    //                             `There are no units available for production order. `
+    //                             + `All quantities for this order have already `
+    //                             + `produced.`
+    //                     });
+    //                     return;
+    //                 } else if (update_values.qty > new_qty) {
+    //                     await transaction.rollback();
+    //                     res.status(400).json({
+    //                         validation:
+    //                             `The quantity entered (${update_values.qty}) exceeds the `
+    //                             + `remaining available units for this order.`
+    //                             + ` Only ${new_qty} units are left`
+    //                             + ` to produce.`
+    //                     });
+    //                     return;
+    //                 }
+    //             } else {
+    //                 await InternalProductProductionOrderModel.update({
+    //                     qty: update_values.qty,
+    //                 }, {
+    //                     where: { id: relationship.order_id },
+    //                     transaction
+    //                 })
+    //             }
+    //         }
+    //         if (update_values?.status === 'completed') {
+    //             const response = await ProductionOrderModel.findAll({
+    //                 where: { id: id },
+    //                 attributes: [
+    //                     ...ProductionOrderModel.getAllFields(),
+    //                     [
+    //                         sequelize.fn(
+    //                             "func_get_order_progress_snapshot",
+    //                             sequelize.col("ProductionOrderModel.id"),
+    //                         ),
+    //                         "production_breakdown"
+    //                     ]
+    //                 ],
+    //                 include: [{
+    //                     model: ProductionModel,
+    //                     as: "productions",
+    //                     attributes: ProductionModel.getAllFields()
+    //                 }]
+    //             });
+    //             if (!(response.length > 0)) {
+    //                 res.status(404).json({
+    //                     validation:
+    //                         "No productions found linked to "
+    //                         + "this production order."
+    //                 });
+    //                 return;
+    //             }
+    //             const productionOrder: ProductionOrderAttributes = response[0].toJSON();
+    //             console.log("diobar revisa", productionOrder);
+    //             const finished = Number(productionOrder?.production_breakdown?.finished || 0);
+    //             const totalOrder = Number(productionOrder.qty);
+    //             console.log("diobar revisa", finished, totalOrder);
+    //             if (finished < totalOrder) {
+    //                 res.status(400).json({
+    //                     validation:
+    //                         `Cannot complete the production order. `
+    //                         + `Total order quantity (${totalOrder}) is less than `
+    //                         + `the required quantity (${finished}).`
+    //                 });
+    //                 return;
+    //             }
+    //         }
+    //         if (location) {
+    //             console.log("******************************************************************************");
+    //             console.log(location);
+    //             console.log("******************************************************************************");
+    //             console.log(location.id, relationship.order_id, location.name);
+    //             console.log(relationship);
+    //             const responsedasdasd = await InternalProductProductionOrderModel.findByPk(relationship.order_id, { transaction });
+    //             console.log("Registro encontrado ******************************************************************************");
+    //             console.log(responsedasdasd?.toJSON());
+    //             console.log("******************************************************************************");
+    //             console.log(relationship);
+    //             const responseUpdateInternalProductProductionOrder = await InternalProductProductionOrderModel.update({
+    //                 location_id: location.id,
+    //                 location_name: location.name,
+    //             }, {
+    //                 where: { id: relationship.order_id },
+    //                 transaction
+    //             })
+    //             console.log(`actualizo registro de internal_product_production_order`)
+    //             console.log(responseUpdateInternalProductProductionOrder[0])
+    //         }
+    //         if (production_line) {
+    //             if (relationship.order_type === 'client') {
+    //                 const responseUpdatePurchaseOrderProductLocationProductionLine =
+    //                     await PurchasedOrdersProductsLocationsProductionLinesModel.update({
+    //                         production_line_id: production_line.id,
+    //                     }, {
+    //                         where: {
+    //                             purchase_order_product_id: relationship.order_id
+    //                         },
+    //                         transaction
+    //                     });
+    //             } else {
+    //                 const responseUpdateInternalProductionOrderLineProduct =
+    //                     await InternalProductionOrderLineProductModel.update({
+    //                         production_line_id: production_line.id
+    //                     }, {
+    //                         where: { internal_product_production_order_id: relationship.order_id },
+    //                         transaction
+    //                     });
+    //             }
+    //             const inventoryMovement = await InventoryMovementModel.update({
+    //                 location_id: location.id,
+    //                 location_name: location.name
+    //             }, {
+    //                 where: {
+    //                     reference_id: relationship.id,
+    //                     reference_type: relationship.order_type === 'client'
+    //                         ? 'Production Order'
+    //                         : 'Internal Production Order'
+    //                 },
+    //                 transaction: transaction
+    //             });
+    //             const validateProductionLineQueue =
+    //                 await ProductionLineQueueModel.findOne({
+    //                     where: {
+    //                         production_line_id: production_line.id,
+    //                         production_order_id: id
+    //                     },
+    //                     transaction
+    //                 });
+    //             // 1️⃣ Bloquear todas las filas de la línea de producción
+    //             await ProductionLineQueueModel.findAll({
+    //                 where: { production_line_id: production_line.id },
+    //                 lock: transaction.LOCK.UPDATE,
+    //                 transaction
+    //             });
+    //             // 1️⃣ Bloquear todas las filas de la línea de producción
+    //             const maxPosition = await ProductionLineQueueModel.max("position", {
+    //                 where: { production_line_id: production_line.id },
+    //                 transaction
+    //             });
+    //             const updateData = {
+    //                 production_line_id: production_line.id,
+    //                 position: (maxPosition ? (Number(maxPosition) + 10) : 10)
+    //             }
+    //             const responseUpdateQueue = await ProductionLineQueueModel.update(
+    //                 updateData,
+    //                 {
+    //                     where: { production_order_id: relationship.order_id },
+    //                     transaction
+    //                 });
+    //             console.log(`actualizo registro de production_line_queue`)
+    //             console.log(responseUpdateQueue[0])
+    //             if (responseUpdateQueue[0] === 0) {
+    //                 await transaction.rollback();
+    //                 res.status(400).json({
+    //                     validation:
+    //                         "No changes were made to the production order"
+    //                 });
+    //                 return;
+    //             }
+    //         }
+    //         console.log("******************************************************************************");
+    //         console.log(id);
+    //         console.log(update_values);
+    //         console.log("******************************************************************************");
+    //         const response: number[] = await ProductionOrderModel.update(
+    //             update_values, {
+    //             where: { id: id },
+    //             individualHooks: true,
+    //             transaction
+    //         });
+    //         console.log("******************************************************************************");
+    //         console.log(response);
+    //         console.log(response[0]);
+    //         console.log("******************************************************************************");
+    //         if (!(response[0] > 0)) {
+    //             await transaction.rollback();
+    //             res.status(400).json({
+    //                 validation:
+    //                     "No changes were made to the production order"
+    //             });
+    //             return;
+    //         }
+    //         await transaction.commit();
+    //         isSuccessfully = true;
+    //         console.log("exitoso");
+    //         res.status(200).json({
+    //             message: "Production order updated successfully"
+    //         });
+    //     } catch (error) {
+    //         await transaction.rollback();
+    //         if (error instanceof Error) {
+    //             next(error);
+    //         } else {
+    //             console.error(`An unexpected error occurred: ${error}`);
+    //         }
+    //     } finally {
+    //         console.log("finally");
+    //         if (isSuccessfully) {
+    //             if (orderType === 'client' && body.qty) {
+    //                 await sequelize.query(
+    //                     `CALL sp_update_movement_inventory_po_pop_update_fix(:id, :qty, :product_id, :product_name)`,
+    //                     {
+    //                         replacements: {
+    //                             id: id,
+    //                             qty: qty,
+    //                             product_id: product.id,
+    //                             product_name: product.name,
+    //                         },
+    //                     }
+    //                 );
+    //             }
+    //             console.log(body.status)
+    //             if (body.status === 'completed') {
+    //                 console.log("******************************************************************************");
+    //                 console.log(`Se actualizo la cola `);
+    //                 console.log("******************************************************************************");
+    //                 await sequelize.query(
+    //                     `CALL sp_validate_queue_po_after_completed(:id)`,
+    //                     {
+    //                         replacements: {
+    //                             id: id
+    //                         },
+    //                     }
+    //                 );
+    //             }
+    //         }
+    //     }
+    // }
     static update = async (req, res, next) => {
         const transaction = await sequelize.transaction({
-            isolationLevel: Transaction
-                .ISOLATION_LEVELS.REPEATABLE_READ
+            isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
         });
         const { id } = req.params;
         const { production_line, location, product, qty } = req.body;
@@ -547,6 +843,7 @@ class ProductionOrdersController {
         console.log(body);
         console.log("******************************************************************************");
         let isSuccessfully = false;
+        // FIX 🟢 Se mueve acá y se asigna correctamente
         let orderType = "";
         try {
             const validatedProduction = await ProductionOrderModel.findByPk(id, { transaction });
@@ -558,22 +855,27 @@ class ProductionOrdersController {
                 return;
             }
             const relationship = validatedProduction.toJSON();
+            // FIX 🟢 Asignar tipo de orden una sola vez
+            orderType = relationship.order_type === "client"
+                ? "client"
+                : "internal";
             const editableFields = ProductionOrderModel.getEditableFields();
             const update_values = collectorUpdateFields(editableFields, body);
             if (!(Object.keys(update_values).length > 0)) {
                 await transaction.rollback();
                 res.status(200).json({
-                    validation: "No valid fields were provided to"
-                        + " update the production order"
+                    validation: "No valid fields were provided to update the production order"
                 });
                 return;
             }
+            // ---------------------------
+            //   TODA TU LÓGICA SE MANTIENE
+            // ---------------------------
             if (update_values?.qty) {
                 if (update_values.qty <= 0) {
                     await transaction.rollback();
                     res.status(400).json({
-                        validation: "The production order quantity must be"
-                            + "greater than 0"
+                        validation: "The production order quantity must be greater than 0"
                     });
                     return;
                 }
@@ -594,8 +896,7 @@ class ProductionOrdersController {
                         await transaction.rollback();
                         res.status(400).json({
                             validation: `There are no units available for production order. `
-                                + `All quantities for this order have already `
-                                + `produced.`
+                                + `All quantities for this order have already produced.`
                         });
                         return;
                     }
@@ -603,9 +904,8 @@ class ProductionOrdersController {
                         await transaction.rollback();
                         res.status(400).json({
                             validation: `The quantity entered (${update_values.qty}) exceeds the `
-                                + `remaining available units for this order.`
-                                + ` Only ${new_qty} units are left`
-                                + ` to produce.`
+                                + `remaining available units for this order. `
+                                + `Only ${new_qty} units are left to produce.`
                         });
                         return;
                     }
@@ -637,16 +937,13 @@ class ProductionOrdersController {
                 });
                 if (!(response.length > 0)) {
                     res.status(404).json({
-                        validation: "No productions found linked to "
-                            + "this production order."
+                        validation: "No productions found linked to this production order."
                     });
                     return;
                 }
                 const productionOrder = response[0].toJSON();
-                console.log("diobar revisa", productionOrder);
                 const finished = Number(productionOrder?.production_breakdown?.finished || 0);
                 const totalOrder = Number(productionOrder.qty);
-                console.log("diobar revisa", finished, totalOrder);
                 if (finished < totalOrder) {
                     res.status(400).json({
                         validation: `Cannot complete the production order. `
@@ -657,16 +954,7 @@ class ProductionOrdersController {
                 }
             }
             if (location) {
-                console.log("******************************************************************************");
-                console.log(location);
-                console.log("******************************************************************************");
-                console.log(location.id, relationship.order_id, location.name);
-                console.log(relationship);
                 const responsedasdasd = await InternalProductProductionOrderModel.findByPk(relationship.order_id, { transaction });
-                console.log("Registro encontrado ******************************************************************************");
-                console.log(responsedasdasd?.toJSON());
-                console.log("******************************************************************************");
-                console.log(relationship);
                 const responseUpdateInternalProductProductionOrder = await InternalProductProductionOrderModel.update({
                     location_id: location.id,
                     location_name: location.name,
@@ -674,12 +962,10 @@ class ProductionOrdersController {
                     where: { id: relationship.order_id },
                     transaction
                 });
-                console.log(`actualizo registro de internal_product_production_order`);
-                console.log(responseUpdateInternalProductProductionOrder[0]);
             }
             if (production_line) {
                 if (relationship.order_type === 'client') {
-                    const responseUpdatePurchaseOrderProductLocationProductionLine = await PurchasedOrdersProductsLocationsProductionLinesModel.update({
+                    await PurchasedOrdersProductsLocationsProductionLinesModel.update({
                         production_line_id: production_line.id,
                     }, {
                         where: {
@@ -689,14 +975,14 @@ class ProductionOrdersController {
                     });
                 }
                 else {
-                    const responseUpdateInternalProductionOrderLineProduct = await InternalProductionOrderLineProductModel.update({
+                    await InternalProductionOrderLineProductModel.update({
                         production_line_id: production_line.id
                     }, {
                         where: { internal_product_production_order_id: relationship.order_id },
                         transaction
                     });
                 }
-                const inventoryMovement = await InventoryMovementModel.update({
+                await InventoryMovementModel.update({
                     location_id: location.id,
                     location_name: location.name
                 }, {
@@ -706,22 +992,13 @@ class ProductionOrdersController {
                             ? 'Production Order'
                             : 'Internal Production Order'
                     },
-                    transaction: transaction
-                });
-                const validateProductionLineQueue = await ProductionLineQueueModel.findOne({
-                    where: {
-                        production_line_id: production_line.id,
-                        production_order_id: id
-                    },
                     transaction
                 });
-                // 1️⃣ Bloquear todas las filas de la línea de producción
                 await ProductionLineQueueModel.findAll({
                     where: { production_line_id: production_line.id },
                     lock: transaction.LOCK.UPDATE,
                     transaction
                 });
-                // 1️⃣ Bloquear todas las filas de la línea de producción
                 const maxPosition = await ProductionLineQueueModel.max("position", {
                     where: { production_line_id: production_line.id },
                     transaction
@@ -734,8 +1011,6 @@ class ProductionOrdersController {
                     where: { production_order_id: relationship.order_id },
                     transaction
                 });
-                console.log(`actualizo registro de production_line_queue`);
-                console.log(responseUpdateQueue[0]);
                 if (responseUpdateQueue[0] === 0) {
                     await transaction.rollback();
                     res.status(400).json({
@@ -744,29 +1019,41 @@ class ProductionOrdersController {
                     return;
                 }
             }
-            console.log("******************************************************************************");
-            console.log(id);
-            console.log(update_values);
-            console.log("******************************************************************************");
-            const response = await ProductionOrderModel.update(update_values, {
+            const responseUpdate = await ProductionOrderModel.update(update_values, {
                 where: { id: id },
                 individualHooks: true,
                 transaction
             });
-            console.log("******************************************************************************");
-            console.log(response);
-            console.log(response[0]);
-            console.log("******************************************************************************");
-            if (!(response[0] > 0)) {
+            if (!(responseUpdate[0] > 0)) {
                 await transaction.rollback();
                 res.status(400).json({
                     validation: "No changes were made to the production order"
                 });
                 return;
             }
+            // ---------------------------
+            // COMMIT
+            // ---------------------------
             await transaction.commit();
             isSuccessfully = true;
-            console.log("exitoso");
+            // ---------------------------
+            // FIX: EJECUTAR SPs DESPUÉS DEL COMMIT
+            // ---------------------------
+            if (orderType === 'client' && body.qty) {
+                await sequelize.query(`CALL sp_update_movement_inventory_po_pop_update_fix(:id, :qty, :product_id, :product_name)`, {
+                    replacements: {
+                        id: id,
+                        qty: qty,
+                        product_id: product.id,
+                        product_name: product.name,
+                    },
+                });
+            }
+            if (body.status === 'completed') {
+                await sequelize.query(`CALL sp_validate_queue_po_after_completed(:id)`, {
+                    replacements: { id }
+                });
+            }
             res.status(200).json({
                 message: "Production order updated successfully"
             });
@@ -778,32 +1065,6 @@ class ProductionOrdersController {
             }
             else {
                 console.error(`An unexpected error occurred: ${error}`);
-            }
-        }
-        finally {
-            console.log("finally");
-            if (isSuccessfully) {
-                if (orderType === 'client' && body.qty) {
-                    await sequelize.query(`CALL sp_update_movement_inventory_po_pop_update_fix(:id, :qty, :product_id, :product_name)`, {
-                        replacements: {
-                            id: id,
-                            qty: qty,
-                            product_id: product.id,
-                            product_name: product.name,
-                        },
-                    });
-                }
-                console.log(body.status);
-                if (body.status === 'completed') {
-                    console.log("******************************************************************************");
-                    console.log(`Se actualizo la cola `);
-                    console.log("******************************************************************************");
-                    await sequelize.query(`CALL sp_validate_queue_po_after_completed(:id)`, {
-                        replacements: {
-                            id: id
-                        },
-                    });
-                }
             }
         }
     };

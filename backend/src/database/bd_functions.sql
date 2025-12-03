@@ -1,4 +1,5 @@
-USE u482698715_shau_erp;
+-- USE u482698715_shau_erp;
+USE brgb5sc7hqlfhh7m;
 /**/
 DROP FUNCTION IF EXISTS asign_production_line;
 DELIMITER //
@@ -625,23 +626,41 @@ END //
 DELIMITER ;
 
 
--- DROP FUNCTION IF EXISTS func_generate_next_purchase_order_code;
+DROP FUNCTION IF EXISTS func_generate_next_purchase_order_code;
 DELIMITER //
 CREATE FUNCTION func_generate_next_purchase_order_code()
 RETURNS VARCHAR(100)
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE v_next_code VARCHAR(100);
-	SELECT 
-		CONCAT('PO-', AUTO_INCREMENT)
-	INTO v_next_code
-	FROM INFORMATION_SCHEMA.TABLES
-	WHERE TABLE_NAME = 'purchased_orders'
-  	AND TABLE_SCHEMA = DATABASE();
-	RETURN v_next_code;
+    DECLARE v_ai BIGINT DEFAULT NULL;
+    DECLARE v_fallback BIGINT DEFAULT NULL;
+    DECLARE v_next_code VARCHAR(100);
+
+    -- 1) Intentar obtener AUTO_INCREMENT
+    SELECT AUTO_INCREMENT
+    INTO v_ai
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_NAME = 'purchased_orders'
+      AND TABLE_SCHEMA = DATABASE()
+    LIMIT 1;
+
+    -- 2) Si falla, usar fallback manual (MAX(id) + 1)
+    IF v_ai IS NULL THEN
+        SELECT IFNULL(MAX(id), 0) + 1
+        INTO v_fallback
+        FROM purchased_orders;
+
+        SET v_ai = v_fallback;
+    END IF;
+
+    -- 3) Construir código seguro
+    SET v_next_code = CONCAT('PO-', v_ai);
+
+    RETURN v_next_code;
 END //
 DELIMITER ;
+
 
 -- DROP FUNCTION IF EXISTS func_generate_next_shipping_order_code;
 DELIMITER //

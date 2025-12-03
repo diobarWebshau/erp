@@ -3,7 +3,7 @@ import PurchasedOrderController from "../controllers/PurchasedOrders.controller.
 import { Router } from "express";
 const createPurchasedOrderRouter = () => {
     const purchasedOrderRouter = Router();
-    purchasedOrderRouter.get("/", PurchasedOrderController.getAll);
+    purchasedOrderRouter.get("/exclude", PurchasedOrderController.getPurchasedOrderByExcludeIds);
     purchasedOrderRouter.get("/id/:id", PurchasedOrderController.getById);
     purchasedOrderRouter.get("/ids", PurchasedOrderController.getByIds);
     purchasedOrderRouter.get("/like/:filter", PurchasedOrderController.getByLike);

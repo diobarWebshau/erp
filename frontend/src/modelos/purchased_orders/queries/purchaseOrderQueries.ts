@@ -6,13 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 const RELATIVE_PATH = "production/purchased-orders/";
 const API_URL = new URL(RELATIVE_PATH, API_BASE_URL);
 
-
-const fetchPurchasedOrdersFromDB = async ({
-    dispatch,
-    like,
-    conditionsExclude,
-    signal
-}: {
+const fetchPurchasedOrdersFromDB = async ({ dispatch, like, conditionsExclude, signal }: {
     dispatch: AppDispatchRedux,
     like?: string,
     conditionsExclude?: IPartialPurchasedOrder,
@@ -193,7 +187,7 @@ const getAllDetailsPurchasedOrderByIdInDB = async (
     id: number
 ): Promise<IPurchasedOrder[]> => {
     try {
-        const response = await fetch(`${API_URL}/details/${id}`, {
+        const response = await fetch(`${API_URL}details/${id}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         });
@@ -261,7 +255,7 @@ const createBatchPurchasedOrderInDB = async (
     dispatch: AppDispatchRedux
 ): Promise<IPartialPurchasedOrder | null> => {
     try {
-        const response = await fetch(`${API_URL}/batch`, {
+        const response = await fetch(`${API_URL}batch`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),

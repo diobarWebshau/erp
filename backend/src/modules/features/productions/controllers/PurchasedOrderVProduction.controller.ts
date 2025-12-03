@@ -1,5 +1,4 @@
 import {
-    validatePartialSafeParseAsync,
     validateSafeParseAsync
 } from "../../../features/productions/schemas/PurchaseOrderProduct.schema.js";
 import SalesControllers
@@ -22,7 +21,6 @@ import {
 import {
     Op,
     QueryTypes,
-    Sequelize,
     Transaction
 } from "sequelize";
 import {
@@ -503,13 +501,13 @@ class PurchasedOrdersVProduction extends SalesControllers.PurchasedOrderControll
                 purchase_order_products,
             } = req.body;
 
-            const objectOrderCode: { order_code: string }[] =
-                await sequelize.query(
-                    `SELECT func_generate_next_purchase_order_code() `
-                    + `AS order_code;`, {
+            const objectOrderCode: { order_code: string }[] = await sequelize.query(
+                `SELECT func_generate_next_purchase_order_code() AS order_code;`,
+                {
                     type: QueryTypes.SELECT,
                     transaction
-                });
+                }
+            );
 
             const orderCode =
                 objectOrderCode[0].order_code;
@@ -1355,7 +1353,7 @@ class PurchasedOrdersVProduction extends SalesControllers.PurchasedOrderControll
                                     newProductsToOrders, { transaction }
                                 );
                         console.log('Bandera 1');
-                            if (!responseCreatePops) {
+                        if (!responseCreatePops) {
                             await transaction.rollback();
                             res.status(200).json({
                                 validation:
@@ -1507,7 +1505,9 @@ class PurchasedOrdersVProduction extends SalesControllers.PurchasedOrderControll
             }
             res.status(200).json({ message: "Purchased order deleted successfully" });
         } catch (error: unknown) {
+            console.log(error)
             if (error instanceof Error) {
+                console.log(error)
                 next(error);
             } else {
                 console.error(`An unexpected error ocurred ${error}`);;

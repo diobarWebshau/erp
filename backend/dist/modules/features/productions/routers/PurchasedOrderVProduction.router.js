@@ -3,7 +3,7 @@ import PurchasedOrdersVProduction from "../controllers/PurchasedOrderVProduction
 import { Router } from "express";
 const createPurchasedOrderVProductionRouter = () => {
     const purchasedOrderRouter = Router();
-    purchasedOrderRouter.get("/", PurchasedOrdersVProduction.getAll);
+    purchasedOrderRouter.get("/", PurchasedOrdersVProduction.getPurchasedOrderByExcludeIds);
     purchasedOrderRouter.get("/id/:id", PurchasedOrdersVProduction.getById);
     purchasedOrderRouter.get("/client/:client_id", PurchasedOrdersVProduction.getByClientId);
     purchasedOrderRouter.get("/ids", PurchasedOrdersVProduction.getByIds);

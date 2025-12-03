@@ -1,6 +1,6 @@
 import ProductsControllers from "../../../core/products/controllers/index.js";
 import ImageHandler from "../../../../classes/ImageHandler.js";
-import { ProductModel, ProcessModel, InputModel, ProductDiscountRangeModel, ProductInputModel, ProductProcessModel, ProductInputProcessModel, } from "../../../associations.js";
+import { ProductModel, ProcessModel, InputModel, ProductDiscountRangeModel, ProductInputModel, ProductProcessModel, ProductInputProcessModel } from "../../../associations.js";
 import { Op, QueryTypes, Transaction } from "sequelize";
 import sequelize from "../../../../mysql/configSequelize.js";
 import { formatImagesDeepRecursive } from "../../../../scripts/formatWithBase64.js";
@@ -1563,13 +1563,24 @@ class ProductVProductionController extends ProductsControllers.ProductController
     static getInfoBestLocationOfProduct = async (req, res, next) => {
         const { id } = req.params;
         try {
-            const response = await sequelize.query(`SELECT funct_get_info_location_stock_product(:id)`
-                + ` AS info_best_location`, {
+            // --------------------------
+            // 3. Query tipado correctamente
+            // --------------------------
+            const response = await sequelize.query(`SELECT funct_get_info_location_stock_product(:id) AS info_best_location`, {
                 replacements: { id },
                 type: QueryTypes.SELECT
             });
-            const data = response[0].info_best_location;
-            console.log(data);
+            // --------------------------
+            // 4. Obtener el string crudo
+            // --------------------------
+            const raw = response[0]?.info_best_location;
+            // --------------------------
+            // 5. Parsear JSON solo si no es null
+            // --------------------------
+            const data = raw ? JSON.parse(raw) : null;
+            // --------------------------
+            // 6. Enviar la respuesta
+            // --------------------------
             res.status(200).json(data);
         }
         catch (error) {
@@ -1577,8 +1588,8 @@ class ProductVProductionController extends ProductsControllers.ProductController
                 next(error);
             }
             else {
-                console.error(`An unexpected error ocurred ` +
-                    `${error}`);
+                console.error(`Unexpected error: ${error}`);
+                next(new Error(String(error)));
             }
         }
     };

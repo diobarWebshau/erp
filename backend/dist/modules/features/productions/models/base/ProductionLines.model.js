@@ -13,7 +13,7 @@ class ProductionLineModel extends Model {
 }
 ProductionLineModel.init({
     id: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },

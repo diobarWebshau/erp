@@ -1,6 +1,7 @@
 import type { ColumnDef, ColumnFiltersState, PaginationState, Row, RowModel, RowSelectionState, SortingState, Table, Updater, VisibilityState } from "@tanstack/react-table";
 import { getCoreRowModel, getExpandedRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { set_row_selection, set_sorting, set_column_visibility, set_column_filters, set_pagination } from "./tableActions"
+import { restrictToFirstScrollableAncestor, restrictToParentElement } from "@dnd-kit/modifiers";
 import PopoverFloating from "../../../external/floating/pop-over/PopoverFloating";
 import equalsBooleanFilter from "../filters/boolean/equalsBooleanFilter";
 import betweenNumberFilter from "../filters/number/betweenNumberFilter";
@@ -21,7 +22,6 @@ import useDndSensors from "./dnd-kit/useDndSensors";
 import useDndTableRows from "./dnd-kit/useDndTableRows";
 import { closestCenter } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
-import { restrictToFirstScrollableAncestor, restrictToParentElement } from "@dnd-kit/modifiers";
 
 interface TableBaseProps<T> {
     modelName: string;

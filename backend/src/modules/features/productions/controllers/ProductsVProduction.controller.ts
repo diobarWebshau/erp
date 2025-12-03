@@ -1,19 +1,10 @@
-import ProductsControllers
-    from "../../../core/products/controllers/index.js";
-import ImageHandler
-    from "../../../../classes/ImageHandler.js";
+import ProductsControllers from "../../../core/products/controllers/index.js";
+import ImageHandler from "../../../../classes/ImageHandler.js";
 import {
-    ProductModel, ProcessModel,
-    InputModel,
-    ProductDiscountRangeModel,
-    ProductInputModel,
-    ProductProcessModel,
-    ProductInputProcessModel,
+    ProductModel, ProcessModel, InputModel, ProductDiscountRangeModel,
+    ProductInputModel, ProductProcessModel, ProductInputProcessModel
 } from "../../../associations.js";
-import {
-    Request, Response,
-    NextFunction
-} from "express";
+import { Request, Response, NextFunction } from "express";
 import {
     Op,
     QueryTypes,
@@ -819,10 +810,10 @@ class ProductVProductionController extends ProductsControllers.ProductController
             // ** ACTUALIZAMOS ATRIBUTOS DIRECTOS DEL PRODUCTO
 
             console.log('update', update_values);
-            
+
             if (Object.keys(update_values).length > 0) {
                 console.log('entro a actualizar');
-                
+
                 // ? Validamos que el name sea unico
                 if (update_values?.name) {
                     const validateName =
@@ -834,41 +825,41 @@ class ProductVProductionController extends ProductsControllers.ProductController
                                 ]
                             }
                         });
-                        if (validateName) {
-                            await transaction.rollback();
-                            if (productBody?.photo)
-                                await ImageHandler.removeImageIfExists(productBody.photo);
-                            res.status(200).json({
-                                validation: normalizeValidationArray([
-                                    `The name is already currently in `
-                                    + ` use by a product`
-                                ])
-                            });
-                            return;
-                        }
+                    if (validateName) {
+                        await transaction.rollback();
+                        if (productBody?.photo)
+                            await ImageHandler.removeImageIfExists(productBody.photo);
+                        res.status(200).json({
+                            validation: normalizeValidationArray([
+                                `The name is already currently in `
+                                + ` use by a product`
+                            ])
+                        });
+                        return;
                     }
-                    
-                    // ? Validamos que el sku sea unico
+                }
+
+                // ? Validamos que el sku sea unico
                 if (update_values?.sku) {
                     const validateSku =
-                    await ProductModel.findOne({
-                        where: {
-                            [Op.and]: [
-                                { sku: update_values.sku },
-                                { id: { [Op.ne]: id } }
-                            ]
-                        }
-                    });
+                        await ProductModel.findOne({
+                            where: {
+                                [Op.and]: [
+                                    { sku: update_values.sku },
+                                    { id: { [Op.ne]: id } }
+                                ]
+                            }
+                        });
                     if (validateSku) {
                         await transaction.rollback();
                         if (productBody?.photo)
                             await ImageHandler.removeImageIfExists(productBody.photo);
                         res.status(200).json({
                             validation:
-                            normalizeValidationArray([
-                                `The sku is already currently in use`
-                                + ` by a product`
-                            ])
+                                normalizeValidationArray([
+                                    `The sku is already currently in use`
+                                    + ` by a product`
+                                ])
                         });
                         return;
                     }
@@ -879,12 +870,12 @@ class ProductVProductionController extends ProductsControllers.ProductController
                     IsupdateImage = true;
                     if (product.photo) urlImageOld = product.photo;
                 }
-                
+
                 // ? Si se actualiza, el estatus, lo casteamos
                 if (update_values?.active) {
                     update_values.active = toBoolean(update_values.active);
                 }
-                
+
                 // console.log(`update_values `, update_values);
                 // console.log(`id`, id)
                 // ? Actualizamos el registro del modelo
@@ -892,7 +883,7 @@ class ProductVProductionController extends ProductsControllers.ProductController
                     where: { id },
                     transaction: transaction
                 });
-                
+
                 // ? validamos
                 if (!affectedCount) {
                     await transaction.rollback();
@@ -902,17 +893,17 @@ class ProductVProductionController extends ProductsControllers.ProductController
                     });
                     return;
                 }
-                
+
                 console.log('salgod');
             }
-            
+
             // ** ACTUALIZAMOS RELACIONES CON PROCESOS
             if (productBody.product_processes_updated) {
-                
+
                 const productProcessesObject: ProductProcessManager = productBody.product_processes_updated
-                
+
                 // console.log(productProcessesObject);
-                
+
                 // ? Validamos que exista por lo menos un cambio
                 const flagProccessUpdate = [
                     productProcessesObject.added,
@@ -1864,47 +1855,70 @@ class ProductVProductionController extends ProductsControllers.ProductController
                 await ImageHandler.removeImageIfExists(urlImageOld);
         }
     }
-
     static getInfoBestLocationOfProduct = async (
         req: Request,
         res: Response,
         next: NextFunction
     ) => {
         const { id } = req.params;
+
         try {
+            // --------------------------
+            // 1. Interface del objeto final
+            // --------------------------
             interface InfoBestLocation {
-                location_id: number,
-                location_name: string,
-                available: number,
-                product_id: number,
-                product_name: string
+                location_id: number;
+                location_name: string;
+                available: number;
+                product_id: number;
+                product_name: string;
             }
 
-            const response: { info_best_location: InfoBestLocation }[] =
-                await sequelize.query(
-                    `SELECT funct_get_info_location_stock_product(:id)`
-                    + ` AS info_best_location`, {
+            // --------------------------
+            // 2. Tipo correcto del row devuelto por MySQL
+            //    (la función JSON SIEMPRE regresa string)
+            // --------------------------
+            type RawRow = {
+                info_best_location: string | null;
+            };
+
+            // --------------------------
+            // 3. Query tipado correctamente
+            // --------------------------
+            const response = await sequelize.query<RawRow>(
+                `SELECT funct_get_info_location_stock_product(:id) AS info_best_location`,
+                {
                     replacements: { id },
                     type: QueryTypes.SELECT
-                });
+                }
+            );
 
-            const data: InfoBestLocation =
-                response[0].info_best_location;
+            // --------------------------
+            // 4. Obtener el string crudo
+            // --------------------------
+            const raw = response[0]?.info_best_location;
 
-            console.log(data);
+            // --------------------------
+            // 5. Parsear JSON solo si no es null
+            // --------------------------
+            const data: InfoBestLocation | null =
+                raw ? JSON.parse(raw) : null;
 
+            // --------------------------
+            // 6. Enviar la respuesta
+            // --------------------------
             res.status(200).json(data);
+
         } catch (error) {
             if (error instanceof Error) {
-                next(error)
+                next(error);
             } else {
-                console.error(
-                    `An unexpected error ocurred ` +
-                    `${error}`
-                );
+                console.error(`Unexpected error: ${error}`);
+                next(new Error(String(error)));
             }
         }
-    }
+    };
+
 
     static getProductDetails = async (
         req: Request,

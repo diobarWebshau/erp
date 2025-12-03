@@ -454,8 +454,7 @@ class PurchasedOrdersVProduction extends SalesControllers.PurchasedOrderControll
         let isSuccess = false;
         try {
             const { delivery_date, status, client_id, client_address_id, total_price, created_at, purchase_order_products, } = req.body;
-            const objectOrderCode = await sequelize.query(`SELECT func_generate_next_purchase_order_code() `
-                + `AS order_code;`, {
+            const objectOrderCode = await sequelize.query(`SELECT func_generate_next_purchase_order_code() AS order_code;`, {
                 type: QueryTypes.SELECT,
                 transaction
             });
@@ -1217,7 +1216,9 @@ class PurchasedOrdersVProduction extends SalesControllers.PurchasedOrderControll
             res.status(200).json({ message: "Purchased order deleted successfully" });
         }
         catch (error) {
+            console.log(error);
             if (error instanceof Error) {
+                console.log(error);
                 next(error);
             }
             else {

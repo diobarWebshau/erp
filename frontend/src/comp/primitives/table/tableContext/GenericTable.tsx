@@ -25,7 +25,11 @@ interface GenericTableProps<T> {
     noResultsMessage?: string;
     onRowSelectionChangeExternal?: (selected: T[], table?: Table<T>) => void;
     conditionalRowSelection?: (updater: RowSelectionState, rows: Row<T>[]) => boolean;
-    extraComponents?: ({ table, state, dispatch }: { table: Table<T>, state: TableState, dispatch: Dispatch<TableAction> }) => React.ReactNode;
+    extraComponents?: (args: {
+        table?: Table<T>;
+        state?: TableState;
+        dispatch?: Dispatch<TableAction>;
+    }) => React.ReactNode,
     footerComponents?: (table: Table<T>) => React.ReactNode;
     classNameGenericTableContainer?: string;
     classNameTableContainer?: string;

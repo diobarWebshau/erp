@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import StyleModule
     from "./Step1.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     useAddModalProductionOrderDispatch,
     useAddModalProductionOrderState
@@ -73,7 +73,7 @@ const Step1 = ({
 
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] =
         useState<IPurchasedOrder | null>(
-            state.data?.purchase_order  ?? null
+            state.data?.purchase_order ?? null
         );
     const [openDropDownSelectPurchaseOrder, setOpenDropDownSelectPurchaseOrder] =
         useState(false);
@@ -153,8 +153,6 @@ const Step1 = ({
         locationsProducedProduct,
         loadingLocationsProducedProduct,
     } = useLocationsProducedOneProduct(selectedProduct?.id ?? null);
-
-
 
 
     const handleOnClickButtonNext = () => {
@@ -267,18 +265,21 @@ const Step1 = ({
     const hadnleOnChangePurchaseOrder = (purchaseOrder: IPurchasedOrder | null | undefined) => {
         if (purchaseOrder) {
             setSelectedPurchaseOrder(purchaseOrder);
-            setValidationForm((prev) => ({
+            setValidationForm(prev => ({
                 ...prev,
                 purchase_order: null,
             }));
-        } else {
-            purchaseOrder === null &&
-                setValidationForm((prev) => ({
-                    ...prev,
-                    purchase_order: "Por favor, selecciona una orden de compra",
-                }));
+            return;
         }
+
+        // Si llega null o undefined
+        setSelectedPurchaseOrder(null);
+        setValidationForm(prev => ({
+            ...prev,
+            purchase_order: "Por favor, selecciona una orden de compra",
+        }));
     };
+
 
     const hadnleOnChangeQuantity = (e: React.ChangeEvent<HTMLInputElement>) => {
         const quantitys = e.target.value;
@@ -311,13 +312,26 @@ const Step1 = ({
         }
     };
 
+    const returnValidProductsOfPurchaseOrder = useCallback(() => {
+        return selectedPurchaseOrder?.purchase_order_products?.filter(
+            (product) => {
+                const originalQty = product.production_summary?.purchased_order_product_qty ?? 0;
+                const productionOrderQty = product.production_summary?.production_order_qty ?? 0;
+                const productionQty = product.production_summary?.production_qty ?? 0;
+                if (productionQty + productionOrderQty < originalQty) {
+                    return product.product;
+                }
+            }
+        ) as IProduct[] ?? [];
+    }, [selectedPurchaseOrder]);
+
     useEffect(() => {
         if (orderType === "Si, ligar a una orden de venta") {
             setProductsOfPurchaseOrder(
                 returnValidProductsOfPurchaseOrder()
             );
         }
-    }, [selectedPurchaseOrder]);
+    }, [selectedPurchaseOrder, orderType, returnValidProductsOfPurchaseOrder]);
 
     useEffect(() => {
         if (isFirstRender.current) {
@@ -341,18 +355,7 @@ const Step1 = ({
         setQuantity(undefined);
     }, [orderType]);
 
-    const returnValidProductsOfPurchaseOrder = () => {
-        return selectedPurchaseOrder?.purchase_order_products?.filter(
-            (product) => {
-                const originalQty = product.production_summary?.purchased_order_product_qty ?? 0;
-                const productionOrderQty = product.production_summary?.production_order_qty ?? 0;
-                const productionQty = product.production_summary?.production_qty ?? 0;
-                if (productionQty + productionOrderQty < originalQty) {
-                    return product.product;
-                }
-            }
-        ) as IProduct[] ?? [];
-    };
+
 
     const validateQtyProductsOfPurchaseOrder = (
         product: IProduct,

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    .custom-select {
+      position: relative;
+      width: 200px;
+    }
+
+    .toggle {
+      padding: 10px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: white;
+    }
+
+    .options {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      border: 1px solid #ccc;
+      background: white;
+    }
+
+    .options.active {
+      display: block;
+    }
+
+    .option {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .option:hover {
+      background: #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="custom-select" id="select">
+    <div class="toggle" id="toggle">Selecciona una opción</div>
+    <div class="options" id="options">
+      <div class="option">Opción 1</div>
+      <div class="option">Opción 2</div>
+      <div class="option">Opción 3</div>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('toggle');
+    const options = document.getElementById('options');
+
+    toggle.addEventListener('click', () => {
+      options.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        toggle.textContent = opt.textContent;
+        options.classList.remove('active');
+      });
+    });
+
+    // 👉 Abre automáticamente cuando se carga la página
+    window.addEventListener('DOMContentLoaded', () => {
+      options.classList.add('active');
+    });
+  </script>
+</body>
+</html>

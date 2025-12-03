@@ -157,13 +157,29 @@ class ProductController {
                 { sku: { [Op.like]: `${filter}%` } },
             ];
         }
-        if (ids.length > 0) {
+        if (ids.length > 0)
             where.id = { [Op.notIn]: ids };
-        }
         try {
             const results = await ProductModel.findAll({
                 where: where,
-                attributes: ProductModel.getAllFields()
+                include: [
+                    {
+                        model: ProductDiscountRangeModel,
+                        as: "product_discount_ranges",
+                        attributes: ProductDiscountRangeModel.getAllFields(),
+                    },
+                ],
+                attributes: [
+                    ...ProductModel.getAllFields(),
+                    [
+                        sequelize2.literal("funct_get_stock_available_of_pop_on_location(`ProductModel`.`id`)"),
+                        "stock_available"
+                    ],
+                    [
+                        sequelize2.literal("funct_get_info_location_stock_product(`ProductModel`.`id`)"),
+                        "summary_location"
+                    ]
+                ],
             });
             if (!(results.length > 0)) {
                 res.status(200).json([]);
@@ -173,12 +189,10 @@ class ProductController {
             res.status(200).json(products);
         }
         catch (error) {
-            if (error instanceof Error) {
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
+            else
                 console.error(`An unexpected error occurred: ${error}`);
-            }
         }
     };
     static getByName = async (req, res, next) => {

@@ -4,28 +4,21 @@ import { Op } from "sequelize";
 import { AppliedProductDiscountClientModel, AppliedProductDiscountRangeModel, ProductDiscountClientModel, PurchaseOrderProductModel } from "../associations.js";
 import sequelize from "sequelize";
 class PurchasedOrderController {
-    static getAll = async (req, res, next) => {
-        const { filter, ...rest } = req.query;
-        // 1) Filtro por texto (opcional)
+    static getPurchasedOrderByExcludeIds = async (req, res, next) => {
+        const raw = req.query.excludeIds;
+        const filter = req.query.filter;
+        const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+        const ids = arr.map(Number).filter(Number.isFinite);
         const where = {};
-        if (filter && filter.trim()) {
-            const f = `${filter}%`;
+        if (filter !== "" && filter !== undefined) {
             where[Op.or] = [
-                { order_code: { [Op.like]: f } },
-                { company_name: { [Op.like]: f } },
-                { email: { [Op.like]: f } },
-                { phone: { [Op.like]: f } },
+                { name: { [Op.like]: `${filter}%` } },
+                { description: { [Op.like]: `${filter}%` } },
+                { sku: { [Op.like]: `${filter}%` } },
             ];
         }
-        // 2) Exclusiones: TODO lo que venga en `rest`
-        const excludePerField = Object.fromEntries(Object.entries(rest)
-            .filter(([, v]) => v !== undefined)
-            .map(([k, v]) => [
-            k,
-            Array.isArray(v) ? { [Op.notIn]: v } : { [Op.ne]: v }
-        ]));
-        // Combina (AND implícito)
-        Object.assign(where, excludePerField);
+        if (ids.length > 0)
+            where.id = { [Op.notIn]: ids };
         try {
             const response = await PurchasedOrderModel.findAll({
                 ...(Object.keys(where).length ? { where } : {}),
@@ -99,12 +92,10 @@ class PurchasedOrderController {
                                 model: PurchasedOrderModel,
                                 as: "purchase_order",
                                 attributes: PurchasedOrderModel.getAllFields(),
-                                include: [
-                                    {
+                                include: [{
                                         all: true, // esto trae TODO el árbol de relaciones de PurchasedOrderModel
                                         // nested: true // esto trae todas relaciones de PurchasedOrderModel y a la vez todas las relaciones de las relaciones
-                                    }
-                                ]
+                                    }]
                             },
                             {
                                 model: PurchasedOrdersProductsLocationsProductionLinesModel,
@@ -163,12 +154,10 @@ class PurchasedOrderController {
             res.status(200).json(purchasedOrder);
         }
         catch (error) {
-            if (error instanceof Error) {
+            if (error instanceof Error)
                 next(error);
-            }
-            else {
+            else
                 console.error(`An unexpected error ocurred ${error}`);
-            }
         }
     };
     static getById = async (req, res, next) => {

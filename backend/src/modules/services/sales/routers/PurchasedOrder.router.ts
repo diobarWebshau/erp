@@ -6,8 +6,8 @@ import { Router } from "express";
 
 const createPurchasedOrderRouter = (): Router => {
     const purchasedOrderRouter = Router();
-    purchasedOrderRouter.get("/",
-        PurchasedOrderController.getAll);
+    purchasedOrderRouter.get("/exclude",
+        PurchasedOrderController.getPurchasedOrderByExcludeIds);
     purchasedOrderRouter.get("/id/:id",
         PurchasedOrderController.getById);
     purchasedOrderRouter.get("/ids",

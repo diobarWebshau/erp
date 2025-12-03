@@ -184,8 +184,13 @@ class ProductionLineQueueController {
             const tempGap = 1000;
             const updates = [];
             productionOrders.forEach((item, index) => {
-                const tempPosition = (index + 1) * tempGap; // temporalmente lejos para no chocar
-                updates.push({ id: item.production_order_id, position: tempPosition });
+                if (item.production_order_id == null)
+                    return; // ← narrowing seguro
+                const tempPosition = (index + 1) * tempGap;
+                updates.push({
+                    id: item.production_order_id,
+                    position: tempPosition
+                });
             });
             // 3️⃣ Actualizar todas las posiciones temporales en batch
             for (const u of updates) {
@@ -377,9 +382,11 @@ class ProductionLineQueueController {
         // Validaciones básicas
         if (!Number.isFinite(production_line_id)) {
             res.status(400).json({ message: "production_line_id inválido" });
+            return; // ← NECESARIO
         }
         if (!Array.isArray(productionOrders) || productionOrders.length === 0) {
             res.status(400).json({ message: "productionOrders debe ser un arreglo no vacío" });
+            return; // ← NECESARIO
         }
         // Normalizar IDs del payload y validar duplicados/numéricos
         const incomingIds = [];
@@ -387,10 +394,16 @@ class ProductionLineQueueController {
         for (const it of productionOrders) {
             const id = Number(it?.production_order_id);
             if (!Number.isFinite(id)) {
-                res.status(400).json({ message: "Todos los production_order_id deben ser numéricos" });
+                res.status(400).json({
+                    message: "Todos los production_order_id deben ser numéricos"
+                });
+                return; // ← NECESARIO
             }
             if (seen.has(id)) {
-                res.status(400).json({ message: "IDs duplicados en productionOrders" });
+                res.status(400).json({
+                    message: "IDs duplicados en productionOrders"
+                });
+                return; // ← NECESARIO
             }
             seen.add(id);
             incomingIds.push(id);
@@ -399,7 +412,7 @@ class ProductionLineQueueController {
             isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ
         });
         try {
-            // 1) Leer y BLOQUEAR la cola actual (consistencia y evitar carreras)
+            // 1) Leer y BLOQUEAR la cola actual
             const currentRows = await ProductionLineQueueModel.findAll({
                 where: { production_line_id },
                 attributes: ["production_order_id", "position"],
@@ -409,67 +422,66 @@ class ProductionLineQueueController {
             });
             const currentIds = currentRows.map(r => Number(r.get("production_order_id")));
             const currentSet = new Set(currentIds);
-            // 2) Validar pertenencia de TODOS los incomingIds a la línea
+            // 2) Validar pertenencia de TODOS los incomingIds
             for (const id of incomingIds) {
                 if (!currentSet.has(id)) {
                     await transaction.rollback();
                     res.status(400).json({
                         message: `El ID ${id} no pertenece a la línea ${production_line_id}`
                     });
+                    return; // ← NECESARIO
                 }
             }
-            // 3) Construir el ORDEN FINAL según el modo
+            // 3) Construir ORDEN FINAL
             let finalOrder = [];
             if (MODE === "full") {
-                // Estricto: deben coincidir exactamente conjuntos y cardinalidad
                 if (incomingIds.length !== currentIds.length) {
                     await transaction.rollback();
                     res.status(400).json({
                         message: "En modo 'full' debes enviar TODOS los IDs de la cola (misma longitud)."
                     });
+                    return; // ← NECESARIO
                 }
-                // Mismo conjunto (sin importar orden)
                 const incomingSet = new Set(incomingIds);
-                if (incomingSet.size !== currentSet.size || [...incomingSet].some(id => !currentSet.has(id))) {
+                if (incomingSet.size !== currentSet.size ||
+                    [...incomingSet].some(id => !currentSet.has(id))) {
                     await transaction.rollback();
                     res.status(400).json({
                         message: "En modo 'full' los IDs enviados deben coincidir EXACTAMENTE con los IDs de la cola."
                     });
+                    return; // ← NECESARIO
                 }
-                // Orden final = el orden recibido
                 finalOrder = incomingIds.slice();
             }
             else {
-                // "partial": subset adelante en el orden recibido + resto preservando orden relativo actual
                 const incomingSet = new Set(incomingIds);
-                const remaining = currentIds.filter(id => !incomingSet.has(id)); // mantiene orden relativo original
+                const remaining = currentIds.filter(id => !incomingSet.has(id));
                 finalOrder = [...incomingIds, ...remaining];
             }
-            // 4) Crear tabla temporal y poblarla con (production_order_id, new_position)
+            // 4) Crear tabla temporal
             await sequelize.query(`
             DROP TEMPORARY TABLE IF EXISTS tmp_line_positions;
             CREATE TEMPORARY TABLE tmp_line_positions (
               production_order_id BIGINT UNSIGNED PRIMARY KEY,
               new_position INT NOT NULL
             ) ENGINE=MEMORY;
-          `, { transaction });
-            // Inserción por lotes para no topar max_allowed_packet en colas grandes
+        `, { transaction });
+            // Lotes
             const batchSize = 2000;
             for (let i = 0; i < finalOrder.length; i += batchSize) {
                 const slice = finalOrder.slice(i, i + batchSize);
                 const valuesSql = slice.map(() => "(?, ?)").join(", ");
                 const replacements = [];
                 slice.forEach((id, idx) => {
-                    const globalIndex = i + idx; // 0..N-1
-                    const pos = (globalIndex + 1) * GAP; // 10, 20, 30...
+                    const pos = (i + idx + 1) * GAP;
                     replacements.push(id, pos);
                 });
                 await sequelize.query(`
-                INSERT INTO tmp_line_positions (production_order_id, new_position)
-                VALUES ${valuesSql};
-              `, { transaction, replacements });
+                    INSERT INTO tmp_line_positions (production_order_id, new_position)
+                    VALUES ${valuesSql};
+                `, { transaction, replacements });
             }
-            // 5) Un solo UPDATE con JOIN: renumeramos TODA la cola → sin colisiones en UNIQUE(position)
+            // 5) Update final con JOIN
             await sequelize.query(`
               UPDATE production_line_queue q
               JOIN tmp_line_positions t
@@ -477,12 +489,18 @@ class ProductionLineQueueController {
               SET q.position = t.new_position
               WHERE q.production_line_id = ?;
             `, { transaction, replacements: [production_line_id] });
-            // Limpieza explícita (opcional)
             await sequelize.query(`DROP TEMPORARY TABLE IF EXISTS tmp_line_positions;`, { transaction });
             await transaction.commit();
-            // Armar respuesta (id, position)
-            const updated = finalOrder.map((id, i) => ({ id, position: (i + 1) * GAP }));
-            res.status(200).json({ message: "Queue reordered successfully", mode: MODE, updated });
+            // Respuesta final
+            const updated = finalOrder.map((id, i) => ({
+                id,
+                position: (i + 1) * GAP
+            }));
+            res.status(200).json({
+                message: "Queue reordered successfully",
+                mode: MODE,
+                updated
+            });
         }
         catch (error) {
             try {

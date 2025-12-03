@@ -204,11 +204,8 @@ class ProductController {
             const products = results.map((p) => p.toJSON());
             res.status(200).json(products);
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                next(error);
-            } else {
-                console.error(`An unexpected error occurred: ${error}`);
-            }
+            if (error instanceof Error) next(error);
+            else console.error(`An unexpected error occurred: ${error}`);
         }
     };
 

@@ -1,0 +1,93 @@
+.container {
+    /* dimension */
+    width: 100%;
+    height: 100%;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1.5rem;
+
+    padding: 2rem;
+
+    /* estilos */
+    /* estilos */
+    background-color: var(--color-theme-background);
+    border-radius: 20px;
+
+
+}
+
+
+/* *************** Header *************** */
+
+.headerSection {
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    /* distribuccion box */
+}
+
+.headerSection>h2 {
+    /* estilos */
+    font-family: inherit;
+    font-size: 24px;
+    color: var(--color-theme-primary);
+}
+
+
+
+/* *************** Form *************** */
+
+.formSection {
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+
+}
+
+
+/* *************** Body *************** */
+
+.bodySection {
+    /* dimension */
+    flex: 1;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    /* estilos */
+}
+
+
+/* *************** Footer *************** */
+
+.footerSection {
+    /* dimension */
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: auto;
+
+    /* distribucion flex */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+}

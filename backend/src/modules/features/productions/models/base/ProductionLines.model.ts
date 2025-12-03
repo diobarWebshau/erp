@@ -1,18 +1,7 @@
-import sequelize
-    from "../../../../../mysql/configSequelize.js";
-import {
-    Model,
-    Optional,
-    DataTypes
-} from "sequelize";
-import {
-    LocationsProductionLinesCreateAttributes,
-    LocationsProductionLinesManager
-} from "../junctions/locations-production-lines.model.js";
-import {
-    ProductionLineProductCreateAttributes,
-    ProductionLineProductManager
-} from "../junctions/production_lines-products.model.js";
+import { LocationsProductionLinesCreateAttributes, LocationsProductionLinesManager } from "../junctions/locations-production-lines.model.js";
+import { ProductionLineProductCreateAttributes, ProductionLineProductManager } from "../junctions/production_lines-products.model.js";
+import sequelize from "../../../../../mysql/configSequelize.js";
+import { Model, Optional, DataTypes } from "sequelize";
 
 interface ProductionLineAttributes {
     id: number,
@@ -28,14 +17,9 @@ interface ProductionLineAttributes {
     production_lines_products_updated?: ProductionLineProductManager
 }
 
-interface ProductionLineCreationAttributes
-    extends Optional<ProductionLineAttributes,
-        "id" | "is_active" |
-        "created_at" | "updated_at"> { }
+type ProductionLineCreationAttributes = Partial<ProductionLineAttributes>;
 
-class ProductionLineModel extends
-    Model<ProductionLineAttributes,
-        ProductionLineCreationAttributes> {
+class ProductionLineModel extends Model<ProductionLineAttributes, ProductionLineCreationAttributes> {
     static getEditableFields(): string[] {
         return ['name', "is_active", "custom_id"];
     }
@@ -47,39 +31,38 @@ class ProductionLineModel extends
     }
 }
 
-ProductionLineModel.init(
-    {
-        id: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        custom_id: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            unique: true,
-        },
-        name: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            unique: true,
-        },
-        is_active: {
-            type: DataTypes.TINYINT,
-            defaultValue: 1,
-            allowNull: false
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-            allowNull: false
-        },
-        updated_at: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-            allowNull: false
-        }
+ProductionLineModel.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
     },
+    custom_id: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true,
+    },
+    name: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true,
+    },
+    is_active: {
+        type: DataTypes.TINYINT,
+        defaultValue: 1,
+        allowNull: false
+    },
+    created_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        allowNull: false
+    },
+    updated_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        allowNull: false
+    }
+},
     {
         sequelize,
         tableName: "production_lines",

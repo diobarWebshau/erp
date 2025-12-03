@@ -49,8 +49,8 @@ class ClientController {
                     },
                 ]
             });
-            if (!(response.length > 0)) {
-                res.status(200).json({ validation: "Clients no found" });
+            if (!(response.length)) {
+                res.status(200).json([]);
                 return;
             }
             const clients = response.map(c => c.toJSON());
